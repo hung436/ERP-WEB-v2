@@ -430,9 +430,9 @@ function EvaluationWorkspace({
                   onClick={() => void persist(true)}
                 >
                   {mode === 'self'
-                    ? 'Gửi phiếu tự đánh giá'
+                    ? 'Gửi phiếu'
                     : mode === 'council'
-                    ? 'Chốt kết quả Hội đồng'
+                    ? 'Chốt kết quả'
                     : 'Hoàn tất chấm điểm'}
                 </Button>
               </div>
@@ -447,7 +447,7 @@ function EvaluationWorkspace({
 
       {/* Note Modal */}
       <Modal
-        title="Ghi chú & Minh chứng tiêu chí"
+        title="Ghi chú tiêu chí"
         open={Boolean(noteCriterion)}
         onOk={saveNote}
         onCancel={() => setNoteCriterionId(null)}

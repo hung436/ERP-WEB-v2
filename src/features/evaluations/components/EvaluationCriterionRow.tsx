@@ -1,5 +1,5 @@
 import { Button, InputNumber, Tooltip } from 'antd';
-import { useMemo } from 'react';
+import { useEffect, useState } from 'react';
 
 import type { EvaluationCriterion, EvaluationLevel, EvaluationStage } from '@/types/evaluation';
 
@@ -11,6 +11,11 @@ const stageLabels: Record<EvaluationStage, string> = {
   council: 'Hội đồng',
   published: 'Đã công bố',
 };
+
+const findLevel = (criterion: EvaluationCriterion) =>
+  criterion.levels?.find(
+    (level) => criterion.score !== null && criterion.score >= level.min && criterion.score <= level.max
+  ) ?? null;
 
 export function EvaluationCriterionRow({
   criterion,
@@ -27,20 +32,25 @@ export function EvaluationCriterionRow({
   onScoreChange: (score: number | null) => void;
   onOpenNote: () => void;
 }) {
-  const activeLevel = useMemo(() => {
-    if (!criterion.levels) return null;
-    return criterion.levels.find((level) => criterion.score !== null && criterion.score >= level.min && criterion.score <= level.max) ?? null;
-  }, [criterion.levels, criterion.score]);
+  const [selectedLevel, setSelectedLevel] = useState<EvaluationLevel | null>(findLevel(criterion));
+
+  useEffect(() => {
+    const matched = findLevel(criterion);
+    if (matched) {
+      setSelectedLevel(matched);
+    }
+  }, [criterion.score, criterion.levels]);
 
   const systemLocked = criterion.type === 'system';
-  const scoreLocked = readOnly || systemLocked;
-  const minimum = activeLevel?.min ?? criterion.min;
-  const maximum = activeLevel?.max ?? criterion.max;
+  const scoreLocked = readOnly || systemLocked || Boolean(criterion.levels && !selectedLevel);
+  const minimum = selectedLevel?.min ?? criterion.min;
+  const maximum = selectedLevel?.max ?? criterion.max;
 
   const chooseLevel = (level: EvaluationLevel) => {
     if (readOnly || systemLocked) return;
+    setSelectedLevel(level);
     if (criterion.score === null || criterion.score < level.min || criterion.score > level.max) {
-      onScoreChange(level.max);
+      onScoreChange(null);
     }
   };
 
@@ -84,7 +94,7 @@ export function EvaluationCriterionRow({
             aria-label={`Mức đánh giá: ${criterion.title}`}
           >
             {criterion.levels.map((level) => {
-              const isSelected = activeLevel?.label === level.label;
+              const isSelected = selectedLevel?.label === level.label;
               return (
                 <button
                   key={level.label}
@@ -147,4 +157,5 @@ export function EvaluationCriterionRow({
     </article>
   );
 }
+
 
