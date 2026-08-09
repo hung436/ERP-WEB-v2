@@ -6,26 +6,66 @@ export const evaluationPeriods: EvaluationPeriod[] = [
 ];
 
 const numberCriterion = (id: string, groupId: string, title: string, max = 5, score: number | null = null) => ({ id, groupId, title, type: 'number' as const, min: 0, max, score });
-const choiceCriterion = (id: string, groupId: string, title: string, max: number, score: number | null = null) => ({
-  id, groupId, title, type: 'choice' as const, min: 0, max, score,
-  levels: [
-    { label: 'Chưa hoàn thành', min: 0, max: Math.round(max * .49) },
-    { label: 'Hoàn thành', min: Math.round(max * .5), max: Math.round(max * .79) },
-    { label: 'Hoàn thành tốt', min: Math.round(max * .8), max },
+const choiceCriterion = (
+  id: string,
+  groupId: string,
+  title: string,
+  max: number,
+  score: number | null = null,
+  customLevels?: { label: string; min: number; max: number }[]
+) => ({
+  id,
+  groupId,
+  title,
+  type: 'choice' as const,
+  min: 0,
+  max,
+  score,
+  levels: customLevels ?? [
+    { label: 'Chưa hoàn thành', min: 0, max: Math.round(max * 0.49) },
+    { label: 'Hoàn thành', min: Math.round(max * 0.5), max: Math.round(max * 0.79) },
+    { label: 'Hoàn thành tốt', min: Math.round(max * 0.8), max },
   ],
 });
 
 const baseGroups: EvaluationGroup[] = [
-  { id: 'duties', title: 'I. Thực hiện chức trách, nhiệm vụ', kind: 'normal', criteria: [
-    choiceCriterion('d1', 'duties', 'Thực hiện nhiệm vụ chuyên môn', 45, 38),
-    choiceCriterion('d2', 'duties', 'Bảo đảm chất lượng và tiến độ công việc được giao', 30, 24),
-    choiceCriterion('d3', 'duties', 'Chủ động đề xuất giải pháp nâng cao hiệu quả công việc', 20, 16),
-    numberCriterion('d4', 'duties', 'Khả năng xử lý công việc độc lập và chịu trách nhiệm về kết quả', 10, 8),
-    numberCriterion('d5', 'duties', 'Mức độ hoàn thành kế hoạch công tác trong quý', 10, 8),
-    numberCriterion('d6', 'duties', 'Hiệu quả sử dụng thời gian và nguồn lực được giao', 5, 4),
-    numberCriterion('d7', 'duties', 'Thực hiện chế độ báo cáo và cập nhật tiến độ công việc', 5, null),
-    numberCriterion('d8', 'duties', 'Khả năng thích ứng và xử lý nhiệm vụ phát sinh', 5, null),
-  ] },
+  {
+    id: 'duties',
+    title: 'I. Thực hiện chức trách, nhiệm vụ',
+    kind: 'normal',
+    criteria: [
+      choiceCriterion(
+        'd1',
+        'duties',
+        'Thực hiện nhiệm vụ chuyên môn theo đúng kế hoạch, phân công của lãnh đạo ban và quy trình xuất bản tin bài của tòa soạn',
+        45,
+        38,
+        [
+          { label: 'Chưa hoàn thành chỉ tiêu được giao hoặc để xảy ra sai sót nghiệp vụ', min: 0, max: 22 },
+          { label: 'Hoàn thành khối lượng công việc được giao đúng tiến độ và chất lượng yêu cầu', min: 23, max: 36 },
+          { label: 'Hoàn thành tốt toàn bộ nhiệm vụ, có bài viết chất lượng cao hoặc sáng kiến', min: 37, max: 45 },
+        ]
+      ),
+      choiceCriterion(
+        'd2',
+        'duties',
+        'Bảo đảm chất lượng tin bài, kiểm tra tính chính xác của số liệu và tiến độ xuất bản được giao',
+        30,
+        24,
+        [
+          { label: 'Cần cải thiện tốc độ xử lý', min: 0, max: 14 },
+          { label: 'Đảm bảo chất lượng và đúng tiến độ cam kết', min: 15, max: 23 },
+          { label: 'Chất lượng xuất sắc, hoàn thành trước thời hạn', min: 24, max: 30 },
+        ]
+      ),
+      choiceCriterion('d3', 'duties', 'Chủ động đề xuất giải pháp nâng cao hiệu quả công việc chuyên môn và ứng dụng công nghệ mới', 20, 16),
+      numberCriterion('d4', 'duties', 'Khả năng xử lý công việc độc lập, phối hợp liên phòng ban và chịu trách nhiệm về kết quả cuối cùng', 10, 8),
+      numberCriterion('d5', 'duties', 'Mức độ hoàn thành các chỉ tiêu kế hoạch công tác được duyệt trong quý', 10, 8),
+      numberCriterion('d6', 'duties', 'Hiệu quả sử dụng thời gian, nguồn lực và trang thiết bị làm việc được giao', 5, 4),
+      numberCriterion('d7', 'duties', 'Thực hiện nghiêm túc chế độ báo cáo định kỳ và cập nhật tiến độ công việc trên hệ thống', 5, null),
+      numberCriterion('d8', 'duties', 'Khả năng thích ứng, linh hoạt xử lý các sự cố hoặc nhiệm vụ phát sinh ngoài kế hoạch', 5, null),
+    ],
+  },
   { id: 'compliance', title: 'II. Chấp hành pháp luật, quy chế cơ quan', kind: 'normal', criteria: [
     numberCriterion('c1', 'compliance', 'Chấp hành pháp luật và nội quy của cơ quan', 5, 5),
     numberCriterion('c2', 'compliance', 'Thực hiện đầy đủ quy trình và quy chế chuyên môn', 5, 4),

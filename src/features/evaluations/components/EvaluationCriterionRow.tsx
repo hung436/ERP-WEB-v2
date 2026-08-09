@@ -69,7 +69,9 @@ export function EvaluationCriterionRow({
       {/* Col 2: Title & History */}
       <div className="title-content">
         <div className="title-heading-wrap">
-          <h4>{criterion.title}</h4>
+          <Tooltip title={criterion.title} mouseEnterDelay={0.4}>
+            <h4>{criterion.title}</h4>
+          </Tooltip>
           {isUnlimited && <span className="badge-unlimited">Điểm mở</span>}
         </div>
 

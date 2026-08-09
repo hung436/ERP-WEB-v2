@@ -556,8 +556,9 @@
 
 .evaluation-compact-row .level-btn {
   min-width: 105px;
-  height: 38px;
-  padding: 4px 10px;
+  min-height: 38px;
+  height: auto;
+  padding: 6px 10px;
   display: flex;
   flex-direction: column;
   justify-content: center;
