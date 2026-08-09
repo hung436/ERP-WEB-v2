@@ -59,112 +59,112 @@ export function EvaluationCriterionRow({
 
   return (
     <article
-      className={`evaluation-stream-row evaluation-criterion-card${isAnswered ? ' answered' : ''}${
+      className={`evaluation-stream-row evaluation-compact-row${isAnswered ? ' answered' : ''}${
         hasLevels ? ' has-levels' : ' no-levels'
       }`}
     >
-      {/* Row 1: Title, History (Left) & Note Button (Top Right - Always aligned) */}
-      <div className="card-top-row">
-        <div className="card-title-group">
-          <span className="card-index-badge">{String(order).padStart(2, '0')}</span>
-          <div className="title-content">
-            <div className="title-heading-wrap">
-              <h4>{criterion.title}</h4>
-              {isUnlimited && <span className="badge-unlimited">Điểm mở</span>}
-            </div>
+      {/* Col 1: Index Badge */}
+      <span className="card-index-badge">{String(order).padStart(2, '0')}</span>
 
-            {previousStages.length > 0 && (
-              <div className="evaluation-row-history" aria-label={`Lịch sử điểm: ${criterion.title}`}>
-                {previousStages.map((stage) => {
-                  const val = criterion.stageScores?.[stage];
-                  return (
-                    <span key={stage} className={`history-pill stage-${stage}`}>
-                      <small>{stageLabels[stage]}</small>
-                      <strong>{val !== undefined && val !== null ? `${val} đ` : '—'}</strong>
-                    </span>
-                  );
-                })}
-              </div>
-            )}
-          </div>
+      {/* Col 2: Title & History */}
+      <div className="title-content">
+        <div className="title-heading-wrap">
+          <h4>{criterion.title}</h4>
+          {isUnlimited && <span className="badge-unlimited">Điểm mở</span>}
         </div>
 
-        {/* Top Right: Note Action Button (Always fixed at top-right corner of Row 1!) */}
-        <div className="card-corner-action">
-          <Tooltip title={criterion.note ? `Ghi chú: ${criterion.note}` : 'Thêm ghi chú/minh chứng'}>
-            <Button
-              className={`evaluation-note-button${criterion.note ? ' has-note' : ''}`}
-              disabled={readOnly}
-              onClick={onOpenNote}
-            >
-              <span className="btn-icon" aria-hidden="true">{criterion.note ? '✓' : '📝'}</span>
-              <span>{criterion.note ? 'Đã ghi chú' : 'Ghi chú'}</span>
-            </Button>
-          </Tooltip>
+        {previousStages.length > 0 && (
+          <div className="evaluation-row-history" aria-label={`Lịch sử điểm: ${criterion.title}`}>
+            {previousStages.map((stage) => {
+              const val = criterion.stageScores?.[stage];
+              return (
+                <span key={stage} className={`history-pill stage-${stage}`}>
+                  <small>{stageLabels[stage]}</small>
+                  <strong>{val !== undefined && val !== null ? `${val} đ` : '—'}</strong>
+                </span>
+              );
+            })}
+          </div>
+        )}
+      </div>
 
-          {criterion.note && (
-            <div className="note-card-preview" title={criterion.note}>
-              <span className="note-pin" aria-hidden="true">📌</span>
-              <span className="note-content">{criterion.note}</span>
-            </div>
-          )}
+      {/* Col 3: Level Options OR Direct Score Hint Tag */}
+      <div className="card-options-col">
+        {hasLevels ? (
+          <div
+            className="evaluation-level-inline"
+            role="radiogroup"
+            aria-label={`Mức đánh giá: ${criterion.title}`}
+          >
+            {criterion.levels!.map((level) => {
+              const isSelected = selectedLevel?.label === level.label;
+              return (
+                <Tooltip
+                  key={level.label}
+                  title={`${level.label} (${level.min}–${level.max} điểm)`}
+                  mouseEnterDelay={0.3}
+                >
+                  <button
+                    type="button"
+                    role="radio"
+                    aria-checked={isSelected}
+                    className={`level-btn${isSelected ? ' selected' : ''}`}
+                    disabled={readOnly}
+                    onClick={() => chooseLevel(level)}
+                  >
+                    <strong className="level-label">{level.label}</strong>
+                    <small className="level-range">{level.min}–{level.max} điểm</small>
+                  </button>
+                </Tooltip>
+              );
+            })}
+          </div>
+        ) : (
+          <span className="direct-score-tag">
+            ⚡ {isUnlimited ? 'Nhập điểm mở' : `Nhập điểm trực tiếp (${criterion.min}–${criterion.max} đ)`}
+          </span>
+        )}
+      </div>
+
+      {/* Col 4: Score Input Box */}
+      <div className="card-score-col">
+        <div className="evaluation-score-inline">
+          <label htmlFor={`evaluation-score-${criterion.id}`}>Điểm</label>
+          <InputNumber
+            id={`evaluation-score-${criterion.id}`}
+            aria-label={`Nhập điểm: ${criterion.title}`}
+            min={minimum}
+            max={maximum}
+            precision={0}
+            controls
+            disabled={scoreLocked}
+            value={criterion.score}
+            onChange={onScoreChange}
+            placeholder={isUnlimited ? 'Nhập điểm' : `${minimum}–${maximum}`}
+          />
+          {!isUnlimited && <span className="score-max">/ {criterion.max}</span>}
         </div>
       </div>
 
-      {/* Row 2: Level Options (Left) & Score Input Box (Bottom Right - Always aligned) */}
-      <div className="card-bottom-row">
-        <div className="card-bottom-left-options">
-          {hasLevels && (
-            <div
-              className="evaluation-level-inline"
-              role="radiogroup"
-              aria-label={`Mức đánh giá: ${criterion.title}`}
-            >
-              {criterion.levels!.map((level) => {
-                const isSelected = selectedLevel?.label === level.label;
-                return (
-                  <Tooltip
-                    key={level.label}
-                    title={`${level.label} (${level.min}–${level.max} điểm)`}
-                    mouseEnterDelay={0.3}
-                  >
-                    <button
-                      type="button"
-                      role="radio"
-                      aria-checked={isSelected}
-                      className={`level-btn${isSelected ? ' selected' : ''}`}
-                      disabled={readOnly}
-                      onClick={() => chooseLevel(level)}
-                    >
-                      <strong className="level-label">{level.label}</strong>
-                      <small className="level-range">{level.min}–{level.max} điểm</small>
-                    </button>
-                  </Tooltip>
-                );
-              })}
-            </div>
-          )}
-        </div>
+      {/* Col 5: Note Action Button */}
+      <div className="card-note-col">
+        <Tooltip title={criterion.note ? `Ghi chú: ${criterion.note}` : 'Thêm ghi chú/minh chứng'}>
+          <Button
+            className={`evaluation-note-button${criterion.note ? ' has-note' : ''}`}
+            disabled={readOnly}
+            onClick={onOpenNote}
+          >
+            <span className="btn-icon" aria-hidden="true">{criterion.note ? '✓' : '📝'}</span>
+            <span>{criterion.note ? 'Đã ghi chú' : 'Ghi chú'}</span>
+          </Button>
+        </Tooltip>
 
-        {/* Bottom Right: Score Input Box (Always fixed at bottom-right corner of Row 2!) */}
-        <div className="card-bottom-right-scoring">
-          <div className="evaluation-score-inline">
-            <label htmlFor={`evaluation-score-${criterion.id}`}>Điểm</label>
-            <InputNumber
-              id={`evaluation-score-${criterion.id}`}
-              aria-label={`Nhập điểm: ${criterion.title}`}
-              min={minimum}
-              max={maximum}
-              precision={0}
-              controls
-              disabled={scoreLocked}
-              value={criterion.score}
-              onChange={onScoreChange}
-              placeholder={isUnlimited ? 'Nhập điểm' : `${minimum}–${maximum}`}
-            />
-            {!isUnlimited && <span className="score-max">/ {criterion.max}</span>}
+        {criterion.note && (
+          <div className="note-card-preview" title={criterion.note}>
+            <span className="note-pin" aria-hidden="true">📌</span>
+            <span className="note-content">{criterion.note}</span>
           </div>
-        </div>
+        )}
       </div>
     </article>
   );
