@@ -112,13 +112,14 @@
 }
 
 .flat-tab-btn .tab-icon {
-  font-size: 15px;
-  line-height: 1;
-  opacity: 0.85;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: inherit;
+  transition: color 0.15s ease;
 }
 
 .flat-tab-btn.active .tab-icon {
-  opacity: 1;
   color: #d92d20;
 }
 

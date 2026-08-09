@@ -11,10 +11,37 @@ import '@/features/evaluations/evaluation-workspace.css';
 
 type EvaluationMode = 'self' | 'scoring' | 'council';
 
+const UserIcon = ({ size = 16 }: { size?: number }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+    <circle cx="12" cy="7" r="4" />
+  </svg>
+);
+
+const TeamIcon = ({ size = 16 }: { size?: number }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M17 21v-2a4 4 0 0 0-3-3.87" />
+    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+    <path d="M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2" />
+    <circle cx="12" cy="7" r="4" />
+  </svg>
+);
+
+const CouncilIcon = ({ size = 16 }: { size?: number }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <line x1="3" y1="21" x2="21" y2="21" />
+    <line x1="6" y1="18" x2="6" y2="11" />
+    <line x1="10" y1="18" x2="10" y2="11" />
+    <line x1="14" y1="18" x2="14" y2="11" />
+    <line x1="18" y1="18" x2="18" y2="11" />
+    <polygon points="12 3 2 9 22 9 12 3" />
+  </svg>
+);
+
 const modeOptions = [
-  { value: 'self', label: 'Phiếu của tôi', icon: '👤', tag: 'Cá nhân', tagClass: 'tag-self' },
-  { value: 'scoring', label: 'Chấm nhân viên', icon: '👥', tag: 'Quản lý', tagClass: 'tag-scoring' },
-  { value: 'council', label: 'Hội đồng đánh giá', icon: '🏛️', tag: 'Hội đồng', tagClass: 'tag-council' },
+  { value: 'self', label: 'Phiếu của tôi', icon: <UserIcon /> },
+  { value: 'scoring', label: 'Chấm nhân viên', icon: <TeamIcon /> },
+  { value: 'council', label: 'Hội đồng đánh giá', icon: <CouncilIcon /> },
 ];
 
 const stageOrder: EvaluationStage[] = ['self', 'deputy', 'manager', 'editorial', 'council'];
