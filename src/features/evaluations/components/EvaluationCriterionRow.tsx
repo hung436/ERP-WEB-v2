@@ -132,9 +132,7 @@ export function EvaluationCriterionRow({
             onChange={onScoreChange}
             placeholder={isUnlimited ? 'Nhập điểm' : `${minimum}–${maximum}`}
           />
-          <span className="score-max">
-            {isUnlimited ? 'điểm (Không trần)' : `/ ${criterion.max}`}
-          </span>
+          {!isUnlimited && <span className="score-max">/ {criterion.max}</span>}
         </div>
       </div>
 
