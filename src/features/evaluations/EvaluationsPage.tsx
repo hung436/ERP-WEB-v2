@@ -396,7 +396,6 @@ function EvaluationWorkspace({
             <div className="evaluation-overview-metric highlight-score">
               <small>Tổng điểm hiện tại</small>
               <strong className="live-score">{totalScore(draft)}</strong>
-              <span className="live-tag">⚡ Cập nhật tức thì</span>
             </div>
 
             <div className="evaluation-overview-metric">
