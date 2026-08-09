@@ -433,7 +433,7 @@
   border-radius: 6px;
 }
 
-/* 6. Smart Criterion Card Layout */
+/* 6. Uniform 2-Row Criterion Card Layout */
 .evaluation-criterion-card {
   display: flex;
   flex-direction: column;
@@ -455,7 +455,7 @@
   border-left: 4px solid #12b76a;
 }
 
-/* Card Top Row: Title, History, Score (if no levels) & Corner Note Action */
+/* Row 1: Header (Title + History on Left, Corner Note Button on Right) */
 .card-top-row {
   display: flex;
   align-items: flex-start;
@@ -542,14 +542,6 @@
   font-weight: 600;
 }
 
-/* Top Right Score Box (When NO levels -> level with question!) */
-.card-top-right-scoring {
-  display: flex;
-  align-items: center;
-  flex-shrink: 0;
-}
-
-/* Corner Note Action (Top Right Corner of Card) */
 .card-corner-action {
   display: flex;
   flex-direction: column;
@@ -558,7 +550,7 @@
   flex-shrink: 0;
 }
 
-/* Card Bottom Row (Only when HAS levels -> Options on left, Score box on right level with options!) */
+/* Row 2: Level Options (Left) & Score Input Box (Bottom Right - Fixed 100% Alignment!) */
 .card-bottom-row {
   display: flex;
   align-items: center;
@@ -569,9 +561,12 @@
   width: 100%;
 }
 
-.card-bottom-row .evaluation-level-inline {
+.card-bottom-left-options {
   flex: 1;
   min-width: 0;
+}
+
+.card-bottom-left-options .evaluation-level-inline {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
@@ -581,6 +576,7 @@
   display: flex;
   align-items: center;
   flex-shrink: 0;
+  margin-left: auto;
 }
 
 .evaluation-level-inline .level-btn {

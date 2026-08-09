@@ -63,7 +63,7 @@ export function EvaluationCriterionRow({
         hasLevels ? ' has-levels' : ' no-levels'
       }`}
     >
-      {/* Top Header Row: Title, History & Top-Right Corner Note Action */}
+      {/* Row 1: Title, History (Left) & Note Button (Top Right - Always aligned) */}
       <div className="card-top-row">
         <div className="card-title-group">
           <span className="card-index-badge">{String(order).padStart(2, '0')}</span>
@@ -89,29 +89,7 @@ export function EvaluationCriterionRow({
           </div>
         </div>
 
-        {/* If NO levels: Score box is also in the top row, aligned with title! */}
-        {!hasLevels && (
-          <div className="card-top-right-scoring">
-            <div className="evaluation-score-inline">
-              <label htmlFor={`evaluation-score-${criterion.id}`}>Điểm</label>
-              <InputNumber
-                id={`evaluation-score-${criterion.id}`}
-                aria-label={`Nhập điểm: ${criterion.title}`}
-                min={minimum}
-                max={maximum}
-                precision={0}
-                controls
-                disabled={scoreLocked}
-                value={criterion.score}
-                onChange={onScoreChange}
-                placeholder={isUnlimited ? 'Nhập điểm' : `${minimum}–${maximum}`}
-              />
-              {!isUnlimited && <span className="score-max">/ {criterion.max}</span>}
-            </div>
-          </div>
-        )}
-
-        {/* Corner Note Action Button */}
+        {/* Top Right: Note Action Button (Always fixed at top-right corner of Row 1!) */}
         <div className="card-corner-action">
           <Tooltip title={criterion.note ? `Ghi chú: ${criterion.note}` : 'Thêm ghi chú/minh chứng'}>
             <Button
@@ -133,58 +111,61 @@ export function EvaluationCriterionRow({
         </div>
       </div>
 
-      {/* Bottom Row (Only if HAS levels): Options on Left, Score Box on Right (Ngang với phương án)! */}
-      {hasLevels && (
-        <div className="card-bottom-row">
-          <div
-            className="evaluation-level-inline"
-            role="radiogroup"
-            aria-label={`Mức đánh giá: ${criterion.title}`}
-          >
-            {criterion.levels!.map((level) => {
-              const isSelected = selectedLevel?.label === level.label;
-              return (
-                <Tooltip
-                  key={level.label}
-                  title={`${level.label} (${level.min}–${level.max} điểm)`}
-                  mouseEnterDelay={0.3}
-                >
-                  <button
-                    type="button"
-                    role="radio"
-                    aria-checked={isSelected}
-                    className={`level-btn${isSelected ? ' selected' : ''}`}
-                    disabled={readOnly}
-                    onClick={() => chooseLevel(level)}
+      {/* Row 2: Level Options (Left) & Score Input Box (Bottom Right - Always aligned) */}
+      <div className="card-bottom-row">
+        <div className="card-bottom-left-options">
+          {hasLevels && (
+            <div
+              className="evaluation-level-inline"
+              role="radiogroup"
+              aria-label={`Mức đánh giá: ${criterion.title}`}
+            >
+              {criterion.levels!.map((level) => {
+                const isSelected = selectedLevel?.label === level.label;
+                return (
+                  <Tooltip
+                    key={level.label}
+                    title={`${level.label} (${level.min}–${level.max} điểm)`}
+                    mouseEnterDelay={0.3}
                   >
-                    <strong className="level-label">{level.label}</strong>
-                    <small className="level-range">{level.min}–{level.max} điểm</small>
-                  </button>
-                </Tooltip>
-              );
-            })}
-          </div>
-
-          <div className="card-bottom-right-scoring">
-            <div className="evaluation-score-inline">
-              <label htmlFor={`evaluation-score-${criterion.id}`}>Điểm</label>
-              <InputNumber
-                id={`evaluation-score-${criterion.id}`}
-                aria-label={`Nhập điểm: ${criterion.title}`}
-                min={minimum}
-                max={maximum}
-                precision={0}
-                controls
-                disabled={scoreLocked}
-                value={criterion.score}
-                onChange={onScoreChange}
-                placeholder={isUnlimited ? 'Nhập điểm' : `${minimum}–${maximum}`}
-              />
-              {!isUnlimited && <span className="score-max">/ {criterion.max}</span>}
+                    <button
+                      type="button"
+                      role="radio"
+                      aria-checked={isSelected}
+                      className={`level-btn${isSelected ? ' selected' : ''}`}
+                      disabled={readOnly}
+                      onClick={() => chooseLevel(level)}
+                    >
+                      <strong className="level-label">{level.label}</strong>
+                      <small className="level-range">{level.min}–{level.max} điểm</small>
+                    </button>
+                  </Tooltip>
+                );
+              })}
             </div>
+          )}
+        </div>
+
+        {/* Bottom Right: Score Input Box (Always fixed at bottom-right corner of Row 2!) */}
+        <div className="card-bottom-right-scoring">
+          <div className="evaluation-score-inline">
+            <label htmlFor={`evaluation-score-${criterion.id}`}>Điểm</label>
+            <InputNumber
+              id={`evaluation-score-${criterion.id}`}
+              aria-label={`Nhập điểm: ${criterion.title}`}
+              min={minimum}
+              max={maximum}
+              precision={0}
+              controls
+              disabled={scoreLocked}
+              value={criterion.score}
+              onChange={onScoreChange}
+              placeholder={isUnlimited ? 'Nhập điểm' : `${minimum}–${maximum}`}
+            />
+            {!isUnlimited && <span className="score-max">/ {criterion.max}</span>}
           </div>
         </div>
-      )}
+      </div>
     </article>
   );
 }
