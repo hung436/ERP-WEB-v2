@@ -96,18 +96,23 @@ export function EvaluationCriterionRow({
             {criterion.levels.map((level) => {
               const isSelected = selectedLevel?.label === level.label;
               return (
-                <button
+                <Tooltip
                   key={level.label}
-                  type="button"
-                  role="radio"
-                  aria-checked={isSelected}
-                  className={`level-btn${isSelected ? ' selected' : ''}`}
-                  disabled={readOnly || systemLocked}
-                  onClick={() => chooseLevel(level)}
+                  title={`${level.label} (${level.min}–${level.max} điểm)`}
+                  mouseEnterDelay={0.3}
                 >
-                  <strong className="level-label">{level.label}</strong>
-                  <small className="level-range">{level.min}–{level.max} điểm</small>
-                </button>
+                  <button
+                    type="button"
+                    role="radio"
+                    aria-checked={isSelected}
+                    className={`level-btn${isSelected ? ' selected' : ''}`}
+                    disabled={readOnly || systemLocked}
+                    onClick={() => chooseLevel(level)}
+                  >
+                    <strong className="level-label">{level.label}</strong>
+                    <small className="level-range">{level.min}–{level.max} điểm</small>
+                  </button>
+                </Tooltip>
               );
             })}
           </div>

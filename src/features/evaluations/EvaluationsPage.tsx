@@ -10,7 +10,6 @@ import type { EvaluationCriterion, EvaluationPeriod, EvaluationSheet, Evaluation
 import '@/features/evaluations/evaluation-workspace.css';
 
 type EvaluationMode = 'self' | 'scoring' | 'council';
-type CriteriaFilter = 'all' | 'unscored' | 'scored' | 'has_note';
 
 const modeOptions = [
   { value: 'self', label: 'Phiếu của tôi' },
@@ -36,14 +35,6 @@ const statusLabels: Record<EvaluationSheet['status'], string> = {
   completed: 'Đã hoàn tất',
   published: 'Đã công bố',
 };
-
-const QUICK_NOTE_TAGS = [
-  'Hoàn thành xuất sắc chỉ tiêu được giao',
-  'Có đầy đủ tài liệu & số liệu đối chiếu',
-  'Đảm bảo đúng tiến độ và chất lượng',
-  'Cần tăng cường phối hợp liên phòng ban',
-  'Tiến độ đạt yêu cầu, cần cải thiện tốc độ xử lý',
-];
 
 const initials = (name: string) =>
   name.split(' ').slice(-2).map((part) => part[0]).join('').toUpperCase();
@@ -101,10 +92,6 @@ function EvaluationWorkspace({
   const [noteCriterionId, setNoteCriterionId] = useState<string | null>(null);
   const [noteValue, setNoteValue] = useState('');
 
-  // Search & Filter criteria states
-  const [searchQuery, setSearchQuery] = useState('');
-  const [criteriaFilter, setCriteriaFilter] = useState<CriteriaFilter>('all');
-
   useEffect(() => {
     const selected = availableSheets.find((sheet) => sheet.id === sheetId) ?? availableSheets[0] ?? null;
     setSheetId(selected?.id ?? '');
@@ -143,10 +130,6 @@ function EvaluationWorkspace({
     setNoteCriterionId(null);
   };
 
-  const addQuickTag = (tagText: string) => {
-    setNoteValue((prev) => (prev ? `${prev}\n- ${tagText}` : tagText));
-  };
-
   const persist = async (finish = false) => {
     if (!draft) return;
     setSaving(true);
@@ -170,30 +153,6 @@ function EvaluationWorkspace({
       setSaving(false);
     }
   };
-
-  // Group filtering logic
-  const filteredGroups = useMemo(() => {
-    if (!draft) return [];
-    const query = searchQuery.trim().toLowerCase();
-
-    return draft.groups
-      .map((group) => {
-        const matchedCriteria = group.criteria.filter((criterion) => {
-          // Search query match
-          const matchesQuery = !query || criterion.title.toLowerCase().includes(query);
-          if (!matchesQuery) return false;
-
-          // Status filter match
-          if (criteriaFilter === 'unscored') return criterion.score === null;
-          if (criteriaFilter === 'scored') return criterion.score !== null;
-          if (criteriaFilter === 'has_note') return Boolean(criterion.note);
-          return true;
-        });
-
-        return { ...group, criteria: matchedCriteria };
-      })
-      .filter((group) => group.criteria.length > 0);
-  }, [draft, searchQuery, criteriaFilter]);
 
   return (
     <div className="evaluation-workspace">
@@ -311,94 +270,46 @@ function EvaluationWorkspace({
             </section>
           )}
 
-          {/* Search & Filter Toolbar */}
-          <div className="evaluation-filter-toolbar">
-            <div className="toolbar-search">
-              <Input.Search
-                placeholder="Tìm kiếm tên tiêu chí đánh giá..."
-                allowClear
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-            <div className="toolbar-filters">
-              <button
-                type="button"
-                className={`filter-chip${criteriaFilter === 'all' ? ' active' : ''}`}
-                onClick={() => setCriteriaFilter('all')}
-              >
-                Tất cả ({criteria.length})
-              </button>
-              <button
-                type="button"
-                className={`filter-chip${criteriaFilter === 'unscored' ? ' active' : ''}`}
-                onClick={() => setCriteriaFilter('unscored')}
-              >
-                Chưa chấm ({criteria.length - answered})
-              </button>
-              <button
-                type="button"
-                className={`filter-chip${criteriaFilter === 'scored' ? ' active' : ''}`}
-                onClick={() => setCriteriaFilter('scored')}
-              >
-                Đã chấm ({answered})
-              </button>
-              <button
-                type="button"
-                className={`filter-chip${criteriaFilter === 'has_note' ? ' active' : ''}`}
-                onClick={() => setCriteriaFilter('has_note')}
-              >
-                Có ghi chú ({criteria.filter((c) => Boolean(c.note)).length})
-              </button>
-            </div>
-          </div>
-
           {/* Criteria Main Stream */}
           <section className="evaluation-stream" aria-label="Danh sách tiêu chí đánh giá">
-            {filteredGroups.length > 0 ? (
-              filteredGroups.map((group) => {
-                const groupAnswered = group.criteria.filter((c) => c.score !== null).length;
-                const groupScore = group.criteria.reduce((sum, c) => sum + (c.score ?? 0), 0);
+            {draft.groups.map((group) => {
+              const groupAnswered = group.criteria.filter((c) => c.score !== null).length;
+              const groupScore = group.criteria.reduce((sum, c) => sum + (c.score ?? 0), 0);
 
-                return (
-                  <section className="evaluation-stream-group" key={group.id}>
-                    <header>
-                      <div className="group-title-box">
-                        <span className={`kind-icon kind-${group.kind}`}>
-                          {group.kind === 'bonus' ? '+' : group.kind === 'deduction' ? '−' : '•'}
-                        </span>
-                        <div>
-                          <h2>{group.title}</h2>
-                          <p>
-                            Hoàn thành {groupAnswered}/{group.criteria.length} tiêu chí
-                          </p>
-                        </div>
+              return (
+                <section className="evaluation-stream-group" key={group.id}>
+                  <header>
+                    <div className="group-title-box">
+                      <span className={`kind-icon kind-${group.kind}`}>
+                        {group.kind === 'bonus' ? '+' : group.kind === 'deduction' ? '−' : '•'}
+                      </span>
+                      <div>
+                        <h2>{group.title}</h2>
+                        <p>
+                          Hoàn thành {groupAnswered}/{group.criteria.length} tiêu chí
+                        </p>
                       </div>
-                      <strong className="group-score-sum">
-                        Tổng nhóm: {groupScore} điểm
-                      </strong>
-                    </header>
-                    <div className="group-rows-container">
-                      {group.criteria.map((criterion) => (
-                        <EvaluationCriterionRow
-                          key={`${draft.id}-${criterion.id}`}
-                          criterion={criterion}
-                          order={criteria.findIndex((item) => item.id === criterion.id) + 1}
-                          previousStages={previousStages}
-                          readOnly={readOnly}
-                          onOpenNote={() => openNote(criterion)}
-                          onScoreChange={(score) => updateCriterion(criterion.id, { score })}
-                        />
-                      ))}
                     </div>
-                  </section>
-                );
-              })
-            ) : (
-              <div className="evaluation-no-results">
-                <Empty description="Không tìm thấy tiêu chí nào phù hợp với bộ lọc" />
-              </div>
-            )}
+                    <strong className="group-score-sum">
+                      Tổng nhóm: {groupScore} điểm
+                    </strong>
+                  </header>
+                  <div className="group-rows-container">
+                    {group.criteria.map((criterion) => (
+                      <EvaluationCriterionRow
+                        key={`${draft.id}-${criterion.id}`}
+                        criterion={criterion}
+                        order={criteria.findIndex((item) => item.id === criterion.id) + 1}
+                        previousStages={previousStages}
+                        readOnly={readOnly}
+                        onOpenNote={() => openNote(criterion)}
+                        onScoreChange={(score) => updateCriterion(criterion.id, { score })}
+                      />
+                    ))}
+                  </div>
+                </section>
+              );
+            })}
           </section>
 
           {/* Sticky Bottom Action Bar */}
@@ -467,27 +378,12 @@ function EvaluationWorkspace({
                 Ghi lại căn cứ, kết quả cụ thể, đường dẫn bài viết hoặc minh chứng cần lưu kèm tiêu chí này.
               </p>
 
-              <div className="quick-note-tags">
-                <span className="tags-label">Gợi ý nhanh:</span>
-                <div className="tags-list">
-                  {QUICK_NOTE_TAGS.map((tagText) => (
-                    <Tag
-                      key={tagText}
-                      className="quick-tag-item"
-                      onClick={() => addQuickTag(tagText)}
-                    >
-                      + {tagText}
-                    </Tag>
-                  ))}
-                </div>
-              </div>
-
               <Input.TextArea
                 aria-label="Nội dung ghi chú"
                 rows={6}
                 value={noteValue}
                 onChange={(e) => setNoteValue(e.target.value)}
-                placeholder="Nhập nội dung ghi chú hoặc nhấp chọn gợi ý nhanh trên..."
+                placeholder="Nhập nội dung ghi chú hoặc minh chứng..."
                 maxLength={2000}
                 showCount
               />
