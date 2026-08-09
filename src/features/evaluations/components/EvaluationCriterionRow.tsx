@@ -41,9 +41,10 @@ export function EvaluationCriterionRow({
     }
   }, [criterion.score, criterion.levels]);
 
+  const isUnlimited = !criterion.max || criterion.max === 0;
   const scoreLocked = readOnly || Boolean(criterion.levels && !selectedLevel);
   const minimum = selectedLevel?.min ?? criterion.min;
-  const maximum = selectedLevel?.max ?? criterion.max;
+  const maximum = isUnlimited ? undefined : (selectedLevel?.max ?? criterion.max);
 
   const chooseLevel = (level: EvaluationLevel) => {
     if (readOnly) return;
@@ -65,6 +66,9 @@ export function EvaluationCriterionRow({
       <div className="evaluation-row-main">
         <div className="evaluation-title-wrap">
           <h4>{criterion.title}</h4>
+          {isUnlimited && (
+            <span className="badge-unlimited">Điểm mở</span>
+          )}
         </div>
 
         {previousStages.length > 0 && (
@@ -126,9 +130,11 @@ export function EvaluationCriterionRow({
             disabled={scoreLocked}
             value={criterion.score}
             onChange={onScoreChange}
-            placeholder={`${minimum}–${maximum}`}
+            placeholder={isUnlimited ? 'Nhập điểm' : `${minimum}–${maximum}`}
           />
-          <span className="score-max">/ {criterion.max}</span>
+          <span className="score-max">
+            {isUnlimited ? 'điểm (Không trần)' : `/ ${criterion.max}`}
+          </span>
         </div>
       </div>
 

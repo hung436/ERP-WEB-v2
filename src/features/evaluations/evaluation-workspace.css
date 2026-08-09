@@ -527,6 +527,16 @@
   border-radius: 4px;
 }
 
+.badge-unlimited {
+  font-size: 11px;
+  font-weight: 600;
+  color: #027a48;
+  background: #ecfdf3;
+  border: 1px solid #abefc6;
+  padding: 1px 7px;
+  border-radius: 4px;
+}
+
 .evaluation-row-history {
   display: flex;
   flex-wrap: wrap;
