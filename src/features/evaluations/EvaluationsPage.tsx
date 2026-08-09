@@ -1,5 +1,6 @@
 import { Button, Empty, Input, Modal, Progress, Select, Tag, message } from 'antd';
 import { useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 
 import { ContentSkeleton, ErrorState } from '@/components/AsyncState';
 import { ModuleIcon } from '@/components/ModuleIcon';
@@ -193,8 +194,28 @@ function EvaluationWorkspace({
   sheets: EvaluationSheet[];
   onReload: () => void;
 }) {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const paramSheetId = searchParams.get('sheetId') ?? '';
+
   const [mode, setMode] = useState<EvaluationMode>('self');
   const [periodId, setPeriodId] = useState(periods.find((p) => p.status === 'active')?.id ?? periods[0]?.id ?? '');
+  const [sheetId, setSheetIdState] = useState(paramSheetId);
+
+  const setSheetId = (id: string) => {
+    setSheetIdState(id);
+    setSearchParams(
+      (prev) => {
+        const next = new URLSearchParams(prev);
+        if (id) {
+          next.set('sheetId', id);
+        } else {
+          next.delete('sheetId');
+        }
+        return next;
+      },
+      { replace: true }
+    );
+  };
 
   const availableSheets = useMemo(
     () =>
@@ -210,8 +231,6 @@ function EvaluationWorkspace({
     [mode, periodId, sheets]
   );
 
-  const [sheetId, setSheetId] = useState('');
-  const [showTable, setShowTable] = useState(false);
   const [draft, setDraft] = useState<EvaluationSheet | null>(null);
   const [saving, setSaving] = useState(false);
   const [noteCriterionId, setNoteCriterionId] = useState<string | null>(null);
@@ -220,7 +239,6 @@ function EvaluationWorkspace({
   useEffect(() => {
     if (mode === 'self') {
       const selected = availableSheets[0] ?? null;
-      setSheetId(selected?.id ?? '');
       setDraft(selected);
     } else {
       const selected = availableSheets.find((sheet) => sheet.id === sheetId) ?? null;
