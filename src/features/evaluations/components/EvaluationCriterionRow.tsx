@@ -86,7 +86,7 @@ export function EvaluationCriterionRow({
         )}
       </div>
 
-      <div className="evaluation-row-scoring">
+      <div className="evaluation-row-levels">
         {criterion.levels && criterion.levels.length > 0 && (
           <div
             className="evaluation-level-inline"
@@ -117,7 +117,9 @@ export function EvaluationCriterionRow({
             })}
           </div>
         )}
+      </div>
 
+      <div className="evaluation-row-right">
         <div className="evaluation-score-inline">
           <label htmlFor={`evaluation-score-${criterion.id}`}>Điểm</label>
           <InputNumber
@@ -134,26 +136,26 @@ export function EvaluationCriterionRow({
           />
           {!isUnlimited && <span className="score-max">/ {criterion.max}</span>}
         </div>
-      </div>
 
-      <div className="evaluation-row-actions">
-        <Tooltip title={criterion.note ? `Nội dung ghi chú: ${criterion.note}` : 'Thêm ghi chú hoặc minh chứng'}>
-          <Button
-            className={`evaluation-note-button${criterion.note ? ' has-note' : ''}`}
-            disabled={readOnly}
-            onClick={onOpenNote}
-          >
-            <span className="btn-icon" aria-hidden="true">{criterion.note ? '✓' : '📝'}</span>
-            <span>{criterion.note ? 'Đã ghi chú' : 'Ghi chú'}</span>
-          </Button>
-        </Tooltip>
+        <div className="evaluation-row-actions">
+          <Tooltip title={criterion.note ? `Nội dung ghi chú: ${criterion.note}` : 'Thêm ghi chú hoặc minh chứng'}>
+            <Button
+              className={`evaluation-note-button${criterion.note ? ' has-note' : ''}`}
+              disabled={readOnly}
+              onClick={onOpenNote}
+            >
+              <span className="btn-icon" aria-hidden="true">{criterion.note ? '✓' : '📝'}</span>
+              <span>{criterion.note ? 'Đã ghi chú' : 'Ghi chú'}</span>
+            </Button>
+          </Tooltip>
 
-        {criterion.note && (
-          <div className="note-card-preview" title={criterion.note}>
-            <span className="note-pin" aria-hidden="true">📌</span>
-            <span className="note-content">{criterion.note}</span>
-          </div>
-        )}
+          {criterion.note && (
+            <div className="note-card-preview" title={criterion.note}>
+              <span className="note-pin" aria-hidden="true">📌</span>
+              <span className="note-content">{criterion.note}</span>
+            </div>
+          )}
+        </div>
       </div>
     </article>
   );

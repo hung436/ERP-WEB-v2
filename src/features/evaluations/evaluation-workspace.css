@@ -444,12 +444,12 @@
 .evaluation-stream-row {
   min-height: 0;
   display: grid;
-  grid-template-columns: 48px 1fr auto;
+  grid-template-columns: 44px 1fr auto;
   grid-template-areas: 
-    "index main actions"
-    "index scoring actions";
+    "index main right"
+    "index levels right";
   align-items: center;
-  gap: 12px 18px;
+  gap: 12px 20px;
   padding: 16px 20px;
   border: 1px solid #eaecf0;
   background: #ffffff;
@@ -552,14 +552,12 @@
   font-weight: 600;
 }
 
-/* Scoring Area */
-.evaluation-row-scoring {
-  grid-area: scoring;
+/* Levels Area */
+.evaluation-row-levels {
+  grid-area: levels;
   min-width: 0;
   display: flex;
   align-items: center;
-  gap: 16px;
-  flex-wrap: wrap;
 }
 
 .evaluation-level-inline {
@@ -617,15 +615,29 @@
   white-space: nowrap;
 }
 
+/* Unified Right Scoring & Actions Column */
+.evaluation-row-right {
+  grid-area: right;
+  min-width: 220px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 10px;
+  padding-left: 18px;
+  border-left: 1px solid #f1f5f9;
+}
+
 .evaluation-score-inline {
-  flex: 0 0 auto;
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   gap: 8px;
   background: #f8fafc;
   padding: 6px 12px;
   border-radius: 8px;
   border: 1px solid #e2e8f0;
+  width: 100%;
 }
 
 .evaluation-score-inline label {
@@ -656,17 +668,12 @@
   font-weight: 600;
 }
 
-/* Actions Column */
 .evaluation-row-actions {
-  grid-area: actions;
-  align-self: center;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
   align-items: flex-end;
-  justify-content: center;
-  padding-left: 12px;
-  border-left: 1px solid #f1f5f9;
+  width: 100%;
 }
 
 .evaluation-note-button {
