@@ -163,17 +163,16 @@ function EmployeeEvaluationListTable({
                     </span>
                   </td>
                   <td style={{ textAlign: 'right' }}>
-                    <Button
-                      type={isDone ? 'default' : 'primary'}
-                      size="small"
-                      className="action-open-btn"
+                    <button
+                      type="button"
+                      className={`table-soft-action-btn${isDone ? ' done' : ''}`}
                       onClick={(e) => {
                         e.stopPropagation();
                         onSelectSheet(sheet.id);
                       }}
                     >
                       {isDone ? 'Xem phiếu' : '📝 Chấm điểm'}
-                    </Button>
+                    </button>
                   </td>
                 </tr>
               );
