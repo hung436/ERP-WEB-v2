@@ -278,8 +278,8 @@ function EvaluationWorkspace({
         </div>
 
         <div className="evaluation-workspace-controls">
-          {/* Ultra-Clean Sleek Segmented Switcher */}
-          <div className="evaluation-segmented-pills" role="radiogroup" aria-label="Chế độ làm việc">
+          {/* Flat Underline Tabs (Ant Design Line Tab Aesthetic) */}
+          <div className="evaluation-flat-tabs" role="radiogroup" aria-label="Chế độ làm việc">
             {modeOptions.map((opt) => {
               const isActive = mode === opt.value;
               return (
@@ -289,14 +289,14 @@ function EvaluationWorkspace({
                   role="radio"
                   aria-label={opt.label}
                   aria-checked={isActive}
-                  className={`segmented-pill-btn${isActive ? ' active' : ''}`}
+                  className={`flat-tab-btn${isActive ? ' active' : ''}`}
                   onClick={() => {
                     setMode(opt.value as EvaluationMode);
                     setSheetId('');
                   }}
                 >
-                  <span className="pill-icon" aria-hidden="true">{opt.icon}</span>
-                  <span className="pill-label">{opt.label}</span>
+                  <span className="tab-icon" aria-hidden="true">{opt.icon}</span>
+                  <span className="tab-label">{opt.label}</span>
                 </button>
               );
             })}
