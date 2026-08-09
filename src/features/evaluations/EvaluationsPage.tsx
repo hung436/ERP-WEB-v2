@@ -193,14 +193,18 @@ function EvaluationWorkspace({
   const [noteValue, setNoteValue] = useState('');
 
   useEffect(() => {
-    const selected = availableSheets.find((sheet) => sheet.id === sheetId) ?? availableSheets[0] ?? null;
-    setSheetId(selected?.id ?? '');
-    setDraft(selected);
-  }, [availableSheets, sheetId]);
+    if (mode === 'self') {
+      const selected = availableSheets[0] ?? null;
+      setSheetId(selected?.id ?? '');
+      setDraft(selected);
+    } else {
+      const selected = availableSheets.find((sheet) => sheet.id === sheetId) ?? null;
+      setDraft(selected);
+    }
+  }, [availableSheets, mode, sheetId]);
 
   const selectEmployeeSheet = (id: string) => {
     setSheetId(id);
-    setShowTable(false);
   };
 
   const criteria = useMemo(() => draft?.groups.flatMap((group) => group.criteria) ?? [], [draft]);
@@ -311,48 +315,25 @@ function EvaluationWorkspace({
               value={periodId}
             />
           </div>
-
-          {mode !== 'self' && (
-            <div className="evaluation-control">
-              <span>Chế độ xem</span>
-              <Button
-                className="view-toggle-btn"
-                type={showTable ? 'primary' : 'default'}
-                onClick={() => setShowTable((v) => !v)}
-              >
-                {showTable ? '📝 Xem phiếu chi tiết' : `📋 Bảng lịch sử chấm (${availableSheets.length})`}
-              </Button>
-            </div>
-          )}
-
-          {mode !== 'self' && (
-            <div className="evaluation-control evaluation-employee-select">
-              <span>Nhân sự đánh giá</span>
-              <Select
-                aria-label="Nhân sự được đánh giá"
-                onChange={(id) => {
-                  setSheetId(id);
-                  setShowTable(false);
-                }}
-                options={availableSheets.map((sheet) => ({
-                  value: sheet.id,
-                  label: `${sheet.employeeName} · ${sheet.department}`,
-                }))}
-                placeholder="Chọn nhân sự"
-                value={sheetId || undefined}
-              />
-            </div>
-          )}
         </div>
       </header>
 
-      {showTable && mode !== 'self' ? (
+      {mode !== 'self' && !sheetId ? (
         <EmployeeEvaluationListTable
           sheets={availableSheets}
           onSelectSheet={selectEmployeeSheet}
         />
       ) : draft ? (
         <>
+          {/* Back to Employee List Button when in scoring/council mode */}
+          {mode !== 'self' && (
+            <div className="back-to-list-bar">
+              <Button type="link" onClick={() => setSheetId('')}>
+                ← Quay lại danh sách nhân sự ({availableSheets.length})
+              </Button>
+            </div>
+          )}
+
           {/* Overview Cards Bar */}
           <section className="evaluation-overview">
             <div className="evaluation-person">
