@@ -88,9 +88,9 @@ export function EvaluationCriterionRow({
         )}
       </div>
 
-      {/* Col 3: Level Options OR Direct Score Hint Tag */}
+      {/* Col 3: Level Options (if present) */}
       <div className="card-options-col">
-        {hasLevels ? (
+        {hasLevels && (
           <div
             className="evaluation-level-inline"
             role="radiogroup"
@@ -119,10 +119,6 @@ export function EvaluationCriterionRow({
               );
             })}
           </div>
-        ) : (
-          <span className="direct-score-tag">
-            {isUnlimited ? 'Điểm mở' : 'Chấm trực tiếp'}
-          </span>
         )}
       </div>
 
