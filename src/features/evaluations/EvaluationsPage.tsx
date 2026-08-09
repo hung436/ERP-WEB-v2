@@ -171,7 +171,7 @@ function EmployeeEvaluationListTable({
                         onSelectSheet(sheet.id);
                       }}
                     >
-                      {isDone ? 'Xem phiếu' : '📝 Chấm điểm'}
+                      {isDone ? 'Xem phiếu' : 'Chấm điểm'}
                     </button>
                   </td>
                 </tr>
