@@ -58,7 +58,7 @@ describe('Workspace Đánh giá lao động', () => {
     renderApp('/evaluations', true);
     await screen.findByRole('heading', { name: 'Đánh giá lao động' });
     await selectMode(user, 'Hội đồng đánh giá');
-    await user.click((await screen.findAllByText(/Vào chấm \/ Xem/))[0]);
+    await user.click((await screen.findAllByText(/Chấm điểm|Xem phiếu/))[0]);
     const firstRow = (await screen.findAllByRole('article'))[0];
     const history = within(firstRow).getByLabelText(/Lịch sử điểm: Thực hiện nhiệm vụ chuyên môn/);
     expect(within(history).getByText('Tự đánh giá')).toBeInTheDocument();

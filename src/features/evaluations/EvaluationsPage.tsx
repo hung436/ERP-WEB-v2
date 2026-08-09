@@ -115,66 +115,69 @@ function EmployeeEvaluationListTable({
               <th>Ban biên tập</th>
               <th>Hội đồng</th>
               <th>Trạng thái</th>
-              <th style={{ textAlign: 'right' }}>Hành động</th>
+              <th style={{ textAlign: 'right' }}>Phiếu chấm</th>
             </tr>
           </thead>
           <tbody>
-            {sheets.map((sheet) => (
-              <tr
-                key={sheet.id}
-                className="history-row"
-                onClick={() => onSelectSheet(sheet.id)}
-              >
-                <td>
-                  <div className="person-cell">
-                    <span className="person-avatar">{initials(sheet.employeeName)}</span>
-                    <div className="person-info">
-                      <strong>{sheet.employeeName}</strong>
-                      <small>{sheet.employeeCode}</small>
+            {sheets.map((sheet) => {
+              const isDone = sheet.status === 'published' || sheet.status === 'completed';
+              return (
+                <tr
+                  key={sheet.id}
+                  className="history-row"
+                  onClick={() => onSelectSheet(sheet.id)}
+                >
+                  <td>
+                    <div className="person-cell">
+                      <span className="person-avatar">{initials(sheet.employeeName)}</span>
+                      <div className="person-info">
+                        <strong>{sheet.employeeName}</strong>
+                        <small>{sheet.employeeCode}</small>
+                      </div>
                     </div>
-                  </div>
-                </td>
-                <td>
-                  <div className="dept-cell">
-                    <strong>{sheet.position}</strong>
-                    <small>{sheet.department}</small>
-                  </div>
-                </td>
-                <td>
-                  <strong className="score-val">{sheet.stageTotals?.self ?? '—'}</strong>
-                </td>
-                <td>
-                  <strong className="score-val">{sheet.stageTotals?.deputy ?? '—'}</strong>
-                </td>
-                <td>
-                  <strong className="score-val">{sheet.stageTotals?.manager ?? '—'}</strong>
-                </td>
-                <td>
-                  <strong className="score-val">{sheet.stageTotals?.editorial ?? '—'}</strong>
-                </td>
-                <td>
-                  <strong className="score-val highlight-council">{sheet.stageTotals?.council ?? '—'}</strong>
-                </td>
-                <td>
-                  <span className={`status-badge status-${sheet.status}`}>
-                    {statusLabels[sheet.status]}
-                  </span>
-                </td>
-                <td style={{ textAlign: 'right' }}>
-                  <Button
-                    type="primary"
-                    size="small"
-                    className="action-open-btn"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onSelectSheet(sheet.id);
-                    }}
-                  >
-                    Vào chấm / Xem
-                  </Button>
-                </td>
-              </tr>
-            ))}
+                  </td>
+                  <td>
+                    <div className="dept-cell">
+                      <strong>{sheet.position}</strong>
+                      <small>{sheet.department}</small>
+                    </div>
+                  </td>
+                  <td>
+                    <strong className="score-val">{sheet.stageTotals?.self ?? '—'}</strong>
+                  </td>
+                  <td>
+                    <strong className="score-val">{sheet.stageTotals?.deputy ?? '—'}</strong>
+                  </td>
+                  <td>
+                    <strong className="score-val">{sheet.stageTotals?.manager ?? '—'}</strong>
+                  </td>
+                  <td>
+                    <strong className="score-val">{sheet.stageTotals?.editorial ?? '—'}</strong>
+                  </td>
+                  <td>
+                    <strong className="score-val highlight-council">{sheet.stageTotals?.council ?? '—'}</strong>
+                  </td>
+                  <td>
+                    <span className={`status-badge status-${sheet.status}`}>
+                      {statusLabels[sheet.status]}
+                    </span>
+                  </td>
+                  <td style={{ textAlign: 'right' }}>
+                    <Button
+                      type={isDone ? 'default' : 'primary'}
+                      size="small"
+                      className="action-open-btn"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onSelectSheet(sheet.id);
+                      }}
+                    >
+                      {isDone ? 'Xem phiếu' : '📝 Chấm điểm'}
+                    </Button>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
