@@ -109,7 +109,6 @@ function EmployeeEvaluationListTable({
             <tr>
               <th>Nhân sự</th>
               <th>Chức danh & Phòng ban</th>
-              <th>Tiến độ</th>
               <th>Tự đánh giá</th>
               <th>Phó phòng</th>
               <th>Trưởng phòng</th>
@@ -140,9 +139,6 @@ function EmployeeEvaluationListTable({
                     <strong>{sheet.position}</strong>
                     <small>{sheet.department}</small>
                   </div>
-                </td>
-                <td>
-                  <span className="progress-pill">{sheet.progress}%</span>
                 </td>
                 <td>
                   <strong className="score-val">{sheet.stageTotals?.self ?? '—'}</strong>
