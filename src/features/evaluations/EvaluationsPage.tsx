@@ -60,6 +60,105 @@ const previousStagesFor = (sheet: EvaluationSheet, mode: EvaluationMode) =>
     ? stageOrder
     : stageOrder.slice(0, Math.max(1, stageOrder.indexOf(mode === 'council' ? 'council' : sheet.stage)));
 
+function EmployeeEvaluationListTable({
+  sheets,
+  onSelectSheet,
+}: {
+  sheets: EvaluationSheet[];
+  onSelectSheet: (id: string) => void;
+}) {
+  return (
+    <section className="employee-evaluation-table-card">
+      <div className="table-card-header">
+        <div>
+          <h3>📋 Bảng tổng hợp lịch sử chấm điểm các cấp ({sheets.length} nhân sự)</h3>
+          <p>Nhấp vào nhân sự trong bảng bên dưới để mở chi tiết phiếu chấm điểm</p>
+        </div>
+      </div>
+
+      <div className="table-wrapper">
+        <table className="employee-history-table">
+          <thead>
+            <tr>
+              <th>Nhân sự</th>
+              <th>Chức danh & Phòng ban</th>
+              <th>Tiến độ</th>
+              <th>Tự đánh giá</th>
+              <th>Phó phòng</th>
+              <th>Trưởng phòng</th>
+              <th>Ban biên tập</th>
+              <th>Hội đồng</th>
+              <th>Trạng thái</th>
+              <th style={{ textAlign: 'right' }}>Hành động</th>
+            </tr>
+          </thead>
+          <tbody>
+            {sheets.map((sheet) => (
+              <tr
+                key={sheet.id}
+                className="history-row"
+                onClick={() => onSelectSheet(sheet.id)}
+              >
+                <td>
+                  <div className="person-cell">
+                    <span className="person-avatar">{initials(sheet.employeeName)}</span>
+                    <div className="person-info">
+                      <strong>{sheet.employeeName}</strong>
+                      <small>{sheet.employeeCode}</small>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div className="dept-cell">
+                    <strong>{sheet.position}</strong>
+                    <small>{sheet.department}</small>
+                  </div>
+                </td>
+                <td>
+                  <span className="progress-pill">{sheet.progress}%</span>
+                </td>
+                <td>
+                  <strong className="score-val">{sheet.stageTotals?.self ?? '—'}</strong>
+                </td>
+                <td>
+                  <strong className="score-val">{sheet.stageTotals?.deputy ?? '—'}</strong>
+                </td>
+                <td>
+                  <strong className="score-val">{sheet.stageTotals?.manager ?? '—'}</strong>
+                </td>
+                <td>
+                  <strong className="score-val">{sheet.stageTotals?.editorial ?? '—'}</strong>
+                </td>
+                <td>
+                  <strong className="score-val highlight-council">{sheet.stageTotals?.council ?? '—'}</strong>
+                </td>
+                <td>
+                  <span className={`status-badge status-${sheet.status}`}>
+                    {statusLabels[sheet.status]}
+                  </span>
+                </td>
+                <td style={{ textAlign: 'right' }}>
+                  <Button
+                    type="primary"
+                    size="small"
+                    className="action-open-btn"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onSelectSheet(sheet.id);
+                    }}
+                  >
+                    Vào chấm / Xem
+                  </Button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  );
+}
+
 function EvaluationWorkspace({
   periods,
   sheets,
@@ -87,6 +186,7 @@ function EvaluationWorkspace({
   );
 
   const [sheetId, setSheetId] = useState('');
+  const [showTable, setShowTable] = useState(false);
   const [draft, setDraft] = useState<EvaluationSheet | null>(null);
   const [saving, setSaving] = useState(false);
   const [noteCriterionId, setNoteCriterionId] = useState<string | null>(null);
@@ -97,6 +197,11 @@ function EvaluationWorkspace({
     setSheetId(selected?.id ?? '');
     setDraft(selected);
   }, [availableSheets, sheetId]);
+
+  const selectEmployeeSheet = (id: string) => {
+    setSheetId(id);
+    setShowTable(false);
+  };
 
   const criteria = useMemo(() => draft?.groups.flatMap((group) => group.criteria) ?? [], [draft]);
   const answered = criteria.filter((criterion) => criterion.score !== null).length;
@@ -208,11 +313,27 @@ function EvaluationWorkspace({
           </div>
 
           {mode !== 'self' && (
+            <div className="evaluation-control">
+              <span>Chế độ xem</span>
+              <Button
+                className="view-toggle-btn"
+                type={showTable ? 'primary' : 'default'}
+                onClick={() => setShowTable((v) => !v)}
+              >
+                {showTable ? '📝 Xem phiếu chi tiết' : `📋 Bảng lịch sử chấm (${availableSheets.length})`}
+              </Button>
+            </div>
+          )}
+
+          {mode !== 'self' && (
             <div className="evaluation-control evaluation-employee-select">
               <span>Nhân sự đánh giá</span>
               <Select
                 aria-label="Nhân sự được đánh giá"
-                onChange={setSheetId}
+                onChange={(id) => {
+                  setSheetId(id);
+                  setShowTable(false);
+                }}
                 options={availableSheets.map((sheet) => ({
                   value: sheet.id,
                   label: `${sheet.employeeName} · ${sheet.department}`,
@@ -225,7 +346,12 @@ function EvaluationWorkspace({
         </div>
       </header>
 
-      {draft ? (
+      {showTable && mode !== 'self' ? (
+        <EmployeeEvaluationListTable
+          sheets={availableSheets}
+          onSelectSheet={selectEmployeeSheet}
+        />
+      ) : draft ? (
         <>
           {/* Overview Cards Bar */}
           <section className="evaluation-overview">
