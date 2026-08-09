@@ -12,9 +12,9 @@ import '@/features/evaluations/evaluation-workspace.css';
 type EvaluationMode = 'self' | 'scoring' | 'council';
 
 const modeOptions = [
-  { value: 'self', label: 'Phiếu của tôi' },
-  { value: 'scoring', label: 'Chấm nhân viên' },
-  { value: 'council', label: 'Hội đồng đánh giá' },
+  { value: 'self', label: 'Phiếu của tôi', icon: '👤', tag: 'Cá nhân', tagClass: 'tag-self' },
+  { value: 'scoring', label: 'Chấm nhân viên', icon: '👥', tag: 'Quản lý', tagClass: 'tag-scoring' },
+  { value: 'council', label: 'Hội đồng đánh giá', icon: '🏛️', tag: 'Hội đồng', tagClass: 'tag-council' },
 ];
 
 const stageOrder: EvaluationStage[] = ['self', 'deputy', 'manager', 'editorial', 'council'];
@@ -169,15 +169,28 @@ function EvaluationWorkspace({
         </div>
 
         <div className="evaluation-workspace-controls">
-          <div className="evaluation-control">
-            <span>Chế độ làm việc</span>
+          <div className="evaluation-control mode-control">
+            <span className="mode-control-label">
+              <span className="mode-star-icon" aria-hidden="true">⚡</span> Chế độ làm việc
+            </span>
             <Select
               aria-label="Chế độ đánh giá"
+              className="evaluation-mode-select"
+              popupClassName="mode-select-dropdown"
               onChange={(value) => {
                 setMode(value);
                 setSheetId('');
               }}
-              options={modeOptions}
+              options={modeOptions.map((opt) => ({
+                value: opt.value,
+                label: (
+                  <div className="mode-option-row">
+                    <span className="mode-option-icon" aria-hidden="true">{opt.icon}</span>
+                    <span className="mode-option-label">{opt.label}</span>
+                    <span className={`mode-option-tag ${opt.tagClass}`}>{opt.tag}</span>
+                  </div>
+                ),
+              }))}
               value={mode}
             />
           </div>
