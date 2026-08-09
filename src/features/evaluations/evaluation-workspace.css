@@ -433,74 +433,95 @@
   border-radius: 6px;
 }
 
-/* 6. Enterprise Compact 1-Row List Layout */
+/* 6. Radio Card Form Layout */
 .evaluation-stream-group .group-rows-container {
   padding: 10px 14px 14px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 }
 
-.evaluation-compact-row {
-  min-height: 58px;
-  display: grid;
-  grid-template-columns: 36px minmax(240px, 1fr) minmax(280px, 1.2fr) 140px 115px;
-  align-items: center;
-  gap: 14px;
-  padding: 12px 18px;
+.evaluation-radio-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px 20px;
   border: 1px solid #eaecf0;
   background: #ffffff;
-  border-radius: 10px;
-  box-shadow: 0 1px 3px rgba(16, 24, 40, 0.02);
+  border-radius: 12px;
+  box-shadow: 0 2px 5px rgba(16, 24, 40, 0.03);
   transition: all 0.2s ease;
 }
 
-.evaluation-compact-row:hover {
-  background: #fcfcfd;
+.evaluation-radio-card:hover {
   border-color: #d0d5dd;
-  box-shadow: 0 3px 8px rgba(16, 24, 40, 0.05);
+  box-shadow: 0 4px 12px rgba(16, 24, 40, 0.06);
 }
 
-.evaluation-compact-row.answered {
+.evaluation-radio-card.answered {
   border-left: 4px solid #12b76a;
 }
 
-/* Col 1: Index Badge */
-.evaluation-compact-row .card-index-badge {
-  width: 32px;
-  height: 32px;
+/* Card Header: Title + History (Left) & Score Input + Note Button (Right Toolbar) */
+.radio-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+}
+
+.radio-card-header .header-left {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+.radio-card-header .card-index-badge {
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
   display: grid;
   place-items: center;
   color: #475467;
   border-radius: 8px;
   background: #f2f4f7;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
+  margin-top: 2px;
 }
 
-.evaluation-compact-row.answered .card-index-badge {
+.evaluation-radio-card.answered .card-index-badge {
   color: #027a48;
   background: #ecfdf3;
   border: 1px solid #abefc6;
 }
 
-/* Col 2: Title & History */
-.evaluation-compact-row .title-content {
-  min-width: 0;
+.radio-card-header .title-content {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  gap: 4px;
+  min-width: 0;
 }
 
-.evaluation-compact-row .title-heading-wrap h4 {
+.radio-card-header .title-heading-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.radio-card-header .title-heading-wrap h4 {
   margin: 0;
   color: #101828;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 600;
-  line-height: 1.4;
+  line-height: 1.45;
 }
 
-.evaluation-compact-row .evaluation-row-history {
+.evaluation-row-history {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
@@ -528,81 +549,116 @@
   font-weight: 600;
 }
 
-/* Col 3: Level Options or Direct Score Tag */
-.evaluation-compact-row .card-options-col {
-  min-width: 0;
+/* Right Toolbar (Unified 100% Alignment across ALL cards!) */
+.radio-card-header .header-right-toolbar {
   display: flex;
   align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
 }
 
-.evaluation-compact-row .direct-score-tag {
-  display: inline-flex;
-  align-items: center;
-  padding: 5px 12px;
-  border-radius: 6px;
-  background: #f0f9ff;
-  border: 1px solid #e0f2fe;
-  color: #0284c7;
-  font-size: 12px;
-  font-weight: 600;
-  white-space: nowrap;
-}
-
-.evaluation-compact-row .evaluation-level-inline {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.evaluation-compact-row .level-btn {
-  min-width: 105px;
-  min-height: 38px;
-  height: auto;
-  padding: 6px 10px;
+.card-note-wrapper {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  border: 1px solid #d0d5dd;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+/* Radio Options List Body */
+.radio-options-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 6px;
+  border-top: 1px dashed #f1f5f9;
+  width: 100%;
+}
+
+.radio-option-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 14px;
+  border: 1px solid #eaecf0;
   border-radius: 8px;
   background: #ffffff;
+  text-align: left;
   cursor: pointer;
   transition: all 0.15s ease;
 }
 
-.evaluation-compact-row .level-btn:hover:not(:disabled) {
+.radio-option-item:hover:not(:disabled) {
+  border-color: #d0d5dd;
+  background: #f8fafc;
+}
+
+.radio-option-item.selected {
   border-color: #f97066;
   background: #fffbfa;
+  box-shadow: 0 1px 3px rgba(249, 112, 102, 0.1);
 }
 
-.evaluation-compact-row .level-btn.selected {
-  color: #b42318;
+.radio-indicator {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: 2px solid #d0d5dd;
+  display: grid;
+  place-items: center;
+  background: #ffffff;
+  transition: all 0.15s ease;
+}
+
+.radio-option-item:hover .radio-indicator {
   border-color: #f97066;
-  background: #fef3f2;
-  box-shadow: 0 0 0 1px #fda29b;
 }
 
-.evaluation-compact-row .level-label {
-  font-size: 12px;
-  font-weight: 600;
-  line-height: 1.35;
-  white-space: normal;
-  word-break: break-word;
-  color: #101828;
+.radio-option-item.selected .radio-indicator {
+  border-color: #d92d20;
+  background: #ffffff;
 }
 
-.evaluation-compact-row .level-range {
-  margin-top: 2px;
-  font-size: 11px;
+.radio-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: transparent;
+  transition: background 0.15s ease;
+}
+
+.radio-option-item.selected .radio-dot {
+  background: #d92d20;
+}
+
+.radio-label-text {
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
   font-weight: 500;
-  color: #667085;
-  white-space: nowrap;
+  color: #344054;
+  line-height: 1.4;
 }
 
-/* Col 4: Score Input Box */
-.evaluation-compact-row .card-score-col {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
+.radio-option-item.selected .radio-label-text {
+  color: #101828;
+  font-weight: 600;
+}
+
+.radio-range-badge {
+  flex-shrink: 0;
+  font-size: 11px;
+  font-weight: 600;
+  color: #667085;
+  background: #f2f4f7;
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+
+.radio-option-item.selected .radio-range-badge {
+  color: #b42318;
+  background: #fef3f2;
 }
 
 .evaluation-score-inline {
@@ -641,15 +697,6 @@
   color: #64748b;
   font-size: 12px;
   font-weight: 600;
-}
-
-/* Col 5: Note Action Button */
-.evaluation-compact-row .card-note-col {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  justify-content: center;
-  gap: 4px;
 }
 
 .evaluation-note-button {

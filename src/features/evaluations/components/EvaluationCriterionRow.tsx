@@ -59,111 +59,108 @@ export function EvaluationCriterionRow({
 
   return (
     <article
-      className={`evaluation-stream-row evaluation-compact-row${isAnswered ? ' answered' : ''}${
+      className={`evaluation-stream-row evaluation-radio-card${isAnswered ? ' answered' : ''}${
         hasLevels ? ' has-levels' : ' no-levels'
       }`}
     >
-      {/* Col 1: Index Badge */}
-      <span className="card-index-badge">{String(order).padStart(2, '0')}</span>
+      {/* Top Header: Title, History & Top-Right Toolbar (Score Input + Note Button) */}
+      <header className="radio-card-header">
+        <div className="header-left">
+          <span className="card-index-badge">{String(order).padStart(2, '0')}</span>
+          <div className="title-content">
+            <div className="title-heading-wrap">
+              <Tooltip title={criterion.title} mouseEnterDelay={0.4}>
+                <h4>{criterion.title}</h4>
+              </Tooltip>
+              {isUnlimited && <span className="badge-unlimited">Điểm mở</span>}
+            </div>
 
-      {/* Col 2: Title & History */}
-      <div className="title-content">
-        <div className="title-heading-wrap">
-          <Tooltip title={criterion.title} mouseEnterDelay={0.4}>
-            <h4>{criterion.title}</h4>
-          </Tooltip>
-          {isUnlimited && <span className="badge-unlimited">Điểm mở</span>}
+            {previousStages.length > 0 && (
+              <div className="evaluation-row-history" aria-label={`Lịch sử điểm: ${criterion.title}`}>
+                {previousStages.map((stage) => {
+                  const val = criterion.stageScores?.[stage];
+                  return (
+                    <span key={stage} className={`history-pill stage-${stage}`}>
+                      <small>{stageLabels[stage]}</small>
+                      <strong>{val !== undefined && val !== null ? `${val} đ` : '—'}</strong>
+                    </span>
+                  );
+                })}
+              </div>
+            )}
+          </div>
         </div>
 
-        {previousStages.length > 0 && (
-          <div className="evaluation-row-history" aria-label={`Lịch sử điểm: ${criterion.title}`}>
-            {previousStages.map((stage) => {
-              const val = criterion.stageScores?.[stage];
-              return (
-                <span key={stage} className={`history-pill stage-${stage}`}>
-                  <small>{stageLabels[stage]}</small>
-                  <strong>{val !== undefined && val !== null ? `${val} đ` : '—'}</strong>
+        {/* Top-Right Toolbar: Score Input + Note Button (Unified 100% Alignment across ALL cards!) */}
+        <div className="header-right-toolbar">
+          <div className="evaluation-score-inline">
+            <label htmlFor={`evaluation-score-${criterion.id}`}>Điểm</label>
+            <InputNumber
+              id={`evaluation-score-${criterion.id}`}
+              aria-label={`Nhập điểm: ${criterion.title}`}
+              min={minimum}
+              max={maximum}
+              precision={0}
+              controls
+              disabled={scoreLocked}
+              value={criterion.score}
+              onChange={onScoreChange}
+              placeholder={isUnlimited ? 'Nhập điểm' : `${minimum}–${maximum}`}
+            />
+            {!isUnlimited && <span className="score-max">/ {criterion.max}</span>}
+          </div>
+
+          <div className="card-note-wrapper">
+            <Tooltip title={criterion.note ? `Ghi chú: ${criterion.note}` : 'Thêm ghi chú/minh chứng'}>
+              <Button
+                className={`evaluation-note-button${criterion.note ? ' has-note' : ''}`}
+                disabled={readOnly}
+                onClick={onOpenNote}
+              >
+                <span className="btn-icon" aria-hidden="true">{criterion.note ? '✓' : '📝'}</span>
+                <span>{criterion.note ? 'Đã ghi chú' : 'Ghi chú'}</span>
+              </Button>
+            </Tooltip>
+
+            {criterion.note && (
+              <div className="note-card-preview" title={criterion.note}>
+                <span className="note-pin" aria-hidden="true">📌</span>
+                <span className="note-content">{criterion.note}</span>
+              </div>
+            )}
+          </div>
+        </div>
+      </header>
+
+      {/* Radio Options List Body (Only when HAS levels) */}
+      {hasLevels && (
+        <div
+          className="radio-options-body"
+          role="radiogroup"
+          aria-label={`Mức đánh giá: ${criterion.title}`}
+        >
+          {criterion.levels!.map((level) => {
+            const isSelected = selectedLevel?.label === level.label;
+            return (
+              <button
+                key={level.label}
+                type="button"
+                role="radio"
+                aria-checked={isSelected}
+                className={`radio-option-item${isSelected ? ' selected' : ''}`}
+                disabled={readOnly}
+                onClick={() => chooseLevel(level)}
+              >
+                <span className="radio-indicator" aria-hidden="true">
+                  <span className="radio-dot" />
                 </span>
-              );
-            })}
-          </div>
-        )}
-      </div>
-
-      {/* Col 3: Level Options (if present) */}
-      <div className="card-options-col">
-        {hasLevels && (
-          <div
-            className="evaluation-level-inline"
-            role="radiogroup"
-            aria-label={`Mức đánh giá: ${criterion.title}`}
-          >
-            {criterion.levels!.map((level) => {
-              const isSelected = selectedLevel?.label === level.label;
-              return (
-                <Tooltip
-                  key={level.label}
-                  title={`${level.label} (${level.min}–${level.max} điểm)`}
-                  mouseEnterDelay={0.3}
-                >
-                  <button
-                    type="button"
-                    role="radio"
-                    aria-checked={isSelected}
-                    className={`level-btn${isSelected ? ' selected' : ''}`}
-                    disabled={readOnly}
-                    onClick={() => chooseLevel(level)}
-                  >
-                    <strong className="level-label">{level.label}</strong>
-                    <small className="level-range">{level.min}–{level.max} điểm</small>
-                  </button>
-                </Tooltip>
-              );
-            })}
-          </div>
-        )}
-      </div>
-
-      {/* Col 4: Score Input Box */}
-      <div className="card-score-col">
-        <div className="evaluation-score-inline">
-          <label htmlFor={`evaluation-score-${criterion.id}`}>Điểm</label>
-          <InputNumber
-            id={`evaluation-score-${criterion.id}`}
-            aria-label={`Nhập điểm: ${criterion.title}`}
-            min={minimum}
-            max={maximum}
-            precision={0}
-            controls
-            disabled={scoreLocked}
-            value={criterion.score}
-            onChange={onScoreChange}
-            placeholder={isUnlimited ? 'Nhập điểm' : `${minimum}–${maximum}`}
-          />
-          {!isUnlimited && <span className="score-max">/ {criterion.max}</span>}
+                <span className="radio-label-text">{level.label}</span>
+                <span className="radio-range-badge">{level.min}–{level.max} điểm</span>
+              </button>
+            );
+          })}
         </div>
-      </div>
-
-      {/* Col 5: Note Action Button */}
-      <div className="card-note-col">
-        <Tooltip title={criterion.note ? `Ghi chú: ${criterion.note}` : 'Thêm ghi chú/minh chứng'}>
-          <Button
-            className={`evaluation-note-button${criterion.note ? ' has-note' : ''}`}
-            disabled={readOnly}
-            onClick={onOpenNote}
-          >
-            <span className="btn-icon" aria-hidden="true">{criterion.note ? '✓' : '📝'}</span>
-            <span>{criterion.note ? 'Đã ghi chú' : 'Ghi chú'}</span>
-          </Button>
-        </Tooltip>
-
-        {criterion.note && (
-          <div className="note-card-preview" title={criterion.note}>
-            <span className="note-pin" aria-hidden="true">📌</span>
-            <span className="note-content">{criterion.note}</span>
-          </div>
-        )}
-      </div>
+      )}
     </article>
   );
 }
