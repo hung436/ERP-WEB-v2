@@ -36,22 +36,20 @@ export function EvaluationCriterionRow({
 
   useEffect(() => {
     const matched = findLevel(criterion);
-    if (matched) {
-      setSelectedLevel(matched);
-    }
+    setSelectedLevel(matched);
   }, [criterion.score, criterion.levels]);
 
   const isUnlimited = !criterion.max || criterion.max === 0;
   const hasLevels = Boolean(criterion.levels && criterion.levels.length > 0);
-  const scoreLocked = readOnly || Boolean(hasLevels && !selectedLevel);
-  const minimum = selectedLevel?.min ?? criterion.min;
-  const maximum = isUnlimited ? undefined : (selectedLevel?.max ?? criterion.max);
+  const scoreLocked = readOnly;
+  const minimum = criterion.min;
+  const maximum = isUnlimited ? undefined : criterion.max;
 
   const chooseLevel = (level: EvaluationLevel) => {
     if (readOnly) return;
     setSelectedLevel(level);
     if (criterion.score === null || criterion.score < level.min || criterion.score > level.max) {
-      onScoreChange(null);
+      onScoreChange(level.max);
     }
   };
 
