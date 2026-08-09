@@ -433,23 +433,11 @@
   border-radius: 6px;
 }
 
-/* /* 6. Spacious Card Criterion Layout */
-.evaluation-stream-group .group-rows-container {
-  padding: 12px 14px 16px;
+/* 6. Smart Criterion Card Layout */
+.evaluation-criterion-card {
   display: flex;
   flex-direction: column;
   gap: 12px;
-}
-
-.evaluation-stream-row {
-  min-height: 0;
-  display: grid;
-  grid-template-columns: 44px 1fr auto;
-  grid-template-areas: 
-    "index main right"
-    "index levels right";
-  align-items: center;
-  gap: 12px 20px;
   padding: 16px 20px;
   border: 1px solid #eaecf0;
   background: #ffffff;
@@ -458,77 +446,79 @@
   transition: all 0.2s ease;
 }
 
-.evaluation-stream-row:hover {
-  background: #ffffff;
+.evaluation-criterion-card:hover {
   border-color: #d0d5dd;
   box-shadow: 0 4px 12px rgba(16, 24, 40, 0.06);
 }
 
-.evaluation-stream-row.answered {
+.evaluation-criterion-card.answered {
   border-left: 4px solid #12b76a;
 }
 
-.evaluation-row-index {
-  grid-area: index;
-  align-self: flex-start;
+/* Card Top Row: Title, History, Score (if no levels) & Corner Note Action */
+.card-top-row {
   display: flex;
-  align-items: center;
-  flex-direction: column;
-  gap: 6px;
-  padding-top: 4px;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
 }
 
-.evaluation-row-index > span {
-  width: 36px;
-  height: 36px;
+.card-title-group {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+.card-index-badge {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
   display: grid;
   place-items: center;
   color: #475467;
-  border-radius: 10px;
+  border-radius: 8px;
   background: #f2f4f7;
   font-size: 13px;
   font-weight: 700;
+  margin-top: 2px;
 }
 
-.evaluation-stream-row.answered .evaluation-row-index > span {
+.evaluation-criterion-card.answered .card-index-badge {
   color: #027a48;
   background: #ecfdf3;
   border: 1px solid #abefc6;
 }
 
-.evaluation-row-index .status-icon {
-  height: 16px;
-  color: #12b76a;
-  font-size: 13px;
-  font-style: normal;
-  font-weight: 700;
-}
-
-.evaluation-row-main {
-  grid-area: main;
+.title-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
   min-width: 0;
 }
 
-.evaluation-row-main .evaluation-title-wrap {
+.title-heading-wrap {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   flex-wrap: wrap;
 }
 
-.evaluation-row-main h4 {
+.title-heading-wrap h4 {
   margin: 0;
   color: #101828;
   font-size: 15px;
   font-weight: 600;
-  line-height: 1.45;
+  line-height: 1.4;
 }
 
 .evaluation-row-history {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  margin-top: 8px;
+  margin-top: 4px;
 }
 
 .evaluation-row-history .history-pill {
@@ -552,20 +542,45 @@
   font-weight: 600;
 }
 
-/* Levels Area */
-.evaluation-row-levels {
-  grid-area: levels;
-  min-width: 0;
+/* Top Right Score Box (When NO levels -> level with question!) */
+.card-top-right-scoring {
   display: flex;
   align-items: center;
+  flex-shrink: 0;
 }
 
-.evaluation-level-inline {
+/* Corner Note Action (Top Right Corner of Card) */
+.card-corner-action {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+/* Card Bottom Row (Only when HAS levels -> Options on left, Score box on right level with options!) */
+.card-bottom-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-top: 8px;
+  border-top: 1px dashed #f1f5f9;
+  width: 100%;
+}
+
+.card-bottom-row .evaluation-level-inline {
+  flex: 1;
   min-width: 0;
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  flex: 1;
+}
+
+.card-bottom-right-scoring {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
 }
 
 .evaluation-level-inline .level-btn {
@@ -615,29 +630,14 @@
   white-space: nowrap;
 }
 
-/* Unified Right Scoring & Actions Column */
-.evaluation-row-right {
-  grid-area: right;
-  min-width: 220px;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  justify-content: center;
-  gap: 10px;
-  padding-left: 18px;
-  border-left: 1px solid #f1f5f9;
-}
-
 .evaluation-score-inline {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
   gap: 8px;
   background: #f8fafc;
   padding: 6px 12px;
   border-radius: 8px;
   border: 1px solid #e2e8f0;
-  width: 100%;
 }
 
 .evaluation-score-inline label {
@@ -668,22 +668,14 @@
   font-weight: 600;
 }
 
-.evaluation-row-actions {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  align-items: flex-end;
-  width: 100%;
-}
-
 .evaluation-note-button {
-  min-height: 38px !important;
-  padding: 8px 16px !important;
+  min-height: 34px !important;
+  padding: 6px 12px !important;
   color: #475467 !important;
   border-color: #d0d5dd !important;
   border-radius: 8px !important;
   background: #ffffff !important;
-  font-size: 13px !important;
+  font-size: 12px !important;
   font-weight: 600 !important;
   box-shadow: 0 1px 2px rgba(16, 24, 40, 0.03) !important;
   display: inline-flex !important;
@@ -693,7 +685,7 @@
 }
 
 .evaluation-note-button .btn-icon {
-  font-size: 13px;
+  font-size: 12px;
   line-height: 1;
 }
 
@@ -720,7 +712,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 5px 10px;
+  padding: 4px 8px;
   background: #f8fafc;
   border: 1px solid #e2e8f0;
   border-left: 3px solid #175cd3;
