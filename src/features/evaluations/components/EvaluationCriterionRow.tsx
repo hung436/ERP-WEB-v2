@@ -41,13 +41,12 @@ export function EvaluationCriterionRow({
     }
   }, [criterion.score, criterion.levels]);
 
-  const systemLocked = criterion.type === 'system';
-  const scoreLocked = readOnly || systemLocked || Boolean(criterion.levels && !selectedLevel);
+  const scoreLocked = readOnly || Boolean(criterion.levels && !selectedLevel);
   const minimum = selectedLevel?.min ?? criterion.min;
   const maximum = selectedLevel?.max ?? criterion.max;
 
   const chooseLevel = (level: EvaluationLevel) => {
-    if (readOnly || systemLocked) return;
+    if (readOnly) return;
     setSelectedLevel(level);
     if (criterion.score === null || criterion.score < level.min || criterion.score > level.max) {
       onScoreChange(null);
@@ -66,9 +65,6 @@ export function EvaluationCriterionRow({
       <div className="evaluation-row-main">
         <div className="evaluation-title-wrap">
           <h4>{criterion.title}</h4>
-          {criterion.type === 'system' && (
-            <span className="badge-system-sync">Tự động đồng bộ</span>
-          )}
         </div>
 
         {previousStages.length > 0 && (
@@ -106,7 +102,7 @@ export function EvaluationCriterionRow({
                     role="radio"
                     aria-checked={isSelected}
                     className={`level-btn${isSelected ? ' selected' : ''}`}
-                    disabled={readOnly || systemLocked}
+                    disabled={readOnly}
                     onClick={() => chooseLevel(level)}
                   >
                     <strong className="level-label">{level.label}</strong>
@@ -118,29 +114,22 @@ export function EvaluationCriterionRow({
           </div>
         )}
 
-        {systemLocked ? (
-          <div className="evaluation-system-score">
-            <span>Hệ thống KPI</span>
-            <strong>{criterion.score ?? 0} / {criterion.max}</strong>
-          </div>
-        ) : (
-          <div className="evaluation-score-inline">
-            <label htmlFor={`evaluation-score-${criterion.id}`}>Điểm</label>
-            <InputNumber
-              id={`evaluation-score-${criterion.id}`}
-              aria-label={`Nhập điểm: ${criterion.title}`}
-              min={minimum}
-              max={maximum}
-              precision={0}
-              controls
-              disabled={scoreLocked}
-              value={criterion.score}
-              onChange={onScoreChange}
-              placeholder={`${minimum}–${maximum}`}
-            />
-            <span className="score-max">/ {criterion.max}</span>
-          </div>
-        )}
+        <div className="evaluation-score-inline">
+          <label htmlFor={`evaluation-score-${criterion.id}`}>Điểm</label>
+          <InputNumber
+            id={`evaluation-score-${criterion.id}`}
+            aria-label={`Nhập điểm: ${criterion.title}`}
+            min={minimum}
+            max={maximum}
+            precision={0}
+            controls
+            disabled={scoreLocked}
+            value={criterion.score}
+            onChange={onScoreChange}
+            placeholder={`${minimum}–${maximum}`}
+          />
+          <span className="score-max">/ {criterion.max}</span>
+        </div>
       </div>
 
       <div className="evaluation-row-actions">
