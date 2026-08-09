@@ -1,0 +1,66 @@
+import { screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { describe, expect, it } from 'vitest';
+
+import { renderApp } from '@/test/testUtils';
+
+const selectMode = async (user: ReturnType<typeof userEvent.setup>, label: string) => {
+  await user.click(screen.getByRole('combobox', { name: 'Chế độ đánh giá' }));
+  await user.click(await screen.findByText(label));
+};
+
+describe('Workspace Đánh giá lao động', () => {
+  it('chấm liên tục, cập nhật tổng điểm tức thì và ghi chú bằng modal', async () => {
+    const user = userEvent.setup();
+    renderApp('/evaluations', true);
+    expect(await screen.findByRole('heading', { name: 'Đánh giá lao động' })).toBeInTheDocument();
+    const stream = await screen.findByRole('region', { name: 'Danh sách tiêu chí đánh giá' });
+    const rows = within(stream).getAllByRole('article');
+    expect(rows).toHaveLength(30);
+
+    const firstRow = rows[0];
+    const initialTotal = Number(document.querySelector('.live-score')?.textContent ?? 0);
+    const levels = within(firstRow).getByRole('radiogroup', { name: /Mức đánh giá: Thực hiện nhiệm vụ chuyên môn/ });
+    await user.click(within(levels).getByRole('radio', { name: /Hoàn thành tốt/ }));
+    const score = within(firstRow).getByLabelText(/Nhập điểm: Thực hiện nhiệm vụ chuyên môn/);
+    await user.clear(score);
+    await user.type(score, '40');
+    expect(score).toHaveValue('40');
+    expect(document.querySelector('.live-score')).toHaveTextContent(String(initialTotal + 2));
+
+    await user.click(within(firstRow).getByRole('button', { name: 'Ghi chú' }));
+    const dialog = await screen.findByRole('dialog', { name: 'Ghi chú tiêu chí' });
+    await user.type(within(dialog).getByLabelText('Nội dung ghi chú'), 'Hoàn thành đúng tiến độ, có số liệu đối chiếu.');
+    await user.click(within(dialog).getByRole('button', { name: 'Lưu ghi chú' }));
+    expect(within(firstRow).getByRole('button', { name: 'Đã ghi chú' })).toBeInTheDocument();
+  });
+
+  it('chuyển sang chấm nhân viên trong cùng workspace và xem nhanh lịch sử điểm', async () => {
+    const user = userEvent.setup();
+    renderApp('/evaluations', true);
+    await screen.findByRole('heading', { name: 'Đánh giá lao động' });
+    await selectMode(user, 'Chấm nhân viên');
+    const employee = await screen.findByRole('combobox', { name: 'Nhân sự được đánh giá' });
+    await user.click(employee);
+    await user.click(await screen.findByText(/Đỗ Quang Huy/));
+    const firstRow = screen.getAllByRole('article')[0];
+    const history = within(firstRow).getByLabelText(/Lịch sử điểm: Thực hiện nhiệm vụ chuyên môn/);
+    expect(within(history).getByText('Tự đánh giá')).toBeInTheDocument();
+    expect(within(history).getByText('Phó phòng/ban')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Hoàn tất chấm điểm' })).toBeInTheDocument();
+  });
+
+  it('Hội đồng xem lịch sử các cấp và chốt ngay trên cùng trang', async () => {
+    const user = userEvent.setup();
+    renderApp('/evaluations', true);
+    await screen.findByRole('heading', { name: 'Đánh giá lao động' });
+    await selectMode(user, 'Hội đồng đánh giá');
+    const firstRow = (await screen.findAllByRole('article'))[0];
+    const history = within(firstRow).getByLabelText(/Lịch sử điểm: Thực hiện nhiệm vụ chuyên môn/);
+    expect(within(history).getByText('Tự đánh giá')).toBeInTheDocument();
+    expect(within(history).getByText('Phó phòng/ban')).toBeInTheDocument();
+    expect(within(history).getByText('Trưởng phòng/ban')).toBeInTheDocument();
+    expect(within(history).getByText('Ban biên tập')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Chốt kết quả' })).toBeInTheDocument();
+  });
+});

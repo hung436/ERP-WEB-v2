@@ -1,0 +1,171 @@
+Nghiệp vụ module đánh giá lao động
+Từ luồng hiện tại của module, đây là toàn bộ nghiệp vụ chính của quá trình đánh giá lao động, từ khi mở phiếu cho đến khi công bố kết quả.
+
+1. Mục tiêu và phạm vi
+Module dùng để:
+
+thực hiện đánh giá tự chấm cho nhân viên theo từng quý,
+cho phép các cấp quản lý xem, điều chỉnh và chốt điểm,
+lưu lịch sử kết quả đánh giá và công bố kết quả chính thức.
+2. Flow nghiệp vụ
+Mở phiếu đánh giá cho kỳ/quý đang hoạt động
+
+Mỗi phiếu có thông tin: quý, thời gian đánh giá, hạn gửi, trạng thái.
+Người được đánh giá thực hiện tự đánh giá
+
+Xem các nhóm tiêu chí.
+Chọn mức phù hợp cho từng câu hỏi loại lựa chọn.
+Nhập điểm cho từng câu hỏi loại điểm số.
+Có thể thêm ghi chú cho từng câu.
+Kiểm tra tiến độ và gửi phiếu
+
+Hệ thống hiển thị tiến độ hoàn thành.
+Khi đủ thông tin, người dùng có thể gửi phiếu.
+Sau khi gửi, phiếu đi qua các cấp xử lý
+
+Tự đánh giá
+Phó phòng/ban
+Trưởng phòng/ban
+Ban biên tập
+Hội đồng
+Các cấp trên có thể xem và điều chỉnh điểm
+
+Mỗi cấp có thể đối chiếu với cấp trước.
+Điểm có thể được điều chỉnh theo mức phù hợp trước khi chốt.
+Đánh giá nhanh nhiều phiếu
+
+Người chấm có thể chọn nhiều phiếu cùng lúc để thực hiện thao tác chấm nhanh.
+Công bố kết quả
+
+Kết quả đánh giá có thể được công bố và xem lại trong lịch sử.
+3. Quy tắc chấm điểm
+Loại câu hỏi 1: Câu hỏi lựa chọn
+Người dùng chọn 1 trong các mức đã định sẵn.
+Sau khi chọn, nhập điểm trong phạm vi điểm của mức đó.
+Dùng cho các tiêu chí có tính chất nhận định mức độ hoàn thành.
+Loại câu hỏi 2: Câu hỏi điểm số
+Người dùng nhập trực tiếp điểm số.
+Điểm phải nằm trong khoảng cho phép.
+Loại câu hỏi 3: Câu hỏi hệ thống
+Điểm do hệ thống tự xác nhận.
+Người dùng không chỉnh sửa được.
+Thường dùng cho điểm cộng hoặc các dữ liệu đã có sẵn.
+Điểm cộng và điểm trừ
+Nhóm điểm cộng dùng để ghi nhận thành tích, sáng kiến, khen thưởng, đào tạo, hoạt động tập thể.
+Nhóm điểm trừ dùng để ghi nhận vi phạm, không hoàn thành đúng hạn, vi phạm quy trình, ảnh hưởng tiến độ chung.
+4. Từng tiêu chí trong phiếu đánh giá
+Nhóm I. Thực hiện chức trách, nhiệm vụ
+Thực hiện nhiệm vụ chuyên môn
+
+Loại: câu hỏi lựa chọn
+Mục đích: đánh giá mức độ hoàn thành nhiệm vụ chuyên môn
+Phạm vi điểm: 0 – 45
+Bảo đảm chất lượng và tiến độ công việc được giao
+
+Loại: câu hỏi lựa chọn
+Phạm vi điểm: 0 – 30
+Chủ động đề xuất giải pháp nâng cao hiệu quả công việc
+
+Loại: câu hỏi lựa chọn
+Phạm vi điểm: 0 – 20
+Khả năng xử lý công việc độc lập và chịu trách nhiệm về kết quả
+
+Loại: điểm số
+Phạm vi điểm: 0 – 10
+Mức độ hoàn thành kế hoạch công tác trong quý
+
+Loại: điểm số
+Phạm vi điểm: 0 – 10
+Hiệu quả sử dụng thời gian và nguồn lực được giao
+
+Loại: điểm số
+Phạm vi điểm: 0 – 5
+Thực hiện chế độ báo cáo và cập nhật tiến độ công việc
+
+Loại: điểm số
+Phạm vi điểm: 0 – 5
+Khả năng thích ứng và xử lý nhiệm vụ phát sinh
+
+Loại: điểm số
+Phạm vi điểm: 0 – 5
+Nhóm II. Chấp hành pháp luật, quy chế cơ quan
+Chấp hành pháp luật và nội quy của cơ quan
+
+Loại: điểm số
+Phạm vi điểm: 0 – 5
+Thực hiện đầy đủ quy trình và quy chế chuyên môn
+
+Loại: điểm số
+Phạm vi điểm: 0 – 5
+Nhiệt tình, tận tụy và chủ động trong công việc
+Loại: điểm số
+Phạm vi điểm: 0 – 5
+Thực hành tiết kiệm, chống tham nhũng và lãng phí
+Loại: điểm số
+Phạm vi điểm: 0 – 5
+Bảo mật thông tin, dữ liệu và tài sản của cơ quan
+Loại: điểm số
+Phạm vi điểm: 0 – 5
+Chấp hành thời gian và kỷ luật làm việc
+Loại: điểm số
+Phạm vi điểm: 0 – 5
+Nhóm III. Phẩm chất, tinh thần phối hợp
+Tinh thần hợp tác, phối hợp và hỗ trợ đồng nghiệp
+Loại: câu hỏi lựa chọn
+Mục đích: đánh giá mức độ phối hợp trong tập thể
+Phạm vi điểm: 0 – 5
+Thái độ giao tiếp và ứng xử trong môi trường làm việc
+Loại: điểm số
+Phạm vi điểm: 0 – 5
+Hỗ trợ tập thể và chia sẻ kinh nghiệm nghiệp vụ
+Loại: điểm số
+Phạm vi điểm: 0 – 5
+Tiếp thu phản hồi và điều chỉnh trong công việc
+Loại: điểm số
+Phạm vi điểm: 0 – 5
+Tinh thần học tập và nâng cao trình độ chuyên môn
+Loại: điểm số
+Phạm vi điểm: 0 – 5
+Giữ gìn đoàn kết nội bộ và văn hóa cơ quan
+Loại: điểm số
+Phạm vi điểm: 0 – 5
+Tinh thần trách nhiệm đối với công việc chung
+Loại: điểm số
+Phạm vi điểm: 0 – 5
+Nhóm IV. Điểm cộng
+Sáng kiến cải tiến được công nhận và áp dụng
+Loại: hệ thống
+Phạm vi điểm: 0 – 30
+Hoàn thành nhiệm vụ đột xuất được ghi nhận
+Loại: hệ thống
+Phạm vi điểm: 0 – 10
+Được khen thưởng trong kỳ đánh giá
+Loại: hệ thống
+Phạm vi điểm: 0
+Tham gia đào tạo hoặc chia sẻ nghiệp vụ nội bộ
+Loại: hệ thống
+Phạm vi điểm: 0 – 5
+Đóng góp hoạt động tập thể được ghi nhận
+Loại: hệ thống
+Phạm vi điểm: 0
+Nhóm V. Điểm trừ
+Vi phạm thời gian làm việc
+Loại: điểm số
+Phạm vi điểm: 0 – 5
+Không hoàn thành nhiệm vụ đúng thời hạn
+Loại: điểm số
+Phạm vi điểm: 0 – 5
+Vi phạm quy trình hoặc quy định của cơ quan
+Loại: điểm số
+Phạm vi điểm: 0 – 5
+Ảnh hưởng đến tiến độ hoặc kết quả chung của tập thể
+Loại: điểm số
+Phạm vi điểm: 0 – 5
+5. Tóm tắt ngắn gọn
+Module đánh giá lao động có 5 phần chính:
+
+nhập điểm và ghi chú,
+gửi phiếu,
+luồng chấm tại nhiều cấp,
+điểm cộng/điểm trừ,
+công bố kết quả.

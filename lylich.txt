@@ -1,0 +1,60 @@
+Thông tin Đầu
+Họ và tên
+Ảnh đại diện
+Số điện thoại
+Số điện thoại nhà
+Email
+Chức vụ hiện tại
+
+###Sơ yếu lý lịch
+
+Sinh ngày
+Giới tính
+Nơi sinh
+Quê quán
+Địa chỉ thường trú (hộ khẩu)
+Nơi ở hiện nay
+Dân tộc
+Tôn giáo
+Quốc tịch
+
+Số CMND/CCCD
+Ngày cấp
+Nơi cấp
+
+Thành phần gia đình xuất thân
+Nghề nghiệp khi được tuyển dụng
+----------
+Trình độ học vấn:
+Văn hóa phổ thông
+Chuyên môn, kỹ thuật
+Lý luận chính trị
+Ngoại ngữ (Anh, Pháp, Hoa, Nga, Đức,…)
+Tin học
+---------------
+Ngày tham gia cách mạng
+Làm gì, trong tổ chức nào
+Ngày được tuyển dụng
+Cơ quan tuyển dụng
+
+Ngày nhập ngũ
+Ngày xuất ngũ
+Quân hàm
+
+Ngày vào Đoàn TNCS Hồ Chí Minh
+Nơi kết nạp
+Ngày vào Đảng CSVN (dự bị)
+Ngày chính thức
+
+Ngạch công chức, viên chức
+Mã số
+Bậc lương
+Hệ số lương
+Từ tháng/năm
+Danh hiệu được phong
+
+Sức khỏe
+Chiều cao
+Cân nặng
+
+Sở trường công tác
