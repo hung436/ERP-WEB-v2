@@ -155,6 +155,22 @@
   width: 270px;
 }
 
+.back-to-list-bar {
+  padding: 4px 10px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  width: fit-content;
+}
+
+.back-to-list-bar .ant-btn-link {
+  color: #175cd3;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 0;
+  height: auto;
+}
+
 /* 2. Overview Bar */
 .evaluation-overview {
   min-height: 84px;

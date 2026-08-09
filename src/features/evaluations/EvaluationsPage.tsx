@@ -278,7 +278,7 @@ function EvaluationWorkspace({
         </div>
 
         <div className="evaluation-workspace-controls">
-          {/* Sleek 1-Click Segmented Pill Bar for Mode Switcher */}
+          {/* Ultra-Clean Sleek Segmented Switcher */}
           <div className="evaluation-segmented-pills" role="radiogroup" aria-label="Chế độ làm việc">
             {modeOptions.map((opt) => {
               const isActive = mode === opt.value;
@@ -289,7 +289,7 @@ function EvaluationWorkspace({
                   role="radio"
                   aria-label={opt.label}
                   aria-checked={isActive}
-                  className={`segmented-pill-btn ${opt.tagClass}${isActive ? ' active' : ''}`}
+                  className={`segmented-pill-btn${isActive ? ' active' : ''}`}
                   onClick={() => {
                     setMode(opt.value as EvaluationMode);
                     setSheetId('');
@@ -297,7 +297,6 @@ function EvaluationWorkspace({
                 >
                   <span className="pill-icon" aria-hidden="true">{opt.icon}</span>
                   <span className="pill-label">{opt.label}</span>
-                  <span className="pill-tag">{opt.tag}</span>
                 </button>
               );
             })}
