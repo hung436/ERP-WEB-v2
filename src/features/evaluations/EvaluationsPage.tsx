@@ -169,30 +169,29 @@ function EvaluationWorkspace({
         </div>
 
         <div className="evaluation-workspace-controls">
-          <div className="evaluation-control mode-control">
-            <span className="mode-control-label">
-              <span className="mode-star-icon" aria-hidden="true">⚡</span> Chế độ làm việc
-            </span>
-            <Select
-              aria-label="Chế độ đánh giá"
-              className="evaluation-mode-select"
-              popupClassName="mode-select-dropdown"
-              onChange={(value) => {
-                setMode(value);
-                setSheetId('');
-              }}
-              options={modeOptions.map((opt) => ({
-                value: opt.value,
-                label: (
-                  <div className="mode-option-row">
-                    <span className="mode-option-icon" aria-hidden="true">{opt.icon}</span>
-                    <span className="mode-option-label">{opt.label}</span>
-                    <span className={`mode-option-tag ${opt.tagClass}`}>{opt.tag}</span>
-                  </div>
-                ),
-              }))}
-              value={mode}
-            />
+          {/* Sleek 1-Click Segmented Pill Bar for Mode Switcher */}
+          <div className="evaluation-segmented-pills" role="radiogroup" aria-label="Chế độ làm việc">
+            {modeOptions.map((opt) => {
+              const isActive = mode === opt.value;
+              return (
+                <button
+                  key={opt.value}
+                  type="button"
+                  role="radio"
+                  aria-label={opt.label}
+                  aria-checked={isActive}
+                  className={`segmented-pill-btn ${opt.tagClass}${isActive ? ' active' : ''}`}
+                  onClick={() => {
+                    setMode(opt.value as EvaluationMode);
+                    setSheetId('');
+                  }}
+                >
+                  <span className="pill-icon" aria-hidden="true">{opt.icon}</span>
+                  <span className="pill-label">{opt.label}</span>
+                  <span className="pill-tag">{opt.tag}</span>
+                </button>
+              );
+            })}
           </div>
 
           <div className="evaluation-control">

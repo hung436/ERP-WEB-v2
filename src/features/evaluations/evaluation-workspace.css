@@ -57,6 +57,7 @@
   line-height: 1.2;
 }
 
+/* 1. Header Bar Controls & Segmented Pill Bar */
 .evaluation-workspace-controls {
   display: flex;
   align-items: center;
@@ -64,98 +65,97 @@
   gap: 14px;
 }
 
-.evaluation-workspace-controls .evaluation-control {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.evaluation-workspace-controls .evaluation-control > span {
-  padding-left: 2px;
-  color: #475467;
-  font-size: 11px;
-  font-weight: 600;
-}
-
-/* Mode Control (Chế độ làm việc Redesign) */
-.evaluation-workspace-controls .mode-control {
-  padding: 6px 12px;
-  background: linear-gradient(135deg, #eff8ff 0%, #f0f5ff 100%);
-  border: 1px solid #b2ddff;
-  border-radius: 10px;
-  box-shadow: 0 1px 3px rgba(23, 92, 211, 0.06);
-}
-
-.mode-control-label {
+.evaluation-segmented-pills {
   display: flex;
   align-items: center;
-  gap: 4px;
-  color: #175cd3 !important;
-  font-size: 11px !important;
-  font-weight: 700 !important;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
+  gap: 6px;
+  background: #f2f4f7;
+  padding: 4px;
+  border-radius: 12px;
+  border: 1px solid #eaecf0;
+  box-shadow: inset 0 1px 2px rgba(16, 24, 40, 0.04);
 }
 
-.mode-star-icon {
-  color: #d92d20;
-  font-size: 12px;
-}
-
-.evaluation-mode-select {
-  min-width: 220px !important;
-}
-
-.evaluation-mode-select .ant-select-selector {
-  border-color: #b2ddff !important;
-  background: #ffffff !important;
-  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.03) !important;
-}
-
-.mode-option-row {
+.segmented-pill-btn {
   display: flex;
   align-items: center;
   gap: 8px;
-  width: 100%;
-}
-
-.mode-option-icon {
-  font-size: 14px;
-  flex-shrink: 0;
-}
-
-.mode-option-label {
-  flex: 1;
-  min-width: 0;
+  padding: 8px 14px;
+  border-radius: 9px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: #475467;
+  font-size: 13px;
   font-weight: 600;
-  color: #101828;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  user-select: none;
 }
 
-.mode-option-tag {
+.segmented-pill-btn:hover:not(.active) {
+  background: #ffffff;
+  color: #101828;
+  border-color: #e4e7ec;
+}
+
+.segmented-pill-btn.active {
+  background: #ffffff;
+  color: #101828;
+  font-weight: 700;
+  border-color: #d0d5dd;
+  box-shadow: 0 2px 5px rgba(16, 24, 40, 0.08), 0 1px 2px rgba(16, 24, 40, 0.04);
+}
+
+.segmented-pill-btn.tag-self.active {
+  border-color: #b2ddff;
+  background: #eff8ff;
+  color: #175cd3;
+}
+
+.segmented-pill-btn.tag-scoring.active {
+  border-color: #f472b6;
+  background: #fdf4ff;
+  color: #c11574;
+}
+
+.segmented-pill-btn.tag-council.active {
+  border-color: #fde68a;
+  background: #fff8f0;
+  color: #b45309;
+}
+
+.segmented-pill-btn .pill-icon {
+  font-size: 15px;
+  line-height: 1;
+}
+
+.segmented-pill-btn .pill-label {
+  line-height: 1.2;
+}
+
+.segmented-pill-btn .pill-tag {
   font-size: 10px;
   font-weight: 700;
   padding: 2px 7px;
   border-radius: 6px;
-  letter-spacing: 0.02em;
-  flex-shrink: 0;
+  background: rgba(16, 24, 40, 0.06);
+  color: inherit;
+  transition: all 0.18s ease;
 }
 
-.mode-option-tag.tag-self {
-  color: #175cd3;
-  background: #eff8ff;
-  border: 1px solid #b2ddff;
+.segmented-pill-btn.tag-self.active .pill-tag {
+  background: #d1e9ff;
+  color: #1570ef;
 }
 
-.mode-option-tag.tag-scoring {
-  color: #c11574;
-  background: #fdf4ff;
-  border: 1px solid #f472b6;
+.segmented-pill-btn.tag-scoring.active .pill-tag {
+  background: #fbcfe8;
+  color: #9e155f;
 }
 
-.mode-option-tag.tag-council {
-  color: #b45309;
-  background: #fff8f0;
-  border: 1px solid #fde68a;
+.segmented-pill-btn.tag-council.active .pill-tag {
+  background: #fef3c7;
+  color: #92400e;
 }
 
 .evaluation-workspace-controls .ant-select {

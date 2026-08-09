@@ -5,8 +5,13 @@ import { describe, expect, it } from 'vitest';
 import { renderApp } from '@/test/testUtils';
 
 const selectMode = async (user: ReturnType<typeof userEvent.setup>, label: string) => {
-  await user.click(screen.getByRole('combobox', { name: 'Chế độ đánh giá' }));
-  await user.click(await screen.findByText(label));
+  const radio = screen.queryByRole('radio', { name: new RegExp(label) });
+  if (radio) {
+    await user.click(radio);
+  } else {
+    await user.click(screen.getByRole('combobox', { name: 'Chế độ đánh giá' }));
+    await user.click(await screen.findByText(label));
+  }
 };
 
 describe('Workspace Đánh giá lao động', () => {
