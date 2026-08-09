@@ -121,7 +121,7 @@ export function EvaluationCriterionRow({
           </div>
         ) : (
           <span className="direct-score-tag">
-            ⚡ {isUnlimited ? 'Nhập điểm mở' : `Nhập điểm trực tiếp (${criterion.min}–${criterion.max} đ)`}
+            {isUnlimited ? 'Điểm mở' : 'Chấm trực tiếp'}
           </span>
         )}
       </div>
