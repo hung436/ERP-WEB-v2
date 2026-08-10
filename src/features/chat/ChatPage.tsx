@@ -11,7 +11,7 @@ import { CreateGroupModal } from '@/features/chat/components/CreateGroupModal';
 import { useAsyncData } from '@/hooks/useAsyncData';
 import { chatApi } from '@/services/api';
 import type { ChatMessage, ChatReply } from '@/types/domain';
-import { avatarTone } from '@/utils/avatar';
+import { avatarTone, nameInitials } from '@/utils/avatar';
 
 const reactionOptions = ['👍', '❤️', '😂', '😮', '😢', '👏'];
 
@@ -177,7 +177,7 @@ export function ChatPage() {
             <div className={item.isMine ? 'message mine' : 'message'}>
               {!item.isMine && selected?.isGroup && (
                 <span className={`avatar group-msg-avatar ${avatarTone(item.senderName)}`} title={item.senderName}>
-                  {item.senderName.slice(0, 2).toUpperCase()}
+                  {nameInitials(item.senderName)}
                 </span>
               )}
               <div className="message-wrapper">
