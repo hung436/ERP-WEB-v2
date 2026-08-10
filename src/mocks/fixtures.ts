@@ -5,6 +5,11 @@ export const demoUser: User = {
   department: 'Ban Nội dung', position: 'Phóng viên', role: 'employee',
 };
 
+export const adminUser: User = {
+  id: 'user-admin', username: 'admin', fullName: 'Phạm Đức Long (Admin)', email: 'admin@noibo.vn',
+  department: 'Ban Quản trị & Công nghệ', position: 'Quản trị viên Hệ thống', role: 'admin',
+};
+
 export const tasks: Task[] = [
   { id: 'task-01', title: 'Duyệt đơn xin nghỉ phép của Nguyễn Hoài Nam', description: 'Nhân viên đề nghị nghỉ phép năm để giải quyết việc gia đình. Hồ sơ đã được trưởng ban xác nhận và đang chờ cấp có thẩm quyền phê duyệt.', status: 'todo', priority: 'urgent', dueAt: '2026-08-06T11:00:00+07:00', assignedBy: 'Hệ thống Tài liệu', department: 'Ban Bạn đọc', progress: 75, sourceModule: 'documents', workflowKind: 'leave_request', subjectName: 'Nguyễn Hoài Nam', requestDuration: '03 ngày · 10/08–12/08/2026', workflowStep: 'Bước 3/3 · Chờ phê duyệt' },
   { id: 'task-02', title: 'Duyệt đơn xin đi nước ngoài của Trần Thu Hà', description: 'Đề nghị đi công tác tại Singapore theo thư mời của đối tác. Hồ sơ đã có ý kiến của Ban Nội dung và Phòng Tổ chức.', status: 'in_progress', priority: 'high', dueAt: '2026-08-06T16:30:00+07:00', assignedBy: 'Hệ thống Tài liệu', department: 'Ban Nội dung', progress: 60, sourceModule: 'documents', workflowKind: 'overseas_request', subjectName: 'Trần Thu Hà', requestDuration: '05 ngày · 18/08–22/08/2026', destination: 'Singapore', workflowStep: 'Bước 4/5 · Chờ lãnh đạo duyệt' },

@@ -752,3 +752,43 @@ body { font-size:var(--font-main); line-height:1.5; }
   opacity: 1 !important;
   pointer-events: auto !important;
 }
+
+/* Login Demo Account Box Styling */
+.demo-account-box {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 14px;
+  border: 1px solid #eaecf0;
+  border-radius: 10px;
+  background: #f9fafb;
+}
+
+.demo-title {
+  color: #475467;
+  font-size: 13px !important;
+  font-weight: 600;
+}
+
+.demo-account-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.demo-account-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  color: #344054;
+  font-size: 13px !important;
+}
+
+.demo-account-item code {
+  padding: 2px 6px;
+  color: #b42318;
+  border-radius: 5px;
+  background: #fee4e2;
+  font-weight: 600;
+}

@@ -36,7 +36,19 @@ export function LoginPage() {
           <Form.Item label="Mật khẩu" name="password" rules={[{ required: true, message: 'Vui lòng nhập mật khẩu.' }, { min: 6, message: 'Mật khẩu có ít nhất 6 ký tự.' }]}><Input.Password autoComplete="current-password" placeholder="Nhập mật khẩu" /></Form.Item>
           <Button block htmlType="submit" loading={submitting} size="large" type="primary">Đăng nhập</Button>
         </Form>
-        <div className="demo-account"><span>Tài khoản dùng thử</span><code>nhanvien</code><span>/</span><code>123456</code></div>
+        <div className="demo-account-box">
+          <small className="demo-title">Tài khoản dùng thử hệ thống:</small>
+          <div className="demo-account-list">
+            <div className="demo-account-item">
+              <span>👑 Quản trị viên (Admin):</span>
+              <code>admin</code> / <code>123456</code>
+            </div>
+            <div className="demo-account-item">
+              <span>👤 Nhân viên (Employee):</span>
+              <code>nhanvien</code> / <code>123456</code>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   </main>;

@@ -1,11 +1,12 @@
-import { announcements, calendarEvents, chatMembers, conversations, demoUser, directoryContacts, mails, messages, tasks } from '@/mocks/fixtures';
+import { adminUser, announcements, calendarEvents, chatMembers, conversations, demoUser, directoryContacts, mails, messages, tasks } from '@/mocks/fixtures';
 import { cloudRecords, evaluationRecords, expertRecords, libraryRecords, meetingRecords, requestRecords } from '@/mocks/extendedFixtures';
 import { documentSubmissions, documentTemplates } from '@/mocks/documentFixtures';
 import { evaluationPeriods, evaluationSheets } from '@/mocks/evaluationFixtures';
 import { personalProfile } from '@/mocks/personnelFixtures';
-import type { Announcement, ApiResponse, ApiState, CalendarEvent, ChatAttachment, ChatConversation, ChatMessage, DashboardSummary, DirectoryContact, DocumentSubmission, MailComposePayload, MailItem, MailReply, Task } from '@/types/domain';
+import type { Announcement, ApiResponse, ApiState, CalendarEvent, ChatAttachment, ChatConversation, ChatMessage, DashboardSummary, DirectoryContact, DocumentSubmission, MailComposePayload, MailItem, MailReply, Task, User } from '@/types/domain';
 import type { EvaluationSheet, EvaluationSummary } from '@/types/evaluation';
 
+let activeUser: User = demoUser;
 let chatConversationStore: ChatConversation[] = conversations.map((item) => ({ ...item, members: [...item.members] }));
 let chatMessageStore: ChatMessage[] = [...messages];
 let chatSequence = 100;
@@ -68,12 +69,21 @@ export async function mockRequest<T>(path: string, options?: { method?: string; 
 
   if (pathname === '/api/auth/login' && options?.method === 'POST') {
     const credentials = options.body as { username?: string; password?: string };
-    if (credentials.username !== 'nhanvien' || credentials.password !== '123456') {
+    if (credentials.username === 'admin' && (credentials.password === '123456' || credentials.password === 'admin123')) {
+      activeUser = adminUser;
+      data = { token: 'mock-admin-token', user: adminUser };
+    } else if (credentials.username === 'nhanvien' && credentials.password === '123456') {
+      activeUser = demoUser;
+      data = { token: 'mock-token', user: demoUser };
+    } else {
       throw new Error('Tên đăng nhập hoặc mật khẩu không đúng.');
     }
-    data = { token: 'mock-token', user: demoUser };
-  } else if (pathname === '/api/auth/me') data = demoUser;
-  else if (pathname === '/api/auth/logout') data = null;
+  } else if (pathname === '/api/auth/me') {
+    data = activeUser;
+  } else if (pathname === '/api/auth/logout') {
+    activeUser = demoUser;
+    data = null;
+  }
   else if (pathname === '/api/dashboard/summary') {
     const taskStore = currentTaskStore();
     data = {

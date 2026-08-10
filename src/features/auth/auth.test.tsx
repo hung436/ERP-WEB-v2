@@ -11,7 +11,16 @@ describe('Xác thực', () => {
     await user.type(screen.getByLabelText('Mật khẩu'), '123456');
     await user.click(screen.getByRole('button', { name: 'Đăng nhập' }));
     await waitFor(() => expect(window.location.pathname).toBe('/'));
-    expect(await screen.findByText('Công việc của tôi')).toBeInTheDocument();
+    expect(await screen.findByText('Công việc cần xử lý')).toBeInTheDocument();
+  });
+
+  it('đăng nhập bằng tài khoản admin thành công', async () => {
+    const user = userEvent.setup(); renderApp('/login');
+    await user.type(screen.getByLabelText('Tên đăng nhập'), 'admin');
+    await user.type(screen.getByLabelText('Mật khẩu'), '123456');
+    await user.click(screen.getByRole('button', { name: 'Đăng nhập' }));
+    await waitFor(() => expect(window.location.pathname).toBe('/'));
+    expect(await screen.findByText('Công việc cần xử lý')).toBeInTheDocument();
   });
 
   it('hiển thị lỗi khi đăng nhập sai', async () => {
@@ -30,7 +39,7 @@ describe('Xác thực', () => {
 
   it('đăng xuất, xoá session và quay về login', async () => {
     const user = userEvent.setup(); renderApp('/', true);
-    await screen.findByText('Công việc của tôi');
+    await screen.findByText('Công việc cần xử lý');
     await user.click(screen.getByRole('button', { name: 'Mở menu tài khoản' }));
     await user.click(await screen.findByText('Đăng xuất'));
     await waitFor(() => expect(window.location.pathname).toBe('/login'));
