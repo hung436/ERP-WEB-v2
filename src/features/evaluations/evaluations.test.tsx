@@ -68,7 +68,7 @@ describe('Workspace Đánh giá lao động', () => {
     expect(screen.getByRole('button', { name: 'Chốt kết quả' })).toBeInTheDocument();
   });
 
-  it('tài khoản admin có giao diện giám sát riêng không tự chấm điểm', async () => {
+  it('tài khoản admin có giao diện trang riêng không dùng popup', async () => {
     const user = userEvent.setup();
     renderApp('/login');
     await user.type(screen.getByLabelText('Tên đăng nhập'), 'admin');
@@ -77,11 +77,13 @@ describe('Workspace Đánh giá lao động', () => {
     await user.click(await screen.findByRole('link', { name: /Đánh giá/i }));
 
     expect(await screen.findByText(/Quản trị viên/i)).toBeInTheDocument();
-    await user.click(screen.getByRole('button', { name: /Quản lý nhóm & Quy trình/i }));
-    expect(await screen.findByText(/Quản lý Nhóm tiêu chí & Quy trình Flow/i)).toBeInTheDocument();
-    await user.click(screen.getByRole('button', { name: 'Lưu & Đóng' }));
+    await user.click(screen.getByRole('button', { name: /Quản lý Kỳ & Mốc thời gian/i }));
+    expect(await screen.findByText(/Khởi tạo Kỳ đánh giá & Thiết lập mốc thời gian/i)).toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', { name: /Quản lý kỳ đánh giá/i }));
-    expect(await screen.findByText(/Quản lý Kỳ đánh giá Lao động & Bộ Import Dữ liệu/i)).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: /Import Dữ liệu Excel\/CSV/i }));
+    expect(await screen.findByText(/Import Danh sách Nhân viên/i)).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: /Nhóm tiêu chí & Flowchart/i }));
+    expect(await screen.findByText(/Sơ đồ Flow tiến trình chấm chi tiết theo cá nhân/i)).toBeInTheDocument();
   });
 });
