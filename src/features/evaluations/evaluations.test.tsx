@@ -78,10 +78,10 @@ describe('Workspace Đánh giá lao động', () => {
 
     expect(await screen.findByText(/Quản trị viên/i)).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: /Quản lý nhóm & Quy trình/i }));
-    expect(await screen.findByText(/Quản lý Nhóm & Quy trình Đánh giá Lao động/i)).toBeInTheDocument();
+    expect(await screen.findByText(/Quản lý Nhóm tiêu chí & Quy trình Flow/i)).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Lưu & Đóng' }));
 
     await user.click(screen.getByRole('button', { name: /Quản lý kỳ đánh giá/i }));
-    expect(await screen.findByText(/Quản lý Kỳ đánh giá Lao động/i)).toBeInTheDocument();
+    expect(await screen.findByText(/Quản lý Kỳ đánh giá Lao động & Bộ Import Dữ liệu/i)).toBeInTheDocument();
   });
 });

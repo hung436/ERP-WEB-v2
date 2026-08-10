@@ -194,7 +194,9 @@ function AdminManageGroupsModal({
   open: boolean;
   onClose: () => void;
 }) {
-  const [activeTab, setActiveTab] = useState<'groups' | 'workflow'>('groups');
+  const [activeTab, setActiveTab] = useState<'groups' | 'flowchart'>('groups');
+  const [selectedEmpCode, setSelectedEmpCode] = useState('NV-001');
+
   const [groups, setGroups] = useState<EvaluationGroup[]>([
     {
       id: 'grp-01',
@@ -234,6 +236,47 @@ function AdminManageGroupsModal({
   const [newGroupTitle, setNewGroupTitle] = useState('');
   const [newGroupKind, setNewGroupKind] = useState<'normal' | 'bonus' | 'deduction'>('normal');
 
+  const employeeFlows: Record<string, { name: string; dept: string; pos: string; steps: { stage: string; reviewer: string; role: string; status: 'completed' | 'current' | 'pending'; time?: string }[] }> = {
+    'NV-001': {
+      name: 'Nguyễn Minh Anh',
+      dept: 'Ban Nội dung',
+      pos: 'Phóng viên',
+      steps: [
+        { stage: 'Giai đoạn 1: Tự đánh giá', reviewer: 'Nguyễn Minh Anh', role: 'Chính chủ tự chấm', status: 'completed', time: '05/08/2026 14:30' },
+        { stage: 'Giai đoạn 2: Phó phòng đánh giá', reviewer: 'Trần Thu Hà', role: 'Phó Ban Nội dung', status: 'completed', time: '07/08/2026 09:15' },
+        { stage: 'Giai đoạn 3: Trưởng phòng duyệt', reviewer: 'Lê Thanh Vân', role: 'Trưởng Ban Nội dung', status: 'current', time: 'Đang xử lý' },
+        { stage: 'Giai đoạn 4: Ban Biên tập rà soát', reviewer: 'Hoàng Tuấn Anh', role: 'Trưởng Ban Thư ký Biên tập', status: 'pending' },
+        { stage: 'Giai đoạn 5: Hội đồng chốt điểm', reviewer: 'Hội đồng Thi đua', role: 'Chủ tịch & Các Ủy viên', status: 'pending' },
+      ],
+    },
+    'NV-005': {
+      name: 'Đỗ Quang Huy',
+      dept: 'Ban Khoa giáo',
+      pos: 'Biên tập viên',
+      steps: [
+        { stage: 'Giai đoạn 1: Tự đánh giá', reviewer: 'Đỗ Quang Huy', role: 'Chính chủ tự chấm', status: 'completed', time: '04/08/2026 16:45' },
+        { stage: 'Giai đoạn 2: Phó phòng đánh giá', reviewer: 'Phạm Đức Long', role: 'Phó Ban Khoa giáo', status: 'completed', time: '06/08/2026 10:20' },
+        { stage: 'Giai đoạn 3: Trưởng phòng duyệt', reviewer: 'Vũ Minh Trí', role: 'Trưởng Ban Khoa giáo', status: 'completed', time: '08/08/2026 11:00' },
+        { stage: 'Giai đoạn 4: Ban Biên tập rà soát', reviewer: 'Hoàng Tuấn Anh', role: 'Trưởng Ban Thư ký Biên tập', status: 'current', time: 'Đang rà soát' },
+        { stage: 'Giai đoạn 5: Hội đồng chốt điểm', reviewer: 'Hội đồng Thi đua', role: 'Chủ tịch & Các Ủy viên', status: 'pending' },
+      ],
+    },
+    'NV-002': {
+      name: 'Trần Thu Hà',
+      dept: 'Ban Nội dung',
+      pos: 'Phó Ban Nội dung',
+      steps: [
+        { stage: 'Giai đoạn 1: Tự đánh giá', reviewer: 'Trần Thu Hà', role: 'Chính chủ tự chấm', status: 'completed', time: '03/08/2026 09:00' },
+        { stage: 'Giai đoạn 2: Phó phòng đánh giá', reviewer: 'Bỏ qua (Cấp Phó ban)', role: 'Tự động chuyển cấp Trưởng ban', status: 'completed', time: '03/08/2026 09:00' },
+        { stage: 'Giai đoạn 3: Trưởng phòng duyệt', reviewer: 'Lê Thanh Vân', role: 'Trưởng Ban Nội dung', status: 'completed', time: '05/08/2026 15:30' },
+        { stage: 'Giai đoạn 4: Ban Biên tập rà soát', reviewer: 'Hoàng Tuấn Anh', role: 'Trưởng Ban Thư ký Biên tập', status: 'completed', time: '07/08/2026 16:00' },
+        { stage: 'Giai đoạn 5: Hội đồng chốt điểm', reviewer: 'Hội đồng Thi đua', role: 'Chủ tịch Hội đồng', status: 'completed', time: '09/08/2026 10:00' },
+      ],
+    },
+  };
+
+  const currentFlow = employeeFlows[selectedEmpCode] ?? employeeFlows['NV-001'];
+
   const handleAddGroup = () => {
     if (!newGroupTitle.trim()) {
       message.error('Vui lòng nhập tên nhóm tiêu chí');
@@ -252,13 +295,13 @@ function AdminManageGroupsModal({
 
   return (
     <Modal
-      title="⚙️ Quản lý Nhóm & Quy trình Đánh giá Lao động (Admin)"
+      title="⚙️ Quản lý Nhóm tiêu chí & Quy trình Flow chấm từng nhân sự"
       open={open}
       onCancel={onClose}
       footer={[
         <Button key="cancel" onClick={onClose}>Lưu & Đóng</Button>,
       ]}
-      width={840}
+      width={920}
       destroyOnHidden
     >
       <div className="admin-modal-body">
@@ -270,10 +313,10 @@ function AdminManageGroupsModal({
             📋 Nhóm & Tiêu chí đánh giá ({groups.length} nhóm)
           </Button>
           <Button
-            type={activeTab === 'workflow' ? 'primary' : 'default'}
-            onClick={() => setActiveTab('workflow')}
+            type={activeTab === 'flowchart' ? 'primary' : 'default'}
+            onClick={() => setActiveTab('flowchart')}
           >
-            🔄 Quy trình xử lý 5 cấp
+            🔄 Flowchart Quy trình chấm của từng nhân sự
           </Button>
         </div>
 
@@ -326,53 +369,53 @@ function AdminManageGroupsModal({
             </div>
           </div>
         ) : (
-          <div className="workflow-manager-panel">
-            <div className="workflow-intro">
-              <h4>🔄 Cấu hình Quy trình xử lý & Phê duyệt Đánh giá Lao động (5 Cấp)</h4>
-              <p>Hệ thống tự động chuyển tiếp hồ sơ đánh giá theo đúng thứ tự các cấp phê duyệt bên dưới:</p>
+          <div className="flowchart-manager-panel">
+            <div className="emp-select-flow-header">
+              <div>
+                <h4>🔄 Sơ đồ Flow tiến trình chấm chi tiết theo cá nhân</h4>
+                <p>Theo dõi chính xác luồng chuyển duyệt, người thụ lý chấm điểm & mốc thời gian của từng cán bộ</p>
+              </div>
+              <div className="emp-flow-picker">
+                <span>Chọn nhân sự:</span>
+                <Select
+                  value={selectedEmpCode}
+                  onChange={(val) => setSelectedEmpCode(val)}
+                  style={{ width: 280 }}
+                  options={[
+                    { value: 'NV-001', label: 'Nguyễn Minh Anh (NV-001) · Ban Nội dung' },
+                    { value: 'NV-005', label: 'Đỗ Quang Huy (NV-005) · Ban Khoa giáo' },
+                    { value: 'NV-002', label: 'Trần Thu Hà (NV-002) · Phó Ban Nội dung' },
+                  ]}
+                />
+              </div>
             </div>
 
-            <div className="workflow-steps-cards">
-              <div className="workflow-step-card active">
-                <span className="step-num">Cấp 1</span>
-                <div className="step-detail">
-                  <strong>Tự đánh giá cá nhân</strong>
-                  <small>Nhân viên tự chấm điểm và gửi minh chứng kết quả công việc (Hạn 5 ngày)</small>
-                </div>
-                <Tag color="blue">Kích hoạt</Tag>
+            <div className="emp-flow-summary-card">
+              <div className="emp-flow-avatar">{initials(currentFlow.name)}</div>
+              <div className="emp-flow-meta">
+                <strong>{currentFlow.name} ({selectedEmpCode})</strong>
+                <small>{currentFlow.pos} · {currentFlow.dept}</small>
               </div>
-              <div className="workflow-step-card">
-                <span className="step-num">Cấp 2</span>
-                <div className="step-detail">
-                  <strong>Đánh giá cấp Phó phòng/ban</strong>
-                  <small>Phó đơn vị rà soát điểm tự chấm và đưa ra nhận xét (Hạn 3 ngày)</small>
+            </div>
+
+            {/* Interactive Flowchart Stepper */}
+            <div className="flowchart-nodes-container">
+              {currentFlow.steps.map((step, idx) => (
+                <div key={idx} className={`flowchart-node-card status-${step.status}`}>
+                  <div className="node-step-index">{idx + 1}</div>
+                  <div className="node-content">
+                    <span className="node-stage-label">{step.stage}</span>
+                    <strong className="node-reviewer-name">👤 {step.reviewer}</strong>
+                    <small className="node-reviewer-role">{step.role}</small>
+                    {step.time && <span className="node-timestamp">⏱️ {step.time}</span>}
+                  </div>
+                  <div className="node-status-tag">
+                    <Tag color={step.status === 'completed' ? 'green' : step.status === 'current' ? 'orange' : 'default'}>
+                      {step.status === 'completed' ? '✓ Đã hoàn tất' : step.status === 'current' ? '⏳ Đang chấm' : '⚪ Chưa tới lượt'}
+                    </Tag>
+                  </div>
                 </div>
-                <Tag color="blue">Kích hoạt</Tag>
-              </div>
-              <div className="workflow-step-card">
-                <span className="step-num">Cấp 3</span>
-                <div className="step-detail">
-                  <strong>Phê duyệt Trưởng phòng/ban</strong>
-                  <small>Trưởng đơn vị chấm điểm chính thức và xác nhận xếp loại (Hạn 3 ngày)</small>
-                </div>
-                <Tag color="blue">Kích hoạt</Tag>
-              </div>
-              <div className="workflow-step-card">
-                <span className="step-num">Cấp 4</span>
-                <div className="step-detail">
-                  <strong>Rà soát Ban Biên tập / Phòng Tổ chức</strong>
-                  <small>Tổng hợp số liệu toàn cơ quan, kiểm tra tính đồng đều giữa các ban (Hạn 2 ngày)</small>
-                </div>
-                <Tag color="blue">Kích hoạt</Tag>
-              </div>
-              <div className="workflow-step-card">
-                <span className="step-num">Cấp 5</span>
-                <div className="step-detail">
-                  <strong>Chốt kết quả Hội đồng Thi đua Khen thưởng</strong>
-                  <small>Chốt điểm thi đua chính thức và công bố kết quả toàn cơ quan (Hạn 2 ngày)</small>
-                </div>
-                <Tag color="green">Chốt công bố</Tag>
-              </div>
+              ))}
             </div>
           </div>
         )}
@@ -392,13 +435,33 @@ function AdminManagePeriodsModal({
   onClose: () => void;
   onAddPeriod: (newPeriod: EvaluationPeriod) => void;
 }) {
+  const [activeTab, setActiveTab] = useState<'timeline' | 'importers'>('timeline');
   const [periodList, setPeriodList] = useState<EvaluationPeriod[]>(periods);
   const [label, setLabel] = useState('');
-  const [dueAt, setDueAt] = useState('2026-09-30');
+
+  // 5 Stage Timeline Milestones
+  const [milestones, setMilestones] = useState<{ stageLabel: string; startAt: string; dueAt: string }[]>([
+    { stageLabel: '1. Tự đánh giá cá nhân', startAt: '2026-08-01', dueAt: '2026-08-10' },
+    { stageLabel: '2. Phó phòng đánh giá', startAt: '2026-08-11', dueAt: '2026-08-15' },
+    { stageLabel: '3. Trưởng phòng phê duyệt', startAt: '2026-08-16', dueAt: '2026-08-20' },
+    { stageLabel: '4. Ban Biên tập rà soát', startAt: '2026-08-21', dueAt: '2026-08-25' },
+    { stageLabel: '5. Hội đồng chốt & công bố', startAt: '2026-08-26', dueAt: '2026-08-30' },
+  ]);
+
+  // Importers state
+  const [importMode, setImportMode] = useState<'employees' | 'criteria' | 'scores'>('employees');
+  const [importedFileName, setImportedFileName] = useState<string | null>(null);
+  const [importPreviewData, setImportPreviewData] = useState<any[]>([]);
 
   useEffect(() => {
     setPeriodList(periods);
   }, [periods]);
+
+  const handleMilestoneDateChange = (index: number, field: 'startAt' | 'dueAt', value: string) => {
+    const updated = [...milestones];
+    updated[index][field] = value;
+    setMilestones(updated);
+  };
 
   const handleCreate = () => {
     if (!label.trim()) {
@@ -408,15 +471,15 @@ function AdminManagePeriodsModal({
     const created: EvaluationPeriod = {
       id: `period-${Date.now()}`,
       label: label.trim(),
-      startAt: new Date().toISOString(),
-      dueAt: new Date(dueAt).toISOString(),
+      startAt: new Date(milestones[0].startAt).toISOString(),
+      dueAt: new Date(milestones[4].dueAt).toISOString(),
       status: 'active',
     };
     const updated = [created, ...periodList];
     setPeriodList(updated);
     onAddPeriod(created);
     setLabel('');
-    message.success(`Đã khởi tạo kỳ đánh giá "${created.label}" thành công`);
+    message.success(`Đã khởi tạo kỳ đánh giá "${created.label}" cùng 5 mốc thời gian chấm thành công`);
   };
 
   const toggleStatus = (id: string) => {
@@ -427,59 +490,213 @@ function AdminManagePeriodsModal({
     message.success('Đã cập nhật trạng thái kỳ đánh giá');
   };
 
+  const handleSimulateFileUpload = (mode: 'employees' | 'criteria' | 'scores') => {
+    if (mode === 'employees') {
+      setImportedFileName('Danh_sach_Nhan_vien_Q3_2026.xlsx');
+      setImportPreviewData([
+        { code: 'NV-010', name: 'Trần Văn Hoàng', dept: 'Ban Bạn đọc', pos: 'Phóng viên' },
+        { code: 'NV-011', name: 'Ngô Thanh Sơn', dept: 'Ban Thời sự', pos: 'Biên tập viên' },
+        { code: 'NV-012', name: 'Lê Minh Hương', dept: 'Văn phòng', pos: 'Chuyên viên' },
+      ]);
+    } else if (mode === 'criteria') {
+      setImportedFileName('Ma_tran_Tieu_chi_Danh_gia_2026.csv');
+      setImportPreviewData([
+        { group: 'Chuyên môn', title: 'Hoàn thành chỉ tiêu bài viết xuất bản', maxScore: 40 },
+        { group: 'Kỷ luật', title: 'Chấp hành giờ giấc & Nội quy tòa soạn', maxScore: 30 },
+        { group: 'Sáng kiến', title: 'Đề xuất tuyến bài đoạt giải báo chí', maxScore: 15 },
+      ]);
+    } else {
+      setImportedFileName('Bang_diem_KPI_He_thong_Q3.xlsx');
+      setImportPreviewData([
+        { code: 'NV-001', name: 'Nguyễn Minh Anh', kpiScore: 88, autoPoints: 10 },
+        { code: 'NV-002', name: 'Trần Thu Hà', kpiScore: 92, autoPoints: 10 },
+        { code: 'NV-005', name: 'Đỗ Quang Huy', kpiScore: 85, autoPoints: 8 },
+      ]);
+    }
+    message.success('Đã đọc dữ liệu tệp thành công! Vui lòng kiểm tra bản xem trước.');
+  };
+
+  const handleExecuteImport = () => {
+    message.success(`Đã import thành công ${importPreviewData.length} bản ghi vào hệ thống đánh giá!`);
+    setImportedFileName(null);
+    setImportPreviewData([]);
+  };
+
   return (
     <Modal
-      title="📅 Quản lý Kỳ đánh giá Lao động (Admin)"
+      title="📅 Quản lý Kỳ đánh giá Lao động & Bộ Import Dữ liệu (Admin)"
       open={open}
       onCancel={onClose}
       footer={[
         <Button key="close" onClick={onClose}>Lưu & Đóng</Button>,
       ]}
-      width={720}
+      width={900}
       destroyOnHidden
     >
       <div className="admin-periods-modal-body">
-        <div className="create-period-box">
-          <h4>+ Khởi tạo Kỳ đánh giá Lao động mới</h4>
-          <div className="create-period-form">
-            <Input
-              placeholder="Tên kỳ đánh giá (ví dụ: Đánh giá lao động Quý IV/2026)"
-              value={label}
-              onChange={(e) => setLabel(e.target.value)}
-            />
-            <div className="due-date-picker">
-              <span>Hạn hoàn thành:</span>
-              <Input
-                type="date"
-                value={dueAt}
-                onChange={(e) => setDueAt(e.target.value)}
-              />
-            </div>
-            <Button type="primary" onClick={handleCreate}>Tạo kỳ đánh giá</Button>
-          </div>
+        <div className="admin-modal-tabs">
+          <Button
+            type={activeTab === 'timeline' ? 'primary' : 'default'}
+            onClick={() => setActiveTab('timeline')}
+          >
+            📅 Thiết lập Kỳ & Mốc thời gian 5 thời điểm chấm
+          </Button>
+          <Button
+            type={activeTab === 'importers' ? 'primary' : 'default'}
+            onClick={() => setActiveTab('importers')}
+          >
+            📥 Import Dữ liệu Excel / CSV (Nhân sự, Tiêu chí, Bảng điểm)
+          </Button>
         </div>
 
-        <div className="period-list-container">
-          <h4>📋 Danh sách các Kỳ đánh giá trong hệ thống ({periodList.length})</h4>
-          <div className="period-cards-list">
-            {periodList.map((p) => (
-              <div key={p.id} className="period-card">
-                <div className="period-card-info">
-                  <strong>{p.label}</strong>
-                  <small>Hạn hoàn thành: {formatDate(p.dueAt)}</small>
+        {activeTab === 'timeline' ? (
+          <div className="periods-timeline-panel">
+            <div className="create-period-box">
+              <h4>+ Khởi tạo Kỳ đánh giá & Thiết lập mốc thời gian từng giai đoạn chấm</h4>
+              <div className="create-period-main-row">
+                <Input
+                  placeholder="Tên kỳ đánh giá (ví dụ: Đánh giá lao động Quý IV/2026)"
+                  value={label}
+                  onChange={(e) => setLabel(e.target.value)}
+                  style={{ width: 340 }}
+                />
+                <Button type="primary" onClick={handleCreate}>+ Tạo kỳ đánh giá mới</Button>
+              </div>
+
+              {/* 5 Stage Milestones Config Matrix */}
+              <div className="milestones-config-matrix">
+                <h5>⏱️ Mốc thời gian tương ứng với 5 thời điểm chấm:</h5>
+                <div className="milestones-grid">
+                  {milestones.map((m, idx) => (
+                    <div key={idx} className="milestone-config-card">
+                      <strong className="m-stage-title">{m.stageLabel}</strong>
+                      <div className="m-date-inputs">
+                        <label>
+                          <span>Ngày mở:</span>
+                          <input
+                            type="date"
+                            value={m.startAt}
+                            onChange={(e) => handleMilestoneDateChange(idx, 'startAt', e.target.value)}
+                          />
+                        </label>
+                        <label>
+                          <span>Hạn chót:</span>
+                          <input
+                            type="date"
+                            value={m.dueAt}
+                            onChange={(e) => handleMilestoneDateChange(idx, 'dueAt', e.target.value)}
+                          />
+                        </label>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-                <div className="period-card-actions">
-                  <Tag color={p.status === 'active' ? 'green' : 'default'}>
-                    {p.status === 'active' ? 'Đang diễn ra' : 'Đã đóng kỳ'}
-                  </Tag>
-                  <Button size="small" onClick={() => toggleStatus(p.id)}>
-                    {p.status === 'active' ? 'Đóng kỳ' : 'Mở lại kỳ'}
+              </div>
+            </div>
+
+            <div className="period-list-container">
+              <h4>📋 Danh sách các Kỳ đánh giá hiện có ({periodList.length})</h4>
+              <div className="period-cards-list">
+                {periodList.map((p) => (
+                  <div key={p.id} className="period-card">
+                    <div className="period-card-info">
+                      <strong>{p.label}</strong>
+                      <small>Thời gian kỳ: {formatDate(p.startAt)} – {formatDate(p.dueAt)}</small>
+                    </div>
+                    <div className="period-card-actions">
+                      <Tag color={p.status === 'active' ? 'green' : 'default'}>
+                        {p.status === 'active' ? 'Đang diễn ra' : 'Đã đóng kỳ'}
+                      </Tag>
+                      <Button size="small" onClick={() => toggleStatus(p.id)}>
+                        {p.status === 'active' ? 'Đóng kỳ' : 'Mở lại kỳ'}
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="importers-panel">
+            <div className="importer-mode-selector">
+              <span>Chọn loại dữ liệu cần Import:</span>
+              <div className="importer-buttons">
+                <Button
+                  type={importMode === 'employees' ? 'primary' : 'default'}
+                  onClick={() => { setImportMode('employees'); setImportedFileName(null); setImportPreviewData([]); }}
+                >
+                  👤 Import Danh sách Nhân viên
+                </Button>
+                <Button
+                  type={importMode === 'criteria' ? 'primary' : 'default'}
+                  onClick={() => { setImportMode('criteria'); setImportedFileName(null); setImportPreviewData([]); }}
+                >
+                  📋 Import Ma trận Tiêu chí
+                </Button>
+                <Button
+                  type={importMode === 'scores' ? 'primary' : 'default'}
+                  onClick={() => { setImportMode('scores'); setImportedFileName(null); setImportPreviewData([]); }}
+                >
+                  📊 Import Bảng điểm KPI / Có sẵn
+                </Button>
+              </div>
+            </div>
+
+            {/* Dropzone Simulation */}
+            <div className="import-dropzone" onClick={() => handleSimulateFileUpload(importMode)}>
+              <div className="dropzone-icon">📁</div>
+              <strong>Nhấp vào đây để chọn tệp Excel (.xlsx) hoặc CSV để Import</strong>
+              <p>Hỗ trợ tệp bảng tính mẫu tiêu chuẩn. Hệ thống tự động khớp cột dữ liệu.</p>
+              <Button size="small" onClick={(e) => { e.stopPropagation(); handleSimulateFileUpload(importMode); }}>
+                Chọn tệp mẫu mô phỏng
+              </Button>
+            </div>
+
+            {/* File & Preview Data */}
+            {importedFileName && (
+              <div className="import-preview-box">
+                <div className="imported-file-badge">
+                  <span>📄 Tệp đã chọn: <strong>{importedFileName}</strong></span>
+                  <Tag color="green">Đã kiểm tra định dạng OK</Tag>
+                </div>
+
+                <h5>Bản xem trước dữ liệu ({importPreviewData.length} bản ghi):</h5>
+                <div className="preview-table-wrapper">
+                  <table className="mini-preview-table">
+                    <thead>
+                      {importMode === 'employees' ? (
+                        <tr><th>Mã NV</th><th>Họ tên</th><th>Phòng ban</th><th>Chức danh</th></tr>
+                      ) : importMode === 'criteria' ? (
+                        <tr><th>Nhóm</th><th>Nội dung tiêu chí</th><th>Điểm tối đa</th></tr>
+                      ) : (
+                        <tr><th>Mã NV</th><th>Họ tên</th><th>Điểm KPI</th><th>Điểm cộng tự động</th></tr>
+                      )}
+                    </thead>
+                    <tbody>
+                      {importPreviewData.map((item, i) => (
+                        <tr key={i}>
+                          {importMode === 'employees' ? (
+                            <><td>{item.code}</td><td>{item.name}</td><td>{item.dept}</td><td>{item.pos}</td></>
+                          ) : importMode === 'criteria' ? (
+                            <><td>{item.group}</td><td>{item.title}</td><td>{item.maxScore}</td></>
+                          ) : (
+                            <><td>{item.code}</td><td>{item.name}</td><td>{item.kpiScore}</td><td>+{item.autoPoints}</td></>
+                          )}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                <div className="import-actions-row">
+                  <Button type="primary" onClick={handleExecuteImport}>
+                    ✓ Tiến hành Import vào Hệ thống
                   </Button>
                 </div>
               </div>
-            ))}
+            )}
           </div>
-        </div>
+        )}
       </div>
     </Modal>
   );

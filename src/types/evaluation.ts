@@ -2,12 +2,31 @@ export type EvaluationStage = 'self' | 'deputy' | 'manager' | 'editorial' | 'cou
 export type EvaluationStatus = 'draft' | 'waiting' | 'in_review' | 'completed' | 'published';
 export type EvaluationQuestionType = 'choice' | 'number' | 'system';
 
+export interface StageMilestone {
+  stage: EvaluationStage;
+  stageLabel: string;
+  startAt: string;
+  dueAt: string;
+  status: 'pending' | 'in_progress' | 'completed';
+}
+
+export interface IndividualWorkflowStep {
+  stage: EvaluationStage;
+  stageLabel: string;
+  reviewerName: string;
+  reviewerRole: string;
+  reviewerDepartment: string;
+  status: 'pending' | 'active' | 'approved' | 'rejected';
+  completedAt?: string;
+}
+
 export interface EvaluationPeriod {
   id: string;
   label: string;
   startAt: string;
   dueAt: string;
   status: 'active' | 'closed';
+  stageMilestones?: StageMilestone[];
 }
 
 export interface EvaluationLevel {
