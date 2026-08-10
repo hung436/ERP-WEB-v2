@@ -47,7 +47,7 @@ describe('Workspace Đánh giá lao động', () => {
     await selectMode(user, 'Chấm nhân viên');
     await user.click(await screen.findByText(/Đỗ Quang Huy/));
     const firstRow = (await screen.findAllByRole('article'))[0];
-    const history = within(firstRow).getByLabelText(/Lịch sử điểm: Thực hiện nhiệm vụ chuyên môn/);
+    const history = within(firstRow).getByLabelText(/Bảng tổng hợp điểm các cấp: Thực hiện nhiệm vụ chuyên môn/);
     expect(within(history).getByText('Tự đánh giá')).toBeInTheDocument();
     expect(within(history).getByText('Phó phòng/ban')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Hoàn tất chấm điểm' })).toBeInTheDocument();
@@ -60,7 +60,7 @@ describe('Workspace Đánh giá lao động', () => {
     await selectMode(user, 'Hội đồng đánh giá');
     await user.click((await screen.findAllByText(/Chấm điểm|Xem phiếu/))[0]);
     const firstRow = (await screen.findAllByRole('article'))[0];
-    const history = within(firstRow).getByLabelText(/Lịch sử điểm: Thực hiện nhiệm vụ chuyên môn/);
+    const history = within(firstRow).getByLabelText(/Bảng tổng hợp điểm các cấp: Thực hiện nhiệm vụ chuyên môn/);
     expect(within(history).getByText('Tự đánh giá')).toBeInTheDocument();
     expect(within(history).getByText('Phó phòng/ban')).toBeInTheDocument();
     expect(within(history).getByText('Trưởng phòng/ban')).toBeInTheDocument();
@@ -92,19 +92,20 @@ describe('Workspace Đánh giá lao động', () => {
     await screen.findByRole('heading', { name: /Đánh giá lao động/i });
     const stream = await screen.findByRole('region', { name: 'Danh sách tiêu chí đánh giá' });
     const firstRow = (await within(stream).findAllByRole('article'))[0];
-    const history = within(firstRow).getByLabelText(/Lịch sử điểm: Thực hiện nhiệm vụ chuyên môn/);
-    expect(within(history).getByText('Tự đánh giá')).toBeInTheDocument();
-    expect(within(history).getByText('Phó phòng/ban')).toBeInTheDocument();
-    expect(within(history).getByText('Trưởng phòng/ban')).toBeInTheDocument();
-    expect(within(history).getByText('Ban biên tập')).toBeInTheDocument();
-    expect(within(history).getByText('Hội đồng')).toBeInTheDocument();
+
+    // Verify Audit Matrix container
+    const auditMatrix = within(firstRow).getByLabelText(/Bảng tổng hợp điểm các cấp: Thực hiện nhiệm vụ chuyên môn/);
+    expect(within(auditMatrix).getByText('Tự đánh giá')).toBeInTheDocument();
+    expect(within(auditMatrix).getByText('Phó phòng/ban')).toBeInTheDocument();
+    expect(within(auditMatrix).getByText('Trưởng phòng/ban')).toBeInTheDocument();
+    expect(within(auditMatrix).getByText('Ban biên tập')).toBeInTheDocument();
+    expect(within(auditMatrix).getByText('Hội đồng')).toBeInTheDocument();
 
     // Verify Option levels are visible
     const radioGroup = within(firstRow).getByRole('radiogroup', { name: /Mức đánh giá: Thực hiện nhiệm vụ chuyên môn/ });
     expect(within(radioGroup).getByText(/Hoàn thành tốt toàn bộ nhiệm vụ/i)).toBeInTheDocument();
 
-    // Verify Stage notes feed is displayed
-    const notesFeed = within(firstRow).getByLabelText(/Ghi chú các cấp chấm: Thực hiện nhiệm vụ chuyên môn/);
-    expect(within(notesFeed).getByText(/Đã hoàn thành 15 bài xuất bản/i)).toBeInTheDocument();
+    // Verify Stage notes bubble inside matrix
+    expect(within(auditMatrix).getByText(/Đã hoàn thành 15 bài xuất bản/i)).toBeInTheDocument();
   });
 });
