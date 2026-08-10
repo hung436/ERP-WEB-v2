@@ -1448,9 +1448,6 @@ function EvaluationWorkspace({
                             </p>
                           </div>
                         </div>
-                        <strong className="group-score-sum">
-                          Tổng nhóm: {groupScore} điểm
-                        </strong>
                       </header>
                       <div className="group-rows-container">
                         {group.criteria.map((criterion) => (
@@ -1518,7 +1515,7 @@ function EvaluationWorkspace({
                           }}
                           title={`Câu ${idx + 1}: ${c.title} (${isScored ? `${c.score}đ` : 'Chưa chấm'})`}
                         >
-                          <span className="grid-item-num">#{idx + 1}</span>
+                          <span className="grid-item-num">{idx + 1}</span>
                           <strong className="grid-item-score">{isScored ? `${c.score}đ` : '—'}</strong>
                         </button>
                       );
@@ -1552,7 +1549,7 @@ function EvaluationWorkspace({
                       onClick={() => void persist(false)}
                     >
                       <span className="btn-icon">💾</span>
-                      <span>Lưu bản nháp</span>
+                      <span>Lưu nháp</span>
                     </Button>
                   </div>
                 )}
