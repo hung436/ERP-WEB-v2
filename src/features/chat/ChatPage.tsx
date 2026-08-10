@@ -184,22 +184,34 @@ export function ChatPage() {
                 {!item.isMine && selected?.isGroup && (
                   <small className="message-sender-name">{item.senderName}</small>
                 )}
-                <div className="message-bubble">
-                  {item.replyTo && <div className="message-reply"><small>{item.replyTo.senderName}</small><strong>{item.replyTo.content}</strong></div>}
-                  <span className="message-content">{item.content}</span>
-                  {item.attachment && <span className="message-attachment"><strong>{item.attachment.name}</strong><small>{(item.attachment.size / 1024).toFixed(1)} KB · {item.attachment.type}</small></span>}
-                  <div className="message-meta">
-                    {Boolean(item.reactions?.length) && <span className="message-reactions">{item.reactions?.map((reaction) => <button aria-label={`${reaction.reacted ? 'Bỏ' : 'Thả'} cảm xúc ${reaction.emoji}`} className={reaction.reacted ? 'reacted' : ''} disabled={pendingAction === `reaction-${item.id}`} key={reaction.emoji} onClick={() => void react(item, reaction.emoji)} type="button">{reaction.emoji} {reaction.count}</button>)}</span>}
-                    <time className="message-time">{new Date(item.sentAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}</time>
+                <div className="message-bubble-row">
+                  {item.isMine && (
+                    <div className="message-actions" aria-label="Thao tác tin nhắn">
+                      <Tooltip title="Trả lời"><button aria-label={`Trả lời tin nhắn của ${item.senderName}`} onClick={() => setReplyTo({ id: item.id, senderName: item.senderName, content: item.content })} type="button"><ChatActionIcon name="reply" /></button></Tooltip>
+                      <Popover content={<div className="reaction-picker">{reactionOptions.map((emoji) => <button aria-label={`Thả cảm xúc ${emoji}`} disabled={pendingAction === `reaction-${item.id}`} key={emoji} onClick={() => void react(item, emoji)} type="button">{emoji}</button>)}</div>} placement="top" trigger="click">
+                        <Tooltip title="Thả cảm xúc"><button aria-label="Chọn cảm xúc" type="button"><ChatActionIcon name="reaction" /></button></Tooltip>
+                      </Popover>
+                      <Tooltip title="Xóa tin nhắn"><button aria-label="Xóa tin nhắn" disabled={pendingAction === `delete-${item.id}`} onClick={() => void deleteMessage(item)} type="button"><ChatActionIcon name="trash" /></button></Tooltip>
+                    </div>
+                  )}
+                  <div className="message-bubble">
+                    {item.replyTo && <div className="message-reply"><small>{item.replyTo.senderName}</small><strong>{item.replyTo.content}</strong></div>}
+                    <span className="message-content">{item.content}</span>
+                    {item.attachment && <span className="message-attachment"><strong>{item.attachment.name}</strong><small>{(item.attachment.size / 1024).toFixed(1)} KB · {item.attachment.type}</small></span>}
+                    <div className="message-meta">
+                      {Boolean(item.reactions?.length) && <span className="message-reactions">{item.reactions?.map((reaction) => <button aria-label={`${reaction.reacted ? 'Bỏ' : 'Thả'} cảm xúc ${reaction.emoji}`} className={reaction.reacted ? 'reacted' : ''} disabled={pendingAction === `reaction-${item.id}`} key={reaction.emoji} onClick={() => void react(item, reaction.emoji)} type="button">{reaction.emoji} {reaction.count}</button>)}</span>}
+                      <time className="message-time">{new Date(item.sentAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}</time>
+                    </div>
                   </div>
+                  {!item.isMine && (
+                    <div className="message-actions" aria-label="Thao tác tin nhắn">
+                      <Tooltip title="Trả lời"><button aria-label={`Trả lời tin nhắn của ${item.senderName}`} onClick={() => setReplyTo({ id: item.id, senderName: item.senderName, content: item.content })} type="button"><ChatActionIcon name="reply" /></button></Tooltip>
+                      <Popover content={<div className="reaction-picker">{reactionOptions.map((emoji) => <button aria-label={`Thả cảm xúc ${emoji}`} disabled={pendingAction === `reaction-${item.id}`} key={emoji} onClick={() => void react(item, emoji)} type="button">{emoji}</button>)}</div>} placement="top" trigger="click">
+                        <Tooltip title="Thả cảm xúc"><button aria-label="Chọn cảm xúc" type="button"><ChatActionIcon name="reaction" /></button></Tooltip>
+                      </Popover>
+                    </div>
+                  )}
                 </div>
-              </div>
-              <div className="message-actions" aria-label="Thao tác tin nhắn">
-                <Tooltip title="Trả lời"><button aria-label={`Trả lời tin nhắn của ${item.senderName}`} onClick={() => setReplyTo({ id: item.id, senderName: item.senderName, content: item.content })} type="button"><ChatActionIcon name="reply" /></button></Tooltip>
-                <Popover content={<div className="reaction-picker">{reactionOptions.map((emoji) => <button aria-label={`Thả cảm xúc ${emoji}`} disabled={pendingAction === `reaction-${item.id}`} key={emoji} onClick={() => void react(item, emoji)} type="button">{emoji}</button>)}</div>} placement="top" trigger="click">
-                  <Tooltip title="Thả cảm xúc"><button aria-label="Chọn cảm xúc" type="button"><ChatActionIcon name="reaction" /></button></Tooltip>
-                </Popover>
-                {item.isMine && <Tooltip title="Xóa tin nhắn"><button aria-label="Xóa tin nhắn" disabled={pendingAction === `delete-${item.id}`} onClick={() => void deleteMessage(item)} type="button"><ChatActionIcon name="trash" /></button></Tooltip>}
               </div>
             </div>
           </div>) : <EmptyState description={messageSearch ? 'Không tìm thấy tin nhắn phù hợp' : 'Chưa có tin nhắn. Hãy bắt đầu cuộc trò chuyện.'} />}
