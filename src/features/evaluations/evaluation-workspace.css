@@ -679,7 +679,7 @@
 .evaluation-stream {
   min-height: 0;
   flex: 1;
-  overflow-y: auto;
+  overflow: visible;
   border: 1px solid #d0d5dd;
   border-radius: 12px;
   background: #f9fafb;
