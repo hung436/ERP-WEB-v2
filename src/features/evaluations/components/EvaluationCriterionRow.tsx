@@ -130,7 +130,7 @@ export function EvaluationCriterionRow({
         </div>
       </header>
 
-      {/* Radio Options List Body (Only when HAS levels) */}
+      {/* Radio Options List Body (Only when HAS levels - Always shown in both edit & readOnly modes) */}
       {hasLevels && (
         <div
           className="radio-options-body"
@@ -157,6 +157,28 @@ export function EvaluationCriterionRow({
               </button>
             );
           })}
+        </div>
+      )}
+
+      {/* Stage Notes Feed (Ghi chú các cấp chấm) */}
+      {(criterion.stageNotes || criterion.note) && (
+        <div className="criterion-stage-notes-feed" aria-label={`Ghi chú các cấp chấm: ${criterion.title}`}>
+          <span className="feed-title">📝 Ghi chú các cấp chấm:</span>
+          <div className="feed-items">
+            {criterion.note && (!criterion.stageNotes || !criterion.stageNotes.self) && (
+              <div className="feed-item stage-self">
+                <strong className="feed-author">👤 Tự đánh giá:</strong>
+                <span className="feed-text">{criterion.note}</span>
+              </div>
+            )}
+            {criterion.stageNotes &&
+              Object.entries(criterion.stageNotes).map(([stage, noteText]) => (
+                <div key={stage} className={`feed-item stage-${stage}`}>
+                  <strong className="feed-author">👤 {stageLabels[stage as EvaluationStage]}:</strong>
+                  <span className="feed-text">{noteText}</span>
+                </div>
+              ))}
+          </div>
         </div>
       )}
     </article>

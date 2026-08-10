@@ -1787,3 +1787,46 @@
   box-shadow: 0 1px 4px rgba(16, 24, 40, 0.04);
 }
 
+/* Criterion Stage Notes Feed */
+.criterion-stage-notes-feed {
+  margin-top: 10px;
+  padding: 10px 14px;
+  background: #f8fafc;
+  border: 1px solid #eaecf0;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.criterion-stage-notes-feed .feed-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #344054;
+}
+
+.criterion-stage-notes-feed .feed-items {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.criterion-stage-notes-feed .feed-item {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 12px;
+  color: #344054;
+}
+
+.criterion-stage-notes-feed .feed-author {
+  font-weight: 600;
+  color: #175cd3;
+  white-space: nowrap;
+}
+
+.criterion-stage-notes-feed .feed-text {
+  color: #475467;
+  font-style: italic;
+}
+

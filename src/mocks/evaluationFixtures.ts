@@ -106,11 +106,19 @@ const cloneGroups = (progress: number, previous = false): EvaluationGroup[] => b
     const manager = Math.max(0, deputy - (index % 5 === 0 ? 1 : 0));
     const editorial = Math.max(0, manager - (index % 6 === 0 ? 1 : 0));
     const council = editorial;
+
+    const notesObj = previous ? {
+      self: index === 0 ? 'Đã hoàn thành 15 bài xuất bản chất lượng cao, đúng tiến độ.' : index === 1 ? 'Kiểm tra kỹ số liệu xuất bản.' : undefined,
+      deputy: index === 0 ? 'Đã rà soát nghiệp vụ, thống nhất mức điểm tốt.' : undefined,
+      manager: index === 0 ? 'Đồng ý phê duyệt xếp loại xuất sắc.' : undefined,
+    } : undefined;
+
     return {
       ...criterion,
       score: progress < 100 && index > 5 && group.id === 'duties' ? null : criterion.score,
       previousScore: previous ? deputy : undefined,
       stageScores: previous ? { self, deputy, manager, editorial, council } : { self },
+      stageNotes: notesObj && Object.values(notesObj).some(Boolean) ? (notesObj as Partial<Record<any, string>>) : undefined,
       levels: criterion.levels?.map((level) => ({ ...level })),
     };
   }),

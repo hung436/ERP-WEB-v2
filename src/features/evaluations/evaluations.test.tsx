@@ -87,7 +87,7 @@ describe('Workspace Đánh giá lao động', () => {
     expect(await screen.findByText(/Sơ đồ Flow tiến trình chấm chi tiết theo cá nhân/i)).toBeInTheDocument();
   });
 
-  it('Phiếu của tôi khi đã công bố sẽ xem được chi tiết điểm từng câu của từng cấp chấm', async () => {
+  it('Phiếu của tôi khi đã công bố sẽ xem được chi tiết điểm từng câu của từng cấp chấm, phương án chọn và ghi chú các cấp', async () => {
     renderApp('/evaluations?sheetId=eval-self-q2', true);
     await screen.findByRole('heading', { name: /Đánh giá lao động/i });
     const stream = await screen.findByRole('region', { name: 'Danh sách tiêu chí đánh giá' });
@@ -98,5 +98,13 @@ describe('Workspace Đánh giá lao động', () => {
     expect(within(history).getByText('Trưởng phòng/ban')).toBeInTheDocument();
     expect(within(history).getByText('Ban biên tập')).toBeInTheDocument();
     expect(within(history).getByText('Hội đồng')).toBeInTheDocument();
+
+    // Verify Option levels are visible
+    const radioGroup = within(firstRow).getByRole('radiogroup', { name: /Mức đánh giá: Thực hiện nhiệm vụ chuyên môn/ });
+    expect(within(radioGroup).getByText(/Hoàn thành tốt toàn bộ nhiệm vụ/i)).toBeInTheDocument();
+
+    // Verify Stage notes feed is displayed
+    const notesFeed = within(firstRow).getByLabelText(/Ghi chú các cấp chấm: Thực hiện nhiệm vụ chuyên môn/);
+    expect(within(notesFeed).getByText(/Đã hoàn thành 15 bài xuất bản/i)).toBeInTheDocument();
   });
 });

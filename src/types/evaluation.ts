@@ -45,6 +45,7 @@ export interface EvaluationCriterion {
   score: number | null;
   previousScore?: number;
   stageScores?: Partial<Record<EvaluationStage, number>>;
+  stageNotes?: Partial<Record<EvaluationStage, string>>;
   note?: string;
   levels?: EvaluationLevel[];
 }
