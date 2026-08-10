@@ -659,12 +659,12 @@
   border: 1px solid #b2ddff;
 }
 
-/* 3. Stage Summary History Stepper */
+/* 3. Stage Summary History Stepper - Fixed (No Horizontal Scroll!) */
 .evaluation-stage-summary {
   min-height: 52px;
   display: flex;
   align-items: center;
-  overflow-x: auto;
+  overflow: hidden;
   border: 1px solid #e4e7ec;
   border-radius: 10px;
   background: #ffffff;
@@ -682,27 +682,39 @@
   letter-spacing: 0.03em;
   min-height: 52px;
   border-right: 1px solid #eaecf0;
+  flex-shrink: 0;
 }
 
 .evaluation-stage-summary .stages-flow {
   display: flex;
-  align-items: center;
+  align-items: stretch;
   flex: 1;
+  min-width: 0;
 }
 
 .evaluation-stage-summary .stage-item {
-  min-width: 135px;
+  flex: 1;
+  min-width: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  padding: 8px 16px;
+  padding: 8px 10px;
   border-right: 1px solid #eaecf0;
+  text-align: center;
+}
+
+.evaluation-stage-summary .stage-item:last-child {
+  border-right: none;
 }
 
 .evaluation-stage-summary .stage-item small {
   color: #667085;
   font-size: 11px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 
 .evaluation-stage-summary .stage-item strong {
