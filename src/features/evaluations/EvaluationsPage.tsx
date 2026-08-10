@@ -1532,7 +1532,6 @@ function EvaluationWorkspace({
                     <Button
                       type="primary"
                       className={`btn-submit-evaluation stage-${mode}`}
-                      disabled={completion < 100}
                       loading={saving}
                       onClick={() => void persist(true)}
                     >
