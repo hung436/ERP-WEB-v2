@@ -53,21 +53,36 @@ export const conversations: ChatConversation[] = [
   ['chat-08','Mai Phương Thảo','Hồ sơ còn thiếu một phụ lục.','2026-08-03T16:00:00+07:00',0,false],
 ].map(([id,participantName,lastMessage,lastMessageAt,unreadCount,online], index) => ({
   id, participantName, lastMessage, lastMessageAt, unreadCount, online,
-  isGroup: String(participantName).startsWith('Nhóm'),
+  isGroup: String(participantName).startsWith('Nhóm') || String(participantName).startsWith('Phòng'),
   pinned: index < 2,
-  members: String(participantName).startsWith('Nhóm')
-    ? [memberById('user-001'), memberById('user-002'), memberById('user-003'), memberById('user-004')]
+  members: String(participantName).startsWith('Nhóm') || String(participantName).startsWith('Phòng')
+    ? [memberById('user-001'), memberById('user-002'), memberById('user-003'), memberById('user-004'), memberById('user-005')]
     : [memberById('user-001'), memberById(`user-00${(index % 5) + 2}`)],
 } as ChatConversation));
 
-export const messages: ChatMessage[] = Array.from({ length: 12 }, (_, index) => ({
-  id: `message-${index + 1}`, conversationId: 'chat-01', senderId: index % 2 ? 'user-001' : 'user-002',
-  senderName: index % 2 ? 'Nguyễn Minh Anh' : 'Trần Thu Hà',
-  content: index === 11 ? 'Tôi sẽ gửi bản hoàn chỉnh trước 15 giờ.' : `Nội dung trao đổi công việc số ${index + 1}.`,
-  sentAt: `2026-08-05T${String(9 + Math.floor(index / 3)).padStart(2,'0')}:${String((index % 3) * 15).padStart(2,'0')}:00+07:00`,
-  isMine: index % 2 === 1,
-  reactions: index === 2 ? [{ emoji: '👍', count: 2, reacted: false }] : [],
-}));
+export const messages: ChatMessage[] = [
+  ...Array.from({ length: 12 }, (_, index) => ({
+    id: `message-${index + 1}`, conversationId: 'chat-01', senderId: index % 2 ? 'user-001' : 'user-002',
+    senderName: index % 2 ? 'Nguyễn Minh Anh' : 'Trần Thu Hà',
+    content: index === 11 ? 'Tôi sẽ gửi bản hoàn chỉnh trước 15 giờ.' : `Nội dung trao đổi công việc số ${index + 1}.`,
+    sentAt: `2026-08-05T${String(9 + Math.floor(index / 3)).padStart(2,'0')}:${String((index % 3) * 15).padStart(2,'0')}:00+07:00`,
+    isMine: index % 2 === 1,
+    reactions: index === 2 ? [{ emoji: '👍', count: 2, reacted: false }] : [],
+  })),
+  { id: 'msg-group-201', conversationId: 'chat-02', senderId: 'user-002', senderName: 'Trần Thu Hà', content: 'Chào cả nhóm! Khung bài viết đề tài tuần này đã sẵn sàng trên Drive nội bộ.', sentAt: '2026-08-05T10:00:00+07:00', isMine: false },
+  { id: 'msg-group-202', conversationId: 'chat-02', senderId: 'user-003', senderName: 'Nguyễn Hoài Nam', content: 'Ban Bạn đọc sẽ bổ sung thêm 3 ý kiến phản hồi độc giả vào bài viết.', sentAt: '2026-08-05T11:20:00+07:00', isMine: false },
+  { id: 'msg-group-203', conversationId: 'chat-02', senderId: 'user-004', senderName: 'Lê Thanh Vân', content: 'Văn phòng đã duyệt kinh phí tác nghiệp cho nhóm.', sentAt: '2026-08-05T12:15:00+07:00', isMine: false },
+  { id: 'msg-group-204', conversationId: 'chat-02', senderId: 'user-001', senderName: 'Nguyễn Minh Anh', content: 'Cảm ơn chị Vân, cả nhóm sẽ chốt bản thảo trước 16 giờ chiều nay.', sentAt: '2026-08-05T13:10:00+07:00', isMine: true },
+  { id: 'msg-group-205', conversationId: 'chat-02', senderId: 'user-002', senderName: 'Trần Thu Hà', content: 'Tài liệu họp đã được cập nhật.', sentAt: '2026-08-05T13:45:00+07:00', isMine: false },
+
+  { id: 'msg-group-501', conversationId: 'chat-05', senderId: 'user-005', senderName: 'Đỗ Quang Huy', content: 'Dự án số hóa dữ liệu tư liệu lịch sử báo chí đã hoàn thành giai đoạn 1.', sentAt: '2026-08-04T14:00:00+07:00', isMine: false },
+  { id: 'msg-group-502', conversationId: 'chat-05', senderId: 'user-001', senderName: 'Nguyễn Minh Anh', content: 'Mọi người kiểm tra giao diện tìm kiếm mới trên laptop nhé.', sentAt: '2026-08-04T16:30:00+07:00', isMine: true },
+  { id: 'msg-group-503', conversationId: 'chat-05', senderId: 'user-004', senderName: 'Lê Thanh Vân', content: 'Biên bản họp đã lưu trên Drive nội bộ.', sentAt: '2026-08-04T17:40:00+07:00', isMine: false },
+
+  { id: 'msg-group-701', conversationId: 'chat-07', senderId: 'user-004', senderName: 'Lê Thanh Vân', content: 'Thông báo: Hệ thống hạ tầng máy chủ sẽ nâng cấp định kỳ.', sentAt: '2026-08-04T10:00:00+07:00', isMine: false },
+  { id: 'msg-group-702', conversationId: 'chat-07', senderId: 'user-001', senderName: 'Nguyễn Minh Anh', content: 'Rõ rồi, đã thông báo tới toàn thể cán bộ.', sentAt: '2026-08-04T10:15:00+07:00', isMine: true },
+  { id: 'msg-group-703', conversationId: 'chat-07', senderId: 'user-005', senderName: 'Đỗ Quang Huy', content: 'Hệ thống sẽ bảo trì lúc 18 giờ.', sentAt: '2026-08-04T10:30:00+07:00', isMine: false },
+];
 
 export const directoryContacts: DirectoryContact[] = [
   ['contact-01', 'Nguyễn Minh Anh', 'Minh Anh', 'Ban Nội dung', '0903 125 418', 'minhanh@noibo.vn', '2101'],
