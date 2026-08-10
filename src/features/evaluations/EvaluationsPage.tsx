@@ -767,9 +767,17 @@ function EvaluationWorkspace({
   // Sync state when URL params change (e.g. from homepage navigation or back/forward)
   useEffect(() => {
     const urlSheetId = searchParams.get('sheetId') ?? '';
-    const urlMode = searchParams.get('mode') as EvaluationMode | null;
+    let urlMode = searchParams.get('mode') as EvaluationMode | null;
     const urlTab = searchParams.get('tab') as ('monitor' | 'periods' | 'import' | 'groups') | null;
     const urlPeriodId = searchParams.get('periodId') ?? '';
+
+    // Auto-detect scoring mode if opening a subordinate sheet and current mode is self
+    if (urlSheetId && mode === 'self' && (!urlMode || urlMode === 'self')) {
+      const targetSheet = sheets.find((s) => s.id === urlSheetId);
+      if (targetSheet && targetSheet.employeeName !== 'Nguyễn Minh Anh') {
+        urlMode = 'scoring';
+      }
+    }
 
     if (urlSheetId !== sheetId) setSheetIdState(urlSheetId);
     if (urlMode && urlMode !== mode) setModeState(urlMode);

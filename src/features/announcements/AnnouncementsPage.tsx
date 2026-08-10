@@ -64,12 +64,15 @@ export function AnnouncementsPage() {
         <div className="notification-center-actions"><Input aria-label="Tìm thông báo" allowClear onChange={(event) => setSearch(event.target.value)} placeholder="Tìm theo tiêu đề, nội dung hoặc đơn vị" prefix={<ModuleIcon module="announcements" size={17} />} value={search} /><Button disabled={!unreadCount} onClick={() => void markAllRead()}>Đánh dấu tất cả đã xem</Button></div>
       </header>
 
-      <div className="notification-center-toolbar">
-        <Segmented onChange={(value) => setFilter(value as AnnouncementFilter)} options={[{ label: <CountedTabLabel count={announcements.length} label="Tất cả" />, value: 'all' }, { label: <CountedTabLabel count={unreadCount} label="Chưa xem" />, value: 'unread' }, { label: <CountedTabLabel count={announcements.length} label="Mới nhất" />, value: 'newest' }]} value={filter} />
-        <span>{rows.length} kết quả</span>
+      <div className="notification-center-filter-bar">
+        <div className="notification-source-tabs">
+          <Segmented onChange={(value) => setSource(value as 'all' | AnnouncementSource)} options={sourceOptions} value={source} />
+        </div>
+        <div className="notification-status-tabs">
+          <Segmented onChange={(value) => setFilter(value as AnnouncementFilter)} options={[{ label: 'Tất cả trạng thái', value: 'all' }, { label: <CountedTabLabel count={unreadCount} label="Chưa xem" />, value: 'unread' }, { label: 'Mới nhất', value: 'newest' }]} value={filter} />
+          <span className="results-count">{rows.length} kết quả</span>
+        </div>
       </div>
-
-      <div className="notification-source-filter"><Segmented onChange={(value) => setSource(value as 'all' | AnnouncementSource)} options={sourceOptions} value={source} /></div>
 
       <div className="notification-list">
         {state.loading ? <ContentSkeleton rows={8} /> : state.error ? <ErrorState message={state.error} onRetry={state.reload} /> : !rows.length ? <EmptyState description="Không có thông báo phù hợp" /> : rows.map((item) => {

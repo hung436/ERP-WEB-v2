@@ -10,7 +10,7 @@ const initials = (value: string) => value.split(' ').slice(-2).map((word) => wor
 export function CalendarQuickView({ event, onClose }: { event: CalendarEvent; onClose: () => void }) {
   const joinMeeting = () => message.success(`Đang mở phòng họp ${event.meetingId ?? ''} trong môi trường mô phỏng`);
 
-  return <Modal centered className="online-meeting-modal" footer={<Button onClick={joinMeeting} type="primary">Tham gia phòng họp</Button>} onCancel={onClose} open title={<span className="preview-title"><span className="section-icon meetings"><ModuleIcon module="meetings" size={20} /></span>{event.title}</span>} width={720}>
+  return <Modal centered className="online-meeting-modal" footer={<Button onClick={joinMeeting} type="primary">Tham gia phòng họp</Button>} onCancel={onClose} open title={<span className="preview-title"><span className="section-icon meetings"><ModuleIcon module="meetings" size={20} /></span><span>Lịch làm việc</span><small>· {event.title}</small></span>} width={720}>
     <article className="meeting-modal-content">
       <header className="meeting-modal-summary"><p>{event.platform} · ID phòng {event.meetingId}</p></header>
       <section className="meeting-time-panel"><div><small>Bắt đầu</small><strong>{formatDate(event.startAt)}</strong></div><span>→</span><div><small>Kết thúc</small><strong>{formatDate(event.endAt)}</strong></div></section>

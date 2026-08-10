@@ -33,8 +33,14 @@ export function AppSidebar({ collapsed, onCollapse }: { collapsed: boolean; onCo
     } satisfies Record<string, number>;
   }, pathname);
 
+  const handleNavClick = () => {
+    if (typeof window !== 'undefined' && window.innerWidth < 992) {
+      onCollapse(true);
+    }
+  };
+
   return <Layout.Sider breakpoint="lg" collapsed={collapsed} collapsedWidth={76} onCollapse={onCollapse} theme="light" width={244} className="app-sidebar">
-    <div className="sidebar-head"><button aria-label={collapsed ? 'Mở rộng menu' : 'Thu gọn menu'} className="sidebar-top-collapse" onClick={() => onCollapse(!collapsed)} title={collapsed ? 'Mở rộng menu' : 'Thu gọn menu'} type="button"><span aria-hidden>{collapsed ? '›' : '‹'}</span></button><NavLink aria-label="Về trang chủ" className="brand" onClick={() => onCollapse(true)} to="/"><img alt="Tuổi Trẻ" className={collapsed ? 'brand-logo collapsed-brand-logo' : 'brand-logo'} src={collapsed ? collapsedLogo : tuoiTreLogo} /></NavLink></div>
-    <nav aria-label="Điều hướng chính" className="sidebar-nav"><ul>{navItems.map((item) => { const count = badgeState.data?.[item.path] ?? 0; return <li key={item.path}><Tooltip mouseEnterDelay={0.15} placement="right" title={collapsed ? `${item.label}${count ? ` · ${count}` : ''}` : null}><NavLink aria-label={`${item.label}${count ? `, ${count} mục cần chú ý` : ''}`} className={({ isActive }) => `sidebar-nav-link${isActive ? ' active' : ''}`} end={item.path === '/'} onClick={() => onCollapse(true)} to={item.path}><span className="sidebar-module-icon"><ModuleIcon module={item.module} /></span>{!collapsed && <span className="sidebar-nav-copy"><strong>{item.label}</strong></span>}{count > 0 && <span className="sidebar-count">{count > 99 ? '99+' : count}</span>}</NavLink></Tooltip></li>; })}</ul></nav>
+    <div className="sidebar-head"><button aria-label={collapsed ? 'Mở rộng menu' : 'Thu gọn menu'} className="sidebar-top-collapse" onClick={() => onCollapse(!collapsed)} title={collapsed ? 'Mở rộng menu' : 'Thu gọn menu'} type="button"><span aria-hidden>{collapsed ? '›' : '‹'}</span></button><NavLink aria-label="Về trang chủ" className="brand" onClick={handleNavClick} to="/"><img alt="Tuổi Trẻ" className={collapsed ? 'brand-logo collapsed-brand-logo' : 'brand-logo'} src={collapsed ? collapsedLogo : tuoiTreLogo} /></NavLink></div>
+    <nav aria-label="Điều hướng chính" className="sidebar-nav"><ul>{navItems.map((item) => { const count = badgeState.data?.[item.path] ?? 0; return <li key={item.path}><Tooltip mouseEnterDelay={0.15} placement="right" title={collapsed ? `${item.label}${count ? ` · ${count}` : ''}` : null}><NavLink aria-label={`${item.label}${count ? `, ${count} mục cần chú ý` : ''}`} className={({ isActive }) => `sidebar-nav-link${isActive ? ' active' : ''}`} end={item.path === '/'} onClick={handleNavClick} to={item.path}><span className="sidebar-module-icon"><ModuleIcon module={item.module} size={26} /></span>{!collapsed && <span className="sidebar-nav-copy"><strong>{item.label}</strong></span>}{count > 0 && <span className="sidebar-count">{count > 99 ? '99+' : count}</span>}</NavLink></Tooltip></li>; })}</ul></nav>
   </Layout.Sider>;
 }

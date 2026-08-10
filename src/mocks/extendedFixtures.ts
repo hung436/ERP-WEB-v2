@@ -15,7 +15,7 @@ export const cloudRecords: WorkspaceFile[] = [
 
 export const meetingRecords: WorkspaceRecord[] = [
   { id: 'meet-editorial', title: 'Họp giao ban Ban Biên tập', subtitle: '09:00 hôm nay · Phòng họp B', status: 'Sắp diễn ra', category: '45 phút', description: 'Rà soát tiến độ nội dung và thống nhất kế hoạch tuần.', meta: [{ label: 'Người tổ chức', value: 'Trần Thu Hà' }, { label: 'Người tham dự', value: '12 người' }, { label: 'Hình thức', value: 'Trực tiếp' }] },
-  { id: 'meet-website', title: 'Triển khai Website mới', subtitle: '11:00 hôm nay · Microsoft Teams', status: 'Sắp diễn ra', category: '60 phút', description: 'Thống nhất kế hoạch chuyển đổi và các mốc nghiệm thu website mới.', meta: [{ label: 'Người tổ chức', value: 'Ban Công nghệ' }, { label: 'Người tham dự', value: '8 người' }, { label: 'Hình thức', value: 'Trực tuyến' }] },
+  { id: 'meet-website', title: 'Triển khai Website mới', subtitle: '11:00 hôm nay · meeting.tuoitre.vn', status: 'Sắp diễn ra', category: '60 phút', description: 'Thống nhất kế hoạch chuyển đổi và các mốc nghiệm thu website mới.', meta: [{ label: 'Người tổ chức', value: 'Ban Công nghệ' }, { label: 'Người tham dự', value: '8 người' }, { label: 'Hình thức', value: 'Trực tuyến' }] },
   { id: 'meet-security', title: 'Đào tạo an toàn thông tin', subtitle: '05/08/2026 · Có bản ghi', status: 'Đã kết thúc', category: 'Bản ghi', description: 'Chương trình đào tạo nhận diện rủi ro và xử lý sự cố an toàn thông tin.', meta: [{ label: 'Thời lượng', value: '90 phút' }, { label: 'Đơn vị', value: 'Phòng Công nghệ' }] },
 ];
 
