@@ -1366,181 +1366,162 @@ function EvaluationWorkspace({
             </div>
           )}
 
-          {/* Sticky Header Container for Overview & Criteria Score Matrix */}
-          <div className="evaluation-sticky-header">
-            <section className="evaluation-overview">
-              <div className="evaluation-person">
-                <span className="avatar-box">{initials(draft.employeeName)}</span>
-                <div>
-                  <small className="period-badge">{draft.periodLabel}</small>
-                  <strong>{draft.employeeName}</strong>
-                  <p>{draft.employeeCode} · {draft.position} · {draft.department}</p>
-                </div>
-              </div>
-
-              <div className="evaluation-overview-metric">
-                <small>Tiến độ chấm</small>
-                <strong>{completion}%</strong>
-                <Progress percent={completion} showInfo={false} strokeColor="#D92D20" size="small" />
-              </div>
-
-              <div className="evaluation-overview-metric highlight-score">
-                <small>Tổng điểm hiện tại</small>
-                <strong className="live-score">{totalScore(draft)}</strong>
-              </div>
-
-              <div className="evaluation-overview-metric">
-                <small>Hạn hoàn thành</small>
-                <strong>{formatDate(draft.dueAt)}</strong>
-                <span>Đã chấm {answered}/{criteria.length} tiêu chí</span>
-              </div>
-
-              <div className="evaluation-overview-status">
-                <small>Trạng thái & Cấp</small>
-                <strong>{stageLabels[currentStage]}</strong>
-                <span className={`status-${draft.status}`}>{statusLabels[draft.status]}</span>
-              </div>
-            </section>
-
-            {/* Quick Criterion Scores Bar (Sticky Matrix of All Criteria Scores) */}
-            <div className="evaluation-criteria-score-bar" aria-label="Tổng quan điểm từng câu">
-              <span className="bar-title">📊 Điểm từng câu:</span>
-              <div className="criteria-pills-scroll">
-                {criteria.map((c, idx) => {
-                  const isScored = c.score !== null;
-                  return (
-                    <button
-                      key={c.id}
-                      type="button"
-                      className={`criterion-quick-pill${isScored ? ' scored' : ' unscored'}`}
-                      onClick={() => {
-                        const el = document.getElementById(`evaluation-score-${c.id}`);
-                        el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                      }}
-                      title={`Câu ${idx + 1}: ${c.title} (${isScored ? `${c.score}đ` : 'Chưa chấm'})`}
-                    >
-                      <span className="pill-num">#{idx + 1}</span>
-                      <strong className="pill-val">{isScored ? `${c.score}đ` : '—'}</strong>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-
-          {/* Previous Stage Scores History */}
-          {previousStages.length > 0 && (
-            <section className="evaluation-stage-summary" aria-label="Điểm tổng theo từng cấp">
-              <span className="summary-title">Lịch sử tổng điểm</span>
-              <div className="stages-flow">
-                {previousStages.map((stage) => (
-                  <div key={stage} className="stage-item">
-                    <small>{stageLabels[stage]}</small>
-                    <strong>{draft.stageTotals?.[stage] ?? '—'}</strong>
-                  </div>
-                ))}
-                <div className="stage-item current">
-                  <small>{stageLabels[currentStage]} (Hiện tại)</small>
-                  <strong>{totalScore(draft)}</strong>
-                </div>
-              </div>
-            </section>
-          )}
-
-          {/* Criteria Main Stream */}
-          <section className="evaluation-stream" aria-label="Danh sách tiêu chí đánh giá">
-            {draft.groups.map((group) => {
-              const groupAnswered = group.criteria.filter((c) => c.score !== null).length;
-              const groupScore = group.criteria.reduce((sum, c) => sum + (c.score ?? 0), 0);
-
-              return (
-                <section className="evaluation-stream-group" key={group.id}>
-                  <header>
-                    <div className="group-title-box">
-                      <span className={`kind-icon kind-${group.kind}`}>
-                        {group.kind === 'bonus' ? '+' : group.kind === 'deduction' ? '−' : '•'}
-                      </span>
-                      <div>
-                        <h2>{group.title}</h2>
-                        <p>
-                          Hoàn thành {groupAnswered}/{group.criteria.length} tiêu chí
-                        </p>
+          {/* 2-Column Workspace Body: Main Stream Left + Sticky Right Side Panel */}
+          <div className="evaluation-workspace-body">
+            {/* Left Column: Criteria Main Stream */}
+            <div className="evaluation-main-stream">
+              {/* Previous Stage Scores History */}
+              {previousStages.length > 0 && (
+                <section className="evaluation-stage-summary" aria-label="Điểm tổng theo từng cấp">
+                  <span className="summary-title">Lịch sử tổng điểm</span>
+                  <div className="stages-flow">
+                    {previousStages.map((stage) => (
+                      <div key={stage} className="stage-item">
+                        <small>{stageLabels[stage]}</small>
+                        <strong>{draft.stageTotals?.[stage] ?? '—'}</strong>
                       </div>
-                    </div>
-                    <strong className="group-score-sum">
-                      Tổng nhóm: {groupScore} điểm
-                    </strong>
-                  </header>
-                  <div className="group-rows-container">
-                    {group.criteria.map((criterion) => (
-                      <EvaluationCriterionRow
-                        key={`${draft.id}-${criterion.id}`}
-                        criterion={criterion}
-                        order={criteria.findIndex((item) => item.id === criterion.id) + 1}
-                        previousStages={previousStages}
-                        readOnly={readOnly}
-                        onOpenNote={() => openNote(criterion)}
-                        onScoreChange={(score) => updateCriterion(criterion.id, { score })}
-                      />
                     ))}
+                    <div className="stage-item current">
+                      <small>{stageLabels[currentStage]} (Hiện tại)</small>
+                      <strong>{totalScore(draft)}</strong>
+                    </div>
                   </div>
                 </section>
-              );
-            })}
-          </section>
+              )}
 
-          {/* Sticky Bottom Action Bar */}
-          <footer className="evaluation-actionbar">
-            <div className="actionbar-info">
-              <strong>
-                {isAdmin
-                  ? '🛡️ Chế độ Giám sát Hệ thống (Dành cho Admin)'
-                  : readOnly
-                  ? 'Phiếu ở chế độ chỉ đọc'
-                  : completion === 100
-                  ? '✓ Đã hoàn thành chấm điểm toàn bộ 100% tiêu chí'
-                  : `Còn ${criteria.length - answered} tiêu chí chưa có điểm`}
-              </strong>
-              <small>
-                {isAdmin
-                  ? 'Tài khoản Admin không tham gia tự chấm hay chấm điểm. Admin quản lý nhóm, quy trình và kỳ đánh giá.'
-                  : readOnly
-                  ? 'Kết quả đã được chuyển sang cấp xử lý tiếp theo hoặc công bố chính thức.'
-                  : 'Điểm tổng và lịch sử cập nhật tức thời trên toàn hệ thống.'}
-              </small>
+              {/* Criteria Groups Stream */}
+              <section className="evaluation-stream" aria-label="Danh sách tiêu chí đánh giá">
+                {draft.groups.map((group) => {
+                  const groupAnswered = group.criteria.filter((c) => c.score !== null).length;
+                  const groupScore = group.criteria.reduce((sum, c) => sum + (c.score ?? 0), 0);
+
+                  return (
+                    <section className="evaluation-stream-group" key={group.id}>
+                      <header>
+                        <div className="group-title-box">
+                          <span className={`kind-icon kind-${group.kind}`}>
+                            {group.kind === 'bonus' ? '+' : group.kind === 'deduction' ? '−' : '•'}
+                          </span>
+                          <div>
+                            <h2>{group.title}</h2>
+                            <p>
+                              Hoàn thành {groupAnswered}/{group.criteria.length} tiêu chí
+                            </p>
+                          </div>
+                        </div>
+                        <strong className="group-score-sum">
+                          Tổng nhóm: {groupScore} điểm
+                        </strong>
+                      </header>
+                      <div className="group-rows-container">
+                        {group.criteria.map((criterion) => (
+                          <EvaluationCriterionRow
+                            key={`${draft.id}-${criterion.id}`}
+                            criterion={criterion}
+                            order={criteria.findIndex((item) => item.id === criterion.id) + 1}
+                            previousStages={previousStages}
+                            readOnly={readOnly}
+                            onOpenNote={() => openNote(criterion)}
+                            onScoreChange={(score) => updateCriterion(criterion.id, { score })}
+                          />
+                        ))}
+                      </div>
+                    </section>
+                  );
+                })}
+              </section>
             </div>
 
-            {!readOnly && !isAdmin && (
-              <div className="actionbar-buttons">
-                <Button
-                  className="btn-save-draft"
-                  loading={saving}
-                  onClick={() => void persist(false)}
-                >
-                  <span className="btn-icon">💾</span>
-                  <span>Lưu bản nháp</span>
-                </Button>
-                <Button
-                  type="primary"
-                  className={`btn-submit-evaluation stage-${mode}`}
-                  disabled={completion < 100}
-                  loading={saving}
-                  onClick={() => void persist(true)}
-                >
-                  <span className="btn-submit-icon" aria-hidden="true">
-                    {mode === 'self' ? '🚀' : mode === 'council' ? '👑' : '✅'}
-                  </span>
-                  <span className="btn-submit-text">
-                    {mode === 'self'
-                      ? 'Gửi phiếu đánh giá'
-                      : mode === 'council'
-                      ? 'Chốt kết quả đánh giá'
-                      : 'Hoàn tất chấm điểm'}
-                  </span>
-                </Button>
+            {/* Right Column: Sticky Summary Side Panel */}
+            <aside className="evaluation-side-panel" aria-label="Tổng quan phiếu đánh giá">
+              <div className="side-panel-card">
+                {/* Employee Header Info */}
+                <div className="side-panel-person">
+                  <span className="avatar-box">{initials(draft.employeeName)}</span>
+                  <div className="person-meta">
+                    <small className="period-badge">{draft.periodLabel}</small>
+                    <strong>{draft.employeeName}</strong>
+                    <p>{draft.employeeCode} · {draft.department}</p>
+                  </div>
+                </div>
+
+                {/* Live Total Score Hero Card */}
+                <div className="side-panel-score-box">
+                  <small>Tổng điểm hiện tại</small>
+                  <strong className="live-score">{totalScore(draft)}</strong>
+                  <div className="side-progress-wrap">
+                    <div className="progress-labels">
+                      <span>Tiến độ chấm</span>
+                      <strong>{completion}%</strong>
+                    </div>
+                    <Progress percent={completion} showInfo={false} strokeColor="#D92D20" size="small" />
+                    <span className="progress-sub">{answered}/{criteria.length} tiêu chí đã cho điểm</span>
+                  </div>
+                </div>
+
+                {/* Vertical Criteria Score Summary List */}
+                <div className="side-criteria-list" aria-label="Tổng quan điểm từng câu">
+                  <div className="side-list-header">
+                    <span>📊 Điểm từng câu ({answered}/{criteria.length})</span>
+                    <span className="stage-badge">{stageLabels[currentStage]}</span>
+                  </div>
+                  <div className="side-list-items">
+                    {criteria.map((c, idx) => {
+                      const isScored = c.score !== null;
+                      return (
+                        <button
+                          key={c.id}
+                          type="button"
+                          className={`side-criterion-item${isScored ? ' scored' : ' unscored'}`}
+                          onClick={() => {
+                            const el = document.getElementById(`evaluation-score-${c.id}`);
+                            el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                          }}
+                          title={`Câu ${idx + 1}: ${c.title} (${isScored ? `${c.score}đ` : 'Chưa chấm'})`}
+                        >
+                          <span className="item-num">#{idx + 1}</span>
+                          <span className="item-title">{c.title}</span>
+                          <strong className="item-score">{isScored ? `${c.score}đ` : '—'}</strong>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Action Buttons inside Side Panel */}
+                {!readOnly && !isAdmin && (
+                  <div className="side-panel-actions">
+                    <Button
+                      type="primary"
+                      className={`btn-submit-evaluation stage-${mode}`}
+                      disabled={completion < 100}
+                      loading={saving}
+                      onClick={() => void persist(true)}
+                    >
+                      <span className="btn-submit-icon" aria-hidden="true">
+                        {mode === 'self' ? '🚀' : mode === 'council' ? '👑' : '✅'}
+                      </span>
+                      <span className="btn-submit-text">
+                        {mode === 'self'
+                          ? 'Gửi phiếu đánh giá'
+                          : mode === 'council'
+                          ? 'Chốt kết quả đánh giá'
+                          : 'Hoàn tất chấm điểm'}
+                      </span>
+                    </Button>
+                    <Button
+                      className="btn-save-draft"
+                      loading={saving}
+                      onClick={() => void persist(false)}
+                    >
+                      <span className="btn-icon">💾</span>
+                      <span>Lưu bản nháp</span>
+                    </Button>
+                  </div>
+                )}
               </div>
-            )}
-          </footer>
+            </aside>
+          </div>
         </>
       ) : (
         <section className="evaluation-empty">
