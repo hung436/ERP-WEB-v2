@@ -1089,17 +1089,25 @@ function EvaluationWorkspace({
             </div>
           )}
 
-          <div className="evaluation-control">
-            <span>Kỳ đánh giá</span>
-            <Select
-              aria-label="Kỳ đánh giá"
-              onChange={(value) => {
-                setPeriodId(value);
-                setSheetId('');
-              }}
-              options={periods.map((period) => ({ value: period.id, label: period.label }))}
-              value={periodId}
-            />
+          <div className="evaluation-period-picker-badge">
+            <div className="period-badge-icon" aria-hidden="true">📅</div>
+            <div className="period-badge-content">
+              <small>Kỳ đánh giá</small>
+              <Select
+                aria-label="Kỳ đánh giá"
+                className="period-select-custom"
+                variant="borderless"
+                onChange={(value) => {
+                  setPeriodId(value);
+                  setSheetId('');
+                }}
+                options={periods.map((period) => ({ value: period.id, label: period.label }))}
+                value={periodId}
+              />
+            </div>
+            {periods.find((p) => p.id === periodId)?.status === 'active' && (
+              <span className="period-status-chip">🟢 Đang diễn ra</span>
+            )}
           </div>
         </div>
       </header>
