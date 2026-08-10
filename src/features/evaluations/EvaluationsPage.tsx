@@ -903,16 +903,8 @@ function EvaluationWorkspace({
         return;
       }
     }
-    if (isAdmin) {
-      const selected = availableSheets.find((sheet) => sheet.id === sheetId) ?? null;
-      setDraft(selected);
-    } else if (mode === 'self') {
-      const selected = availableSheets[0] ?? null;
-      setDraft(selected);
-    } else {
-      const selected = availableSheets.find((sheet) => sheet.id === sheetId) ?? null;
-      setDraft(selected);
-    }
+    const selected = availableSheets.find((sheet) => sheet.id === sheetId) ?? availableSheets[0] ?? sheets[0] ?? null;
+    setDraft(selected);
   }, [availableSheets, isAdmin, mode, periodId, sheetId, sheets]);
 
   const selectEmployeeSheet = (id: string) => {
@@ -925,7 +917,7 @@ function EvaluationWorkspace({
   const currentStage: EvaluationStage =
     mode === 'self' ? 'self' : mode === 'council' ? 'council' : draft?.stage === 'published' ? 'council' : draft?.stage ?? 'deputy';
   const previousStages = draft ? previousStagesFor(draft, mode) : [];
-  const readOnly = isAdmin || !draft || draft.status === 'published' || (mode === 'self' && draft.status !== 'draft');
+  const readOnly = !draft || draft.status === 'published';
   const noteCriterion = criteria.find((criterion) => criterion.id === noteCriterionId) ?? null;
 
   const updateCriterion = (id: string, patch: Partial<EvaluationCriterion>) =>
@@ -952,7 +944,7 @@ function EvaluationWorkspace({
   };
 
   const persist = async (finish = false) => {
-    if (!draft || isAdmin) return;
+    if (!draft) return;
     setSaving(true);
     try {
       const action = finish ? (mode === 'self' ? 'submit' : 'approve') : 'save';
@@ -1535,7 +1527,7 @@ function EvaluationWorkspace({
                 </div>
 
                 {/* Action Buttons inside Side Panel */}
-                {!readOnly && !isAdmin && (
+                {!readOnly && (
                   <div className="side-panel-actions">
                     <Button
                       type="primary"
