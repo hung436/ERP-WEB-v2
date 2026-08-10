@@ -33,7 +33,7 @@ describe('Workspace Đánh giá lao động', () => {
     expect(score).toHaveValue('40');
     expect(document.querySelector('.live-score')).toHaveTextContent(String(initialTotal + 2));
 
-    await user.click(within(firstRow).getByRole('button', { name: 'Ghi chú' }));
+    await user.click(within(firstRow).getByRole('button', { name: /Ghi chú|Thêm ghi chú/i }));
     const dialog = await screen.findByRole('dialog', { name: 'Ghi chú tiêu chí' });
     await user.type(within(dialog).getByLabelText('Nội dung ghi chú'), 'Hoàn thành đúng tiến độ, có số liệu đối chiếu.');
     await user.click(within(dialog).getByRole('button', { name: 'Lưu ghi chú' }));

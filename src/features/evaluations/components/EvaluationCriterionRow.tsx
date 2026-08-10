@@ -80,21 +80,8 @@ export function EvaluationCriterionRow({
           </div>
         </div>
 
-        {/* Top-Right Toolbar: Visual Score Badge + Score Input + Note Icon Button */}
+        {/* Top-Right Toolbar: Score Input + Note Button */}
         <div className="header-right-toolbar">
-          <div className="criterion-score-badge-wrap">
-            {criterion.score !== null ? (
-              <span className="criterion-score-badge scored">
-                <span className="score-num">{criterion.score}</span>
-                {!isUnlimited && <span className="score-max">/ {criterion.max} điểm</span>}
-              </span>
-            ) : (
-              <span className="criterion-score-badge un-scored">
-                <span>Chưa chấm {!isUnlimited ? `(Tối đa ${criterion.max}đ)` : ''}</span>
-              </span>
-            )}
-          </div>
-
           <div className="evaluation-score-inline">
             <label htmlFor={`evaluation-score-${criterion.id}`}>Điểm</label>
             <InputNumber
@@ -107,19 +94,20 @@ export function EvaluationCriterionRow({
               disabled={scoreLocked}
               value={criterion.score}
               onChange={onScoreChange}
-              placeholder={isUnlimited ? 'Điểm' : `${minimum}–${maximum}`}
+              placeholder={isUnlimited ? 'Nhập điểm' : `${minimum}–${maximum}`}
             />
+            {!isUnlimited && <span className="score-max">/ {criterion.max}</span>}
           </div>
 
           <div className="card-note-wrapper">
-            <Tooltip title={criterion.note ? 'Sửa ghi chú / minh chứng' : 'Thêm ghi chú / minh chứng'}>
+            <Tooltip title={criterion.note ? `Ghi chú: ${criterion.note}` : 'Thêm ghi chú/minh chứng'}>
               <Button
-                className={`evaluation-note-button-icon${criterion.note ? ' has-note' : ''}`}
-                aria-label={criterion.note ? 'Sửa ghi chú' : 'Ghi chú'}
+                aria-label={criterion.note ? 'Chỉnh sửa ghi chú' : 'Thêm ghi chú'}
+                className={`evaluation-note-button${criterion.note ? ' has-note' : ''}`}
                 disabled={readOnly}
                 onClick={onOpenNote}
               >
-                <span className="btn-icon" aria-hidden="true">{criterion.note ? '✏️' : '📝'}</span>
+                <span className="btn-icon" aria-hidden="true">{criterion.note ? '📝' : '💬'}</span>
               </Button>
             </Tooltip>
           </div>
