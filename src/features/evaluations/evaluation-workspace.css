@@ -184,15 +184,15 @@
   min-width: 0;
 }
 
-/* Sticky Right Summary Side Panel */
+/* Sticky Right Summary Side Panel - Full Viewport Height */
 .evaluation-side-panel {
   position: sticky;
-  top: 24px;
+  top: 16px;
+  max-height: calc(100vh - 32px);
   align-self: start;
   z-index: 50;
   display: flex;
   flex-direction: column;
-  gap: 16px;
 }
 
 .side-panel-card {
@@ -203,7 +203,9 @@
   box-shadow: 0 4px 16px rgba(16, 24, 40, 0.05);
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 14px;
+  max-height: calc(100vh - 32px);
+  overflow: hidden;
 }
 
 .side-panel-person {
@@ -314,6 +316,9 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .side-list-header {
@@ -335,12 +340,14 @@
   border: 1px solid #b2ddff;
 }
 
-/* Compact Grid Layout for Criteria Scores in Side Panel with Inner Vertical Scroll */
+/* Compact Grid Layout for Criteria Scores - Flex Fill Full Viewport Height */
 .side-list-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 8px;
-  max-height: 180px;
+  flex: 1;
+  min-height: 120px;
+  max-height: calc(100vh - 340px);
   overflow-y: auto;
   padding-right: 4px;
   scrollbar-width: thin;
