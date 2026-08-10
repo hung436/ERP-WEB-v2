@@ -176,7 +176,7 @@ export function ChatPage() {
             {(index === 0 || new Date(visibleMessages[index - 1].sentAt).toDateString() !== new Date(item.sentAt).toDateString()) && <div className="message-day">{new Date(item.sentAt).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' })}</div>}
             <div className={item.isMine ? 'message mine' : 'message'}>
               {!item.isMine && selected?.isGroup && (
-                <span className={`avatar neutral group-msg-avatar ${avatarTone(item.senderName)}`} title={item.senderName}>
+                <span className={`avatar group-msg-avatar ${avatarTone(item.senderName)}`} title={item.senderName}>
                   {item.senderName.slice(0, 2).toUpperCase()}
                 </span>
               )}
