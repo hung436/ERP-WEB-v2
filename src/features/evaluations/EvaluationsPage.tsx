@@ -1546,9 +1546,6 @@ function EvaluationWorkspace({
                 <Tag color="red">Tiêu chí {criteria.findIndex((c) => c.id === noteCriterion.id) + 1}</Tag>
                 <strong>{noteCriterion.title}</strong>
               </div>
-              <p className="note-guide">
-                Ghi lại căn cứ, kết quả cụ thể, đường dẫn bài viết hoặc minh chứng cần lưu kèm tiêu chí này.
-              </p>
 
               <Input.TextArea
                 aria-label="Nội dung ghi chú"
