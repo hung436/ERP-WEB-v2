@@ -1459,29 +1459,28 @@ function EvaluationWorkspace({
                   </div>
                 </div>
 
-                {/* Vertical Criteria Score Summary List */}
+                {/* Compact Grid Criteria Score Matrix */}
                 <div className="side-criteria-list" aria-label="Tổng quan điểm từng câu">
                   <div className="side-list-header">
                     <span>📊 Điểm từng câu ({answered}/{criteria.length})</span>
                     <span className="stage-badge">{stageLabels[currentStage]}</span>
                   </div>
-                  <div className="side-list-items">
+                  <div className="side-list-grid">
                     {criteria.map((c, idx) => {
                       const isScored = c.score !== null;
                       return (
                         <button
                           key={c.id}
                           type="button"
-                          className={`side-criterion-item${isScored ? ' scored' : ' unscored'}`}
+                          className={`side-grid-item${isScored ? ' scored' : ' unscored'}`}
                           onClick={() => {
                             const el = document.getElementById(`evaluation-score-${c.id}`);
                             el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
                           }}
                           title={`Câu ${idx + 1}: ${c.title} (${isScored ? `${c.score}đ` : 'Chưa chấm'})`}
                         >
-                          <span className="item-num">#{idx + 1}</span>
-                          <span className="item-title">{c.title}</span>
-                          <strong className="item-score">{isScored ? `${c.score}đ` : '—'}</strong>
+                          <span className="grid-item-num">#{idx + 1}</span>
+                          <strong className="grid-item-score">{isScored ? `${c.score}đ` : '—'}</strong>
                         </button>
                       );
                     })}
