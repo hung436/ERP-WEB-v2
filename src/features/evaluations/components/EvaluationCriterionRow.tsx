@@ -77,21 +77,6 @@ export function EvaluationCriterionRow({
               </Tooltip>
               {isUnlimited && <span className="badge-unlimited">Điểm mở</span>}
             </div>
-
-            {/* Clean Stage History Pills Header */}
-            {previousStages.length > 0 && (
-              <div className="evaluation-row-history" aria-label={`Bảng tổng hợp điểm các cấp: ${criterion.title}`}>
-                {previousStages.map((stage) => {
-                  const val = criterion.stageScores?.[stage];
-                  return (
-                    <span key={stage} className={`history-pill stage-${stage}`}>
-                      <small>{stageLabels[stage]}</small>
-                      <strong>{val !== undefined && val !== null ? `${val} đ` : '—'}</strong>
-                    </span>
-                  );
-                })}
-              </div>
-            )}
           </div>
         </div>
 
