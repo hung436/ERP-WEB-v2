@@ -9,7 +9,10 @@ import { useAsyncData } from '@/hooks/useAsyncData';
 import { dashboardApi, documentApi, taskApi } from '@/services/api';
 import type { DocumentSubmission, Task, TaskStatus } from '@/types/domain';
 
+import { useNavigate } from 'react-router-dom';
+
 export function TasksPage() {
+  const navigate = useNavigate();
   const [status, setStatus] = useState(''); const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
@@ -23,6 +26,14 @@ export function TasksPage() {
   const rows = (state.data?.rows ?? []).map((task) => ({ ...task, ...taskUpdates[task.id] })).filter((task) => `${task.title} ${task.assignedBy} ${task.department ?? ''}`.toLocaleLowerCase('vi').includes(search.toLocaleLowerCase('vi')));
   const summary = state.data?.summary;
   const openTask = (task: Task) => {
+    if (task.sourceModule === 'evaluations') {
+      if (task.subjectName === 'Lê Thanh Vân') navigate('/evaluations?sheetId=eval-van-q3');
+      else if (task.subjectName === 'Đỗ Quang Huy') navigate('/evaluations?sheetId=eval-huy-q3');
+      else if (task.subjectName === 'Mai Phương Thảo') navigate('/evaluations?sheetId=eval-mai-q3');
+      else if (task.period === 'Quý II/2026') navigate('/evaluations?sheetId=eval-self-q2');
+      else navigate('/evaluations');
+      return;
+    }
     if (task.sourceModule === 'documents' && task.documentId) {
       setSelectedDocument(state.data?.documents.find((item) => item.id === task.documentId) ?? null);
       return;

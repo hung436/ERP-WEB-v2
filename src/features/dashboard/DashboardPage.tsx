@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 import { ContentSkeleton, EmptyState, ErrorState } from '@/components/AsyncState';
 import { ModuleIcon } from '@/components/ModuleIcon';
@@ -19,6 +19,7 @@ const taskDue = (value: string) => new Date(value).toLocaleString('vi-VN', { day
 const shortTime = (value: string) => new Date(value).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
 
 export function DashboardPage() {
+  const navigate = useNavigate();
   const [detailTask, setDetailTask] = useState<Task | null>(null);
   const [detailDocument, setDetailDocument] = useState<DocumentSubmission | null>(null);
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
@@ -38,6 +39,14 @@ export function DashboardPage() {
   if (!state.data || state.data.tasks.length === 0) return <EmptyState description="Hôm nay chưa có công việc cần xử lý" />;
   const { summary, tasks, events, mails, chats, announcements, documents } = state.data;
   const openTask = (task: Task) => {
+    if (task.sourceModule === 'evaluations') {
+      if (task.subjectName === 'Lê Thanh Vân') navigate('/evaluations?sheetId=eval-van-q3');
+      else if (task.subjectName === 'Đỗ Quang Huy') navigate('/evaluations?sheetId=eval-huy-q3');
+      else if (task.subjectName === 'Mai Phương Thảo') navigate('/evaluations?sheetId=eval-mai-q3');
+      else if (task.period === 'Quý II/2026') navigate('/evaluations?sheetId=eval-self-q2');
+      else navigate('/evaluations');
+      return;
+    }
     if (task.sourceModule === 'documents' && task.documentId) {
       setDetailDocument(documents.find((item) => item.id === task.documentId) ?? null);
       return;
