@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { ContentSkeleton, EmptyState, ErrorState } from '@/components/AsyncState';
 import { ModuleIcon } from '@/components/ModuleIcon';
+import { ContactQuickView } from '@/features/directory/components/ContactQuickView';
 import { contactInitials, matchesDirectorySearch } from '@/features/directory/utils';
 import { useAsyncData } from '@/hooks/useAsyncData';
 import { chatApi, directoryApi } from '@/services/api';
@@ -16,6 +17,7 @@ export function DirectoryPage() {
   const [query, setQuery] = useState('');
   const [department, setDepartment] = useState('');
   const [chattingId, setChattingId] = useState('');
+  const [selected, setSelected] = useState<DirectoryContact | null>(null);
   const departments = useMemo(() => [...new Set((state.data ?? []).map((contact) => contact.department))].sort((a, b) => a.localeCompare(b, 'vi')), [state.data]);
   const contacts = useMemo(() => (state.data ?? []).filter((contact) => (!department || contact.department === department) && matchesDirectorySearch(contact, query)), [state.data, department, query]);
   const startChat = async (contact: DirectoryContact) => {
@@ -41,5 +43,6 @@ export function DirectoryPage() {
       <div className="contact-channels"><span><small>Điện thoại</small><strong title={contact.phone}>{contact.phone}</strong></span><span><small>Email</small><strong title={contact.email}>{contact.email}</strong></span></div>
       <footer>{contact.extension ? <span className="contact-extension">Máy lẻ {contact.extension}</span> : <span>Không có số nội bộ</span>}</footer>
     </article>)}</section>}
+    <ContactQuickView chatting={chattingId === selected?.id} contact={selected} onChat={startChat} onClose={() => setSelected(null)} />
   </div>;
 }
