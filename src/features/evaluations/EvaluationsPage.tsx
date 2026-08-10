@@ -7,7 +7,7 @@ import { ModuleIcon } from '@/components/ModuleIcon';
 import { EvaluationCriterionRow } from '@/features/evaluations/components/EvaluationCriterionRow';
 import { useAsyncData } from '@/hooks/useAsyncData';
 import { evaluationApi } from '@/services/api';
-import type { EvaluationCriterion, EvaluationPeriod, EvaluationSheet, EvaluationStage } from '@/types/evaluation';
+import type { EvaluationCriterion, EvaluationGroup, EvaluationPeriod, EvaluationSheet, EvaluationStage } from '@/types/evaluation';
 import '@/features/evaluations/evaluation-workspace.css';
 
 type EvaluationMode = 'self' | 'scoring' | 'council';
@@ -354,7 +354,7 @@ function AdminManageGroupsModal({
                   </div>
                   <div className="group-criteria-mini-list">
                     {group.criteria.length > 0 ? (
-                      group.criteria.map((c) => (
+                      group.criteria.map((c: EvaluationCriterion) => (
                         <div key={c.id} className="criterion-mini-row">
                           <span>• {c.title}</span>
                           <Tag>Tối đa {c.max} điểm</Tag>
@@ -712,7 +712,7 @@ function EvaluationWorkspace({
   onReload: () => void;
 }) {
   const { user } = useAuth();
-  const isAdmin = user?.role === 'admin';
+  const isAdmin = user?.role === 'admin' || (user?.role as string) === 'admin';
   const [searchParams, setSearchParams] = useSearchParams();
 
   const paramSheetId = searchParams.get('sheetId') ?? '';
@@ -1325,7 +1325,7 @@ function EvaluationWorkspace({
                   </div>
                   <div className="group-criteria-mini-list">
                     {group.criteria.length > 0 ? (
-                      group.criteria.map((c) => (
+                      group.criteria.map((c: EvaluationCriterion) => (
                         <div key={c.id} className="criterion-mini-row">
                           <span>• {c.title}</span>
                           <Tag>Tối đa {c.max} điểm</Tag>
