@@ -50,7 +50,7 @@ describe('Workspace Đánh giá lao động', () => {
     const history = within(firstRow).getByLabelText(/Chi tiết đánh giá các cấp: Thực hiện nhiệm vụ chuyên môn/);
     expect(within(history).getByText(/Tự đánh giá/)).toBeInTheDocument();
     expect(within(history).getByText(/Phó phòng\/ban/)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Hoàn tất chấm điểm' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Hoàn tất chấm điểm/ })).toBeInTheDocument();
   });
 
   it('Hội đồng xem lịch sử các cấp và chốt ngay trên cùng trang', async () => {
@@ -65,7 +65,7 @@ describe('Workspace Đánh giá lao động', () => {
     expect(within(history).getByText(/Phó phòng\/ban/)).toBeInTheDocument();
     expect(within(history).getByText(/Trưởng phòng\/ban/)).toBeInTheDocument();
     expect(within(history).getByText(/Ban biên tập/)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Chốt kết quả' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Chốt kết quả/ })).toBeInTheDocument();
   });
 
   it('tài khoản admin có giao diện trang riêng không dùng popup', async () => {

@@ -1485,20 +1485,31 @@ function EvaluationWorkspace({
 
             {!readOnly && !isAdmin && (
               <div className="actionbar-buttons">
-                <Button loading={saving} onClick={() => void persist(false)}>
-                  Lưu bản nháp
+                <Button
+                  className="btn-save-draft"
+                  loading={saving}
+                  onClick={() => void persist(false)}
+                >
+                  <span className="btn-icon">💾</span>
+                  <span>Lưu bản nháp</span>
                 </Button>
                 <Button
                   type="primary"
+                  className={`btn-submit-evaluation stage-${mode}`}
                   disabled={completion < 100}
                   loading={saving}
                   onClick={() => void persist(true)}
                 >
-                  {mode === 'self'
-                    ? 'Gửi phiếu'
-                    : mode === 'council'
-                    ? 'Chốt kết quả'
-                    : 'Hoàn tất chấm điểm'}
+                  <span className="btn-submit-icon" aria-hidden="true">
+                    {mode === 'self' ? '🚀' : mode === 'council' ? '👑' : '✅'}
+                  </span>
+                  <span className="btn-submit-text">
+                    {mode === 'self'
+                      ? 'Gửi phiếu đánh giá'
+                      : mode === 'council'
+                      ? 'Chốt kết quả đánh giá'
+                      : 'Hoàn tất chấm điểm'}
+                  </span>
                 </Button>
               </div>
             )}
