@@ -268,11 +268,10 @@
   min-width: 0;
 }
 
-/* Sticky Right Summary Side Panel - Full Viewport Height */
+/* Sticky Right Summary Side Panel - Full Viewport Clean Display */
 .evaluation-side-panel {
   position: sticky;
   top: 16px;
-  max-height: calc(100vh - 32px);
   align-self: start;
   z-index: 50;
   display: flex;
@@ -283,32 +282,32 @@
   background: #ffffff;
   border: 1px solid #eaecf0;
   border-radius: 14px;
-  padding: 18px;
+  padding: 16px;
   box-shadow: 0 4px 16px rgba(16, 24, 40, 0.05);
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  max-height: calc(100vh - 32px);
-  overflow: hidden;
+  gap: 12px;
+  height: auto;
+  overflow: visible;
 }
 
 .side-panel-person {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding-bottom: 14px;
+  gap: 10px;
+  padding-bottom: 12px;
   border-bottom: 1px solid #f1f5f9;
 }
 
 .side-panel-person .avatar-box {
-  width: 42px;
-  height: 42px;
+  width: 38px;
+  height: 38px;
   display: grid;
   place-items: center;
   color: #175cd3;
-  border-radius: 10px;
+  border-radius: 8px;
   background: #eff8ff;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
   border: 1px solid #d1e9ff;
   flex-shrink: 0;
@@ -323,12 +322,12 @@
 
 .side-panel-person .person-meta .period-badge {
   color: #b42318;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
 }
 
 .side-panel-person .person-meta strong {
-  font-size: 14px;
+  font-size: 13px;
   color: #101828;
   font-weight: 600;
   white-space: nowrap;
@@ -349,17 +348,17 @@
 .side-panel-score-box {
   background: #fffcf5;
   border: 1px solid #fedf89;
-  border-radius: 12px;
-  padding: 14px;
+  border-radius: 10px;
+  padding: 10px 12px;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: 4px;
+  gap: 2px;
 }
 
 .side-panel-score-box small {
-  font-size: 11px;
+  font-size: 10px;
   color: #b54708;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -367,7 +366,7 @@
 }
 
 .side-panel-score-box .live-score {
-  font-size: 32px;
+  font-size: 26px;
   font-weight: 800;
   color: #d92d20;
   line-height: 1.1;
@@ -375,31 +374,31 @@
 
 .side-progress-wrap {
   width: 100%;
-  margin-top: 6px;
+  margin-top: 4px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 3px;
 }
 
 .side-progress-wrap .progress-labels {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: 11px;
+  font-size: 10px;
   color: #475467;
 }
 
 .side-progress-wrap .progress-sub {
-  font-size: 11px;
+  font-size: 10px;
   color: #667085;
-  margin-top: 2px;
+  margin-top: 1px;
 }
 
 /* Criteria Score List in Side Panel */
 .side-criteria-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
   min-height: 0;
   overflow: visible;
 }
@@ -408,17 +407,17 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
   color: #344054;
 }
 
 .side-list-header .stage-badge {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 600;
   color: #175cd3;
   background: #eff8ff;
-  padding: 2px 6px;
+  padding: 1px 5px;
   border-radius: 4px;
   border: 1px solid #b2ddff;
 }
@@ -427,7 +426,7 @@
 .side-list-grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: 6px;
+  gap: 5px;
   overflow-y: visible;
   max-height: none;
   padding-right: 0;
@@ -440,12 +439,12 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 6px 2px;
-  border-radius: 8px;
+  padding: 5px 2px;
+  border-radius: 6px;
   border: 1px solid #e2e8f0;
   background: #ffffff;
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
   user-select: none;
 }
 
@@ -457,14 +456,14 @@
 }
 
 .side-grid-item.scored .grid-item-num {
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 700;
   color: #047857;
   letter-spacing: 0.02em;
 }
 
 .side-grid-item.scored .grid-item-score {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 800;
   color: #065f46;
 }
@@ -484,13 +483,13 @@
 }
 
 .side-grid-item.unscored .grid-item-num {
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 700;
   color: #b45309;
 }
 
 .side-grid-item.unscored .grid-item-score {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 800;
   color: #d97706;
 }
@@ -508,19 +507,19 @@
   flex-direction: row;
   align-items: center;
   gap: 8px;
-  padding-top: 12px;
+  padding-top: 10px;
   border-top: 1px solid #f1f5f9;
 }
 
 .side-panel-actions .ant-btn {
   flex: 1 !important;
   width: auto !important;
-  height: 38px !important;
+  height: 36px !important;
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
-  gap: 6px !important;
-  font-size: 13px !important;
+  gap: 5px !important;
+  font-size: 12px !important;
   font-weight: 600 !important;
   border-radius: 8px !important;
   white-space: nowrap !important;
