@@ -335,12 +335,15 @@
   border: 1px solid #b2ddff;
 }
 
-/* Compact Grid Layout for Criteria Scores in Side Panel (No inner scrollbar!) */
+/* Compact Grid Layout for Criteria Scores in Side Panel with Inner Vertical Scroll */
 .side-list-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 8px;
-  overflow: visible;
+  max-height: 180px;
+  overflow-y: auto;
+  padding-right: 4px;
+  scrollbar-width: thin;
 }
 
 .side-grid-item {
