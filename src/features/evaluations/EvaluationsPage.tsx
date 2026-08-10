@@ -1366,40 +1366,67 @@ function EvaluationWorkspace({
             </div>
           )}
 
-          {/* Overview Cards Bar */}
-          <section className="evaluation-overview">
-            <div className="evaluation-person">
-              <span className="avatar-box">{initials(draft.employeeName)}</span>
-              <div>
-                <small className="period-badge">{draft.periodLabel}</small>
-                <strong>{draft.employeeName}</strong>
-                <p>{draft.employeeCode} · {draft.position} · {draft.department}</p>
+          {/* Sticky Header Container for Overview & Criteria Score Matrix */}
+          <div className="evaluation-sticky-header">
+            <section className="evaluation-overview">
+              <div className="evaluation-person">
+                <span className="avatar-box">{initials(draft.employeeName)}</span>
+                <div>
+                  <small className="period-badge">{draft.periodLabel}</small>
+                  <strong>{draft.employeeName}</strong>
+                  <p>{draft.employeeCode} · {draft.position} · {draft.department}</p>
+                </div>
+              </div>
+
+              <div className="evaluation-overview-metric">
+                <small>Tiến độ chấm</small>
+                <strong>{completion}%</strong>
+                <Progress percent={completion} showInfo={false} strokeColor="#D92D20" size="small" />
+              </div>
+
+              <div className="evaluation-overview-metric highlight-score">
+                <small>Tổng điểm hiện tại</small>
+                <strong className="live-score">{totalScore(draft)}</strong>
+              </div>
+
+              <div className="evaluation-overview-metric">
+                <small>Hạn hoàn thành</small>
+                <strong>{formatDate(draft.dueAt)}</strong>
+                <span>Đã chấm {answered}/{criteria.length} tiêu chí</span>
+              </div>
+
+              <div className="evaluation-overview-status">
+                <small>Trạng thái & Cấp</small>
+                <strong>{stageLabels[currentStage]}</strong>
+                <span className={`status-${draft.status}`}>{statusLabels[draft.status]}</span>
+              </div>
+            </section>
+
+            {/* Quick Criterion Scores Bar (Sticky Matrix of All Criteria Scores) */}
+            <div className="evaluation-criteria-score-bar" aria-label="Tổng quan điểm từng câu">
+              <span className="bar-title">📊 Điểm từng câu:</span>
+              <div className="criteria-pills-scroll">
+                {criteria.map((c, idx) => {
+                  const isScored = c.score !== null;
+                  return (
+                    <button
+                      key={c.id}
+                      type="button"
+                      className={`criterion-quick-pill${isScored ? ' scored' : ' unscored'}`}
+                      onClick={() => {
+                        const el = document.getElementById(`evaluation-score-${c.id}`);
+                        el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                      }}
+                      title={`Câu ${idx + 1}: ${c.title} (${isScored ? `${c.score}đ` : 'Chưa chấm'})`}
+                    >
+                      <span className="pill-num">#{idx + 1}</span>
+                      <strong className="pill-val">{isScored ? `${c.score}đ` : '—'}</strong>
+                    </button>
+                  );
+                })}
               </div>
             </div>
-
-            <div className="evaluation-overview-metric">
-              <small>Tiến độ chấm</small>
-              <strong>{completion}%</strong>
-              <Progress percent={completion} showInfo={false} strokeColor="#D92D20" size="small" />
-            </div>
-
-            <div className="evaluation-overview-metric highlight-score">
-              <small>Tổng điểm hiện tại</small>
-              <strong className="live-score">{totalScore(draft)}</strong>
-            </div>
-
-            <div className="evaluation-overview-metric">
-              <small>Hạn hoàn thành</small>
-              <strong>{formatDate(draft.dueAt)}</strong>
-              <span>Đã chấm {answered}/{criteria.length} tiêu chí</span>
-            </div>
-
-            <div className="evaluation-overview-status">
-              <small>Trạng thái & Cấp</small>
-              <strong>{stageLabels[currentStage]}</strong>
-              <span className={`status-${draft.status}`}>{statusLabels[draft.status]}</span>
-            </div>
-          </section>
+          </div>
 
           {/* Previous Stage Scores History */}
           {previousStages.length > 0 && (

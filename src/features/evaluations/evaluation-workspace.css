@@ -163,7 +163,103 @@
   height: auto;
 }
 
-/* 2. Overview Bar */
+/* Sticky Overview Header & Criterion Score Bar */
+.evaluation-sticky-header {
+  position: sticky;
+  top: 0;
+  z-index: 90;
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid #eaecf0;
+  box-shadow: 0 4px 16px rgba(16, 24, 40, 0.06);
+  margin-bottom: 16px;
+  border-radius: 0 0 14px 14px;
+  transition: all 0.2s ease;
+}
+
+.evaluation-sticky-header .evaluation-overview {
+  border-radius: 0;
+  box-shadow: none;
+  border: none;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+/* Quick Criterion Scores Bar (Horizontal Matrix) */
+.evaluation-criteria-score-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px;
+  background: #f8fafc;
+  border-radius: 0 0 14px 14px;
+  overflow-x: auto;
+}
+
+.evaluation-criteria-score-bar .bar-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #344054;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.criteria-pills-scroll {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+  scrollbar-width: thin;
+}
+
+.criterion-quick-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  border: 1px solid #eaecf0;
+  background: #ffffff;
+  font-size: 11px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.criterion-quick-pill:hover {
+  border-color: #b2ddff;
+  background: #eff8ff;
+  transform: translateY(-1px);
+}
+
+.criterion-quick-pill.scored {
+  border-color: #d1e9ff;
+  background: #eff8ff;
+  color: #175cd3;
+}
+
+.criterion-quick-pill.scored .pill-num {
+  color: #1570ef;
+  font-weight: 700;
+}
+
+.criterion-quick-pill.scored .pill-val {
+  color: #175cd3;
+  font-weight: 800;
+}
+
+.criterion-quick-pill.unscored {
+  border-color: #fedf89;
+  background: #fffcf5;
+  color: #b54708;
+}
+
+.criterion-quick-pill.unscored .pill-val {
+  color: #d97706;
+}
+
+/* 4. Overview Header Metrics Bar */
 .evaluation-overview {
   min-height: 84px;
   display: grid;
