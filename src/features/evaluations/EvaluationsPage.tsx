@@ -1432,8 +1432,6 @@ function EvaluationWorkspace({
           <section className="evaluation-stream" aria-label="Danh sách tiêu chí đánh giá">
             {draft.groups.map((group) => {
               const groupAnswered = group.criteria.filter((c) => c.score !== null).length;
-              const groupScore = group.criteria.reduce((sum, c) => sum + (c.score ?? 0), 0);
-              const groupMax = group.criteria.reduce((sum, c) => sum + (c.max ?? 0), 0);
 
               return (
                 <section className="evaluation-stream-group" key={group.id}>
@@ -1448,16 +1446,6 @@ function EvaluationWorkspace({
                           Hoàn thành {groupAnswered}/{group.criteria.length} tiêu chí
                         </p>
                       </div>
-                    </div>
-                    <div className="group-score-summary-badge">
-                      <small>Tổng điểm nhóm này:</small>
-                      <strong>
-                        {group.kind === 'bonus'
-                          ? `+${groupScore}`
-                          : group.kind === 'deduction'
-                          ? `-${groupScore}`
-                          : `${groupScore} / ${groupMax}`} điểm
-                      </strong>
                     </div>
                   </header>
                   <div className="group-rows-container">
@@ -1489,20 +1477,6 @@ function EvaluationWorkspace({
               <Tag color={getRatingGrade(totalScore(draft)).color} className="scoreboard-grade-tag">
                 {getRatingGrade(totalScore(draft)).label}
               </Tag>
-
-              <div className="scoreboard-groups-breakdown">
-                {draft.groups.map((g) => {
-                  const gScore = g.criteria.reduce((s, c) => s + (c.score ?? 0), 0);
-                  const gMax = g.criteria.reduce((s, c) => s + (c.max ?? 0), 0);
-                  const cleanTitle = g.title.replace(/^\d+\.\s*/, '');
-                  return (
-                    <span key={g.id} className={`mini-group-score-chip kind-${g.kind}`}>
-                      <small>{cleanTitle}:</small>
-                      <strong>{g.kind === 'bonus' ? `+${gScore}` : g.kind === 'deduction' ? `-${gScore}` : `${gScore}/${gMax}`}đ</strong>
-                    </span>
-                  );
-                })}
-              </div>
             </div>
 
             {!readOnly && !isAdmin && (
