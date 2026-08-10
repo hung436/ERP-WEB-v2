@@ -100,7 +100,7 @@ export function EvaluationCriterionRow({
           </div>
 
           <div className="card-note-wrapper">
-            <Tooltip title={criterion.note ? `Ghi chú: ${criterion.note}` : 'Thêm ghi chú/minh chứng'}>
+            <Tooltip title={criterion.note ? 'Chỉnh sửa ghi chú/minh chứng' : 'Thêm ghi chú/minh chứng'}>
               <Button
                 className={`evaluation-note-button${criterion.note ? ' has-note' : ''}`}
                 disabled={readOnly}
@@ -110,13 +110,6 @@ export function EvaluationCriterionRow({
                 <span>{criterion.note ? 'Đã ghi chú' : 'Ghi chú'}</span>
               </Button>
             </Tooltip>
-
-            {criterion.note && (
-              <div className="note-card-preview" title={criterion.note}>
-                <span className="note-pin" aria-hidden="true">📌</span>
-                <span className="note-content">{criterion.note}</span>
-              </div>
-            )}
           </div>
         </div>
       </header>
@@ -148,6 +141,29 @@ export function EvaluationCriterionRow({
               </button>
             );
           })}
+        </div>
+      )}
+
+      {/* Sleek Personal Note Card Display */}
+      {criterion.note && (
+        <div className="criterion-personal-note-card" aria-label={`Ghi chú cá nhân: ${criterion.title}`}>
+          <div className="note-card-header">
+            <span className="note-card-title">
+              <span className="note-icon" aria-hidden="true">📝</span>
+              <strong>Ghi chú & minh chứng cá nhân:</strong>
+            </span>
+            {!readOnly && (
+              <button
+                type="button"
+                className="btn-edit-note-inline"
+                onClick={onOpenNote}
+                title="Chỉnh sửa ghi chú"
+              >
+                ✏️ Chỉnh sửa
+              </button>
+            )}
+          </div>
+          <p className="note-card-body">{criterion.note}</p>
         </div>
       )}
 
