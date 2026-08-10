@@ -100,18 +100,16 @@ export function EvaluationCriterionRow({
           </div>
 
           <div className="card-note-wrapper">
-            {!criterion.note && (
-              <Tooltip title="Thêm ghi chú/minh chứng">
-                <Button
-                  className="evaluation-note-button"
-                  disabled={readOnly}
-                  onClick={onOpenNote}
-                >
-                  <span className="btn-icon" aria-hidden="true">📝</span>
-                  <span>Ghi chú</span>
-                </Button>
-              </Tooltip>
-            )}
+            <Tooltip title={criterion.note ? 'Chỉnh sửa ghi chú/minh chứng' : 'Thêm ghi chú/minh chứng'}>
+              <Button
+                className={`evaluation-note-button${criterion.note ? ' has-note' : ''}`}
+                disabled={readOnly}
+                onClick={onOpenNote}
+              >
+                <span className="btn-icon" aria-hidden="true">{criterion.note ? '✏️' : '📝'}</span>
+                <span>{criterion.note ? 'Sửa ghi chú' : 'Ghi chú'}</span>
+              </Button>
+            </Tooltip>
           </div>
         </div>
       </header>
@@ -148,7 +146,12 @@ export function EvaluationCriterionRow({
 
       {/* Sleek Personal Note Card Display */}
       {criterion.note && (
-        <div className="criterion-personal-note-card" aria-label={`Ghi chú cá nhân: ${criterion.title}`}>
+        <div
+          className="criterion-personal-note-card"
+          aria-label={`Ghi chú cá nhân: ${criterion.title}`}
+          onClick={!readOnly ? onOpenNote : undefined}
+          style={{ cursor: !readOnly ? 'pointer' : 'default' }}
+        >
           <div className="note-card-header">
             <span className="note-card-title">
               <span className="note-icon" aria-hidden="true">📝</span>
@@ -158,7 +161,10 @@ export function EvaluationCriterionRow({
               <button
                 type="button"
                 className="btn-edit-note-inline"
-                onClick={onOpenNote}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onOpenNote();
+                }}
                 title="Chỉnh sửa ghi chú"
               >
                 ✏️ Chỉnh sửa
