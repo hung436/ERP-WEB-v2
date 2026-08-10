@@ -66,7 +66,7 @@ export function EvaluationCriterionRow({
         hasLevels ? ' has-levels' : ' no-levels'
       }`}
     >
-      {/* Top Header: Title & Right Toolbar */}
+      {/* Top Header: Title, Stage Score Pills & Toolbar */}
       <header className="radio-card-header">
         <div className="header-left">
           <span className="card-index-badge">{String(order).padStart(2, '0')}</span>
@@ -77,6 +77,21 @@ export function EvaluationCriterionRow({
               </Tooltip>
               {isUnlimited && <span className="badge-unlimited">Điểm mở</span>}
             </div>
+
+            {/* Clean Stage History Pills Header */}
+            {previousStages.length > 0 && (
+              <div className="evaluation-row-history" aria-label={`Bảng tổng hợp điểm các cấp: ${criterion.title}`}>
+                {previousStages.map((stage) => {
+                  const val = criterion.stageScores?.[stage];
+                  return (
+                    <span key={stage} className={`history-pill stage-${stage}`}>
+                      <small>{stageLabels[stage]}</small>
+                      <strong>{val !== undefined && val !== null ? `${val} đ` : '—'}</strong>
+                    </span>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </div>
 
@@ -121,7 +136,7 @@ export function EvaluationCriterionRow({
         </div>
       </header>
 
-      {/* Radio Options List Body (Only when HAS levels) */}
+      {/* Radio Options List Body (Sleek & Uncluttered) */}
       {hasLevels && (
         <div
           className="radio-options-body"
@@ -130,13 +145,6 @@ export function EvaluationCriterionRow({
         >
           {criterion.levels!.map((level) => {
             const isSelected = selectedLevel?.label === level.label;
-
-            // Find which stages selected score in this level range
-            const matchingStageBadges = previousStages.filter((stage) => {
-              const val = criterion.stageScores?.[stage];
-              return val !== undefined && val !== null && val >= level.min && val <= level.max;
-            });
-
             return (
               <button
                 key={level.label}
@@ -147,69 +155,44 @@ export function EvaluationCriterionRow({
                 disabled={readOnly}
                 onClick={() => chooseLevel(level)}
               >
-                <div className="radio-option-main">
-                  <span className="radio-indicator" aria-hidden="true">
-                    <span className="radio-dot" />
-                  </span>
-                  <span className="radio-label-text">{level.label}</span>
-                  <span className="radio-range-badge">{level.min}–{level.max} điểm</span>
-                </div>
-
-                {matchingStageBadges.length > 0 && (
-                  <div className="radio-option-stage-tags">
-                    {matchingStageBadges.map((stage) => {
-                      const scoreVal = criterion.stageScores?.[stage];
-                      return (
-                        <span key={stage} className={`stage-choice-tag stage-${stage}`}>
-                          <span className="tag-role">{stageLabels[stage]}:</span>
-                          <strong className="tag-val">{scoreVal}đ</strong>
-                        </span>
-                      );
-                    })}
-                  </div>
-                )}
+                <span className="radio-indicator" aria-hidden="true">
+                  <span className="radio-dot" />
+                </span>
+                <span className="radio-label-text">{level.label}</span>
+                <span className="radio-range-badge">{level.min}–{level.max} điểm</span>
               </button>
             );
           })}
         </div>
       )}
 
-      {/* Unified Stage Audit Breakdown Matrix (Harmonized Table of Stage Scores + Selected Option + Notes) */}
+      {/* Sleek Stage Review Feed (Clean Cards for Stage Scores, Option Match & Notes) */}
       {previousStages.length > 0 && (
-        <div className="stage-audit-matrix-container" aria-label={`Bảng tổng hợp điểm các cấp: ${criterion.title}`}>
-          <div className="matrix-title">📊 Chi tiết chấm điểm & nhận xét các cấp:</div>
-          <div className="stage-audit-grid">
+        <div className="stage-audit-feed" aria-label={`Chi tiết đánh giá các cấp: ${criterion.title}`}>
+          <div className="audit-feed-heading">💬 Chi tiết ý kiến & phương án chấm các cấp:</div>
+          <div className="audit-feed-cards">
             {previousStages.map((stage) => {
               const val = criterion.stageScores?.[stage];
               const matchedOpt = getStageOptionLevel(criterion, val);
               const noteText = criterion.stageNotes?.[stage] || (stage === 'self' ? criterion.note : undefined);
 
               return (
-                <div key={stage} className={`stage-audit-row stage-${stage}`}>
-                  <div className="stage-col-role">
-                    <span className={`history-pill stage-${stage}`}>
-                      <small>{stageLabels[stage]}</small>
-                      <strong>{val !== undefined && val !== null ? `${val} đ` : '—'}</strong>
+                <div key={stage} className={`stage-audit-feed-card stage-${stage}`}>
+                  <div className="card-top-row">
+                    <span className={`stage-feed-badge stage-${stage}`}>
+                      {stageLabels[stage]}: <strong>{val !== undefined && val !== null ? `${val} đ` : '—'}</strong>
                     </span>
-                  </div>
-
-                  <div className="stage-col-option">
-                    {matchedOpt ? (
-                      <span className="matched-option-badge">
-                        🎯 {matchedOpt.label} <small>({matchedOpt.min}–{matchedOpt.max}đ)</small>
+                    {matchedOpt && (
+                      <span className="stage-feed-option">
+                        🎯 {matchedOpt.label} ({matchedOpt.min}–{matchedOpt.max}đ)
                       </span>
-                    ) : (
-                      <span className="matched-option-badge empty">—</span>
                     )}
                   </div>
-
-                  <div className="stage-col-note">
-                    {noteText ? (
-                      <span className="stage-note-bubble">📝 {noteText}</span>
-                    ) : (
-                      <span className="stage-note-bubble empty">Chưa có ghi chú</span>
-                    )}
-                  </div>
+                  {noteText ? (
+                    <p className="stage-feed-quote">“{noteText}”</p>
+                  ) : (
+                    <span className="stage-feed-no-note">Không có ghi chú thêm</span>
+                  )}
                 </div>
               );
             })}

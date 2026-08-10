@@ -1787,122 +1787,90 @@
   box-shadow: 0 1px 4px rgba(16, 24, 40, 0.04);
 }
 
-/* Radio Option Layout & Stage Tags */
-.radio-option-item {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 6px;
-  width: 100%;
-}
-
-.radio-option-main {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  width: 100%;
-}
-
-.radio-option-stage-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-left: 28px;
-}
-
-.stage-choice-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 2px 8px;
-  border-radius: 6px;
-  font-size: 11px;
-  border: 1px solid #d0d5dd;
-  background: #ffffff;
-}
-
-.stage-choice-tag.stage-self { background: #eff8ff; border-color: #b2ddff; color: #175cd3; }
-.stage-choice-tag.stage-deputy { background: #f0f9ff; border-color: #b9e6fe; color: #026aa2; }
-.stage-choice-tag.stage-manager { background: #f4f3ff; border-color: #d9d6fe; color: #5925dc; }
-.stage-choice-tag.stage-editorial { background: #fdf2fa; border-color: #fce7f6; color: #c11574; }
-.stage-choice-tag.stage-council { background: #ecfdf3; border-color: #abefc6; color: #067647; }
-
-/* Unified Stage Audit Breakdown Matrix */
-.stage-audit-matrix-container {
+/* Sleek Stage Review Feed (Ultra Minimalist & Premium) */
+.stage-audit-feed {
   margin-top: 14px;
-  padding: 12px 16px;
+  padding: 12px 14px;
   background: #f8fafc;
-  border: 1px solid #eaecf0;
+  border: 1px solid #f1f5f9;
   border-radius: 12px;
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-.stage-audit-matrix-container .matrix-title {
+.stage-audit-feed .audit-feed-heading {
   font-size: 12px;
   font-weight: 700;
   color: #344054;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
 }
 
-.stage-audit-grid {
+.stage-audit-feed .audit-feed-cards {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 }
 
-.stage-audit-row {
-  display: grid;
-  grid-template-columns: 170px 1fr 1.5fr;
-  align-items: center;
-  gap: 12px;
-  padding: 8px 12px;
+.stage-audit-feed-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 14px;
   background: #ffffff;
-  border: 1px solid #f1f5f9;
-  border-radius: 8px;
-  transition: all 0.15s ease;
+  border: 1px solid #eaecf0;
+  border-radius: 10px;
+  transition: all 0.2s ease;
 }
 
-.stage-audit-row:hover {
+.stage-audit-feed-card:hover {
   border-color: #d0d5dd;
-  box-shadow: 0 1px 3px rgba(16, 24, 40, 0.04);
+  box-shadow: 0 2px 6px rgba(16, 24, 40, 0.04);
 }
 
-.stage-col-role {
+.stage-audit-feed-card .card-top-row {
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
-.stage-col-option .matched-option-badge {
+.stage-feed-badge {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
   font-size: 12px;
   font-weight: 600;
-  color: #1d2939;
-  background: #f2f4f7;
-  padding: 3px 8px;
+  padding: 3px 10px;
   border-radius: 6px;
-  border: 1px solid #e4e7ec;
 }
 
-.stage-col-option .matched-option-badge.empty {
-  color: #98a2b3;
-  background: transparent;
-  border: none;
-  font-weight: normal;
+.stage-feed-badge.stage-self { background: #eff8ff; color: #175cd3; border: 1px solid #b2ddff; }
+.stage-feed-badge.stage-deputy { background: #f0f9ff; color: #026aa2; border: 1px solid #b9e6fe; }
+.stage-feed-badge.stage-manager { background: #f4f3ff; color: #5925dc; border: 1px solid #d9d6fe; }
+.stage-feed-badge.stage-editorial { background: #fdf2fa; color: #c11574; border: 1px solid #fce7f6; }
+.stage-feed-badge.stage-council { background: #ecfdf3; color: #067647; border: 1px solid #abefc6; }
+
+.stage-feed-option {
+  font-size: 12px;
+  font-weight: 600;
+  color: #344054;
+  background: #f2f4f7;
+  padding: 2px 8px;
+  border-radius: 6px;
 }
 
-.stage-col-note .stage-note-bubble {
+.stage-feed-quote {
   font-size: 12px;
   color: #475467;
   font-style: italic;
+  margin: 0;
+  padding-left: 6px;
+  border-left: 2px solid #d0d5dd;
 }
 
-.stage-col-note .stage-note-bubble.empty {
+.stage-feed-no-note {
+  font-size: 11px;
   color: #98a2b3;
-  font-style: normal;
 }
 
