@@ -1191,3 +1191,210 @@
   }
 }
 
+/* Admin Controls and Modals in Evaluation Workspace */
+.admin-actions-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.admin-btn {
+  height: 38px !important;
+  border-radius: 8px !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+}
+
+.admin-btn.group-mgr-btn {
+  color: #175cd3 !important;
+  background: #eff8ff !important;
+  border-color: #b2ddff !important;
+}
+
+.admin-btn.group-mgr-btn:hover {
+  color: #1570ef !important;
+  background: #d1e9ff !important;
+}
+
+.admin-btn.period-mgr-btn {
+  color: #b42318 !important;
+  background: #fef3f2 !important;
+  border-color: #fecdca !important;
+}
+
+.admin-btn.period-mgr-btn:hover {
+  color: #912018 !important;
+  background: #fee4e2 !important;
+}
+
+/* Admin Modals Styling */
+.admin-modal-body, .admin-periods-modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding-top: 10px;
+}
+
+.admin-modal-tabs {
+  display: flex;
+  gap: 12px;
+  border-bottom: 1px solid #eaecf0;
+  padding-bottom: 14px;
+}
+
+.groups-manager-panel, .workflow-manager-panel, .create-period-box, .period-list-container {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.add-group-card, .create-period-box {
+  padding: 14px;
+  background: #f8fafc;
+  border: 1px solid #eaecf0;
+  border-radius: 10px;
+}
+
+.add-group-card h4, .create-period-box h4, .workflow-intro h4, .period-list-container h4 {
+  margin: 0 0 10px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #101828;
+}
+
+.add-group-row, .create-period-form {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.add-group-row .ant-input, .create-period-form .ant-input {
+  flex: 1;
+}
+
+.due-date-picker {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #475467;
+}
+
+.due-date-picker input[type="date"] {
+  height: 38px;
+  padding: 4px 10px;
+  border: 1px solid #d0d5dd;
+  border-radius: 8px;
+}
+
+.groups-list, .period-cards-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 360px;
+  overflow-y: auto;
+}
+
+.group-item-card, .period-card {
+  padding: 12px 16px;
+  border: 1px solid #eaecf0;
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.group-item-header, .period-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.group-criteria-mini-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed #f1f5f9;
+}
+
+.criterion-mini-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
+  color: #344054;
+}
+
+.workflow-steps-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.workflow-step-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 16px;
+  border: 1px solid #eaecf0;
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.workflow-step-card.active {
+  border-color: #b2ddff;
+  background: #eff8ff;
+}
+
+.workflow-step-card .step-num {
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: #f2f4f7;
+  font-size: 12px;
+  font-weight: 700;
+  color: #344054;
+}
+
+.workflow-step-card .step-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.workflow-step-card .step-detail strong {
+  font-size: 14px;
+  color: #101828;
+}
+
+.workflow-step-card .step-detail small {
+  font-size: 12px;
+  color: #667085;
+}
+
+.period-card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.period-card-info strong {
+  font-size: 14px;
+  color: #101828;
+}
+
+.period-card-info small {
+  font-size: 12px;
+  color: #667085;
+}
+
+.period-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+

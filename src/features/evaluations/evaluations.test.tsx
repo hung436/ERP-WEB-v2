@@ -67,4 +67,16 @@ describe('Workspace Đánh giá lao động', () => {
     expect(within(history).getByText('Ban biên tập')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Chốt kết quả' })).toBeInTheDocument();
   });
+
+  it('cho phép admin quản lý nhóm quy trình và kỳ đánh giá', async () => {
+    const user = userEvent.setup();
+    renderApp('/evaluations', true);
+    await screen.findByRole('heading', { name: 'Đánh giá lao động' });
+    await user.click(screen.getByRole('button', { name: /Quản lý nhóm & Quy trình/i }));
+    expect(await screen.findByText(/Quản lý Nhóm & Quy trình Đánh giá Lao động/i)).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Lưu & Đóng' }));
+
+    await user.click(screen.getByRole('button', { name: /Quản lý kỳ đánh giá/i }));
+    expect(await screen.findByText(/Quản lý Kỳ đánh giá Lao động/i)).toBeInTheDocument();
+  });
 });
