@@ -714,13 +714,68 @@ function EvaluationWorkspace({
   const { user } = useAuth();
   const isAdmin = user?.role === 'admin';
   const [searchParams, setSearchParams] = useSearchParams();
+
   const paramSheetId = searchParams.get('sheetId') ?? '';
+  const paramMode = (searchParams.get('mode') as EvaluationMode) ?? 'self';
+  const paramTab = (searchParams.get('tab') as 'monitor' | 'periods' | 'import' | 'groups') ?? 'monitor';
+  const paramPeriodId = searchParams.get('periodId') ?? '';
 
   const [periods, setPeriods] = useState<EvaluationPeriod[]>(initialPeriods);
-  const [mode, setMode] = useState<EvaluationMode>('self');
-  const [adminTab, setAdminTab] = useState<'monitor' | 'periods' | 'import' | 'groups'>('monitor');
-  const [periodId, setPeriodId] = useState(periods.find((p) => p.status === 'active')?.id ?? periods[0]?.id ?? '');
+  const [mode, setModeState] = useState<EvaluationMode>(paramMode);
+  const [adminTab, setAdminTabState] = useState<'monitor' | 'periods' | 'import' | 'groups'>(paramTab);
+  const [periodId, setPeriodIdState] = useState(paramPeriodId || (periods.find((p) => p.status === 'active')?.id ?? periods[0]?.id ?? ''));
   const [sheetId, setSheetIdState] = useState(paramSheetId);
+
+  // Sync params to URL helper
+  const updateQueryParams = (updates: Record<string, string | null>) => {
+    setSearchParams(
+      (prev) => {
+        const next = new URLSearchParams(prev);
+        Object.entries(updates).forEach(([key, value]) => {
+          if (value) {
+            next.set(key, value);
+          } else {
+            next.delete(key);
+          }
+        });
+        return next;
+      },
+      { replace: true }
+    );
+  };
+
+  const setMode = (newMode: EvaluationMode) => {
+    setModeState(newMode);
+    updateQueryParams({ mode: newMode });
+  };
+
+  const setAdminTab = (newTab: 'monitor' | 'periods' | 'import' | 'groups') => {
+    setAdminTabState(newTab);
+    updateQueryParams({ tab: newTab });
+  };
+
+  const setPeriodId = (newPeriodId: string) => {
+    setPeriodIdState(newPeriodId);
+    updateQueryParams({ periodId: newPeriodId });
+  };
+
+  const setSheetId = (id: string) => {
+    setSheetIdState(id);
+    updateQueryParams({ sheetId: id || null });
+  };
+
+  // Sync state when URL params change (e.g. from homepage navigation or back/forward)
+  useEffect(() => {
+    const urlSheetId = searchParams.get('sheetId') ?? '';
+    const urlMode = searchParams.get('mode') as EvaluationMode | null;
+    const urlTab = searchParams.get('tab') as ('monitor' | 'periods' | 'import' | 'groups') | null;
+    const urlPeriodId = searchParams.get('periodId') ?? '';
+
+    if (urlSheetId !== sheetId) setSheetIdState(urlSheetId);
+    if (urlMode && urlMode !== mode) setModeState(urlMode);
+    if (urlTab && urlTab !== adminTab) setAdminTabState(urlTab);
+    if (urlPeriodId && urlPeriodId !== periodId) setPeriodIdState(urlPeriodId);
+  }, [searchParams]);
 
   // Admin Period Milestones State
   const [label, setLabel] = useState('');
@@ -817,22 +872,6 @@ function EvaluationWorkspace({
   };
 
   const currentFlow = employeeFlows[selectedEmpCode] ?? employeeFlows['NV-001'];
-
-  const setSheetId = (id: string) => {
-    setSheetIdState(id);
-    setSearchParams(
-      (prev) => {
-        const next = new URLSearchParams(prev);
-        if (id) {
-          next.set('sheetId', id);
-        } else {
-          next.delete('sheetId');
-        }
-        return next;
-      },
-      { replace: true }
-    );
-  };
 
   const availableSheets = useMemo(
     () =>
