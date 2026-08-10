@@ -629,3 +629,31 @@ body { font-size:var(--font-main); line-height:1.5; }
     padding: 6px 12px;
   }
 }
+
+/* Group Chat Message Avatars & Member Labels */
+.group-msg-avatar {
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  flex: 0 0 32px;
+  font-size: 11px;
+  font-weight: 700;
+  border-radius: 50%;
+  align-self: flex-start;
+  margin-top: 18px;
+}
+
+.message-wrapper {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  max-width: min(70%, 680px);
+}
+
+.message-sender-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: #475467;
+  padding-left: 2px;
+}

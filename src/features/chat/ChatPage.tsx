@@ -175,11 +175,21 @@ export function ChatPage() {
           {messagesState.loading ? <ContentSkeleton rows={6} /> : messagesState.error ? <ErrorState message={messagesState.error} onRetry={messagesState.reload} /> : visibleMessages.length ? visibleMessages.map((item, index) => <div className="message-block" key={item.id}>
             {(index === 0 || new Date(visibleMessages[index - 1].sentAt).toDateString() !== new Date(item.sentAt).toDateString()) && <div className="message-day">{new Date(item.sentAt).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' })}</div>}
             <div className={item.isMine ? 'message mine' : 'message'}>
-              <div className="message-bubble">
-                {item.replyTo && <div className="message-reply"><small>{item.replyTo.senderName}</small><strong>{item.replyTo.content}</strong></div>}
-                <span className="message-content">{item.content}</span>
-                {item.attachment && <span className="message-attachment"><strong>{item.attachment.name}</strong><small>{(item.attachment.size / 1024).toFixed(1)} KB · {item.attachment.type}</small></span>}
-                {Boolean(item.reactions?.length) && <span className="message-reactions">{item.reactions?.map((reaction) => <button aria-label={`${reaction.reacted ? 'Bỏ' : 'Thả'} cảm xúc ${reaction.emoji}`} className={reaction.reacted ? 'reacted' : ''} disabled={pendingAction === `reaction-${item.id}`} key={reaction.emoji} onClick={() => void react(item, reaction.emoji)} type="button">{reaction.emoji} {reaction.count}</button>)}</span>}
+              {!item.isMine && selected?.isGroup && (
+                <span className={`avatar neutral group-msg-avatar ${avatarTone(item.senderName)}`} title={item.senderName}>
+                  {item.senderName.slice(0, 2).toUpperCase()}
+                </span>
+              )}
+              <div className="message-wrapper">
+                {!item.isMine && selected?.isGroup && (
+                  <small className="message-sender-name">{item.senderName}</small>
+                )}
+                <div className="message-bubble">
+                  {item.replyTo && <div className="message-reply"><small>{item.replyTo.senderName}</small><strong>{item.replyTo.content}</strong></div>}
+                  <span className="message-content">{item.content}</span>
+                  {item.attachment && <span className="message-attachment"><strong>{item.attachment.name}</strong><small>{(item.attachment.size / 1024).toFixed(1)} KB · {item.attachment.type}</small></span>}
+                  {Boolean(item.reactions?.length) && <span className="message-reactions">{item.reactions?.map((reaction) => <button aria-label={`${reaction.reacted ? 'Bỏ' : 'Thả'} cảm xúc ${reaction.emoji}`} className={reaction.reacted ? 'reacted' : ''} disabled={pendingAction === `reaction-${item.id}`} key={reaction.emoji} onClick={() => void react(item, reaction.emoji)} type="button">{reaction.emoji} {reaction.count}</button>)}</span>}
+                </div>
               </div>
               <time>{new Date(item.sentAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}</time>
               <div className="message-actions" aria-label="Thao tác tin nhắn">
