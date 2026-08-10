@@ -495,6 +495,7 @@ function EvaluationWorkspace({
   onReload: () => void;
 }) {
   const { user } = useAuth();
+  const isAdmin = user?.role === 'admin';
   const [searchParams, setSearchParams] = useSearchParams();
   const paramSheetId = searchParams.get('sheetId') ?? '';
 
@@ -524,16 +525,16 @@ function EvaluationWorkspace({
 
   const availableSheets = useMemo(
     () =>
-      sheets.filter(
-        (sheet) =>
-          sheet.periodId === periodId &&
-          (mode === 'self'
-            ? sheet.employeeCode === 'NV-001'
-            : mode === 'scoring'
-            ? sheet.employeeCode !== 'NV-001' && sheet.stage !== 'council'
-            : sheet.employeeCode !== 'NV-001' && (sheet.stage === 'council' || sheet.status === 'published'))
-      ),
-    [mode, periodId, sheets]
+      sheets.filter((sheet) => {
+        if (sheet.periodId !== periodId) return false;
+        if (isAdmin) return true;
+        return mode === 'self'
+          ? sheet.employeeCode === 'NV-001'
+          : mode === 'scoring'
+          ? sheet.employeeCode !== 'NV-001' && sheet.stage !== 'council'
+          : sheet.employeeCode !== 'NV-001' && (sheet.stage === 'council' || sheet.status === 'published');
+      }),
+    [isAdmin, mode, periodId, sheets]
   );
 
   const [draft, setDraft] = useState<EvaluationSheet | null>(null);
@@ -542,14 +543,17 @@ function EvaluationWorkspace({
   const [noteValue, setNoteValue] = useState('');
 
   useEffect(() => {
-    if (mode === 'self') {
+    if (isAdmin) {
+      const selected = availableSheets.find((sheet) => sheet.id === sheetId) ?? null;
+      setDraft(selected);
+    } else if (mode === 'self') {
       const selected = availableSheets[0] ?? null;
       setDraft(selected);
     } else {
       const selected = availableSheets.find((sheet) => sheet.id === sheetId) ?? null;
       setDraft(selected);
     }
-  }, [availableSheets, mode, sheetId]);
+  }, [availableSheets, isAdmin, mode, sheetId]);
 
   const selectEmployeeSheet = (id: string) => {
     setSheetId(id);
@@ -561,7 +565,7 @@ function EvaluationWorkspace({
   const currentStage: EvaluationStage =
     mode === 'self' ? 'self' : mode === 'council' ? 'council' : draft?.stage === 'published' ? 'council' : draft?.stage ?? 'deputy';
   const previousStages = draft ? previousStagesFor(draft, mode) : [];
-  const readOnly = !draft || draft.status === 'published' || (mode === 'self' && draft.status !== 'draft');
+  const readOnly = isAdmin || !draft || draft.status === 'published' || (mode === 'self' && draft.status !== 'draft');
   const noteCriterion = criteria.find((criterion) => criterion.id === noteCriterionId) ?? null;
 
   const updateCriterion = (id: string, patch: Partial<EvaluationCriterion>) =>
@@ -588,7 +592,7 @@ function EvaluationWorkspace({
   };
 
   const persist = async (finish = false) => {
-    if (!draft) return;
+    if (!draft || isAdmin) return;
     setSaving(true);
     try {
       const action = finish ? (mode === 'self' ? 'submit' : 'approve') : 'save';
@@ -621,13 +625,13 @@ function EvaluationWorkspace({
           </span>
           <div>
             <small>Không gian làm việc ERP</small>
-            <h1>Đánh giá lao động</h1>
+            <h1>Đánh giá lao động {isAdmin && <Tag color="gold" style={{ marginLeft: 8 }}>👑 Quản trị viên</Tag>}</h1>
           </div>
         </div>
 
         <div className="evaluation-workspace-controls">
           {/* Admin Management Action Buttons */}
-          {(user?.role === 'admin' || true) && (
+          {isAdmin ? (
             <div className="admin-actions-bar">
               <Button
                 className="admin-btn group-mgr-btn"
@@ -642,31 +646,31 @@ function EvaluationWorkspace({
                 📅 Quản lý kỳ đánh giá
               </Button>
             </div>
+          ) : (
+            /* Flat Underline Tabs (Ant Design Line Tab Aesthetic for regular users) */
+            <div className="evaluation-flat-tabs" role="radiogroup" aria-label="Chế độ làm việc">
+              {modeOptions.map((opt) => {
+                const isActive = mode === opt.value;
+                return (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    role="radio"
+                    aria-label={opt.label}
+                    aria-checked={isActive}
+                    className={`flat-tab-btn${isActive ? ' active' : ''}`}
+                    onClick={() => {
+                      setMode(opt.value as EvaluationMode);
+                      setSheetId('');
+                    }}
+                  >
+                    <span className="tab-icon" aria-hidden="true">{opt.icon}</span>
+                    <span className="tab-label">{opt.label}</span>
+                  </button>
+                );
+              })}
+            </div>
           )}
-
-          {/* Flat Underline Tabs (Ant Design Line Tab Aesthetic) */}
-          <div className="evaluation-flat-tabs" role="radiogroup" aria-label="Chế độ làm việc">
-            {modeOptions.map((opt) => {
-              const isActive = mode === opt.value;
-              return (
-                <button
-                  key={opt.value}
-                  type="button"
-                  role="radio"
-                  aria-label={opt.label}
-                  aria-checked={isActive}
-                  className={`flat-tab-btn${isActive ? ' active' : ''}`}
-                  onClick={() => {
-                    setMode(opt.value as EvaluationMode);
-                    setSheetId('');
-                  }}
-                >
-                  <span className="tab-icon" aria-hidden="true">{opt.icon}</span>
-                  <span className="tab-label">{opt.label}</span>
-                </button>
-              );
-            })}
-          </div>
 
           <div className="evaluation-control">
             <span>Kỳ đánh giá</span>
@@ -683,15 +687,15 @@ function EvaluationWorkspace({
         </div>
       </header>
 
-      {mode !== 'self' && !sheetId ? (
+      {(isAdmin || mode !== 'self') && !sheetId ? (
         <EmployeeEvaluationListTable
           sheets={availableSheets}
           onSelectSheet={selectEmployeeSheet}
         />
       ) : draft ? (
         <>
-          {/* Back to Employee List Button when in scoring/council mode */}
-          {mode !== 'self' && (
+          {/* Back to Employee List Button */}
+          {(isAdmin || mode !== 'self') && (
             <div className="back-to-list-bar">
               <Button type="link" onClick={() => setSheetId('')}>
                 ← Quay lại danh sách nhân sự ({availableSheets.length})
@@ -799,20 +803,24 @@ function EvaluationWorkspace({
           <footer className="evaluation-actionbar">
             <div className="actionbar-info">
               <strong>
-                {readOnly
+                {isAdmin
+                  ? '🛡️ Chế độ Giám sát Hệ thống (Dành cho Admin)'
+                  : readOnly
                   ? 'Phiếu ở chế độ chỉ đọc'
                   : completion === 100
                   ? '✓ Đã hoàn thành chấm điểm toàn bộ 100% tiêu chí'
                   : `Còn ${criteria.length - answered} tiêu chí chưa có điểm`}
               </strong>
               <small>
-                {readOnly
+                {isAdmin
+                  ? 'Tài khoản Admin không tham gia tự chấm hay chấm điểm. Admin quản lý nhóm, quy trình và kỳ đánh giá.'
+                  : readOnly
                   ? 'Kết quả đã được chuyển sang cấp xử lý tiếp theo hoặc công bố chính thức.'
                   : 'Điểm tổng và lịch sử cập nhật tức thời trên toàn hệ thống.'}
               </small>
             </div>
 
-            {!readOnly && (
+            {!readOnly && !isAdmin && (
               <div className="actionbar-buttons">
                 <Button loading={saving} onClick={() => void persist(false)}>
                   Lưu bản nháp

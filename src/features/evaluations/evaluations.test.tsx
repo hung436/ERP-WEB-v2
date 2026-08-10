@@ -68,10 +68,15 @@ describe('Workspace Đánh giá lao động', () => {
     expect(screen.getByRole('button', { name: 'Chốt kết quả' })).toBeInTheDocument();
   });
 
-  it('cho phép admin quản lý nhóm quy trình và kỳ đánh giá', async () => {
+  it('tài khoản admin có giao diện giám sát riêng không tự chấm điểm', async () => {
     const user = userEvent.setup();
-    renderApp('/evaluations', true);
-    await screen.findByRole('heading', { name: 'Đánh giá lao động' });
+    renderApp('/login');
+    await user.type(screen.getByLabelText('Tên đăng nhập'), 'admin');
+    await user.type(screen.getByLabelText('Mật khẩu'), '123456');
+    await user.click(screen.getByRole('button', { name: 'Đăng nhập' }));
+    await user.click(await screen.findByRole('link', { name: /Đánh giá/i }));
+
+    expect(await screen.findByText(/Quản trị viên/i)).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: /Quản lý nhóm & Quy trình/i }));
     expect(await screen.findByText(/Quản lý Nhóm & Quy trình Đánh giá Lao động/i)).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Lưu & Đóng' }));
