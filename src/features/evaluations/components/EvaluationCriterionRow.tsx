@@ -80,8 +80,21 @@ export function EvaluationCriterionRow({
           </div>
         </div>
 
-        {/* Top-Right Toolbar: Score Input + Note Button */}
+        {/* Top-Right Toolbar: Visual Score Badge + Score Input + Note Icon Button */}
         <div className="header-right-toolbar">
+          <div className="criterion-score-badge-wrap">
+            {criterion.score !== null ? (
+              <span className="criterion-score-badge scored">
+                <span className="score-num">{criterion.score}</span>
+                {!isUnlimited && <span className="score-max">/ {criterion.max} điểm</span>}
+              </span>
+            ) : (
+              <span className="criterion-score-badge un-scored">
+                <span>Chưa chấm {!isUnlimited ? `(Tối đa ${criterion.max}đ)` : ''}</span>
+              </span>
+            )}
+          </div>
+
           <div className="evaluation-score-inline">
             <label htmlFor={`evaluation-score-${criterion.id}`}>Điểm</label>
             <InputNumber
@@ -94,9 +107,8 @@ export function EvaluationCriterionRow({
               disabled={scoreLocked}
               value={criterion.score}
               onChange={onScoreChange}
-              placeholder={isUnlimited ? 'Nhập điểm' : `${minimum}–${maximum}`}
+              placeholder={isUnlimited ? 'Điểm' : `${minimum}–${maximum}`}
             />
-            {!isUnlimited && <span className="score-max">/ {criterion.max}</span>}
           </div>
 
           <div className="card-note-wrapper">

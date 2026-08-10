@@ -81,6 +81,14 @@ const totalScore = (sheet: EvaluationSheet) =>
     0
   );
 
+const getRatingGrade = (score: number) => {
+  if (score >= 90) return { label: 'Xuất sắc (Loại A+)', color: 'green' };
+  if (score >= 80) return { label: 'Hoàn thành tốt (Loại A)', color: 'blue' };
+  if (score >= 70) return { label: 'Hoàn thành (Loại B)', color: 'cyan' };
+  if (score >= 50) return { label: 'Cần cố gắng (Loại C)', color: 'orange' };
+  return { label: 'Chưa đạt (Loại D)', color: 'red' };
+};
+
 const previousStagesFor = (sheet: EvaluationSheet, mode: EvaluationMode) =>
   sheet.status === 'published' || sheet.stage === 'published'
     ? stageOrder
@@ -1425,10 +1433,11 @@ function EvaluationWorkspace({
             {draft.groups.map((group) => {
               const groupAnswered = group.criteria.filter((c) => c.score !== null).length;
               const groupScore = group.criteria.reduce((sum, c) => sum + (c.score ?? 0), 0);
+              const groupMax = group.criteria.reduce((sum, c) => sum + (c.max ?? 0), 0);
 
               return (
                 <section className="evaluation-stream-group" key={group.id}>
-                  <header>
+                  <header className="group-stream-header">
                     <div className="group-title-box">
                       <span className={`kind-icon kind-${group.kind}`}>
                         {group.kind === 'bonus' ? '+' : group.kind === 'deduction' ? '−' : '•'}
@@ -1440,9 +1449,16 @@ function EvaluationWorkspace({
                         </p>
                       </div>
                     </div>
-                    <strong className="group-score-sum">
-                      Tổng nhóm: {groupScore} điểm
-                    </strong>
+                    <div className="group-score-summary-badge">
+                      <small>Tổng điểm nhóm này:</small>
+                      <strong>
+                        {group.kind === 'bonus'
+                          ? `+${groupScore}`
+                          : group.kind === 'deduction'
+                          ? `-${groupScore}`
+                          : `${groupScore} / ${groupMax}`} điểm
+                      </strong>
+                    </div>
                   </header>
                   <div className="group-rows-container">
                     {group.criteria.map((criterion) => (
@@ -1462,25 +1478,31 @@ function EvaluationWorkspace({
             })}
           </section>
 
-          {/* Sticky Bottom Action Bar */}
+          {/* Sticky Bottom Action Bar with Visual Scoreboard */}
           <footer className="evaluation-actionbar">
-            <div className="actionbar-info">
-              <strong>
-                {isAdmin
-                  ? '🛡️ Chế độ Giám sát Hệ thống (Dành cho Admin)'
-                  : readOnly
-                  ? 'Phiếu ở chế độ chỉ đọc'
-                  : completion === 100
-                  ? '✓ Đã hoàn thành chấm điểm toàn bộ 100% tiêu chí'
-                  : `Còn ${criteria.length - answered} tiêu chí chưa có điểm`}
-              </strong>
-              <small>
-                {isAdmin
-                  ? 'Tài khoản Admin không tham gia tự chấm hay chấm điểm. Admin quản lý nhóm, quy trình và kỳ đánh giá.'
-                  : readOnly
-                  ? 'Kết quả đã được chuyển sang cấp xử lý tiếp theo hoặc công bố chính thức.'
-                  : 'Điểm tổng và lịch sử cập nhật tức thời trên toàn hệ thống.'}
-              </small>
+            <div className="actionbar-left-scoreboard">
+              <div className="scoreboard-total-pill">
+                <small>Tổng điểm hiện tại:</small>
+                <strong className="live-score live-score-value">{totalScore(draft)} <span className="max-unit">/ 100 điểm</span></strong>
+              </div>
+              
+              <Tag color={getRatingGrade(totalScore(draft)).color} className="scoreboard-grade-tag">
+                {getRatingGrade(totalScore(draft)).label}
+              </Tag>
+
+              <div className="scoreboard-groups-breakdown">
+                {draft.groups.map((g) => {
+                  const gScore = g.criteria.reduce((s, c) => s + (c.score ?? 0), 0);
+                  const gMax = g.criteria.reduce((s, c) => s + (c.max ?? 0), 0);
+                  const cleanTitle = g.title.replace(/^\d+\.\s*/, '');
+                  return (
+                    <span key={g.id} className={`mini-group-score-chip kind-${g.kind}`}>
+                      <small>{cleanTitle}:</small>
+                      <strong>{g.kind === 'bonus' ? `+${gScore}` : g.kind === 'deduction' ? `-${gScore}` : `${gScore}/${gMax}`}đ</strong>
+                    </span>
+                  );
+                })}
+              </div>
             </div>
 
             {!readOnly && !isAdmin && (
