@@ -4,7 +4,15 @@
 @tailwind utilities;
 
 :root { color:#1d2939; background:#f5f7fa; font-family:Inter,system-ui,sans-serif; font-synthesis:none; }
-* { box-sizing:border-box; }
+* { box-sizing:border-box; scrollbar-width:thin; scrollbar-color:#d0d5dd transparent; }
+
+/* Sleek Modern Custom Scrollbars across entire app */
+::-webkit-scrollbar { width:7px; height:7px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background:#d0d5dd; border-radius:999px; border:2px solid transparent; background-clip:content-box; transition:background .15s ease-in-out; }
+::-webkit-scrollbar-thumb:hover { background:#98a2b3; border-width:1px; }
+::-webkit-scrollbar-corner { background:transparent; }
+
 body { margin:0; min-width:768px; min-height:100vh; background:#f5f7fa; }
 button,a,input { font:inherit; }
 a { color:inherit; text-decoration:none; }
