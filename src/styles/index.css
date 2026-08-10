@@ -637,8 +637,10 @@ body { font-size:var(--font-main); line-height:1.5; }
   min-width: 32px !important;
   min-height: 32px !important;
   flex: 0 0 32px !important;
-  display: inline-grid !important;
-  place-items: center !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
   border-radius: 50% !important;
   font-size: 11px !important;
   font-weight: 700 !important;
