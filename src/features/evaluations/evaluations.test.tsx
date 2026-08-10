@@ -37,7 +37,7 @@ describe('Workspace Đánh giá lao động', () => {
     const dialog = await screen.findByRole('dialog', { name: 'Ghi chú tiêu chí' });
     await user.type(within(dialog).getByLabelText('Nội dung ghi chú'), 'Hoàn thành đúng tiến độ, có số liệu đối chiếu.');
     await user.click(within(dialog).getByRole('button', { name: 'Lưu ghi chú' }));
-    expect(within(firstRow).getByRole('button', { name: 'Đã ghi chú' })).toBeInTheDocument();
+    expect(within(firstRow).getByText(/Hoàn thành đúng tiến độ/)).toBeInTheDocument();
   });
 
   it('chuyển sang chấm nhân viên trong cùng workspace và xem nhanh lịch sử điểm', async () => {

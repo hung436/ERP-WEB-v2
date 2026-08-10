@@ -100,16 +100,18 @@ export function EvaluationCriterionRow({
           </div>
 
           <div className="card-note-wrapper">
-            <Tooltip title={criterion.note ? 'Chỉnh sửa ghi chú/minh chứng' : 'Thêm ghi chú/minh chứng'}>
-              <Button
-                className={`evaluation-note-button${criterion.note ? ' has-note' : ''}`}
-                disabled={readOnly}
-                onClick={onOpenNote}
-              >
-                <span className="btn-icon" aria-hidden="true">{criterion.note ? '✓' : '📝'}</span>
-                <span>{criterion.note ? 'Đã ghi chú' : 'Ghi chú'}</span>
-              </Button>
-            </Tooltip>
+            {!criterion.note && (
+              <Tooltip title="Thêm ghi chú/minh chứng">
+                <Button
+                  className="evaluation-note-button"
+                  disabled={readOnly}
+                  onClick={onOpenNote}
+                >
+                  <span className="btn-icon" aria-hidden="true">📝</span>
+                  <span>Ghi chú</span>
+                </Button>
+              </Tooltip>
+            )}
           </div>
         </div>
       </header>
