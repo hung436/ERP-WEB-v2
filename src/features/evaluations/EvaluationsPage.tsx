@@ -82,10 +82,10 @@ const totalScore = (sheet: EvaluationSheet) =>
   );
 
 const previousStagesFor = (sheet: EvaluationSheet, mode: EvaluationMode) =>
-  mode === 'self'
-    ? []
-    : sheet.stage === 'published'
+  sheet.status === 'published' || sheet.stage === 'published'
     ? stageOrder
+    : mode === 'self'
+    ? []
     : stageOrder.slice(0, Math.max(1, stageOrder.indexOf(mode === 'council' ? 'council' : sheet.stage)));
 
 function EmployeeEvaluationListTable({
@@ -854,6 +854,16 @@ function EvaluationWorkspace({
   const [noteValue, setNoteValue] = useState('');
 
   useEffect(() => {
+    if (sheetId) {
+      const found = sheets.find((s) => s.id === sheetId);
+      if (found) {
+        if (found.periodId !== periodId) {
+          setPeriodId(found.periodId);
+        }
+        setDraft(found);
+        return;
+      }
+    }
     if (isAdmin) {
       const selected = availableSheets.find((sheet) => sheet.id === sheetId) ?? null;
       setDraft(selected);
@@ -864,7 +874,7 @@ function EvaluationWorkspace({
       const selected = availableSheets.find((sheet) => sheet.id === sheetId) ?? null;
       setDraft(selected);
     }
-  }, [availableSheets, isAdmin, mode, sheetId]);
+  }, [availableSheets, isAdmin, mode, periodId, sheetId, sheets]);
 
   const selectEmployeeSheet = (id: string) => {
     setSheetId(id);

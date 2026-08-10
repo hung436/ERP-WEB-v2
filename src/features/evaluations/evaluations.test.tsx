@@ -86,4 +86,17 @@ describe('Workspace Đánh giá lao động', () => {
     await user.click(screen.getByRole('button', { name: /Nhóm tiêu chí & Flowchart/i }));
     expect(await screen.findByText(/Sơ đồ Flow tiến trình chấm chi tiết theo cá nhân/i)).toBeInTheDocument();
   });
+
+  it('Phiếu của tôi khi đã công bố sẽ xem được chi tiết điểm từng câu của từng cấp chấm', async () => {
+    renderApp('/evaluations?sheetId=eval-self-q2', true);
+    await screen.findByRole('heading', { name: /Đánh giá lao động/i });
+    const stream = await screen.findByRole('region', { name: 'Danh sách tiêu chí đánh giá' });
+    const firstRow = (await within(stream).findAllByRole('article'))[0];
+    const history = within(firstRow).getByLabelText(/Lịch sử điểm: Thực hiện nhiệm vụ chuyên môn/);
+    expect(within(history).getByText('Tự đánh giá')).toBeInTheDocument();
+    expect(within(history).getByText('Phó phòng/ban')).toBeInTheDocument();
+    expect(within(history).getByText('Trưởng phòng/ban')).toBeInTheDocument();
+    expect(within(history).getByText('Ban biên tập')).toBeInTheDocument();
+    expect(within(history).getByText('Hội đồng')).toBeInTheDocument();
+  });
 });

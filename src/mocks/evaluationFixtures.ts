@@ -105,11 +105,12 @@ const cloneGroups = (progress: number, previous = false): EvaluationGroup[] => b
     const deputy = Math.max(0, self - (index % 4 === 0 ? 1 : 0));
     const manager = Math.max(0, deputy - (index % 5 === 0 ? 1 : 0));
     const editorial = Math.max(0, manager - (index % 6 === 0 ? 1 : 0));
+    const council = editorial;
     return {
       ...criterion,
       score: progress < 100 && index > 5 && group.id === 'duties' ? null : criterion.score,
       previousScore: previous ? deputy : undefined,
-      stageScores: previous ? { self, deputy, manager, editorial } : { self },
+      stageScores: previous ? { self, deputy, manager, editorial, council } : { self },
       levels: criterion.levels?.map((level) => ({ ...level })),
     };
   }),
