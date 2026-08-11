@@ -13,7 +13,7 @@ import type { DirectoryContact } from '@/types/domain';
 import { avatarTone } from '@/utils/avatar';
 
 export function AppLayout() {
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(true);
   const [selectedContact, setSelectedContact] = useState<DirectoryContact | null>(null);
   const [contactChatting, setContactChatting] = useState(false);
   const { user, logout } = useAuth();

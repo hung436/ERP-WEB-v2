@@ -14,7 +14,7 @@ export function CalendarQuickView({ event, onClose }: { event: CalendarEvent; on
     message.success(`Đang tham gia phòng họp trực tuyến ${event.meetingId ?? ''}`);
   };
 
-  return <Modal centered className="online-meeting-modal" footer={<div className="document-modal-actions"><Button onClick={onClose}>Đóng</Button><Button icon={<ModuleIcon module="meetings" size={16} />} onClick={joinMeeting} type="primary">Tham gia phòng họp trực tuyến</Button></div>} onCancel={onClose} open title={<span className="preview-title"><span className="section-icon meetings"><ModuleIcon module="meetings" size={20} /></span><span>Chi tiết cuộc họp trực tuyến</span><small>· {event.title}</small></span>} width={720}>
+  return <Modal centered className="online-meeting-modal" footer={<div className="document-modal-actions"><Button onClick={onClose}>Đóng</Button><Button icon={<ModuleIcon module="meetings" size={16} />} onClick={joinMeeting} type="primary">Tham gia phòng họp trực tuyến</Button></div>} onCancel={onClose} open title={<span className="preview-title"><span className="section-icon meetings"><ModuleIcon module="meetings" size={20} /></span><strong>{event.title}</strong></span>} width={720}>
     <article className="meeting-modal-content">
       <header className="meeting-modal-summary"><p>📹 Nền tảng: <strong>{event.platform}</strong> · ID phòng: <strong>{event.meetingId ?? 'TT-ONLINE'}</strong></p></header>
       <section className="meeting-time-panel"><div><small>Bắt đầu</small><strong>{formatDate(event.startAt)}</strong></div><span>→</span><div><small>Kết thúc</small><strong>{formatDate(event.endAt)}</strong></div></section>

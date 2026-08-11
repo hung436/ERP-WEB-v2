@@ -1886,8 +1886,6 @@ function EvaluationWorkspace({
                 value={noteValue}
                 onChange={(e) => setNoteValue(e.target.value)}
                 placeholder="Nhập nội dung ghi chú hoặc minh chứng..."
-                maxLength={2000}
-                showCount
               />
             </>
           )}
