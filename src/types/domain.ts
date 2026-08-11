@@ -11,6 +11,8 @@ export interface User {
   id: string;
   username: string;
   fullName: string;
+  penName?: string;
+  avatarUrl?: string;
   email: string;
   department: string;
   position: string;

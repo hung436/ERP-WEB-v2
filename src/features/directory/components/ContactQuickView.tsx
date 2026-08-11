@@ -10,7 +10,7 @@ export function ContactQuickView({ contact, chatting = false, onChat, onClose }:
     {contact && <div className="contact-preview-content">
       <header className="contact-profile-hero">
         <span className={`contact-avatar large ${avatarTone(contact.fullName)}`}>{contactInitials(contact.fullName)}</span>
-        <span className="contact-profile-copy"><span className="contact-department-pill">{contact.department}</span><h3>{contact.fullName}{contact.penName && <small>({contact.penName})</small>}</h3></span>
+        <span className="contact-profile-copy"><h3>{contact.fullName}{contact.penName && <small>({contact.penName})</small>}</h3></span>
       </header>
       <section aria-label="Thông tin liên hệ chính" className="contact-primary-details">
         <a href={`tel:${contact.phone.replace(/\s/g, '')}`}><span className="contact-detail-icon phone" aria-hidden="true">☎</span><span><small>Điện thoại</small><strong>{contact.phone}</strong></span><i aria-hidden="true">→</i></a>

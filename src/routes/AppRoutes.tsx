@@ -1,5 +1,6 @@
 import { Route, Routes } from 'react-router-dom';
 
+import { AccountProfilePage } from '@/features/account/AccountProfilePage';
 import { AnnouncementsPage } from '@/features/announcements/AnnouncementsPage';
 import { LoginPage } from '@/features/auth/LoginPage';
 import { ProtectedRoute } from '@/features/auth/ProtectedRoute';
@@ -16,5 +17,5 @@ import { PersonnelProfilePage } from '@/features/personnel/PersonnelProfilePage'
 import { AppLayout } from '@/layouts/AppLayout';
 
 export function AppRoutes() {
-  return <Routes><Route path="/login" element={<LoginPage />} /><Route element={<ProtectedRoute />}><Route element={<AppLayout />}><Route index element={<DashboardPage />} /><Route path="tasks" element={<TasksPage />} /><Route path="documents" element={<DocumentsPage />} /><Route path="evaluations" element={<EvaluationsPage />} /><Route path="personnel/profile" element={<PersonnelProfilePage />} /><Route path="calendar" element={<CalendarPage />} /><Route path="chat" element={<ChatPage />} /><Route path="mail" element={<MailPage />} /><Route path="announcements" element={<AnnouncementsPage />} /><Route path="directory" element={<DirectoryPage />} /><Route path="*" element={<NotFoundPage />} /></Route></Route></Routes>;
+  return <Routes><Route path="/login" element={<LoginPage />} /><Route element={<ProtectedRoute />}><Route element={<AppLayout />}><Route index element={<DashboardPage />} /><Route path="tasks" element={<TasksPage />} /><Route path="documents" element={<DocumentsPage />} /><Route path="evaluations" element={<EvaluationsPage />} /><Route path="personnel/profile" element={<PersonnelProfilePage />} /><Route path="account" element={<AccountProfilePage />} /><Route path="calendar" element={<CalendarPage />} /><Route path="chat" element={<ChatPage />} /><Route path="mail" element={<MailPage />} /><Route path="announcements" element={<AnnouncementsPage />} /><Route path="directory" element={<DirectoryPage />} /><Route path="*" element={<NotFoundPage />} /></Route></Route></Routes>;
 }

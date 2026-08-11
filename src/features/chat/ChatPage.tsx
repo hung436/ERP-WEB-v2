@@ -1,6 +1,7 @@
 import { Button, Input, Popover, Segmented, Tooltip, message } from 'antd';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { UserPlus, Users } from 'lucide-react';
 
 import { ContentSkeleton, EmptyState, ErrorState } from '@/components/AsyncState';
 import { CountedTabLabel } from '@/components/CountedTabLabel';
@@ -8,9 +9,10 @@ import { ChatComposer } from '@/features/chat/components/ChatComposer';
 import { ChatActionIcon } from '@/features/chat/components/ChatActionIcon';
 import { ConversationInfoPanel } from '@/features/chat/components/ConversationInfoPanel';
 import { CreateGroupModal } from '@/features/chat/components/CreateGroupModal';
+import { CreateDirectChatModal } from '@/features/chat/components/CreateDirectChatModal';
 import { useAsyncData } from '@/hooks/useAsyncData';
 import { chatApi } from '@/services/api';
-import type { ChatMessage, ChatReply } from '@/types/domain';
+import type { ChatMessage, ChatReply, DirectoryContact } from '@/types/domain';
 import { avatarTone, nameInitials } from '@/utils/avatar';
 
 const reactionOptions = ['👍', '❤️', '😂', '😮', '😢', '👏'];
@@ -24,6 +26,7 @@ export function ChatPage() {
   const [conversationFilter, setConversationFilter] = useState<'all' | 'unread'>('all');
   const [messageSearch, setMessageSearch] = useState('');
   const [messageSearchOpen, setMessageSearchOpen] = useState(false);
+  const [directChatOpen, setDirectChatOpen] = useState(false);
   const [groupOpen, setGroupOpen] = useState(false);
   const [infoOpen, setInfoOpen] = useState(false);
   const [replyTo, setReplyTo] = useState<ChatReply>();
@@ -32,6 +35,21 @@ export function ChatPage() {
   const [updatingMembers, setUpdatingMembers] = useState(false);
   const [pendingAction, setPendingAction] = useState('');
   const messageListRef = useRef<HTMLDivElement>(null);
+
+  const startDirectChat = async (contact: DirectoryContact) => {
+    setCreating(true);
+    try {
+      const conversation = (await chatApi.startDirect(contact)).data;
+      setSelectedId(conversation.id);
+      await conversationsState.reload();
+      setDirectChatOpen(false);
+      message.success(`Đã bắt đầu trò chuyện với ${contact.fullName}`);
+    } catch (error) {
+      message.error(error instanceof Error ? error.message : 'Không thể tạo trò chuyện.');
+    } finally {
+      setCreating(false);
+    }
+  };
 
   const effectiveId = selectedId || conversationsState.data?.[0]?.id || '';
   const messagesState = useAsyncData(async () => effectiveId ? (await chatApi.messages(effectiveId)).data : [], effectiveId);
@@ -143,7 +161,10 @@ export function ChatPage() {
       <aside className="conversation-pane">
         <div className="chat-list-heading">
           <div><h2>Tin nhắn</h2><span>{conversationsState.data.length}</span></div>
-          <Tooltip title="Tạo nhóm"><Button aria-label="Tạo nhóm" icon={<ChatActionIcon name="group" />} onClick={() => setGroupOpen(true)} /></Tooltip>
+          <div className="chat-heading-actions" style={{ display: 'flex', gap: 6 }}>
+            <Tooltip title="Đoạn chat mới"><Button aria-label="Đoạn chat mới" icon={<UserPlus size={16} />} onClick={() => setDirectChatOpen(true)} /></Tooltip>
+            <Tooltip title="Nhóm mới"><Button aria-label="Nhóm mới" icon={<Users size={16} />} onClick={() => setGroupOpen(true)} type="primary" /></Tooltip>
+          </div>
         </div>
         <div className="chat-list-tools">
           <Input aria-label="Tìm cuộc trò chuyện" allowClear onChange={(event) => setSearch(event.target.value)} placeholder="Tìm kiếm" value={search} />
@@ -222,6 +243,7 @@ export function ChatPage() {
 
       {infoOpen && selected && <ConversationInfoPanel conversation={selected} members={membersState.data ?? []} messages={messagesState.data ?? []} onAddMember={(id) => updateMember('add', id)} onClose={() => setInfoOpen(false)} onRemoveMember={(id) => updateMember('remove', id)} updating={updatingMembers} />}
     </section>
-    <CreateGroupModal creating={creating} members={membersState.data ?? []} onClose={() => setGroupOpen(false)} onCreate={createGroup} open={groupOpen} />
+    <CreateDirectChatModal creating={creating} onClose={() => setDirectChatOpen(false)} onStartChat={startDirectChat} open={directChatOpen} />
+    <CreateGroupModal creating={creating} onClose={() => setGroupOpen(false)} onCreate={createGroup} open={groupOpen} />
   </div>;
 }

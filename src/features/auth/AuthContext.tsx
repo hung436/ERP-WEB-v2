@@ -10,6 +10,7 @@ interface AuthContextValue {
   isInitializing: boolean;
   login: (username: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
+  updateUser: (data: Partial<User>) => void;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -27,6 +28,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     authApi.me().then((response) => setUser(response.data)).catch(() => window.sessionStorage.removeItem(SESSION_KEY)).finally(() => setIsInitializing(false));
   }, []);
 
+  const updateUser = (data: Partial<User>) => {
+    setUser((prev) => (prev ? { ...prev, ...data } : null));
+  };
+
   const value = useMemo<AuthContextValue>(() => ({
     user,
     isInitializing,
@@ -40,6 +45,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       window.sessionStorage.removeItem(SESSION_KEY);
       setUser(null);
     },
+    updateUser,
   }), [isInitializing, user]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

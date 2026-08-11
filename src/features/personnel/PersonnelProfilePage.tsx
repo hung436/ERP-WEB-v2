@@ -4,6 +4,7 @@ import type { MouseEvent, ReactNode } from 'react';
 
 import { ContentSkeleton, EmptyState, ErrorState } from '@/components/AsyncState';
 import { ModuleIcon } from '@/components/ModuleIcon';
+import { AccountSettingsTab } from '@/features/personnel/components/AccountSettingsTab';
 import { useAsyncData } from '@/hooks/useAsyncData';
 import { personnelApi } from '@/services/api';
 import type { PersonalProfile } from '@/types/personnel';
@@ -138,5 +139,20 @@ function ProfileDocument({ profile }: { profile: PersonalProfile }) {
 
 export function PersonnelProfilePage() {
   const state = useAsyncData(async () => (await personnelApi.profile()).data);
-  return <div className="module-page personnel-profile-page">{state.loading ? <ContentSkeleton rows={12} /> : state.error ? <ErrorState message={state.error} onRetry={state.reload} /> : !state.data ? <EmptyState description="Chưa có lý lịch cá nhân" /> : <div className="personnel-profile-layout"><ProfileSectionNav /><ProfileDocument profile={state.data} /></div>}</div>;
+  return (
+    <div className="module-page personnel-profile-page">
+      {state.loading ? (
+        <ContentSkeleton rows={12} />
+      ) : state.error ? (
+        <ErrorState message={state.error} onRetry={state.reload} />
+      ) : !state.data ? (
+        <EmptyState description="Chưa có lý lịch cá nhân" />
+      ) : (
+        <div className="personnel-profile-layout">
+          <ProfileSectionNav />
+          <ProfileDocument profile={state.data} />
+        </div>
+      )}
+    </div>
+  );
 }

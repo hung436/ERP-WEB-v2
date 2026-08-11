@@ -52,25 +52,7 @@ export function TasksPage() {
     setSelectedTask(task);
   };
   return <div className="module-page tasks-module-page">
-    <section className="metric-grid task-metrics-bar" aria-label="Tổng quan công việc">
-      <div className={`task-metric-card ${!status ? 'active' : ''}`} onClick={() => setStatus('')} role="button" tabIndex={0}>
-        <span className="task-metric-label">Tổng công việc</span>
-        <strong className="task-metric-value">{summary?.total ?? 0}</strong>
-      </div>
-      <div className={`task-metric-card ${status === 'dueSoon' ? 'active' : ''}`} onClick={() => setStatus('dueSoon')} role="button" tabIndex={0}>
-        <span className="task-metric-label">Sắp đến hạn</span>
-        <strong className="task-metric-value warning">{summary?.dueSoon ?? 0}</strong>
-      </div>
-      <div className={`task-metric-card ${status === 'overdue' ? 'active' : ''}`} onClick={() => setStatus('overdue')} role="button" tabIndex={0}>
-        <span className="task-metric-label">Quá hạn</span>
-        <strong className="task-metric-value urgent">{summary?.overdue ?? 0}</strong>
-      </div>
-      <div className={`task-metric-card ${status === 'completed' ? 'active' : ''}`} onClick={() => setStatus('completed')} role="button" tabIndex={0}>
-        <span className="task-metric-label">Hoàn thành</span>
-        <strong className="task-metric-value success">{summary?.completed ?? 0}</strong>
-      </div>
-    </section>
-    <div className="filter-bar tasks-filter-bar"><Input aria-label="Tìm công việc" allowClear onChange={(event) => { setSearch(event.target.value); setPage(1); }} placeholder="Tìm công việc, người gửi, đơn vị…" value={search} /><Select aria-label="Lọc theo trạng thái" onChange={setStatus} options={[{value:'',label:'Tất cả trạng thái'},{value:'dueSoon',label:'Sắp đến hạn'},{value:'todo',label:'Chờ xử lý'},{value:'in_progress',label:'Đang xử lý'},{value:'completed',label:'Hoàn thành'},{value:'overdue',label:'Quá hạn'}]} value={status} /></div>
+    <div className="filter-bar tasks-filter-bar"><Input aria-label="Tìm công việc" allowClear onChange={(event) => { setSearch(event.target.value); setPage(1); }} placeholder="Tìm công việc, người gửi, đơn vị…" value={search} /><Select aria-label="Lọc theo trạng thái" onChange={setStatus} options={[{value:'',label:'Tất cả trạng thái'},{value:'todo',label:'Chờ xử lý'},{value:'completed',label:'Đã xử lý'}]} value={status} /></div>
     {state.loading ? <ContentSkeleton rows={8} /> : state.error ? <ErrorState message={state.error} onRetry={state.reload} /> : rows.length === 0 ? <EmptyState description="Không có công việc phù hợp bộ lọc" /> : <section className="surface-panel table-panel"><Table<Task> pagination={false} rowClassName="clickable-table-row" rowKey="id" onRow={(task) => ({ onClick: () => openTask(task), onKeyDown: (event) => { if (event.key === 'Enter') openTask(task); }, tabIndex: 0, 'aria-label': `Xem chi tiết công việc: ${task.title}` })} scroll={{x:720}} columns={[{title:'Công việc',dataIndex:'title',render:(value:string,row)=><div className="task-table-primary"><span className={`task-module-icon ${row.sourceModule ?? 'documents'}`}><ModuleIcon module={row.sourceModule === 'evaluations' ? 'evaluations' : 'documents'} size={19} /></span><div className="table-primary"><strong>{value}</strong><span>{row.assignedBy} · {row.department}</span></div></div>},{title:'Trạng thái',dataIndex:'status',width:140,render:(value:TaskStatus)=><StatusTag category="status" value={value}/>},{title:'Thời gian',dataIndex:'receivedAt',width:170,render:(value:string)=>new Date(value).toLocaleString('vi-VN')}]} dataSource={rows.slice((page-1)*6,page*6)} /><Pagination current={page} pageSize={6} total={rows.length} onChange={setPage} showSizeChanger={false} /></section>}
     {selectedTask && <TaskDetailQuickView onClose={() => setSelectedTask(null)} onSave={(nextStatus, progress) => setTaskUpdates((current) => ({ ...current, [selectedTask.id]: { status: nextStatus, progress } }))} task={selectedTask} />}
     <DocumentDetailModal document={selectedDocument} onClose={() => setSelectedDocument(null)} onUpdated={async (updated) => { setSelectedDocument(updated); await state.reload(); }} />

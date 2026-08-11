@@ -202,9 +202,11 @@ export async function mockRequest<T>(path: string, options?: { method?: string; 
   else if (pathname === '/api/chat/conversations' && options?.method === 'POST') {
     const body = options.body as { name?: string; memberIds?: string[] };
     if (!body.name?.trim()) throw new Error('Tên nhóm không được để trống.');
-    const memberIds = new Set(['user-001', ...(body.memberIds ?? [])]);
-    const members = chatMembers.filter((member) => memberIds.has(member.id));
-    const created: ChatConversation = { id: `chat-${++chatSequence}`, participantName: body.name.trim(), lastMessage: 'Nhóm vừa được tạo', lastMessageAt: new Date().toISOString(), unreadCount: 0, online: members.some((member) => member.online), isGroup: true, members };
+    const selectedIds = new Set(body.memberIds ?? []);
+    const dirMembers = directoryContacts.filter((contact) => selectedIds.has(contact.id)).map((c) => ({ id: c.id, name: c.fullName, email: c.email, department: c.department, online: true }));
+    const chatM = chatMembers.filter((m) => selectedIds.has(m.id));
+    const members = [chatMembers[0], ...dirMembers, ...chatM.filter((m) => m.id !== 'user-001')];
+    const created: ChatConversation = { id: `chat-${++chatSequence}`, participantName: body.name.trim(), lastMessage: 'Nhóm vừa được tạo', lastMessageAt: new Date().toISOString(), unreadCount: 0, online: true, isGroup: true, members };
     chatConversationStore = [created, ...chatConversationStore]; data = created;
   } else if (pathname === '/api/chat/conversations') data = chatConversationStore;
   else if (/^\/api\/chat\/conversations\/[^/]+\/attachments$/.test(pathname) && options?.method === 'POST') {
