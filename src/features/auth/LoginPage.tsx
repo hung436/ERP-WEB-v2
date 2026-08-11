@@ -78,19 +78,19 @@ export function LoginPage() {
   return (
     <main className="login-page">
       <section className="login-intro" aria-label="Giới thiệu hệ thống">
-        <div className="brand brand-login">
-          <img alt="Tuổi Trẻ" className="brand-logo login-brand-logo" src={tuoiTreLogo} />
+        <div className="login-intro-header">
+          <div className="brand brand-login">
+            <img alt="Tuổi Trẻ" className="brand-logo login-brand-logo" src={tuoiTreLogo} />
+          </div>
+          <span className="login-badge-tag">Hệ thống Nội bộ</span>
         </div>
 
         <div className="login-intro-hero">
-          <span className="intro-kicker">Nền tảng Quản trị Tập trung</span>
+          <span className="intro-kicker">Hệ thống Quản trị</span>
           <h1>
             Không gian làm việc số<br />
             Báo điện tử Tuổi Trẻ
           </h1>
-          <p>
-            Đơn giản hóa quy trình, kết nối mọi nghiệp vụ tòa soạn trên một nền tảng duy nhất.
-          </p>
         </div>
 
         <small className="login-footer-copy">
@@ -101,9 +101,8 @@ export function LoginPage() {
       <section className="login-form-wrap">
         <div className="login-card">
           <header className="login-card-header">
-            <span className="eyebrow">Cổng xác thực</span>
-            <h2>Đăng nhập</h2>
-            <p>Chọn phương thức để bắt đầu làm việc</p>
+            <h2>Đăng nhập hệ thống</h2>
+            <p>Chọn phương thức để bắt đầu phiên làm việc</p>
           </header>
 
           {/* Login Method Segmented Switcher */}
@@ -118,7 +117,7 @@ export function LoginPage() {
                         <rect height="11" rx="2" ry="2" width="18" x="3" y="11" />
                         <path d="M7 11V7a5 5 0 0 1 10 0v4" />
                       </svg>
-                      🔑 Tài khoản nội bộ
+                      Tài khoản nội bộ
                     </span>
                   ),
                   value: 'account',
@@ -132,7 +131,7 @@ export function LoginPage() {
                         <rect height="7" width="7" x="14" y="14" />
                         <rect height="7" width="7" x="3" y="14" />
                       </svg>
-                      📱 Quét mã QR
+                      Quét mã QR
                     </span>
                   ),
                   value: 'qr',
@@ -197,18 +196,6 @@ export function LoginPage() {
               <Button block className="login-submit-btn" htmlType="submit" loading={submitting} size="large" type="primary">
                 Đăng nhập
               </Button>
-
-              <div className="demo-account-box">
-                <small className="demo-title">Tài khoản dùng thử (Nhấp để chọn nhanh):</small>
-                <button
-                  className="demo-pill-btn employee"
-                  onClick={() => fillDemoAccount('nhanvien')}
-                  style={{ width: '100%', justifyContent: 'center' }}
-                  type="button"
-                >
-                  👤 <strong>Tài khoản Nhân viên</strong> (nhanvien / 123456)
-                </button>
-              </div>
             </Form>
           ) : (
             /* METHOD 2: QR CODE SCANNING VIA MY TUỔI TRẺ APP */
@@ -218,8 +205,8 @@ export function LoginPage() {
                   <QRCode
                     bordered={false}
                     icon={tuoiTreLogo}
-                    iconSize={32}
-                    size={185}
+                    iconSize={{ width: 46, height: 18 }}
+                    size={160}
                     value={qrToken}
                   />
                   <div className="qr-scan-laser-line" />
@@ -240,18 +227,6 @@ export function LoginPage() {
                   <li>Chọn biểu tượng <strong>Quét mã QR</strong>.</li>
                   <li>Hướng camera vào màn hình để đăng nhập.</li>
                 </ol>
-              </div>
-
-              <div className="qr-simulate-actions">
-                <small className="simulate-label">⚡ Thao tác nhanh cho Demo:</small>
-                <Button
-                  block
-                  loading={submitting}
-                  onClick={() => void handleSimulateQrScan('nhanvien')}
-                  type="primary"
-                >
-                  ✓ Xác nhận Đăng nhập Nhân viên
-                </Button>
               </div>
             </div>
           )}

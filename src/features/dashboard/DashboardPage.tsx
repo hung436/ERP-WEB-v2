@@ -66,12 +66,18 @@ export function DashboardPage() {
         <div className="section-heading"><div><div><h2 id="dashboard-tasks-title">Công việc của tôi</h2></div><span className="section-count">{tasks.length}</span></div></div>
         <div className="work-list">{tasks.map((task) => {
           const currentTask = { ...task, ...taskUpdates[task.id] };
+          const isDoc = task.sourceModule === 'documents';
+          const relatedDoc = isDoc && task.documentId ? documents.find((d) => d.id === task.documentId) : null;
+          const displayTitle = relatedDoc ? relatedDoc.title : task.title;
+
           return <article className="work-item" key={task.id}>
             <span className={`task-module-icon ${task.sourceModule ?? 'documents'}`}><ModuleIcon module={task.sourceModule === 'evaluations' ? 'evaluations' : 'documents'} size={19} /></span>
-            <button aria-label={`Xem chi tiết công việc: ${task.title}`} className="work-main task-detail-trigger" onClick={() => openTask(currentTask)} type="button"><strong>{task.title}</strong><small>{task.subjectName ?? task.assignedBy}</small></button>
-            <time className="task-due" dateTime={task.dueAt}>{taskDue(task.dueAt)}</time>
+            <button aria-label={`Xem chi tiết công việc: ${displayTitle}`} className="work-main task-detail-trigger" onClick={() => openTask(currentTask)} type="button">
+              <strong>{displayTitle}</strong>
+              <small>{relatedDoc ? `${relatedDoc.createdBy} · ${relatedDoc.department}` : (task.subjectName ?? task.assignedBy)}</small>
+            </button>
             <StatusTag category="status" value={currentTask.status} />
-            <span className="task-row-actions"><button aria-label={`Xem và xử lý công việc: ${task.title}`} className="task-process-action" onClick={() => openTask(currentTask)} type="button">Chi tiết</button></span>
+            <time className="task-due" dateTime={task.dueAt}>{taskDue(task.dueAt)}</time>
           </article>;
         })}</div>
         <footer className="section-footer">
@@ -90,7 +96,7 @@ export function DashboardPage() {
 
         <section className="surface-panel compact-widget announcement-widget">
           <div className="widget-heading"><div><span className="section-icon announcements"><ModuleIcon module="announcements" /></span><span><h2>Thông báo cơ quan</h2><p>Mới từ cơ quan</p></span></div></div>
-          <div className="widget-body widget-list announcement-widget-list">{announcements.slice(0, 3).map((item) => <button aria-label={`${item.isRead ? 'Thông báo đã đọc' : 'Thông báo mới'}: ${item.title}`} className={item.isRead ? 'read' : 'unread'} key={item.id} onClick={() => setSelectedAnnouncement(item)} type="button"><i /><span><strong>{item.title}</strong><small>{item.issuingDepartment} · {new Date(item.publishedAt).toLocaleDateString('vi-VN')}</small></span></button>)}</div>
+          <div className="widget-body widget-list announcement-widget-list">{announcements.slice(0, 3).map((item) => <button aria-label={`${item.isRead ? 'Thông báo đã đọc' : 'Thông báo mới'}: ${item.title}`} className={`widget-item ${item.isRead ? 'read' : 'unread'}`} key={item.id} onClick={() => setSelectedAnnouncement(item)} type="button"><i /><span><strong>{item.title}</strong><small>{item.issuingDepartment} · {new Date(item.publishedAt).toLocaleDateString('vi-VN')}</small></span></button>)}</div>
           <footer className="widget-footer">
             <Link aria-label="Xem tất cả thông báo cơ quan" to="/announcements">Xem tất cả →</Link>
           </footer>

@@ -36,4 +36,17 @@ export const documentSubmissions: DocumentSubmission[] = [
     { id: 'step-006-2', name: 'Phòng Tổ chức', assignee: 'Trịnh Khánh Vy', status: 'approved', actedAt: '2026-08-07T10:10:00+07:00' },
     { id: 'step-006-3', name: 'Ban Biên tập phụ trách', assignee: 'Nguyễn Minh Anh', status: 'pending' },
   ] },
+  { id: 'document-007', code: 'NN-2026-012', templateId: 'template-overseas', kind: 'overseas_request', title: 'Phiếu đề xuất đi Hàn Quốc · Nguyễn Hoàng Nam', createdBy: 'Nguyễn Hoàng Nam', department: 'Ban Quốc tế', createdAt: '2026-08-08T08:30:00+07:00', status: 'pending', currentStep: 1, viewScope: 'pending_review', fields: { fullName: 'Nguyễn Hoàng Nam', positionUnit: 'Phóng viên, Ban Quốc tế', destination: 'Seoul, Hàn Quốc', departureDate: '25/08/2026', returnDate: '30/08/2026', reason: 'Tác nghiệp Hội nghị Truyền thông Châu Á - Thái Bình Dương', hostUnit: 'KBS Korea', funding: 'self', fundingOther: '' }, steps: [
+    { id: 'step-007-1', name: 'Trưởng bộ phận', assignee: 'Trưởng Ban Quốc tế', status: 'approved', actedAt: '2026-08-08T09:10:00+07:00', note: 'Đồng ý trình Ban Biên tập.' },
+    { id: 'step-007-2', name: 'Ban Biên tập phụ trách', assignee: 'Nguyễn Minh Anh', status: 'pending', consultations: [
+      { id: 'sub-007-1', name: 'Lấy ý kiến: Trần Thu Hà (Phó Ban Nội dung)', assignee: 'Trần Thu Hà (Phó Ban Nội dung)', status: 'pending', deadline: '15/08/2026' }
+    ] },
+    { id: 'step-007-3', name: 'Tổng Biên tập', assignee: 'Chờ phân công', status: 'waiting' },
+  ] },
+  { id: 'document-008', code: 'NP-2026-025', templateId: 'template-leave', kind: 'leave_request', title: 'Đơn xin nghỉ phép · Phạm Quốc Nam', createdBy: 'Phạm Quốc Nam', department: 'Ban Quản trị', createdAt: '2026-08-08T10:00:00+07:00', status: 'pending', currentStep: 1, viewScope: 'pending_review', fields: { fullName: 'Phạm Quốc Nam', department: 'Ban Quản trị', fromDate: '14/08/2026', toDate: '18/08/2026', reason: 'Nghỉ phép năm kết hợp đi tham quan', leaveLocation: 'Nha Trang' }, steps: [
+    { id: 'step-008-1', name: 'Trưởng bộ phận', assignee: 'Ban Quản trị', status: 'approved', actedAt: '2026-08-08T10:30:00+07:00' },
+    { id: 'step-008-2', name: 'Phòng Tổ chức', assignee: 'Nguyễn Minh Anh', status: 'pending', consultations: [
+      { id: 'sub-008-1', name: 'Lấy ý kiến: Trần Văn Bình (Phó Trưởng ban Tổ chức)', assignee: 'Trần Văn Bình (Phó Trưởng ban Tổ chức)', status: 'approved', actedAt: '2026-08-08T11:45:00+07:00', note: 'Ý kiến tham khảo: Nhân sự đã hoàn thành đủ chỉ tiêu quý và có số ngày phép tồn 8 ngày. Đề xuất chấp thuận đơn.' }
+    ] },
+  ] },
 ];

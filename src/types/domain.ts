@@ -171,6 +171,16 @@ export interface DocumentTemplate {
   estimatedDays: number;
   workflow: string[];
 }
+export interface DocumentConsultationSubStep {
+  id: string;
+  name: string;
+  assignee: string;
+  status: 'pending' | 'approved';
+  deadline?: string;
+  actedAt?: string;
+  note?: string;
+}
+
 export interface DocumentWorkflowStep {
   id: string;
   name: string;
@@ -178,6 +188,7 @@ export interface DocumentWorkflowStep {
   status: 'waiting' | 'pending' | 'approved' | 'rejected';
   actedAt?: string;
   note?: string;
+  consultations?: DocumentConsultationSubStep[];
 }
 export interface DocumentSubmission {
   id: string;

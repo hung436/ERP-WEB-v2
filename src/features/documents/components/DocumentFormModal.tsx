@@ -49,9 +49,9 @@ export function DocumentFormModal({ template, onClose, onSubmitted }: { template
         <div className="document-wordmark"><img alt="Tuổi Trẻ" src={tuoiTreLogo} /></div>
         <h2>ĐƠN XIN NGHỈ PHÉP</h2>
         <Form.Item className="document-line-field" label="Họ tên:" name="fullName" rules={lineRule}><Input /></Form.Item>
-        <Form.Item className="document-line-field leave-department" label="Bộ phận công tác:" name="department" rules={lineRule}><Input /></Form.Item>
-        <div className="document-two-columns"><Form.Item className="document-line-field" label="Từ ngày:" name="fromDate" rules={lineRule}><DatePicker format="DD/MM/YYYY" /></Form.Item><Form.Item className="document-line-field" label="Đến hết ngày:" name="toDate" rules={lineRule}><DatePicker format="DD/MM/YYYY" /></Form.Item></div>
-        <Form.Item className="document-line-field" label="Lý do:" name="reason" rules={lineRule}><Input.TextArea autoSize={{ minRows: 1, maxRows: 3 }} /></Form.Item>
+        <Form.Item className="document-line-field" label="Bộ phận công tác:" name="department" rules={lineRule}><Input /></Form.Item>
+        <div className="document-two-columns"><Form.Item className="document-line-field" label="Từ ngày:" name="fromDate" rules={lineRule}><DatePicker format="DD/MM/YYYY" style={{ width: '100%' }} /></Form.Item><Form.Item className="document-line-field" label="Đến hết ngày:" name="toDate" rules={lineRule}><DatePicker format="DD/MM/YYYY" style={{ width: '100%' }} /></Form.Item></div>
+        <Form.Item className="document-line-field" label="Lý do:" name="reason" rules={lineRule}><Input.TextArea autoSize={{ minRows: 2, maxRows: 4 }} /></Form.Item>
         <Form.Item className="document-line-field" label="Địa điểm nghỉ:" name="leaveLocation" rules={lineRule}><Input /></Form.Item>
       </section> : <section className="document-paper overseas-document-paper">
         <header className="formal-document-header"><strong>BÁO TUỔI TRẺ</strong><div><b>CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</b><span>Độc lập - Tự do - Hạnh phúc</span><em>TP. HCM, ngày …… tháng …… năm ……</em></div></header>

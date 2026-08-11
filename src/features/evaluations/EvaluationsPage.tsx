@@ -7,6 +7,7 @@ import { ModuleIcon } from '@/components/ModuleIcon';
 import { EvaluationCriterionRow } from '@/features/evaluations/components/EvaluationCriterionRow';
 import { useAsyncData } from '@/hooks/useAsyncData';
 import { evaluationApi } from '@/services/api';
+import { CheckCircle2, Save, Search, Send, Zap } from 'lucide-react';
 import type { EvaluationCriterion, EvaluationGroup, EvaluationPeriod, EvaluationSheet, EvaluationStage } from '@/types/evaluation';
 import '@/features/evaluations/evaluation-workspace.css';
 
@@ -64,6 +65,27 @@ const statusLabels: Record<EvaluationSheet['status'], string> = {
   published: 'Đã công bố',
 };
 
+const getStageStatusText = (sheet: EvaluationSheet) => {
+  if (sheet.status === 'published' || sheet.stage === 'published') {
+    return 'Đã công bố';
+  }
+  const evaluator = sheet.stageEvaluators?.[sheet.stage] ?? sheet.evaluatorName;
+  switch (sheet.stage) {
+    case 'self':
+      return `Tự chấm: ${sheet.employeeName}`;
+    case 'deputy':
+      return `Phó ban: ${evaluator ?? 'Trần Văn Bình'}`;
+    case 'manager':
+      return `Trưởng ban: ${evaluator ?? 'Phạm Quốc Nam'}`;
+    case 'editorial':
+      return `Ban Biên tập: ${evaluator ?? 'Hoàng Thị Lan'}`;
+    case 'council':
+      return `Hội đồng: ${evaluator ?? 'Hội đồng chuyên môn'}`;
+    default:
+      return statusLabels[sheet.status] ?? 'Đang đánh giá';
+  }
+};
+
 const initials = (name: string) =>
   name.split(' ').slice(-2).map((part) => part[0]).join('').toUpperCase();
 
@@ -81,26 +103,192 @@ const totalScore = (sheet: EvaluationSheet) =>
     0
   );
 
-const previousStagesFor = (sheet: EvaluationSheet, mode: EvaluationMode) =>
-  sheet.status === 'published' || sheet.stage === 'published'
-    ? stageOrder
-    : mode === 'self'
-    ? []
-    : stageOrder.slice(0, Math.max(1, stageOrder.indexOf(mode === 'council' ? 'council' : sheet.stage)));
+const stageTotalScore = (sheet: EvaluationSheet, stage: EvaluationStage | 'published') => {
+  return sheet.groups.reduce((total, group) => {
+    const factor = group.kind === 'deduction' ? -1 : 1;
+    return (
+      total +
+      group.criteria.reduce((sum, c) => {
+        let scoreVal: number | null | undefined = undefined;
+        if (stage === 'published') {
+          scoreVal = c.stageScores?.['published'] ?? (sheet.status === 'published' ? c.score : undefined);
+        } else if (stage === 'self') {
+          scoreVal = c.stageScores?.['self'] ?? (sheet.stage === 'self' ? c.score : undefined);
+        } else {
+          scoreVal = c.stageScores?.[stage] ?? (sheet.stage === stage ? c.score : undefined);
+        }
+        return sum + (scoreVal ?? 0) * factor;
+      }, 0)
+    );
+  }, 0);
+};
+
+const previousStagesFor = (sheet: EvaluationSheet, mode: EvaluationMode) => {
+  const isPublished = sheet.status === 'published' || sheet.stage === 'published';
+  if (isPublished) {
+    if (mode === 'self') {
+      return ['self', 'published'] as EvaluationStage[];
+    }
+    return stageOrder;
+  }
+  if (mode === 'self') {
+    return [];
+  }
+  return stageOrder.slice(0, Math.max(1, stageOrder.indexOf(mode === 'council' ? 'council' : sheet.stage)));
+};
 
 function EmployeeEvaluationListTable({
   sheets,
   onSelectSheet,
+  onQuickEvaluateSheets,
 }: {
   sheets: EvaluationSheet[];
   onSelectSheet: (id: string) => void;
+  onQuickEvaluateSheets: (ids: string[]) => void;
 }) {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedDept, setSelectedDept] = useState<string>('all');
+  const [selectedPos, setSelectedPos] = useState<string>('all');
+  const [selectedRowIds, setSelectedRowIds] = useState<string[]>([]);
+
+  const departments = useMemo(() => {
+    const set = new Set(sheets.map((s) => s.department));
+    return ['all', ...Array.from(set)];
+  }, [sheets]);
+
+  const positions = useMemo(() => {
+    const set = new Set(sheets.map((s) => s.position));
+    return ['all', ...Array.from(set)];
+  }, [sheets]);
+
+  const filteredSheets = useMemo(() => {
+    const query = searchTerm.trim().toLowerCase();
+    return sheets.filter((sheet) => {
+      const matchSearch =
+        !query ||
+        sheet.employeeName.toLowerCase().includes(query) ||
+        sheet.employeeCode.toLowerCase().includes(query) ||
+        sheet.position.toLowerCase().includes(query) ||
+        sheet.department.toLowerCase().includes(query);
+      const matchDept = selectedDept === 'all' || sheet.department === selectedDept;
+      const matchPos = selectedPos === 'all' || sheet.position === selectedPos;
+      return matchSearch && matchDept && matchPos;
+    });
+  }, [sheets, searchTerm, selectedDept, selectedPos]);
+
+  const isAllSelected =
+    filteredSheets.length > 0 && filteredSheets.every((s) => selectedRowIds.includes(s.id));
+
+  const toggleSelectAll = () => {
+    if (isAllSelected) {
+      setSelectedRowIds([]);
+    } else {
+      setSelectedRowIds(filteredSheets.map((s) => s.id));
+    }
+  };
+
+  const toggleSelectRow = (id: string) => {
+    setSelectedRowIds((prev) =>
+      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
+    );
+  };
+
+  const selectedCount = selectedRowIds.length;
+
+  const handleQuickEvaluateClick = () => {
+    const targetIds =
+      selectedRowIds.length > 0
+        ? selectedRowIds
+        : filteredSheets.filter((s) => s.status !== 'published').map((s) => s.id);
+
+    if (targetIds.length === 0) {
+      message.warning('Không có phiếu đánh giá nào phù hợp để chấm nhanh!');
+      return;
+    }
+
+    const targetSheets = sheets.filter((s) => targetIds.includes(s.id));
+
+    Modal.confirm({
+      title: 'Xác nhận đánh giá nhanh',
+      icon: <Zap size={20} style={{ color: '#d92d20', marginRight: 6 }} />,
+      width: 440,
+      content: (
+        <div style={{ marginTop: 8, fontSize: 13.5, color: '#344054' }}>
+          <p style={{ margin: 0 }}>
+            Bạn có chắc chắn muốn đánh giá nhanh cho <strong>{targetSheets.length} phiếu</strong> sau không?
+          </p>
+          <ul style={{ paddingLeft: 18, margin: '10px 0 0', color: '#101828' }}>
+            {targetSheets.map((s) => (
+              <li key={s.id} style={{ marginBottom: 4 }}>
+                <strong>{s.employeeName}</strong> ({s.employeeCode} - {s.department})
+              </li>
+            ))}
+          </ul>
+        </div>
+      ),
+      okText: 'Đồng ý',
+      cancelText: 'Hủy',
+      okButtonProps: {
+        style: {
+          background: '#dc2626',
+          borderColor: '#dc2626',
+          fontWeight: 600,
+        },
+      },
+      onOk: () => {
+        onQuickEvaluateSheets(targetIds);
+      },
+    });
+  };
+
   return (
     <section className="employee-evaluation-table-card">
-      <div className="table-card-header">
-        <div>
-          <h3>📋 Bảng tổng hợp lịch sử chấm điểm các cấp ({sheets.length} nhân sự)</h3>
-          <p>Nhấp vào nhân sự trong bảng bên dưới để mở chi tiết phiếu chấm điểm</p>
+      {/* Search & Filter Toolbar with Quick Action */}
+      <div className="table-filter-toolbar">
+        <div className="filter-left-group">
+          <Input
+            className="search-employee-input"
+            prefix={<Search size={15} className="search-icon" />}
+            placeholder="Tìm tên, mã NV, phòng ban..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            allowClear
+            style={{ width: 220 }}
+          />
+          <Select
+            value={selectedDept}
+            onChange={setSelectedDept}
+            style={{ width: 160 }}
+            className="filter-select"
+            options={[
+              { value: 'all', label: 'Tất cả phòng ban' },
+              ...departments.filter((d) => d !== 'all').map((d) => ({ value: d, label: d })),
+            ]}
+          />
+          <Select
+            value={selectedPos}
+            onChange={setSelectedPos}
+            style={{ width: 160 }}
+            className="filter-select"
+            options={[
+              { value: 'all', label: 'Tất cả chức danh' },
+              ...positions.filter((p) => p !== 'all').map((p) => ({ value: p, label: p })),
+            ]}
+          />
+        </div>
+
+        <div className="filter-right-group">
+          <Button
+            type="default"
+            className="btn-quick-evaluate-modern"
+            icon={<Zap size={15} />}
+            disabled={selectedCount === 0}
+            onClick={handleQuickEvaluateClick}
+          >
+            {selectedCount > 0
+              ? `Đánh giá nhanh (${selectedCount} đã chọn)`
+              : 'Đánh giá nhanh'}
+          </Button>
         </div>
       </div>
 
@@ -108,76 +296,94 @@ function EmployeeEvaluationListTable({
         <table className="employee-history-table">
           <thead>
             <tr>
+              <th style={{ width: 38, textAlign: 'center' }}>
+                <input
+                  type="checkbox"
+                  className="table-checkbox"
+                  checked={isAllSelected}
+                  onChange={toggleSelectAll}
+                  aria-label="Chọn tất cả"
+                />
+              </th>
               <th>Nhân sự</th>
               <th>Chức danh & Phòng ban</th>
-              <th>Tự đánh giá</th>
-              <th>Phó phòng</th>
-              <th>Trưởng phòng</th>
-              <th>Ban biên tập</th>
-              <th>Hội đồng</th>
+              <th className="text-center">Tự đánh giá</th>
+              <th className="text-center">Phó phòng</th>
+              <th className="text-center">Trưởng phòng</th>
+              <th className="text-center">Ban biên tập</th>
+              <th className="text-center">Hội đồng</th>
+              <th className="text-center">Điểm bình quân</th>
               <th>Trạng thái</th>
-              <th style={{ textAlign: 'right' }}>Phiếu chấm</th>
             </tr>
           </thead>
           <tbody>
-            {sheets.map((sheet) => {
-              const isDone = sheet.status === 'published' || sheet.status === 'completed';
-              return (
-                <tr
-                  key={sheet.id}
-                  className="history-row"
-                  onClick={() => onSelectSheet(sheet.id)}
-                >
-                  <td>
-                    <div className="person-cell">
-                      <span className="person-avatar">{initials(sheet.employeeName)}</span>
-                      <div className="person-info">
-                        <strong>{sheet.employeeName}</strong>
-                        <small>{sheet.employeeCode}</small>
+            {filteredSheets.length > 0 ? (
+              filteredSheets.map((sheet) => {
+                const isChecked = selectedRowIds.includes(sheet.id);
+                const avgScore = sheet.stageTotals?.council ?? stageTotalScore(sheet, 'council');
+                return (
+                  <tr
+                    key={sheet.id}
+                    className={`history-row${isChecked ? ' row-selected' : ''}`}
+                    onClick={() => onSelectSheet(sheet.id)}
+                  >
+                    <td style={{ textAlign: 'center' }} onClick={(e) => e.stopPropagation()}>
+                      <input
+                        type="checkbox"
+                        className="table-checkbox"
+                        checked={isChecked}
+                        onChange={() => toggleSelectRow(sheet.id)}
+                        aria-label={`Chọn ${sheet.employeeName}`}
+                      />
+                    </td>
+                    <td>
+                      <div className="person-cell">
+                        <span className="person-avatar">{initials(sheet.employeeName)}</span>
+                        <div className="person-info">
+                          <strong>{sheet.employeeName}</strong>
+                          <small>{sheet.employeeCode}</small>
+                        </div>
                       </div>
-                    </div>
-                  </td>
-                  <td>
-                    <div className="dept-cell">
-                      <strong>{sheet.position}</strong>
-                      <small>{sheet.department}</small>
-                    </div>
-                  </td>
-                  <td>
-                    <strong className="score-val">{sheet.stageTotals?.self ?? '—'}</strong>
-                  </td>
-                  <td>
-                    <strong className="score-val">{sheet.stageTotals?.deputy ?? '—'}</strong>
-                  </td>
-                  <td>
-                    <strong className="score-val">{sheet.stageTotals?.manager ?? '—'}</strong>
-                  </td>
-                  <td>
-                    <strong className="score-val">{sheet.stageTotals?.editorial ?? '—'}</strong>
-                  </td>
-                  <td>
-                    <strong className="score-val highlight-council">{sheet.stageTotals?.council ?? '—'}</strong>
-                  </td>
-                  <td>
-                    <span className={`status-badge status-${sheet.status}`}>
-                      {statusLabels[sheet.status]}
-                    </span>
-                  </td>
-                  <td style={{ textAlign: 'right' }}>
-                    <button
-                      type="button"
-                      className={`table-soft-action-btn${isDone ? ' done' : ''}`}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onSelectSheet(sheet.id);
-                      }}
-                    >
-                      {isDone ? 'Xem phiếu' : 'Chấm điểm'}
-                    </button>
-                  </td>
-                </tr>
-              );
-            })}
+                    </td>
+                    <td>
+                      <div className="dept-cell">
+                        <strong>{sheet.position}</strong>
+                        <small>{sheet.department}</small>
+                      </div>
+                    </td>
+                    <td className="text-center">
+                      <strong className="score-val">{sheet.stageTotals?.self ?? stageTotalScore(sheet, 'self')}</strong>
+                    </td>
+                    <td className="text-center">
+                      <strong className="score-val">{sheet.stageTotals?.deputy ?? stageTotalScore(sheet, 'deputy')}</strong>
+                    </td>
+                    <td className="text-center">
+                      <strong className="score-val">{sheet.stageTotals?.manager ?? stageTotalScore(sheet, 'manager')}</strong>
+                    </td>
+                    <td className="text-center">
+                      <strong className="score-val">{sheet.stageTotals?.editorial ?? stageTotalScore(sheet, 'editorial')}</strong>
+                    </td>
+                    <td className="text-center">
+                      <strong className="score-val">{sheet.stageTotals?.council ?? stageTotalScore(sheet, 'council')}</strong>
+                    </td>
+                    <td className="text-center">
+                      <strong className="score-val highlight-council">{avgScore}</strong>
+                    </td>
+                    <td>
+                      <span className={`status-badge status-${sheet.status}`}>
+                        {getStageStatusText(sheet)}
+                      </span>
+                    </td>
+                  </tr>
+                );
+              })
+            ) : (
+              <tr>
+                <td colSpan={10} style={{ textAlign: 'center', padding: '30px' }}>
+                  <Empty description="Không tìm thấy nhân sự phù hợp" />
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
@@ -925,7 +1131,7 @@ function EvaluationWorkspace({
   const currentStage: EvaluationStage =
     mode === 'self' ? 'self' : mode === 'council' ? 'council' : draft?.stage === 'published' ? 'council' : draft?.stage ?? 'deputy';
   const previousStages = draft ? previousStagesFor(draft, mode) : [];
-  const readOnly = !draft || draft.status === 'published';
+  const readOnly = !draft || draft.status === 'published' || mode === 'council';
   const noteCriterion = criteria.find((criterion) => criterion.id === noteCriterionId) ?? null;
 
   const updateCriterion = (id: string, patch: Partial<EvaluationCriterion>) =>
@@ -972,6 +1178,48 @@ function EvaluationWorkspace({
       message.error(error instanceof Error ? error.message : 'Không thể lưu phiếu đánh giá.');
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleQuickEvaluateSheets = async (targetIds: string[]) => {
+    try {
+      for (const id of targetIds) {
+        const sheet = sheets.find((s) => s.id === id);
+        if (!sheet || sheet.status === 'published') continue;
+
+        const currentStage = sheet.stage;
+        const prevStage: EvaluationStage =
+          currentStage === 'deputy' ? 'self' :
+          currentStage === 'manager' ? 'deputy' :
+          currentStage === 'editorial' ? 'manager' :
+          currentStage === 'council' ? 'editorial' : 'self';
+
+        const updatedGroups = sheet.groups.map((group) => ({
+          ...group,
+          criteria: group.criteria.map((criterion) => {
+            const prevScore = criterion.stageScores?.[prevStage] ?? criterion.score ?? 0;
+            return {
+              ...criterion,
+              score: prevScore,
+              stageScores: {
+                ...criterion.stageScores,
+                [currentStage]: prevScore,
+              },
+            };
+          }),
+        }));
+
+        const updatedSheet: EvaluationSheet = {
+          ...sheet,
+          groups: updatedGroups,
+        };
+
+        await evaluationApi.save(updatedSheet, 'save');
+      }
+      message.success(`Đã đánh giá nhanh thành công cho ${targetIds.length} nhân sự (lấy điểm cấp trước đưa lên cấp hiện tại)!`);
+      onReload();
+    } catch (err) {
+      message.error('Có lỗi xảy ra khi thực hiện đánh giá nhanh.');
     }
   };
 
@@ -1059,15 +1307,11 @@ function EvaluationWorkspace({
     <div className="evaluation-workspace">
       {/* Header Bar */}
       <header className="evaluation-workspace-header">
-        <div className="evaluation-workspace-brand">
-          <span className="brand-icon">
-            <ModuleIcon module="evaluations" size={24} />
-          </span>
-          <div>
-            <small>Không gian làm việc ERP</small>
-            <h1>Đánh giá lao động {isAdmin && <Tag color="gold" style={{ marginLeft: 8 }}>👑 Quản trị viên</Tag>}</h1>
+        {isAdmin && (
+          <div className="evaluation-workspace-brand">
+            <Tag color="gold">👑 Quản trị viên</Tag>
           </div>
-        </div>
+        )}
 
         <div className="evaluation-workspace-controls">
           {/* Admin Dedicated Inline Page Tabs */}
@@ -1401,6 +1645,7 @@ function EvaluationWorkspace({
         <EmployeeEvaluationListTable
           sheets={availableSheets}
           onSelectSheet={selectEmployeeSheet}
+          onQuickEvaluateSheets={handleQuickEvaluateSheets}
         />
       ) : draft ? (
         <>
@@ -1417,21 +1662,27 @@ function EvaluationWorkspace({
           <div className="evaluation-workspace-body">
             {/* Left Column: Criteria Main Stream */}
             <div className="evaluation-main-stream">
-              {/* Previous Stage Scores History */}
+              {/* Total Score Summary Bar */}
               {previousStages.length > 0 && (
                 <section className="evaluation-stage-summary" aria-label="Điểm tổng theo từng cấp">
-                  <span className="summary-title">Lịch sử tổng điểm</span>
+                  <span className="summary-title">📊 Tổng hợp điểm đánh giá</span>
                   <div className="stages-flow">
-                    {previousStages.map((stage) => (
-                      <div key={stage} className="stage-item">
-                        <small>{stageLabels[stage]}</small>
-                        <strong>{draft.stageTotals?.[stage] ?? '—'}</strong>
+                    {previousStages.map((stage) => {
+                      const val = stageTotalScore(draft, stage);
+
+                      return (
+                        <div key={stage} className={`stage-item stage-${stage}`}>
+                          <small>{stageLabels[stage]}</small>
+                          <strong>{val} điểm</strong>
+                        </div>
+                      );
+                    })}
+                    {draft.stage !== 'published' && draft.status !== 'published' && (
+                      <div className="stage-item current">
+                        <small>{stageLabels[currentStage]} (Hiện tại)</small>
+                        <strong>{totalScore(draft)} điểm</strong>
                       </div>
-                    ))}
-                    <div className="stage-item current">
-                      <small>{stageLabels[currentStage]} (Hiện tại)</small>
-                      <strong>{totalScore(draft)}</strong>
-                    </div>
+                    )}
                   </div>
                 </section>
               )}
@@ -1444,17 +1695,9 @@ function EvaluationWorkspace({
 
                   return (
                     <section className="evaluation-stream-group" key={group.id}>
-                      <header>
+                      <header className="group-header-sync">
                         <div className="group-title-box">
-                          <span className={`kind-icon kind-${group.kind}`}>
-                            {group.kind === 'bonus' ? '+' : group.kind === 'deduction' ? '−' : '•'}
-                          </span>
-                          <div>
-                            <h2>{group.title}</h2>
-                            <p>
-                              Hoàn thành {groupAnswered}/{group.criteria.length} tiêu chí
-                            </p>
-                          </div>
+                          <h2>{group.title}</h2>
                         </div>
                       </header>
                       <div className="group-rows-container">
@@ -1483,19 +1726,33 @@ function EvaluationWorkspace({
                 <div className="side-panel-person">
                   <span className="avatar-box">{initials(draft.employeeName)}</span>
                   <div className="person-meta">
-                    <small className="period-badge">{draft.periodLabel}</small>
                     <strong>{draft.employeeName}</strong>
                     <p>{draft.employeeCode} · {draft.department}</p>
+                    <span className={`status-badge status-${draft.status}`} style={{ marginTop: 4, display: 'inline-block' }}>
+                      {getStageStatusText(draft)}
+                    </span>
                   </div>
                 </div>
 
-                {/* Live Total Score Hero Card */}
+                {/* Live Total Score Hero Card - Unified Style */}
                 <div className="side-panel-score-box">
-                  <small>Tổng điểm hiện tại</small>
-                  <strong className="live-score">{totalScore(draft)}</strong>
+                  <small>
+                    {mode === 'council'
+                      ? 'ĐIỂM BÌNH QUÂN'
+                      : draft.stage === 'published' || draft.status === 'published'
+                      ? 'TỔNG ĐIỂM'
+                      : 'TỔNG ĐIỂM HIỆN TẠI'}
+                  </small>
+                  <strong className="live-score">
+                    {mode === 'council'
+                      ? stageTotalScore(draft, 'council')
+                      : draft.stage === 'published' || draft.status === 'published'
+                      ? stageTotalScore(draft, 'published')
+                      : totalScore(draft)}
+                  </strong>
                   <div className="side-progress-wrap">
                     <div className="progress-labels">
-                      <span>Tiến độ chấm</span>
+                      <span>Tiến độ hoàn thành</span>
                       <strong>{completion}%</strong>
                     </div>
                     <Progress percent={completion} showInfo={false} strokeColor="#D92D20" size="small" />
@@ -1503,12 +1760,8 @@ function EvaluationWorkspace({
                   </div>
                 </div>
 
-                {/* Compact Grid Criteria Score Matrix */}
-                <div className="side-criteria-list" aria-label="Tổng quan điểm từng câu">
-                  <div className="side-list-header">
-                    <span>📊 Điểm từng câu ({answered}/{criteria.length})</span>
-                    <span className="stage-badge">{stageLabels[currentStage]}</span>
-                  </div>
+                {/* Compact Grid Criteria Score Matrix (No Title Header) */}
+                <div className="side-criteria-list" aria-label="Danh sách điểm từng câu">
                   <div className="side-list-grid">
                     {criteria.map((c, idx) => {
                       const isScored = c.score !== null;
@@ -1531,33 +1784,70 @@ function EvaluationWorkspace({
                   </div>
                 </div>
 
+
+
                 {/* Action Buttons inside Side Panel */}
                 {!readOnly && (
                   <div className="side-panel-actions">
-                    <Button
-                      type="primary"
-                      className={`btn-submit-evaluation stage-${mode}`}
-                      loading={saving}
-                      onClick={() => void persist(true)}
-                    >
-                      <span className="btn-submit-icon" aria-hidden="true">
-                        {mode === 'self' ? '🚀' : mode === 'council' ? '👑' : '✅'}
-                      </span>
-                      <span className="btn-submit-text">
-                        {mode === 'self'
-                          ? 'Gửi phiếu đánh giá'
-                          : mode === 'council'
-                          ? 'Chốt kết quả đánh giá'
-                          : 'Hoàn tất chấm điểm'}
-                      </span>
-                    </Button>
                     <Button
                       className="btn-save-draft"
                       loading={saving}
                       onClick={() => void persist(false)}
                     >
-                      <span className="btn-icon">💾</span>
+                      <span className="btn-icon"><Save size={15} /></span>
                       <span>Lưu nháp</span>
+                    </Button>
+                    <Button
+                      type="primary"
+                      className={`btn-submit-evaluation stage-${mode}`}
+                      loading={saving}
+                      onClick={() => {
+                        Modal.confirm({
+                          title: null,
+                          icon: null,
+                          width: 480,
+                          centered: true,
+                          className: 'evaluation-confirm-modal',
+                          content: (
+                            <div className="evaluation-confirm-content">
+                              <div className="confirm-modal-header">
+                                <span className="confirm-modal-icon"><Send size={24} /></span>
+                                <div className="confirm-modal-title">
+                                  <h3>Xác nhận gửi phiếu đánh giá</h3>
+                                  <p>Vui lòng kiểm tra lại điểm số trước khi chốt phiếu</p>
+                                </div>
+                              </div>
+
+                              <div className="confirm-score-card">
+                                <span className="score-card-label">🏆 TỔNG ĐIỂM ĐÃ CHẤM</span>
+                                <strong className="score-card-value">{totalScore(draft)} <small>điểm</small></strong>
+                              </div>
+
+                              <div className="confirm-stats-grid">
+                                <div className="confirm-stat-item">
+                                  <small>Tiến độ hoàn thành</small>
+                                  <strong>{answered}/{criteria.length} tiêu chí ({completion}%)</strong>
+                                </div>
+                                <div className="confirm-stat-item">
+                                  <small>Người được đánh giá</small>
+                                  <strong>{draft.employeeName}</strong>
+                                </div>
+                              </div>
+                            </div>
+                          ),
+                          okText: 'Xác nhận & Gửi phiếu ngay',
+                          cancelText: 'Quay lại xem',
+                          okButtonProps: { type: 'primary', className: 'confirm-ok-btn' },
+                          onOk: () => void persist(true),
+                        });
+                      }}
+                    >
+                      <span className="btn-submit-icon" aria-hidden="true">
+                        <Send size={15} />
+                      </span>
+                      <span className="btn-submit-text">
+                        Gửi phiếu đánh giá
+                      </span>
                     </Button>
                   </div>
                 )}

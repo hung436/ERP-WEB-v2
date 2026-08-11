@@ -71,6 +71,8 @@ export interface EvaluationSheet {
   selfScore: number | null;
   currentScore: number | null;
   stageTotals?: Partial<Record<EvaluationStage, number>>;
+  stageEvaluators?: Partial<Record<EvaluationStage, string>>;
+  evaluatorName?: string;
   dueAt: string;
   updatedAt: string;
   groups: EvaluationGroup[];

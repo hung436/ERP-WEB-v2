@@ -23,6 +23,7 @@ export const taskApi = { list: (query = '') => mockRequest<Task[]>(`/api/tasks${
 export const calendarApi = {
   list: (query = '') => mockRequest<CalendarEvent[]>(`/api/calendar/events${query}`),
   respond: (id: string, responseStatus: NonNullable<CalendarEvent['responseStatus']>) => mockRequest<CalendarEvent>(`/api/calendar/events/${id}/respond`, { method: 'POST', body: { responseStatus } }),
+  create: (data: Partial<CalendarEvent>) => mockRequest<CalendarEvent>('/api/calendar/events', { method: 'POST', body: data }),
 };
 export const directoryApi = { list: (query = '') => mockRequest<DirectoryContact[]>(`/api/directory${query}`) };
 export const personnelApi = { profile: () => mockRequest<PersonalProfile | null>('/api/personnel/profile') };

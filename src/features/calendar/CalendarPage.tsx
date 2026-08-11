@@ -1,34 +1,223 @@
-import { Input, Segmented, Select } from 'antd';
+import { Button, Dropdown, Input, MenuProps, Segmented, message } from 'antd';
 import { useMemo, useState } from 'react';
 
 import { ContentSkeleton, EmptyState, ErrorState } from '@/components/AsyncState';
-import { CountedTabLabel } from '@/components/CountedTabLabel';
 import { ModuleIcon } from '@/components/ModuleIcon';
 import { CalendarQuickView } from '@/features/dashboard/quickViews/CalendarQuickView';
+import { CreateMeetingModal } from '@/features/calendar/components/CreateMeetingModal';
+import { ActiveMeetingRoomModal } from '@/features/calendar/components/ActiveMeetingRoomModal';
 import { useAsyncData } from '@/hooks/useAsyncData';
 import { calendarApi } from '@/services/api';
 import type { CalendarEvent } from '@/types/domain';
 import { avatarTone } from '@/utils/avatar';
 
-const responseLabel = { pending: 'Chưa phản hồi', accepted: 'Sẽ tham gia', declined: 'Không tham gia' } as const;
 const initials = (value: string) => value.split(' ').slice(-2).map((word) => word[0]).join('').toUpperCase();
 
 export function CalendarPage() {
-  const [view, setView] = useState<'today'|'week'>('today');
-  const [response, setResponse] = useState('');
+  const [activeTab, setActiveTab] = useState<'all' | 'today' | 'upcoming'>('all');
   const [search, setSearch] = useState('');
+  const [joinCode, setJoinCode] = useState('');
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
+  const [activeMeetingRoom, setActiveMeetingRoom] = useState<CalendarEvent | null>(null);
+  const [createOpen, setCreateOpen] = useState(false);
   const state = useAsyncData(async () => (await calendarApi.list()).data);
   const currentDate = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Bangkok' }).format(new Date());
-  const rows = useMemo(() => (state.data ?? []).filter((event) => (view === 'week' || event.startAt.startsWith(currentDate)) && (!response || (event.responseStatus ?? 'pending') === response) && `${event.title} ${event.organizer} ${event.platform} ${event.agenda}`.toLocaleLowerCase('vi').includes(search.toLocaleLowerCase('vi'))), [currentDate, response, search, state.data, view]);
-  const todayMeetings = (state.data ?? []).filter((event) => event.startAt.startsWith(currentDate));
-  const accepted = (state.data ?? []).filter((event) => event.responseStatus === 'accepted').length;
-  const nextMeeting = todayMeetings[0] ?? state.data?.[0];
 
-  return <div className="module-page online-meetings-page">
-    <section className="meeting-overview"><div className="meeting-overview-main"><span className="meeting-overview-icon"><ModuleIcon module="meetings" size={24} /></span><span><small>Cuộc họp tiếp theo</small><strong>{nextMeeting?.title ?? 'Chưa có cuộc họp'}</strong><em>{nextMeeting ? `${new Date(nextMeeting.startAt).toLocaleTimeString('vi-VN', { hour:'2-digit', minute:'2-digit' })} · ${nextMeeting.platform}` : 'Lịch trống'}</em></span></div><div><small>Hôm nay</small><strong>{todayMeetings.length}</strong><em>Cuộc họp</em></div><div><small>Tuần này</small><strong>{state.data?.length ?? 0}</strong><em>Đã lên lịch</em></div><div><small>Sẽ tham gia</small><strong>{accepted}</strong><em>Đã xác nhận</em></div></section>
-    <div className="meeting-toolbar surface-panel"><Input aria-label="Tìm cuộc họp" allowClear onChange={(event) => setSearch(event.target.value)} placeholder="Tìm tên cuộc họp, người tổ chức, nền tảng…" prefix={<ModuleIcon module="meetings" size={18} />} value={search} /><Segmented aria-label="Khoảng thời gian" onChange={(value) => setView(value as 'today'|'week')} options={[{label:<CountedTabLabel count={todayMeetings.length} label="Hôm nay" />,value:'today'},{label:<CountedTabLabel count={state.data?.length ?? 0} label="Tuần này" />,value:'week'}]} value={view} /><Select aria-label="Lọc trạng thái tham gia" onChange={setResponse} options={[{value:'',label:'Tất cả trạng thái'},{value:'pending',label:'Chưa phản hồi'},{value:'accepted',label:'Sẽ tham gia'},{value:'declined',label:'Không tham gia'}]} value={response} /></div>
-    {state.loading ? <ContentSkeleton rows={7} /> : state.error ? <ErrorState message={state.error} onRetry={state.reload} /> : !rows.length ? <EmptyState description="Không có cuộc họp trực tuyến phù hợp" /> : <section aria-label="Danh sách họp trực tuyến" className="meeting-list">{rows.map((event) => <article className="meeting-card surface-panel" key={event.id}><div className="meeting-time"><strong>{new Date(event.startAt).toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'})}</strong><span>{new Date(event.startAt).toLocaleDateString('vi-VN',{day:'2-digit',month:'2-digit'})}</span><small>{Math.round((new Date(event.endAt).getTime()-new Date(event.startAt).getTime())/60000)} phút</small></div><span className="meeting-video-icon"><ModuleIcon module="meetings" size={22} /></span><button className="meeting-card-main" onClick={() => setSelectedEvent(event)} type="button"><span><strong>{event.title}</strong><i className={`meeting-response ${event.responseStatus ?? 'pending'}`}>{responseLabel[event.responseStatus ?? 'pending']}</i></span><small>{event.platform} · ID {event.meetingId}</small><p>{event.agenda}</p></button><div className="meeting-people"><span>{event.participants?.slice(0,3).map((person) => <i className={avatarTone(person)} key={person} title={person}>{initials(person)}</i>)}</span><small>{event.participants?.length ?? 0} người tham gia</small></div><button className="meeting-detail-link" onClick={() => setSelectedEvent(event)} type="button">Xem chi tiết</button></article>)}</section>}
-    {selectedEvent && <CalendarQuickView event={selectedEvent} onClose={() => setSelectedEvent(null)} />}
-  </div>;
+  const allMeetings = state.data ?? [];
+  const todayMeetings = useMemo(() => allMeetings.filter((event) => event.startAt.startsWith(currentDate)), [allMeetings, currentDate]);
+  const upcomingMeetings = useMemo(() => allMeetings.filter((event) => new Date(event.startAt) >= new Date()), [allMeetings]);
+
+  const rows = useMemo(() => {
+    let list = allMeetings;
+    if (activeTab === 'today') list = todayMeetings;
+    if (activeTab === 'upcoming') list = upcomingMeetings;
+    const keyword = search.trim().toLocaleLowerCase('vi');
+    if (!keyword) return list;
+    return list.filter((event) => `${event.title} ${event.organizer} ${event.agenda} ${event.meetingId}`.toLocaleLowerCase('vi').includes(keyword));
+  }, [activeTab, allMeetings, search, todayMeetings, upcomingMeetings]);
+
+  const handleInstantMeeting = async () => {
+    try {
+      const roomCode = `TT-INSTANT-${Math.floor(1000 + Math.random() * 9000)}`;
+      const created = (await calendarApi.create({
+        title: 'Cuộc họp video tức thì',
+        startAt: new Date().toISOString(),
+        endAt: new Date(Date.now() + 3600000).toISOString(),
+        platform: 'Phòng họp ứng dụng Tuổi Trẻ',
+        location: 'In-App Video Engine',
+        type: 'meeting',
+        meetingId: roomCode,
+        recordingAvailable: true,
+        agenda: 'Phòng họp video trực tiếp khởi tạo ngay trên ứng dụng ERP Tuổi Trẻ.',
+        participants: ['Nguyễn Minh Anh (Bạn)', 'Trần Thu Hà', 'Lê Thanh Vân'],
+      })).data;
+      await state.reload();
+      setActiveMeetingRoom(created);
+      message.success(`Đã khởi tạo phòng họp video: ${roomCode}`);
+    } catch {
+      message.error('Không thể tạo cuộc họp tức thì');
+    }
+  };
+
+  const handleQuickJoin = () => {
+    if (!joinCode.trim()) return;
+    const targetRoom: CalendarEvent = allMeetings.find((m) => m.meetingId === joinCode.trim() || m.title.includes(joinCode.trim())) || {
+      id: `custom-${Date.now()}`,
+      title: `Phòng họp ${joinCode.toUpperCase()}`,
+      startAt: new Date().toISOString(),
+      endAt: new Date(Date.now() + 3600000).toISOString(),
+      platform: 'Phòng họp ứng dụng Tuổi Trẻ',
+      type: 'meeting',
+      organizer: 'Nguyễn Minh Anh',
+      meetingId: joinCode.trim().toUpperCase(),
+      agenda: `Tham gia phòng họp video nội bộ mã ${joinCode.toUpperCase()}`,
+      participants: ['Nguyễn Minh Anh (Bạn)', 'Lê Thanh Vân', 'Nguyễn Hoài Nam'],
+    };
+    setActiveMeetingRoom(targetRoom);
+    message.success(`Đã vào phòng họp trực tiếp: ${joinCode.toUpperCase()}`);
+  };
+
+  const createMenuItems: MenuProps['items'] = [
+    {
+      key: 'instant',
+      icon: <ModuleIcon module="meetings" size={16} />,
+      label: 'Bắt đầu cuộc họp tức thì',
+      onClick: () => void handleInstantMeeting(),
+    },
+    {
+      key: 'schedule',
+      icon: <ModuleIcon module="calendar" size={16} />,
+      label: 'Lên lịch họp mới',
+      onClick: () => setCreateOpen(true),
+    },
+  ];
+
+  return (
+    <div className="module-page online-meetings-page meet-wow-page">
+      {/* HERO SECTION */}
+      <section className="meet-wow-hero surface-panel">
+        <div className="meet-wow-left">
+          <h1>Họp trực tuyến</h1>
+          <p>Tạo phòng họp trực tuyến tức thì, lên lịch họp hoặc nhập mã phòng họp để vào họp ngay trên ứng dụng ERP Tuổi Trẻ.</p>
+
+          <div className="meet-wow-actions">
+            <Dropdown menu={{ items: createMenuItems }} placement="bottomLeft">
+              <Button className="meet-wow-create-btn" icon={<ModuleIcon module="meetings" size={18} />} type="primary">
+                Cuộc họp mới ▾
+              </Button>
+            </Dropdown>
+
+            <div className="meet-wow-join-box">
+              <Input
+                allowClear
+                onChange={(e) => setJoinCode(e.target.value)}
+                onPressEnter={handleQuickJoin}
+                placeholder="Nhập mã phòng họp (VD: TT-482-193)"
+                prefix={<span className="meet-kbd-icon">⌨</span>}
+                value={joinCode}
+              />
+              <Button disabled={!joinCode.trim()} onClick={handleQuickJoin} type="text">
+                Vào họp
+              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* SCHEDULED MEETINGS LIST */}
+
+      {/* SCHEDULED MEETINGS LIST */}
+      <section className="meet-wow-schedule surface-panel">
+        <header className="schedule-header">
+          <div className="schedule-controls">
+            <Segmented
+              onChange={(val) => setActiveTab(val as 'all' | 'today' | 'upcoming')}
+              options={[
+                { label: `Tất cả (${allMeetings.length})`, value: 'all' },
+                { label: `Hôm nay (${todayMeetings.length})`, value: 'today' },
+                { label: `Sắp tới (${upcomingMeetings.length})`, value: 'upcoming' },
+              ]}
+              value={activeTab}
+            />
+            <Input
+              allowClear
+              onChange={(event) => setSearch(event.target.value)}
+              placeholder="Tìm theo tên cuộc họp, người chủ trì..."
+              prefix={<ModuleIcon module="meetings" size={16} />}
+              style={{ width: 240 }}
+              value={search}
+            />
+          </div>
+        </header>
+
+        {state.loading ? (
+          <ContentSkeleton rows={4} />
+        ) : state.error ? (
+          <ErrorState message={state.error} onRetry={state.reload} />
+        ) : !rows.length ? (
+          <EmptyState description="Không có cuộc họp phù hợp" />
+        ) : (
+          <div className="meet-cards-feed">
+            {rows.map((event) => (
+              <article className="meet-wow-item-card" key={event.id}>
+                <div className="item-time-col">
+                  <strong>{new Date(event.startAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}</strong>
+                  <span>{new Date(event.startAt).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' })}</span>
+                  <small>{Math.round((new Date(event.endAt).getTime() - new Date(event.startAt).getTime()) / 60000)} phút</small>
+                </div>
+
+                <div className="item-main-col" onClick={() => setSelectedEvent(event)} role="button" tabIndex={0}>
+                  <div className="item-title-row">
+                    <h3>{event.title}</h3>
+                    <span className="item-id-badge">ID: {event.meetingId ?? 'TT-ROOM'}</span>
+                  </div>
+                  <p className="item-meta-text">
+                    Chủ trì: <strong>{event.organizer}</strong>
+                  </p>
+                  <p className="item-agenda-text">{event.agenda}</p>
+                </div>
+
+                <div className="item-people-col">
+                  <div className="avatar-group">
+                    {event.participants?.slice(0, 3).map((person) => (
+                      <i className={avatarTone(person)} key={person} title={person}>
+                        {initials(person)}
+                      </i>
+                    ))}
+                  </div>
+                  <small>{event.participants?.length ?? 0} thành viên</small>
+                </div>
+
+                <div className="item-action-col">
+                  <Button
+                    className="item-join-btn"
+                    icon={<ModuleIcon module="meetings" size={16} />}
+                    onClick={() => setActiveMeetingRoom(event)}
+                    type="primary"
+                  >
+                    Vào họp ngay
+                  </Button>
+                </div>
+              </article>
+            ))}
+          </div>
+        )}
+      </section>
+
+      {/* IN-APP ACTIVE VIDEO ROOM MODAL */}
+      {activeMeetingRoom && (
+        <ActiveMeetingRoomModal event={activeMeetingRoom} onClose={() => setActiveMeetingRoom(null)} />
+      )}
+
+      {/* QUICK VIEW & CREATION MODALS */}
+      {selectedEvent && <CalendarQuickView event={selectedEvent} onClose={() => setSelectedEvent(null)} />}
+      <CreateMeetingModal
+        onClose={() => setCreateOpen(false)}
+        onCreated={async () => {
+          await state.reload();
+        }}
+        open={createOpen}
+      />
+    </div>
+  );
 }

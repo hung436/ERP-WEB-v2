@@ -35,13 +35,13 @@ function documentToTask(document: DocumentSubmission): Task {
   return {
     id: `task-${document.id}`,
     documentId: document.id,
-    title: document.kind === 'leave_request' ? `Duyệt đơn xin nghỉ phép của ${document.createdBy}` : `Duyệt phiếu đề xuất đi nước ngoài của ${document.createdBy}`,
+    title: document.title,
     description: fields.reason,
-    status: 'todo',
+    status: document.status === 'pending' ? 'todo' : 'completed',
     priority: 'medium',
     dueAt,
     receivedAt: document.createdAt,
-    assignedBy: 'Hệ thống Tài liệu',
+    assignedBy: document.createdBy,
     department: document.department,
     progress: Math.round((document.currentStep / document.steps.length) * 100),
     sourceModule: 'documents',
@@ -53,9 +53,42 @@ function documentToTask(document: DocumentSubmission): Task {
   };
 }
 
+function evaluationToTask(sheet: EvaluationSheet): Task {
+  const isSelf = sheet.stage === 'self';
+  const stageName =
+    sheet.stage === 'self'
+      ? 'Tự đánh giá'
+      : sheet.stage === 'deputy'
+      ? 'Phó Ban đánh giá'
+      : sheet.stage === 'manager'
+      ? 'Trưởng ban đánh giá'
+      : 'Hội đồng xét duyệt';
+
+  return {
+    id: `task-${sheet.id}`,
+    title: isSelf
+      ? `Phiếu tự đánh giá lao động & KPI ${sheet.periodLabel}`
+      : `Xét duyệt đánh giá lao động & KPI ${sheet.periodLabel} · ${sheet.employeeName}`,
+    description: `Thực hiện ${stageName} cho ${sheet.employeeName} (${sheet.department})`,
+    status: sheet.status === 'published' ? 'completed' : 'todo',
+    priority: 'medium',
+    dueAt: sheet.dueAt,
+    receivedAt: sheet.updatedAt,
+    assignedBy: isSelf ? sheet.employeeName : (sheet.stageEvaluators?.[sheet.stage] || 'Hội đồng đánh giá'),
+    department: sheet.department,
+    progress: sheet.progress,
+    sourceModule: 'evaluations',
+    workflowKind: isSelf ? 'self_evaluation' : 'subordinate_evaluation',
+    subjectName: sheet.employeeName,
+    period: sheet.periodLabel,
+    workflowStep: stageName,
+  };
+}
+
 const currentTaskStore = () => [
   ...documentSubmissionStore.filter((item) => item.viewScope === 'pending_review' && item.status === 'pending').map(documentToTask),
-  ...tasks.filter((item) => item.sourceModule !== 'documents').map((item) => ({ ...item, receivedAt: item.receivedAt ?? new Date(new Date(item.dueAt).getTime() - 2 * 86_400_000).toISOString() })),
+  ...evaluationSheetStore.filter((sheet) => sheet.status !== 'published').map(evaluationToTask),
+  ...tasks.filter((item) => item.sourceModule !== 'documents' && item.sourceModule !== 'evaluations').map((item) => ({ ...item, receivedAt: item.receivedAt ?? new Date(new Date(item.dueAt).getTime() - 2 * 86_400_000).toISOString() })),
 ];
 
 export async function mockRequest<T>(path: string, options?: { method?: string; body?: unknown }): Promise<ApiResponse<T>> {
@@ -86,22 +119,56 @@ export async function mockRequest<T>(path: string, options?: { method?: string; 
   }
   else if (pathname === '/api/dashboard/summary') {
     const taskStore = currentTaskStore();
+    const activeTasks = taskStore.filter((item) => item.status !== 'completed');
     data = {
-      taskSummary: { total: taskStore.length, dueSoon: taskStore.filter((item) => item.status !== 'completed').slice(0, 4).length, overdue: taskStore.filter((item) => item.status === 'overdue').length, completed: taskStore.filter((item) => item.status === 'completed').length },
+      taskSummary: {
+        total: activeTasks.length,
+        dueSoon: activeTasks.slice(0, 4).length,
+        overdue: taskStore.filter((item) => item.status === 'overdue').length,
+        completed: taskStore.filter((item) => item.status === 'completed').length,
+      },
       unreadMailCount: mailStore.filter((item) => (item.folder ?? 'inbox') === 'inbox' && !item.isRead).length,
       unreadChatCount: chatConversationStore.reduce((sum, item) => sum + item.unreadCount, 0),
     } satisfies DashboardSummary;
-  } else if (pathname === '/api/dashboard/tasks') data = currentTaskStore().filter((item) => item.status !== 'completed').slice(0, 6);
+  } else if (pathname === '/api/dashboard/tasks') data = currentTaskStore().filter((item) => item.status !== 'completed');
   else if (pathname === '/api/dashboard/today-events') {
     const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Bangkok' }).format(new Date());
     data = calendarEventStore.filter((item) => item.startAt.startsWith(today)).slice(0, 4);
   }
   else if (pathname === '/api/dashboard/mail-summary') data = mailStore.filter((item) => (item.folder ?? 'inbox') === 'inbox' && !item.isRead).slice(0, 3);
   else if (pathname === '/api/dashboard/chat-summary') data = chatConversationStore.filter((item) => item.unreadCount > 0).slice(0, 3);
-  else if (pathname === '/api/dashboard/announcements') data = announcementStore.filter((item) => item.sourceModule === 'agency').slice(0, 5);
+  else if (pathname === '/api/dashboard/announcements') data = announcementStore;
   else if (pathname === '/api/tasks') {
-    data = currentTaskStore().filter((item) => (!url.searchParams.get('status') || item.status === url.searchParams.get('status')) && (!url.searchParams.get('priority') || item.priority === url.searchParams.get('priority')));
-  } else if (pathname === '/api/calendar/events') data = calendarEventStore.filter((item) => !url.searchParams.get('type') || item.type === url.searchParams.get('type'));
+    const statusParam = url.searchParams.get('status');
+    const priorityParam = url.searchParams.get('priority');
+    data = currentTaskStore().filter((item) => {
+      if (statusParam === 'dueSoon') return item.status !== 'completed';
+      return (!statusParam || item.status === statusParam) && (!priorityParam || item.priority === priorityParam);
+    });
+  } else if (pathname === '/api/calendar/events') {
+    if (options?.method === 'POST') {
+      const body = options.body as Partial<CalendarEvent>;
+      const newEvent: CalendarEvent = {
+        id: `event-${Date.now()}`,
+        title: body.title ?? 'Cuộc họp mới',
+        startAt: body.startAt ?? new Date().toISOString(),
+        endAt: body.endAt ?? new Date(Date.now() + 3600000).toISOString(),
+        location: body.location ?? 'meeting.tuoitre.vn',
+        meetingUrl: body.meetingUrl ?? 'https://meeting.tuoitre.vn/truc-tuyen',
+        type: body.type ?? 'meeting',
+        organizer: activeUser.fullName,
+        responseStatus: 'accepted',
+        meetingId: `TT-${Math.floor(100 + Math.random() * 900)}-${Math.floor(100 + Math.random() * 900)}`,
+        platform: body.platform ?? 'meeting.tuoitre.vn',
+        agenda: body.agenda ?? 'Trao đổi nội dung công việc',
+        participants: body.participants?.length ? body.participants : [activeUser.fullName],
+      };
+      calendarEventStore = [newEvent, ...calendarEventStore];
+      data = newEvent;
+    } else {
+      data = calendarEventStore.filter((item) => !url.searchParams.get('type') || item.type === url.searchParams.get('type'));
+    }
+  }
   else if (/^\/api\/calendar\/events\/[^/]+\/respond$/.test(pathname) && options?.method === 'POST') {
     const eventId = pathname.split('/')[4];
     const body = options.body as { responseStatus?: CalendarEvent['responseStatus'] };
