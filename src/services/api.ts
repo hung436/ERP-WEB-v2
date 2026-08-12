@@ -2,7 +2,7 @@ import { mockRequest } from '@/services/mockApi';
 import type { Announcement, CalendarEvent, ChatAttachment, ChatConversation, ChatMember, ChatMessage, ChatReply, DashboardSummary, DirectoryContact, DocumentSubmission, DocumentTemplate, MailAttachment, MailComposePayload, MailItem, MailReply, Task, User } from '@/types/domain';
 import type { ExpertRecord, WorkspaceFile, WorkspaceRecord } from '@/types/extended';
 import type { EvaluationPeriod, EvaluationSheet, EvaluationSummary } from '@/types/evaluation';
-import type { PersonalProfile } from '@/types/personnel';
+import type { CreatePersonnelPayload, PersonalProfile, PersonnelRecordItem } from '@/types/personnel';
 
 export const authApi = {
   login: (username: string, password: string) => mockRequest<{ token: string; user: User }>('/api/auth/login', { method: 'POST', body: { username, password } }),
@@ -26,7 +26,19 @@ export const calendarApi = {
   create: (data: Partial<CalendarEvent>) => mockRequest<CalendarEvent>('/api/calendar/events', { method: 'POST', body: data }),
 };
 export const directoryApi = { list: (query = '') => mockRequest<DirectoryContact[]>(`/api/directory${query}`) };
-export const personnelApi = { profile: () => mockRequest<PersonalProfile | null>('/api/personnel/profile') };
+export const personnelApi = {
+  list: (query = '') => mockRequest<PersonnelRecordItem[]>(`/api/personnel/list${query}`),
+  get: (id: string) => mockRequest<PersonnelRecordItem>(`/api/personnel/${id}`),
+  profile: () => mockRequest<PersonalProfile | null>('/api/personnel/profile'),
+  create: (payload: CreatePersonnelPayload) => mockRequest<{ id: string; code: string; message: string }>('/api/personnel/create', { method: 'POST', body: payload }),
+  update: (id: string, payload: Partial<CreatePersonnelPayload>) => mockRequest<{ success: boolean; message: string }>(`/api/personnel/${id}`, { method: 'PUT', body: payload }),
+};
+export const changeRequestsApi = {
+  list: (query = '') => mockRequest<import('@/types/personnel').PersonnelChangeRequest[]>(`/api/personnel/change-requests${query}`),
+  create: (payload: any) => mockRequest<{ id: string; code: string; message: string }>('/api/personnel/change-requests', { method: 'POST', body: payload }),
+  approve: (id: string, comment?: string) => mockRequest<{ success: boolean; message: string }>(`/api/personnel/change-requests/${id}/approve`, { method: 'POST', body: { comment } }),
+  reject: (id: string, comment?: string) => mockRequest<{ success: boolean; message: string }>(`/api/personnel/change-requests/${id}/reject`, { method: 'POST', body: { comment } }),
+};
 export const chatApi = {
   conversations: () => mockRequest<ChatConversation[]>('/api/chat/conversations'),
   members: () => mockRequest<ChatMember[]>('/api/chat/members'),
