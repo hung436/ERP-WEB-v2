@@ -2,9 +2,10 @@ import { adminUser, announcements, calendarEvents, chatMembers, conversations, d
 import { cloudRecords, evaluationRecords, expertRecords, libraryRecords, meetingRecords, requestRecords } from '@/mocks/extendedFixtures';
 import { documentSubmissions, documentTemplates } from '@/mocks/documentFixtures';
 import { evaluationPeriods, evaluationSheets } from '@/mocks/evaluationFixtures';
-import { personalProfile } from '@/mocks/personnelFixtures';
+import { initialChangeRequests, initialPersonnelList, personalProfile } from '@/mocks/personnelFixtures';
 import type { Announcement, ApiResponse, ApiState, CalendarEvent, ChatAttachment, ChatConversation, ChatMessage, DashboardSummary, DirectoryContact, DocumentSubmission, MailComposePayload, MailItem, MailReply, Task, User } from '@/types/domain';
 import type { EvaluationSheet, EvaluationSummary } from '@/types/evaluation';
+import type { PersonnelChangeRequest, PersonnelRecordItem } from '@/types/personnel';
 
 let activeUser: User = demoUser;
 let chatConversationStore: ChatConversation[] = conversations.map((item) => ({ ...item, members: [...item.members] }));
@@ -18,6 +19,8 @@ let documentSubmissionStore: DocumentSubmission[] = documentSubmissions.map((ite
 let documentSequence = documentSubmissions.length + 20;
 let workspaceActionSequence = 100;
 let evaluationSheetStore: EvaluationSheet[] = evaluationSheets.map((sheet) => ({ ...sheet, groups: sheet.groups.map((group) => ({ ...group, criteria: group.criteria.map((criterion) => ({ ...criterion })) })) }));
+let personnelRecordStore: PersonnelRecordItem[] = [...initialPersonnelList];
+let changeRequestsStore: PersonnelChangeRequest[] = [...initialChangeRequests];
 
 const wait = (milliseconds: number) => new Promise((resolve) => window.setTimeout(resolve, milliseconds));
 const normalizeSearch = (value: string) => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D').toLowerCase();
@@ -187,6 +190,149 @@ export async function mockRequest<T>(path: string, options?: { method?: string; 
     });
   }
   else if (pathname === '/api/personnel/profile') data = state === 'empty' ? null : personalProfile;
+  else if (pathname === '/api/personnel/list') {
+    const search = normalizeSearch(url.searchParams.get('search')?.trim() ?? '');
+    const department = url.searchParams.get('department') ?? '';
+
+    data = personnelRecordStore.filter((item) => {
+      const searchable = normalizeSearch(`${item.fullName} ${item.penName ?? ''} ${item.department} ${item.position} ${item.specialty ?? ''}`);
+      const matchSearch = !search || searchable.includes(search);
+      const matchDept = !department || item.department === department;
+      return matchSearch && matchDept;
+    });
+  }
+  else if (pathname === '/api/personnel/create' && options?.method === 'POST') {
+    const body = options.body as any;
+    if (!body?.fullName?.trim() || !body?.employmentType?.trim() || !body?.phone?.trim() || !body?.department?.trim() || !body?.position?.trim() || !body?.email?.trim()) {
+      throw new Error('Vui lòng điền đầy đủ các thông tin bắt buộc (*).');
+    }
+    const code = `NV-2026-${Math.floor(100 + Math.random() * 900)}`;
+    const newRecord: PersonnelRecordItem = {
+      id: `pers-${Date.now()}`,
+      employeeCode: code,
+      fullName: body.fullName,
+      penName: body.penName,
+      photoUrl: body.photoUrl,
+      birthDate: body.birthDate,
+      gender: body.gender,
+      phone: body.phone,
+      extension: body.extension,
+      email: body.email,
+      secondaryEmail: body.secondaryEmail,
+      employmentType: body.employmentType,
+      department: body.department,
+      position: body.position,
+      specialty: body.specialty,
+      assignments: body.assignments || [{ department: body.department, position: body.position, specialty: body.specialty, isPrimary: true }],
+      participateEvaluation: Boolean(body.participateEvaluation),
+      isYouthUnionMember: Boolean(body.isYouthUnionMember),
+      isPartyMember: Boolean(body.isPartyMember),
+      leaveEffectiveDate: body.leaveEffectiveDate,
+      identityNumber: body.identityNumber,
+      identityIssuedDate: body.identityIssuedDate,
+      identityIssuedPlace: body.identityIssuedPlace,
+      notes: body.notes,
+      status: body.action === 'complete' ? 'complete' : 'submitted',
+      createdAt: new Date().toISOString(),
+    };
+    personnelRecordStore = [newRecord, ...personnelRecordStore];
+
+    data = {
+      id: newRecord.id,
+      code,
+      message: body.action === 'complete' ? `Hồ sơ nhân sự ${body.fullName} (${code}) đã được hoàn tất thành công.` : `Hồ sơ nhân sự ${body.fullName} (${code}) đã được gửi thành công.`,
+    };
+  }
+  else if (pathname.startsWith('/api/personnel/') && options?.method === 'PUT') {
+    const id = pathname.replace('/api/personnel/', '');
+    const body = options.body as any;
+    const index = personnelRecordStore.findIndex((item) => item.id === id);
+    if (index !== -1) {
+      personnelRecordStore[index] = {
+        ...personnelRecordStore[index],
+        ...body,
+        department: body.department || personnelRecordStore[index].department,
+        position: body.position || personnelRecordStore[index].position,
+        assignments: body.assignments || personnelRecordStore[index].assignments,
+      };
+      data = { success: true, message: `Hồ sơ nhân sự ${personnelRecordStore[index].fullName} (${personnelRecordStore[index].employeeCode}) đã được cập nhật thành công.` };
+    } else {
+      throw new Error('Không tìm thấy hồ sơ nhân sự.');
+    }
+  }
+  else if (pathname === '/api/personnel/change-requests') {
+    if (options?.method === 'POST') {
+      const body = options.body as any;
+      const code = `YC-2026-${Math.floor(100 + Math.random() * 900)}`;
+      const newReq: PersonnelChangeRequest = {
+        id: `req-${Date.now()}`,
+        code,
+        personnelId: body.personnelId || 'pers-101',
+        employeeCode: body.employeeCode || 'NV-2026-101',
+        fullName: body.fullName || 'Nguyễn Minh Anh',
+        department: body.department || 'Ban Biên tập',
+        profileType: body.profileType || '2A',
+        fields: body.fields || [],
+        reason: body.reason,
+        attachmentName: body.attachmentName || 'Minh_Chung_Thay_Doi.pdf',
+        requestedBy: body.requestedBy || body.fullName || 'Nguyễn Minh Anh',
+        requestedAt: new Date().toISOString(),
+        status: 'new',
+        snapshotPdfName: `Ly_Lich_${body.profileType || '2A'}_${body.employeeCode || 'NV2026101'}_${Date.now()}.pdf`,
+      };
+      changeRequestsStore = [newReq, ...changeRequestsStore];
+      data = { id: newReq.id, code, message: `Đã gửi yêu cầu thay đổi / bổ sung thông tin (${code}) thành công.` };
+    } else {
+      const search = normalizeSearch(url.searchParams.get('search')?.trim() ?? '');
+      const status = url.searchParams.get('status') ?? '';
+      const profileType = url.searchParams.get('profileType') ?? '';
+
+      data = changeRequestsStore.filter((item) => {
+        const searchable = normalizeSearch(`${item.code} ${item.fullName} ${item.employeeCode} ${item.department} ${item.requestedBy}`);
+        const matchSearch = !search || searchable.includes(search);
+        const matchStatus = !status || item.status === status;
+        const matchType = !profileType || item.profileType === profileType;
+        return matchSearch && matchStatus && matchType;
+      });
+    }
+  }
+  else if (pathname.includes('/api/personnel/change-requests/') && pathname.endsWith('/approve') && options?.method === 'POST') {
+    const id = pathname.split('/')[4];
+    const body = options.body as any;
+    const req = changeRequestsStore.find((item) => item.id === id);
+    if (req) {
+      req.status = 'approved';
+      req.reviewedBy = 'Ban Tổ chức - Nhân sự';
+      req.reviewedAt = new Date().toISOString();
+      req.reviewComment = body?.comment || 'Đã chấp nhận các nội dung thay đổi / bổ sung.';
+      data = { success: true, message: `Đã phê duyệt yêu cầu thay đổi ${req.code} thành công.` };
+    } else {
+      throw new Error('Không tìm thấy yêu cầu.');
+    }
+  }
+  else if (pathname.includes('/api/personnel/change-requests/') && pathname.endsWith('/reject') && options?.method === 'POST') {
+    const id = pathname.split('/')[4];
+    const body = options.body as any;
+    const req = changeRequestsStore.find((item) => item.id === id);
+    if (req) {
+      req.status = 'returned';
+      req.reviewedBy = 'Ban Tổ chức - Nhân sự';
+      req.reviewedAt = new Date().toISOString();
+      req.reviewComment = body?.comment || 'Yêu cầu bị trả về. Vui lòng kiểm tra lại thông tin hoặc minh chứng.';
+      data = { success: true, message: `Đã trả về yêu cầu ${req.code}.` };
+    } else {
+      throw new Error('Không tìm thấy yêu cầu.');
+    }
+  }
+  else if (pathname.startsWith('/api/personnel/')) {
+    const id = pathname.replace('/api/personnel/', '');
+    const record = personnelRecordStore.find((item) => item.id === id);
+    if (record) {
+      data = record;
+    } else {
+      throw new Error('Không tìm thấy hồ sơ nhân sự.');
+    }
+  }
   else if (pathname === '/api/chat/members') data = chatMembers;
   else if (pathname === '/api/chat/direct' && options?.method === 'POST') {
     const contact = options.body as DirectoryContact;

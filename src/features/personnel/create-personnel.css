@@ -1,0 +1,311 @@
+.create-personnel-page {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 16px 16px 40px;
+}
+
+/* Page Header */
+.create-personnel-page-head {
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #eaecf0;
+}
+
+.create-personnel-page-head h1 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: #101828;
+  letter-spacing: -0.01em;
+}
+
+/* Compact Single Form Card */
+.create-personnel-flat-form {
+  background: #ffffff;
+  border: 1px solid #eaecf0;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(16, 24, 40, 0.03);
+  padding: 20px 24px;
+}
+
+/* Override Ant Design Form Item Margin for Tight Compact Spacing */
+.create-personnel-flat-form .ant-form-item {
+  margin-bottom: 8px !important;
+}
+
+/* Top Identity Block */
+.create-personnel-top-identity {
+  display: grid;
+  grid-template-columns: 114px minmax(0, 1fr);
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.create-personnel-photo-box {
+  width: 110px;
+  height: 146px; /* Exact 3x4 aspect ratio */
+  border: 1.5px dashed #d0d5dd;
+  border-radius: 8px;
+  background: #fafafa;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  cursor: pointer;
+  overflow: hidden;
+  transition: all 0.15s ease;
+}
+
+.create-personnel-photo-box:hover,
+.create-personnel-photo-box:focus-visible {
+  border-color: #d92d20;
+  background: #fef3f2;
+  box-shadow: 0 0 0 3px #fee4e2;
+  outline: none;
+}
+
+.create-personnel-photo-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.create-personnel-photo-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  color: #667085;
+  text-align: center;
+}
+
+.create-personnel-photo-placeholder span {
+  font-size: 11px;
+  font-weight: 600;
+  color: #475467;
+}
+
+/* Tight Divider Lines */
+.create-personnel-divider {
+  height: 1px;
+  background: #f2f4f7;
+  margin: 14px 0;
+}
+
+/* Section Headings */
+.create-personnel-section-title {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #667085;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Static Assignment Item Box - Non-collapsible */
+.create-personnel-assignment-box {
+  border: 1px solid #eaecf0;
+  border-radius: 8px;
+  background: #ffffff;
+  margin-bottom: 8px;
+  overflow: hidden;
+  transition: border-color 0.15s ease;
+}
+
+.create-personnel-assignment-box:hover {
+  border-color: #d0d5dd;
+}
+
+.create-personnel-assignment-box-head {
+  padding: 8px 14px;
+  background: #fafafa;
+  border-bottom: 1px solid #f2f4f7;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.create-personnel-assignment-box-title {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #344054;
+}
+
+.create-personnel-assignment-box-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Subdued Delete Button - Plain text, no icon */
+.btn-remove-assignment-subdued {
+  border: 0;
+  background: transparent;
+  color: #98a2b3;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: all 0.15s ease;
+}
+
+.btn-remove-assignment-subdued:hover {
+  color: #d92d20;
+  background: #fef3f2;
+}
+
+.create-personnel-assignment-box-body {
+  padding: 10px 14px 4px;
+}
+
+.btn-add-assignment {
+  width: 100%;
+  height: 34px;
+  border: 1px dashed #d0d5dd;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #475467;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 2px;
+  transition: all 0.15s ease;
+}
+
+.btn-add-assignment:hover {
+  border-color: #d92d20;
+  color: #d92d20;
+  background: #fef3f2;
+}
+
+/* Grids */
+.create-personnel-row-4 {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px 14px;
+}
+
+.create-personnel-row-3 {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px 14px;
+}
+
+.create-personnel-row-2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 14px;
+}
+
+/* Input Labels */
+.create-personnel-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #344054;
+  margin-bottom: 2px;
+  display: inline-block;
+}
+
+.create-personnel-label .req {
+  color: #d92d20;
+  margin-left: 2px;
+  font-weight: 700;
+}
+
+.create-personnel-switch-box {
+  display: flex;
+  align-items: center;
+  min-height: 38px;
+}
+
+/* Alert Styling */
+.create-personnel-alert {
+  border-radius: 8px !important;
+  margin-bottom: 14px !important;
+  border: 1px solid #fecdca !important;
+  background-color: #fef3f2 !important;
+}
+
+/* Sticky Action Bar */
+.create-personnel-footer-actions {
+  position: sticky;
+  bottom: 12px;
+  z-index: 20;
+  margin-top: 14px;
+  background: #ffffff;
+  border: 1px solid #eaecf0;
+  border-radius: 10px;
+  padding: 10px 20px;
+  box-shadow: 0 4px 16px rgba(16, 24, 40, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.create-personnel-footer-btns {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn-gui-ho-so {
+  height: 36px;
+  padding: 0 18px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 6px;
+  border: 1px solid #d0d5dd;
+  background: #ffffff;
+  color: #344054;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-gui-ho-so:hover {
+  border-color: #b42318;
+  color: #b42318;
+  background: #fef3f2;
+}
+
+.btn-hoan-tat-ho-so {
+  height: 36px;
+  padding: 0 20px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 6px;
+  border: 1px solid #d92d20;
+  background: #d92d20;
+  color: #ffffff;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.05);
+  transition: all 0.15s ease;
+}
+
+.btn-hoan-tat-ho-so:hover {
+  background: #b42318;
+  border-color: #b42318;
+}
+
+@media (max-width: 860px) {
+  .create-personnel-top-identity,
+  .create-personnel-row-4,
+  .create-personnel-row-3,
+  .create-personnel-row-2 {
+    grid-template-columns: 1fr;
+  }
+  .create-personnel-flat-form {
+    padding: 16px 12px;
+  }
+}

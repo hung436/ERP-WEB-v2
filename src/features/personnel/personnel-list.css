@@ -1,0 +1,228 @@
+/* Full Width Personnel List Page */
+.personnel-list-page {
+  width: 100%;
+  max-width: 100%;
+  padding: 16px 24px 40px;
+}
+
+/* Page Header */
+.personnel-list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.personnel-list-header h1 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #101828;
+  margin: 0;
+}
+
+.personnel-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Import Action Buttons with Clean SVG Icon */
+.btn-import-secondary {
+  height: 36px;
+  padding: 0 14px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 6px;
+  border: 1px solid #d0d5dd;
+  background: #ffffff;
+  color: #344054;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s ease;
+}
+
+.btn-import-secondary svg {
+  color: #667085;
+  transition: color 0.15s ease;
+}
+
+.btn-import-secondary:hover {
+  border-color: #d92d20;
+  color: #d92d20;
+  background: #fef3f2;
+}
+
+.btn-import-secondary:hover svg {
+  color: #d92d20;
+}
+
+.btn-create-personnel-primary {
+  height: 36px;
+  padding: 0 18px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 6px;
+  border: 1px solid #d92d20;
+  background: #d92d20;
+  color: #ffffff;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.05);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s ease;
+}
+
+.btn-create-personnel-primary:hover {
+  background: #b42318;
+  border-color: #b42318;
+}
+
+/* Filter Bar */
+.personnel-list-toolbar {
+  background: #ffffff;
+  border: 1px solid #eaecf0;
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* Table Wrap - Clean Minimalist Font Size & Styling */
+.personnel-list-card {
+  background: #ffffff;
+  border: 1px solid #eaecf0;
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(16, 24, 40, 0.03);
+  overflow: hidden;
+}
+
+.personnel-table .ant-table-thead > tr > th {
+  background: #fafafa;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #475467;
+  padding: 12px 16px;
+  border-bottom: 1px solid #eaecf0;
+}
+
+.personnel-table .ant-table-tbody > tr > td {
+  padding: 12px 16px;
+  font-size: 14px;
+  line-height: 1.45;
+  color: #1d2939;
+  border-bottom: 1px solid #f2f4f7;
+  vertical-align: middle;
+}
+
+.personnel-table .ant-table-tbody > tr:hover > td {
+  background-color: #fcfcfd !important;
+}
+
+/* Personnel Name Cell - Font size 15px */
+.personnel-name-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.personnel-name-text strong {
+  font-size: 15px;
+  font-weight: 600;
+  color: #101828;
+  display: block;
+}
+
+/* Pen Name Styling - Font size 14px */
+.personnel-penname {
+  font-size: 14px;
+  font-style: italic;
+  color: #475467;
+  font-weight: 500;
+  display: block;
+  margin-top: 1px;
+}
+
+/* Multiple Assignments Display List - Font size 15px */
+.personnel-assignments-cell-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.personnel-assignment-line {
+  font-size: 15px;
+  line-height: 1.45;
+  color: #1d2939;
+}
+
+.personnel-assignment-line strong {
+  color: #101828;
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.personnel-primary-tag-text {
+  font-size: 12px;
+  color: #d92d20;
+  font-weight: 600;
+  margin-left: 4px;
+}
+
+/* Clean Right-Click Context Menu */
+.personnel-context-menu {
+  position: fixed;
+  z-index: 1050;
+  background: #ffffff;
+  border: 1px solid #eaecf0;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(16, 24, 40, 0.12), 0 1px 3px rgba(16, 24, 40, 0.08);
+  min-width: 200px;
+  padding: 4px 0;
+  animation: contextMenuFadeIn 0.1s ease-out;
+}
+
+@keyframes contextMenuFadeIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.personnel-context-menu-header {
+  padding: 6px 14px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #667085;
+  border-bottom: 1px solid #f2f4f7;
+  margin-bottom: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.personnel-context-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: #101828;
+  cursor: pointer;
+  transition: background-color 0.12s ease;
+}
+
+.personnel-context-menu-item:hover {
+  background-color: #fef3f2;
+  color: #d92d20;
+}
+
+.personnel-context-icon {
+  font-size: 15px;
+  flex-shrink: 0;
+}

@@ -32,7 +32,7 @@ a { color:inherit; text-decoration:none; }
 .sidebar-note { position:absolute; bottom:18px; left:18px; right:18px; padding:12px; background:#f9fafb; color:#595959; font-size:11px; border:1px solid #e4e7ec; border-radius:10px; }
 .status-dot { display:inline-block; width:7px; height:7px; margin-right:8px; border-radius:50%; background:#039855; }
 .app-frame { margin-left:244px; min-height:100vh; transition:margin .2s; }.app-frame-collapsed { margin-left:76px; }
-.app-header { height:68px; display:flex; align-items:center; justify-content:space-between; padding:0 28px; background:#fff; border-bottom:1px solid #e4e7ec; }
+.app-header { position:sticky!important; top:0; z-index:100!important; height:68px; display:flex; align-items:center; justify-content:space-between; padding:0 28px; background:#fff; border-bottom:1px solid #e4e7ec; box-shadow:0 1px 3px rgba(16,24,40,.04); }
 .app-header strong { font-size:15px; }.eyebrow { color:#595959; font-size:11px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; }
 .account-button { height:42px!important; display:flex!important; align-items:center; gap:9px; border-color:#e4e7ec!important; box-shadow:none!important; }
 .avatar { width:30px; height:30px; display:inline-grid; place-items:center; border-radius:50%; background:#fef3f2; color:#b42318; font-size:11px; font-weight:700; position:relative; }.avatar.neutral { background:#eef2f6; color:#344054; }
@@ -94,6 +94,27 @@ a { color:inherit; text-decoration:none; }
 .sidebar-nav-copy small { overflow:hidden; color:#595959; font-size:13px; text-overflow:ellipsis; white-space:nowrap; }
 .module-home{--module-color:#344054;--module-soft:#f2f4f7}.module-tasks{--module-color:#d92d20;--module-soft:#fef3f2}.module-calendar{--module-color:#7f56d9;--module-soft:#f4f3ff}.module-chat{--module-color:#039855;--module-soft:#ecfdf3}.module-mail{--module-color:#1570ef;--module-soft:#eff8ff}.module-announcements{--module-color:#dc6803;--module-soft:#fff6ed}
 .brand small,.sidebar-note { font-size:13px; }
+
+/* Sidebar group button (parent with children) */
+.sidebar-group-btn { width:100%; text-align:left; border:none; cursor:pointer; background:transparent; }
+.sidebar-group-btn:hover { color:#1d2939; background:#f9fafb; }
+.sidebar-group-btn.active { color:#1d2939; border-color:#eaecf0; background:#fff; box-shadow:0 1px 2px rgba(16,24,40,.05); }
+.sidebar-group-btn.active::after { background:var(--module-color); }
+
+/* Chevron arrow for parent groups */
+.sidebar-chevron { flex:0 0 auto; margin-left:auto; font-size:16px; font-weight:700; color:#98a2b3; line-height:1; transform:rotate(90deg); transition:transform .2s ease, color .2s ease; }
+.sidebar-chevron.open { transform:rotate(-90deg); color:#d92d20; }
+.sidebar-group-btn:hover .sidebar-chevron { color:#475467; }
+
+/* Subnav children list — animated collapse */
+.sidebar-subnav { margin:0; padding:0; list-style:none; border-left:2px solid #e4e7ec; margin-left:28px; max-height:0; overflow:hidden; opacity:0; transition:max-height .25s ease, opacity .2s ease, margin .2s ease; }
+.sidebar-subnav.open { max-height:400px; opacity:1; margin-top:3px; margin-bottom:5px; }
+.sidebar-subnav li { margin:1px 0; }
+.sidebar-subnav-link { display:block; padding:7px 10px 7px 14px; border-radius:7px; color:#667085; font-size:14px; font-weight:500; transition:background .13s, color .13s; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.sidebar-subnav-link:hover { color:#1d2939; background:#f5f7fa; }
+.sidebar-subnav-link.active { color:#d92d20; background:#fef3f2; font-weight:600; }
+
+
 
 /* Dashboard module icons and task items */
 .metric-icon svg,.section-icon svg { display:block; }
