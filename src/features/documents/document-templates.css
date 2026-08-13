@@ -1,0 +1,287 @@
+/* Document Templates CSS — Clean Simplified Workflow Cards */
+.document-templates-page,
+.create-document-template-page {
+  width: 100%;
+  max-width: 100%;
+  padding: 0;
+}
+
+.document-templates-header,
+.create-template-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.document-templates-header h1,
+.create-template-header .page-main-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #101828;
+  margin: 6px 0 0 0;
+}
+
+.header-action-buttons {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.save-template-primary-btn {
+  background: #d92d20 !important;
+  border-color: #d92d20 !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  border-radius: 6px !important;
+}
+
+.save-template-primary-btn:hover {
+  background: #b42318 !important;
+  border-color: #b42318 !important;
+}
+
+.document-templates-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  gap: 12px;
+}
+
+.document-templates-card,
+.modern-card-container {
+  border-radius: 8px;
+  border: 1px solid #eaecf0;
+  box-shadow: 0 1px 3px rgba(16, 24, 40, 0.05);
+}
+
+.modern-card-container .ant-card-head {
+  border-bottom: 1px solid #f0f2f5;
+  padding: 12px 18px;
+  font-size: 15px;
+  font-weight: 700;
+  color: #101828;
+}
+
+.modern-card-container .ant-card-body {
+  padding: 18px 20px;
+}
+
+/* Modern Grid Container */
+.modern-template-grid-container {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.modern-template-left-column {
+  flex: 1;
+  min-width: 0;
+}
+
+.modern-template-right-column {
+  width: 400px;
+  flex: 0 0 400px;
+  position: sticky;
+  top: 16px;
+}
+
+@media (max-width: 1024px) {
+  .modern-template-grid-container {
+    flex-direction: column;
+  }
+  .modern-template-right-column {
+    width: 100%;
+    flex: 1;
+    position: static;
+  }
+}
+
+/* Paper Document Frame */
+.modern-paper-frame {
+  background: #ffffff;
+  border: 1px solid #e4e7ec;
+  border-radius: 8px;
+  padding: 32px 36px;
+  max-width: 680px;
+  margin: 0 auto;
+  box-shadow: 0 2px 6px rgba(16, 24, 40, 0.04);
+}
+
+.modern-paper-logo {
+  text-align: center;
+  margin-bottom: 14px;
+}
+
+.modern-paper-logo img {
+  height: 44px;
+  object-fit: contain;
+}
+
+.modern-paper-title {
+  font-size: 19px;
+  font-weight: 800;
+  color: #101828;
+  text-align: center;
+  margin-top: 0;
+  margin-bottom: 24px;
+  letter-spacing: 0.3px;
+}
+
+.modern-paper-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.paper-form-row {
+  display: flex;
+  align-items: flex-end;
+  font-size: 13.5px;
+  color: #344054;
+}
+
+.paper-label {
+  font-weight: 600;
+  margin-right: 8px;
+  white-space: nowrap;
+}
+
+.paper-dotted-line {
+  flex: 1;
+  border-bottom: 1px dotted #98a2b3;
+  margin-bottom: 3px;
+}
+
+.paper-form-two-cols {
+  display: flex;
+  gap: 20px;
+}
+
+.paper-green-action-btn {
+  background: #039855 !important;
+  border-color: #039855 !important;
+  color: #ffffff !important;
+  width: 100%;
+  height: 40px;
+  font-weight: 700;
+  font-size: 14px;
+  border-radius: 6px;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.05);
+}
+
+.paper-green-action-btn:hover {
+  background: #027a48 !important;
+  border-color: #027a48 !important;
+}
+
+/* Simplified Workflow Cards Matching User Image */
+.workflow-card-right .ant-card-body {
+  padding: 14px;
+}
+
+.add-step-primary-btn {
+  background: #039855 !important;
+  border-color: #039855 !important;
+  color: #fff !important;
+  font-weight: 600 !important;
+}
+
+.simplified-workflow-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-height: 540px;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+.simplified-step-card {
+  border: 1px solid #10b981;
+  border-radius: 8px;
+  padding: 12px 14px;
+  background: #ffffff;
+}
+
+.simplified-step-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.simplified-step-title {
+  display: flex;
+  align-items: center;
+  font-size: 14.5px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.step-user-icon {
+  margin-right: 8px;
+  font-size: 15px;
+  color: #4b5563;
+}
+
+.simplified-step-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.icon-btn-action {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  padding: 0;
+}
+
+.btn-add-user {
+  background: #ecfdf5 !important;
+  border: 1px solid #a7f3d0 !important;
+}
+
+.btn-delete-step {
+  background: #fef2f2 !important;
+  border: 1px solid #fecaca !important;
+}
+
+/* Gray Pill Item inside Step Card */
+.simplified-pills-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.simplified-gray-pill {
+  background: #f3f4f6;
+  border-radius: 4px;
+  padding: 7px 10px;
+  font-size: 12.5px;
+  color: #374151;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.pill-remove-icon {
+  color: #ef4444;
+  font-size: 13.5px;
+  cursor: pointer;
+  opacity: 0.8;
+  transition: opacity 0.15s ease;
+}
+
+.pill-remove-icon:hover {
+  opacity: 1;
+}
+
+.simplified-checkbox-row {
+  margin-top: 10px;
+}

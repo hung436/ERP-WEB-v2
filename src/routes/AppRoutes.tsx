@@ -8,7 +8,10 @@ import { CalendarPage } from '@/features/calendar/CalendarPage';
 import { ChatPage } from '@/features/chat/ChatPage';
 import { DashboardPage } from '@/features/dashboard/DashboardPage';
 import { DirectoryPage } from '@/features/directory/DirectoryPage';
+import { CreateDocumentTemplatePage } from '@/features/documents/CreateDocumentTemplatePage';
 import { DocumentsPage } from '@/features/documents/DocumentsPage';
+import { DocumentStatisticsPage } from '@/features/documents/DocumentStatisticsPage';
+import { DocumentTemplatesPage } from '@/features/documents/DocumentTemplatesPage';
 import { MailPage } from '@/features/mail/MailPage';
 import { NotFoundPage } from '@/features/not-found/NotFoundPage';
 import { TasksPage } from '@/features/tasks/TasksPage';
@@ -31,6 +34,10 @@ export function AppRoutes() {
           <Route index element={<DashboardPage />} />
           <Route path="tasks" element={<TasksPage />} />
           <Route path="documents" element={<DocumentsPage />} />
+          <Route path="documents/templates" element={<DocumentTemplatesPage />} />
+          <Route path="documents/templates/create" element={<CreateDocumentTemplatePage />} />
+          <Route path="documents/templates/edit/:id" element={<CreateDocumentTemplatePage />} />
+          <Route path="documents/statistics" element={<DocumentStatisticsPage />} />
           <Route path="evaluations" element={<EvaluationsPage />} />
           <Route path="personnel/list" element={<PersonnelListPage />} />
           <Route path="personnel/management" element={<PersonnelManagementPage />} />

@@ -176,6 +176,12 @@ export interface DocumentTemplate {
 
 export type WorkflowStepActionType = 'process' | 'notify_only';
 
+export interface WorkflowStepAssignee {
+  id: string;
+  positionName: string;
+  departmentName: string;
+}
+
 export interface TemplateWorkflowStep {
   stepIndex: number;
   positionName: string;
@@ -183,6 +189,7 @@ export interface TemplateWorkflowStep {
   roleName: string;
   actionType?: WorkflowStepActionType; // Step 2+: 'process' | 'notify_only'
   continueOnReject?: boolean; // Step 2+: boolean
+  assignees?: WorkflowStepAssignee[];
 }
 
 export interface CustomDocumentTemplateItem {

@@ -18,7 +18,16 @@ interface NavItem {
 const navItems: NavItem[] = [
   { path: '/', module: 'home', label: 'Trang chủ' },
   { path: '/tasks', module: 'tasks', label: 'Công việc' },
-  { path: '/documents', module: 'documents', label: 'Tài liệu' },
+  {
+    path: '/documents',
+    module: 'documents',
+    label: 'Tài liệu',
+    children: [
+      { path: '/documents', label: 'Danh sách tài liệu' },
+      { path: '/documents/templates', label: 'Tài liệu mẫu' },
+      { path: '/documents/statistics', label: 'Thống kê' },
+    ],
+  },
   { path: '/evaluations', module: 'evaluations', label: 'Đánh giá lao động' },
   {
     path: '/personnel/list',
