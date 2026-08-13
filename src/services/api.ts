@@ -2,7 +2,8 @@ import { mockRequest } from '@/services/mockApi';
 import type { Announcement, CalendarEvent, ChatAttachment, ChatConversation, ChatMember, ChatMessage, ChatReply, DashboardSummary, DirectoryContact, DocumentSubmission, DocumentTemplate, MailAttachment, MailComposePayload, MailItem, MailReply, Task, User } from '@/types/domain';
 import type { ExpertRecord, WorkspaceFile, WorkspaceRecord } from '@/types/extended';
 import type { EvaluationPeriod, EvaluationSheet, EvaluationSummary } from '@/types/evaluation';
-import type { CreatePersonnelPayload, PersonalProfile, PersonnelRecordItem } from '@/types/personnel';
+import type { CreatePersonnelPayload, PersonalProfile, PersonnelRecordItem, PositionTitleItem, ResignedEmployeeItem, SpecialtyItem, UnitPositionMapping, WorkUnitItem } from '@/types/personnel';
+
 
 export const authApi = {
   login: (username: string, password: string) => mockRequest<{ token: string; user: User }>('/api/auth/login', { method: 'POST', body: { username, password } }),
@@ -92,3 +93,32 @@ export const evaluationApi = {
   detail: (id: string) => mockRequest<EvaluationSheet>(`/api/evaluations/sheets/${id}`),
   save: (sheet: EvaluationSheet, action: 'save' | 'submit' | 'approve' = 'save') => mockRequest<EvaluationSheet>(`/api/evaluations/sheets/${sheet.id}`, { method: 'POST', body: { groups: sheet.groups, action } }),
 };
+
+export const personnelManagementApi = {
+  units: {
+    list: (query = '') => mockRequest<WorkUnitItem[]>(`/api/personnel/management/units${query}`),
+    save: (payload: Partial<WorkUnitItem>) => mockRequest<{ success: boolean; message: string }>('/api/personnel/management/units', { method: 'POST', body: payload }),
+    delete: (id: string) => mockRequest<{ success: boolean; message: string }>(`/api/personnel/management/units/${id}`, { method: 'DELETE' }),
+  },
+  positions: {
+    list: (query = '') => mockRequest<PositionTitleItem[]>(`/api/personnel/management/positions${query}`),
+    save: (payload: Partial<PositionTitleItem>) => mockRequest<{ success: boolean; message: string }>('/api/personnel/management/positions', { method: 'POST', body: payload }),
+    delete: (id: string) => mockRequest<{ success: boolean; message: string }>(`/api/personnel/management/positions/${id}`, { method: 'DELETE' }),
+  },
+  specialties: {
+    list: (query = '') => mockRequest<SpecialtyItem[]>(`/api/personnel/management/specialties${query}`),
+    save: (payload: Partial<SpecialtyItem>) => mockRequest<{ success: boolean; message: string }>('/api/personnel/management/specialties', { method: 'POST', body: payload }),
+    delete: (id: string) => mockRequest<{ success: boolean; message: string }>(`/api/personnel/management/specialties/${id}`, { method: 'DELETE' }),
+  },
+  mappings: {
+    list: (query = '') => mockRequest<UnitPositionMapping[]>(`/api/personnel/management/mappings${query}`),
+    save: (payload: Partial<UnitPositionMapping>) => mockRequest<{ success: boolean; message: string }>('/api/personnel/management/mappings', { method: 'POST', body: payload }),
+    delete: (id: string) => mockRequest<{ success: boolean; message: string }>(`/api/personnel/management/mappings/${id}`, { method: 'DELETE' }),
+  },
+  resigned: {
+    list: (query = '') => mockRequest<ResignedEmployeeItem[]>(`/api/personnel/management/resigned${query}`),
+    save: (payload: Partial<ResignedEmployeeItem>) => mockRequest<{ success: boolean; message: string }>('/api/personnel/management/resigned', { method: 'POST', body: payload }),
+    delete: (id: string) => mockRequest<{ success: boolean; message: string }>(`/api/personnel/management/resigned/${id}`, { method: 'DELETE' }),
+  },
+};
+

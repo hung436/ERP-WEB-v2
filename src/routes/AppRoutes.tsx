@@ -16,6 +16,7 @@ import { EvaluationsPage } from '@/features/evaluations/EvaluationsPage';
 import { CreatePersonnelPage } from '@/features/personnel/CreatePersonnelPage';
 import { PersonnelChangeRequestsPage } from '@/features/personnel/PersonnelChangeRequestsPage';
 import { PersonnelListPage } from '@/features/personnel/PersonnelListPage';
+import { PersonnelManagementPage } from '@/features/personnel/PersonnelManagementPage';
 import { PersonnelProfilePage } from '@/features/personnel/PersonnelProfilePage';
 import { AppLayout } from '@/layouts/AppLayout';
 
@@ -30,7 +31,9 @@ export function AppRoutes() {
           <Route path="documents" element={<DocumentsPage />} />
           <Route path="evaluations" element={<EvaluationsPage />} />
           <Route path="personnel/list" element={<PersonnelListPage />} />
+          <Route path="personnel/management" element={<PersonnelManagementPage />} />
           <Route path="personnel/change-requests" element={<PersonnelChangeRequestsPage />} />
+
           <Route path="personnel/profile" element={<PersonnelProfilePage />} />
           <Route path="personnel/resume/:id" element={<PersonnelProfilePage />} />
           <Route path="personnel/create" element={<CreatePersonnelPage />} />

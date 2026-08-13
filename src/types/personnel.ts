@@ -180,3 +180,51 @@ export interface PersonnelChangeRequest {
   reviewedAt?: string;
   reviewComment?: string;
 }
+
+export type UnitTypeCategory = 'Chính quyền' | 'Đoàn, công đoàn' | 'Đảng';
+
+export interface WorkUnitItem {
+  id: string;
+  name: string;
+  address: string;
+  phone: string;
+  type: UnitTypeCategory;
+  personnelCount: number;
+  createdAt: string;
+}
+
+export interface PositionTitleItem {
+  id: string;
+  name: string;
+  unitType: UnitTypeCategory | 'Tất cả';
+  personnelCount: number;
+  createdAt: string;
+}
+
+export interface SpecialtyItem {
+  id: string;
+  name: string;
+  description: string;
+  personnelCount: number;
+  createdAt: string;
+}
+
+export interface UnitPositionMapping {
+  id: string;
+  unitId: string;
+  unitName: string;
+  positionId: string;
+  positionName: string;
+  createdAt: string;
+}
+
+export interface ResignedEmployeeItem {
+  id: string;
+  employeeCode: string;
+  fullName: string;
+  department: string;
+  reason: string;
+  resignationDate: string;
+  attachmentName: string;
+  attachmentUrl?: string;
+}

@@ -26,6 +26,7 @@ const navItems: NavItem[] = [
     label: 'Nhân sự',
     children: [
       { path: '/personnel/list', label: 'Danh sách hồ sơ' },
+      { path: '/personnel/management', label: 'Quản lý' },
       { path: '/personnel/change-requests', label: 'Yêu cầu thay đổi' },
       { path: '/personnel/profile', label: 'Hồ sơ cá nhân' },
       { path: '/personnel/create', label: 'Tạo hồ sơ mới' },
@@ -66,9 +67,14 @@ export function AppSidebar({ collapsed, onCollapse }: { collapsed: boolean; onCo
     onCollapse(true);
   };
 
-  // Toggle submenu open/closed WITHOUT collapsing the sidebar
+  // Toggle submenu open/closed; expand sidebar if currently collapsed
   const handleGroupClick = (path: string) => {
-    setOpenGroup((prev) => (prev === path ? null : path));
+    if (collapsed) {
+      onCollapse(false);
+      setOpenGroup(path);
+    } else {
+      setOpenGroup((prev) => (prev === path ? null : path));
+    }
   };
 
   return (

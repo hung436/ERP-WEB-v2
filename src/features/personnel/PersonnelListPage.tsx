@@ -1,4 +1,4 @@
-import { Avatar, Dropdown, Input, Select, Table, message } from 'antd';
+import { Avatar, Dropdown, Input, Select, Table, Tag, message } from 'antd';
 import type { MenuProps } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { useEffect, useState } from 'react';
@@ -15,14 +15,36 @@ const { Option } = Select;
 const departmentOptions = [
   'Ban Biên tập',
   'Ban Thư ký toà soạn',
+  'Ban Nội dung & Xuất bản',
   'Ban Công nghệ thông tin',
   'Ban Tài chính - Kế toán',
   'Ban Tổ chức - Nhân sự',
+  'Ban Kỹ thuật & Công nghệ',
+  'Ban Kinh tế - Xã hội',
   'Ban Quảng cáo & Phát hành',
   'Ban Thời sự - Chính trị',
   'Ban Vấn đề - Sự kiện',
   'Ban Văn hóa - Giải trí',
   'Ban Bạn đọc',
+  'Đoàn Thanh niên Báo Tuổi Trẻ',
+  'Công đoàn Báo Tuổi Trẻ',
+  'Đảng ủy Báo Tuổi Trẻ',
+];
+
+const positionOptions = [
+  'Tổng Biên tập',
+  'Phó Tổng Biên tập',
+  'Trưởng ban',
+  'Phó Trưởng ban',
+  'Phóng viên',
+  'Phóng viên cao cấp',
+  'Biên tập viên',
+  'Biên tập viên chính',
+  'Kế toán viên',
+  'Chuyên viên Nhân sự',
+  'Bí thư Đoàn Thanh niên',
+  'Chủ tịch Công đoàn',
+  'Bí thư Đảng ủy',
 ];
 
 const initials = (name: string) => name.split(' ').slice(-2).map((part) => part[0]).join('').toUpperCase();
@@ -64,8 +86,10 @@ function SimpleImportIcon() {
 export function PersonnelListPage() {
   const navigate = useNavigate();
 
-  const [searchText, setSearchText] = useState('');
+  const [searchName, setSearchName] = useState('');
   const [selectedDept, setSelectedDept] = useState<string>('');
+  const [selectedPos, setSelectedPos] = useState<string>('');
+  const [selectedProfileType, setSelectedProfileType] = useState<string>('');
 
   const [contextMenu, setContextMenu] = useState<{
     visible: boolean;
@@ -89,8 +113,10 @@ export function PersonnelListPage() {
 
   const buildQuery = () => {
     const params = new URLSearchParams();
-    if (searchText.trim()) params.set('search', searchText.trim());
+    if (searchName.trim()) params.set('search', searchName.trim());
     if (selectedDept) params.set('department', selectedDept);
+    if (selectedPos) params.set('position', selectedPos);
+    if (selectedProfileType) params.set('profileType', selectedProfileType);
     const q = params.toString();
     return q ? `?${q}` : '';
   };
@@ -194,9 +220,19 @@ export function PersonnelListPage() {
       dataIndex: 'profileType',
       key: 'profileType',
       width: 170,
-      render: (type?: string) => (
-        <span>Lý lịch {type || '2A'}</span>
-      ),
+      render: (type?: string) => {
+        const profileType = type || '2A';
+        const colorMap: Record<string, string> = {
+          '2A': 'blue',
+          '2B': 'purple',
+          '2C': 'orange',
+        };
+        return (
+          <Tag color={colorMap[profileType] || 'blue'} style={{ fontWeight: 600, fontSize: 13, borderRadius: 4, padding: '2px 10px' }}>
+            Lý lịch {profileType}
+          </Tag>
+        );
+      },
     },
   ];
 
@@ -241,12 +277,12 @@ export function PersonnelListPage() {
       </header>
 
       {/* Filter Toolbar */}
-      <div className="personnel-list-toolbar">
+      <div className="personnel-list-toolbar" style={{ display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'center' }}>
         <Input.Search
           allowClear
-          onSearch={(val) => setSearchText(val)}
-          placeholder="Tìm theo Họ và tên, Đơn vị công tác, Chức danh..."
-          style={{ maxWidth: 360 }}
+          onSearch={(val) => setSearchName(val)}
+          placeholder="Tìm kiếm theo Họ và tên..."
+          style={{ width: 260 }}
         />
         <Select
           allowClear
@@ -258,6 +294,28 @@ export function PersonnelListPage() {
           {departmentOptions.map((dept) => (
             <Option key={dept} value={dept}>{dept}</Option>
           ))}
+        </Select>
+        <Select
+          allowClear
+          onChange={(val) => setSelectedPos(val || '')}
+          placeholder="Tất cả Chức danh"
+          style={{ width: 200 }}
+          value={selectedPos || undefined}
+        >
+          {positionOptions.map((pos) => (
+            <Option key={pos} value={pos}>{pos}</Option>
+          ))}
+        </Select>
+        <Select
+          allowClear
+          onChange={(val) => setSelectedProfileType(val || '')}
+          placeholder="Tất cả Loại hồ sơ"
+          style={{ width: 170 }}
+          value={selectedProfileType || undefined}
+        >
+          <Option value="2A">Lý lịch 2A</Option>
+          <Option value="2B">Lý lịch 2B</Option>
+          <Option value="2C">Lý lịch 2C</Option>
         </Select>
       </div>
 
