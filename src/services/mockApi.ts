@@ -2,10 +2,10 @@ import { adminUser, announcements, calendarEvents, chatMembers, conversations, d
 import { cloudRecords, evaluationRecords, expertRecords, libraryRecords, meetingRecords, requestRecords } from '@/mocks/extendedFixtures';
 import { documentSubmissions, documentTemplates } from '@/mocks/documentFixtures';
 import { evaluationPeriods, evaluationSheets } from '@/mocks/evaluationFixtures';
-import { initialChangeRequests, initialPersonnelList, personalProfile } from '@/mocks/personnelFixtures';
+import { initialChangeRequests, initialPersonnelList, initialPositionTitles, initialResignedEmployees, initialSpecialties, initialUnitPositionMappings, initialWorkUnits, personalProfile } from '@/mocks/personnelFixtures';
 import type { Announcement, ApiResponse, ApiState, CalendarEvent, ChatAttachment, ChatConversation, ChatMessage, DashboardSummary, DirectoryContact, DocumentSubmission, MailComposePayload, MailItem, MailReply, Task, User } from '@/types/domain';
 import type { EvaluationSheet, EvaluationSummary } from '@/types/evaluation';
-import type { PersonnelChangeRequest, PersonnelRecordItem } from '@/types/personnel';
+import type { PositionTitleItem, PersonnelChangeRequest, PersonnelRecordItem, ResignedEmployeeItem, SpecialtyItem, UnitPositionMapping, WorkUnitItem } from '@/types/personnel';
 
 let activeUser: User = demoUser;
 let chatConversationStore: ChatConversation[] = conversations.map((item) => ({ ...item, members: [...item.members] }));
@@ -21,6 +21,12 @@ let workspaceActionSequence = 100;
 let evaluationSheetStore: EvaluationSheet[] = evaluationSheets.map((sheet) => ({ ...sheet, groups: sheet.groups.map((group) => ({ ...group, criteria: group.criteria.map((criterion) => ({ ...criterion })) })) }));
 let personnelRecordStore: PersonnelRecordItem[] = [...initialPersonnelList];
 let changeRequestsStore: PersonnelChangeRequest[] = [...initialChangeRequests];
+let workUnitsStore: WorkUnitItem[] = [...initialWorkUnits];
+let positionTitlesStore: PositionTitleItem[] = [...initialPositionTitles];
+let specialtiesStore: SpecialtyItem[] = [...initialSpecialties];
+let unitPositionMappingsStore: UnitPositionMapping[] = [...initialUnitPositionMappings];
+let resignedEmployeesStore: ResignedEmployeeItem[] = [...initialResignedEmployees];
+
 
 const wait = (milliseconds: number) => new Promise((resolve) => window.setTimeout(resolve, milliseconds));
 const normalizeSearch = (value: string) => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D').toLowerCase();
@@ -193,12 +199,16 @@ export async function mockRequest<T>(path: string, options?: { method?: string; 
   else if (pathname === '/api/personnel/list') {
     const search = normalizeSearch(url.searchParams.get('search')?.trim() ?? '');
     const department = url.searchParams.get('department') ?? '';
+    const position = url.searchParams.get('position') ?? '';
+    const profileType = url.searchParams.get('profileType') ?? '';
 
     data = personnelRecordStore.filter((item) => {
-      const searchable = normalizeSearch(`${item.fullName} ${item.penName ?? ''} ${item.department} ${item.position} ${item.specialty ?? ''}`);
-      const matchSearch = !search || searchable.includes(search);
-      const matchDept = !department || item.department === department;
-      return matchSearch && matchDept;
+      const nameSearchable = normalizeSearch(`${item.fullName} ${item.penName ?? ''}`);
+      const matchSearch = !search || nameSearchable.includes(search);
+      const matchDept = !department || item.department === department || item.assignments?.some((a) => a.department === department);
+      const matchPos = !position || item.position === position || item.assignments?.some((a) => a.position === position);
+      const matchType = !profileType || (item.profileType || '2A') === profileType;
+      return matchSearch && matchDept && matchPos && matchType;
     });
   }
   else if (pathname === '/api/personnel/create' && options?.method === 'POST') {
@@ -324,7 +334,204 @@ export async function mockRequest<T>(path: string, options?: { method?: string; 
       throw new Error('Không tìm thấy yêu cầu.');
     }
   }
+  else if (pathname === '/api/personnel/management/units') {
+    if (options?.method === 'POST') {
+      const body = options.body as Partial<WorkUnitItem>;
+      if (body.id) {
+        const index = workUnitsStore.findIndex((u) => u.id === body.id);
+        if (index !== -1) {
+          workUnitsStore[index] = { ...workUnitsStore[index], ...body } as WorkUnitItem;
+          data = { success: true, message: 'Đã cập nhật Đơn vị công tác thành công.' };
+        } else throw new Error('Không tìm thấy đơn vị.');
+      } else {
+        const newUnit: WorkUnitItem = {
+          id: `unit-${Date.now()}`,
+          name: body.name || 'Đơn vị mới',
+          address: body.address || '60A Hoàng Văn Thụ, P.9, Q. Phú Nhuận, TP.HCM',
+          phone: body.phone || '028 3997 3800',
+          type: body.type || 'Chính quyền',
+          personnelCount: body.personnelCount || 0,
+          createdAt: new Date().toISOString().slice(0, 10),
+        };
+        workUnitsStore = [newUnit, ...workUnitsStore];
+        data = { success: true, message: 'Đã thêm Đơn vị công tác mới thành công.' };
+      }
+    } else {
+      const search = normalizeSearch(url.searchParams.get('search')?.trim() ?? '');
+      const type = url.searchParams.get('type') ?? '';
+      data = workUnitsStore
+        .map((u) => {
+          const count = personnelRecordStore.filter((r) => r.department === u.name || r.assignments?.some((a) => a.department === u.name)).length;
+          return { ...u, personnelCount: count || u.personnelCount };
+        })
+        .filter((u) => {
+          const matchSearch = !search || normalizeSearch(`${u.name} ${u.address} ${u.phone}`).includes(search);
+          const matchType = !type || u.type === type;
+          return matchSearch && matchType;
+        });
+    }
+  }
+  else if (pathname.startsWith('/api/personnel/management/units/') && options?.method === 'DELETE') {
+    const id = pathname.replace('/api/personnel/management/units/', '');
+    workUnitsStore = workUnitsStore.filter((u) => u.id !== id);
+    data = { success: true, message: 'Đã xóa Đơn vị công tác.' };
+  }
+  else if (pathname === '/api/personnel/management/positions') {
+    if (options?.method === 'POST') {
+      const body = options.body as Partial<PositionTitleItem>;
+      if (body.id) {
+        const index = positionTitlesStore.findIndex((p) => p.id === body.id);
+        if (index !== -1) {
+          positionTitlesStore[index] = { ...positionTitlesStore[index], ...body } as PositionTitleItem;
+          data = { success: true, message: 'Đã cập nhật Chức danh thành công.' };
+        } else throw new Error('Không tìm thấy chức danh.');
+      } else {
+        const newPos: PositionTitleItem = {
+          id: `pos-${Date.now()}`,
+          name: body.name || 'Chức danh mới',
+          unitType: body.unitType || 'Chính quyền',
+          personnelCount: 0,
+          createdAt: new Date().toISOString().slice(0, 10),
+        };
+        positionTitlesStore = [newPos, ...positionTitlesStore];
+        data = { success: true, message: 'Đã thêm Chức danh mới thành công.' };
+      }
+    } else {
+      const search = normalizeSearch(url.searchParams.get('search')?.trim() ?? '');
+      const unitType = url.searchParams.get('unitType') ?? '';
+      data = positionTitlesStore
+        .map((p) => {
+          const count = personnelRecordStore.filter((r) => r.position === p.name || r.assignments?.some((a) => a.position === p.name)).length;
+          return { ...p, personnelCount: count || p.personnelCount };
+        })
+        .filter((p) => {
+          const matchSearch = !search || normalizeSearch(p.name).includes(search);
+          const matchType = !unitType || p.unitType === unitType || p.unitType === 'Tất cả';
+          return matchSearch && matchType;
+        });
+    }
+  }
+  else if (pathname.startsWith('/api/personnel/management/positions/') && options?.method === 'DELETE') {
+    const id = pathname.replace('/api/personnel/management/positions/', '');
+    positionTitlesStore = positionTitlesStore.filter((p) => p.id !== id);
+    data = { success: true, message: 'Đã xóa Chức danh.' };
+  }
+  else if (pathname === '/api/personnel/management/specialties') {
+    if (options?.method === 'POST') {
+      const body = options.body as Partial<SpecialtyItem>;
+      if (body.id) {
+        const index = specialtiesStore.findIndex((s) => s.id === body.id);
+        if (index !== -1) {
+          specialtiesStore[index] = { ...specialtiesStore[index], ...body } as SpecialtyItem;
+          data = { success: true, message: 'Đã cập nhật Chuyên môn thành công.' };
+        } else throw new Error('Không tìm thấy chuyên môn.');
+      } else {
+        const newSpec: SpecialtyItem = {
+          id: `spec-${Date.now()}`,
+          name: body.name || 'Chuyên môn mới',
+          description: body.description || '',
+          personnelCount: 0,
+          createdAt: new Date().toISOString().slice(0, 10),
+        };
+        specialtiesStore = [newSpec, ...specialtiesStore];
+        data = { success: true, message: 'Đã thêm Chuyên môn mới thành công.' };
+      }
+    } else {
+      const search = normalizeSearch(url.searchParams.get('search')?.trim() ?? '');
+      data = specialtiesStore
+        .map((s) => {
+          const count = personnelRecordStore.filter((r) => r.specialty === s.name || r.notes?.includes(s.name) || r.assignments?.some((a) => a.specialty === s.name)).length;
+          return { ...s, personnelCount: count || s.personnelCount };
+        })
+        .filter((s) => !search || normalizeSearch(`${s.name} ${s.description}`).includes(search));
+    }
+  }
+  else if (pathname.startsWith('/api/personnel/management/specialties/') && options?.method === 'DELETE') {
+    const id = pathname.replace('/api/personnel/management/specialties/', '');
+    specialtiesStore = specialtiesStore.filter((s) => s.id !== id);
+    data = { success: true, message: 'Đã xóa Chuyên môn.' };
+  }
+  else if (pathname === '/api/personnel/management/mappings') {
+    if (options?.method === 'POST') {
+      const body = options.body as Partial<UnitPositionMapping>;
+      const unit = workUnitsStore.find((u) => u.id === body.unitId);
+      const pos = positionTitlesStore.find((p) => p.id === body.positionId);
+      if (body.id) {
+        const index = unitPositionMappingsStore.findIndex((m) => m.id === body.id);
+        if (index !== -1) {
+          unitPositionMappingsStore[index] = {
+            ...unitPositionMappingsStore[index],
+            unitId: body.unitId || unitPositionMappingsStore[index].unitId,
+            unitName: unit ? unit.name : body.unitName || unitPositionMappingsStore[index].unitName,
+            positionId: body.positionId || unitPositionMappingsStore[index].positionId,
+            positionName: pos ? pos.name : body.positionName || unitPositionMappingsStore[index].positionName,
+          };
+          data = { success: true, message: 'Đã cập nhật liên kết Đơn vị - Chức danh thành công.' };
+        } else throw new Error('Không tìm thấy liên kết.');
+      } else {
+        const newMap: UnitPositionMapping = {
+          id: `map-${Date.now()}`,
+          unitId: body.unitId || 'unit-1',
+          unitName: unit ? unit.name : body.unitName || 'Ban Biên tập',
+          positionId: body.positionId || 'pos-3',
+          positionName: pos ? pos.name : body.positionName || 'Trưởng ban',
+          createdAt: new Date().toISOString().slice(0, 10),
+        };
+        unitPositionMappingsStore = [newMap, ...unitPositionMappingsStore];
+        data = { success: true, message: 'Đã thêm liên kết Đơn vị - Chức danh thành công.' };
+      }
+    } else {
+      const search = normalizeSearch(url.searchParams.get('search')?.trim() ?? '');
+      const unitId = url.searchParams.get('unitId') ?? '';
+      data = unitPositionMappingsStore.filter((m) => {
+        const matchSearch = !search || normalizeSearch(`${m.unitName} ${m.positionName}`).includes(search);
+        const matchUnit = !unitId || m.unitId === unitId;
+        return matchSearch && matchUnit;
+      });
+    }
+  }
+  else if (pathname.startsWith('/api/personnel/management/mappings/') && options?.method === 'DELETE') {
+    const id = pathname.replace('/api/personnel/management/mappings/', '');
+    unitPositionMappingsStore = unitPositionMappingsStore.filter((m) => m.id !== id);
+    data = { success: true, message: 'Đã xóa liên kết Đơn vị - Chức danh.' };
+  }
+  else if (pathname === '/api/personnel/management/resigned') {
+    if (options?.method === 'POST') {
+      const body = options.body as Partial<ResignedEmployeeItem>;
+      if (body.id) {
+        const index = resignedEmployeesStore.findIndex((r) => r.id === body.id);
+        if (index !== -1) {
+          resignedEmployeesStore[index] = {
+            ...resignedEmployeesStore[index],
+            ...body,
+          } as ResignedEmployeeItem;
+          data = { success: true, message: 'Đã cập nhật thông tin nhân viên nghỉ việc thành công.' };
+        } else throw new Error('Không tìm thấy bản ghi nghỉ việc.');
+      } else {
+        const newResigned: ResignedEmployeeItem = {
+          id: `res-${Date.now()}`,
+          employeeCode: body.employeeCode || `NV-${Date.now().toString().slice(-4)}`,
+          fullName: body.fullName || 'Nhân viên mới',
+          department: body.department || 'Ban Biên tập',
+          reason: body.reason || 'Nghỉ việc theo nguyện vọng',
+          resignationDate: body.resignationDate || new Date().toISOString().slice(0, 10),
+          attachmentName: body.attachmentName || 'Quyet_Dinh_Nghi_Viec.pdf',
+        };
+        resignedEmployeesStore = [newResigned, ...resignedEmployeesStore];
+        data = { success: true, message: 'Đã ghi nhận nhân viên nghỉ việc thành công.' };
+      }
+    } else {
+      const search = normalizeSearch(url.searchParams.get('search')?.trim() ?? '');
+      data = resignedEmployeesStore.filter((r) => !search || normalizeSearch(`${r.fullName} ${r.employeeCode} ${r.department} ${r.reason}`).includes(search));
+    }
+  }
+  else if (pathname.startsWith('/api/personnel/management/resigned/') && options?.method === 'DELETE') {
+    const id = pathname.replace('/api/personnel/management/resigned/', '');
+    resignedEmployeesStore = resignedEmployeesStore.filter((r) => r.id !== id);
+    data = { success: true, message: 'Đã xóa ghi nhận nghỉ việc.' };
+  }
   else if (pathname.startsWith('/api/personnel/')) {
+
     const id = pathname.replace('/api/personnel/', '');
     const record = personnelRecordStore.find((item) => item.id === id);
     if (record) {

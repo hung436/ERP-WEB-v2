@@ -22,12 +22,12 @@ export function AppLayout() {
   const unreadAnnouncements = (announcementsState.data ?? []).filter((item) => !item.isRead).length;
   const navigate = useNavigate();
   const location = useLocation();
-  const isPersonnelProfile = location.pathname.startsWith('/personnel/profile');
+  const isPersonnelPage = location.pathname.startsWith('/personnel');
 
   useEffect(() => {
-    document.body.classList.toggle('personnel-page-open', isPersonnelProfile);
+    document.body.classList.toggle('personnel-page-open', isPersonnelPage);
     return () => document.body.classList.remove('personnel-page-open');
-  }, [isPersonnelProfile]);
+  }, [isPersonnelPage]);
 
   const startContactChat = async (contact: DirectoryContact) => {
     setContactChatting(true);
@@ -74,7 +74,7 @@ export function AppLayout() {
 
   return <Layout className="min-h-screen">
     <AppSidebar collapsed={collapsed} onCollapse={setCollapsed} />
-    <Layout className={`${collapsed ? 'app-frame app-frame-collapsed' : 'app-frame'}${isPersonnelProfile ? ' app-frame-personnel' : ''}`}>
+    <Layout className={collapsed ? 'app-frame app-frame-collapsed' : 'app-frame'}>
       <header className="app-header">
         <HeaderDirectorySearch onSelect={setSelectedContact} />
         <div className="app-header-account">
@@ -96,7 +96,7 @@ export function AppLayout() {
           </Dropdown>
         </div>
       </header>
-      <main className={`app-content${isPersonnelProfile ? ' app-content-personnel' : ''}`}><Outlet /></main>
+      <main className="app-content"><Outlet /></main>
       <ContactQuickView chatting={contactChatting} contact={selectedContact} onChat={startContactChat} onClose={() => { setSelectedContact(null); setContactChatting(false); }} />
     </Layout>
   </Layout>;

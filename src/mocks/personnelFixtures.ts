@@ -328,3 +328,55 @@ export const initialChangeRequests: import('@/types/personnel').PersonnelChangeR
     snapshotPdfName: 'Ly_Lich_2C_NV2026104_v1.pdf',
   },
 ];
+
+export const initialWorkUnits = [
+  { id: 'unit-1', name: 'Ban Biên tập', address: '60A Hoàng Văn Thụ, P.9, Q. Phú Nhuận, TP.HCM', phone: '028 3997 3838', type: 'Chính quyền' as const, personnelCount: 18, createdAt: '2024-01-15' },
+  { id: 'unit-2', name: 'Ban Nội dung & Xuất bản', address: '60A Hoàng Văn Thụ, P.9, Q. Phú Nhuận, TP.HCM', phone: '028 3997 3839', type: 'Chính quyền' as const, personnelCount: 42, createdAt: '2024-01-15' },
+  { id: 'unit-3', name: 'Ban Tài chính - Kế toán', address: '60A Hoàng Văn Thụ, P.9, Q. Phú Nhuận, TP.HCM', phone: '028 3997 3840', type: 'Chính quyền' as const, personnelCount: 12, createdAt: '2024-01-15' },
+  { id: 'unit-4', name: 'Ban Kỹ thuật & Công nghệ', address: '60A Hoàng Văn Thụ, P.9, Q. Phú Nhuận, TP.HCM', phone: '028 3997 3841', type: 'Chính quyền' as const, personnelCount: 15, createdAt: '2024-02-01' },
+  { id: 'unit-5', name: 'Ban Kinh tế - Xã hội', address: '60A Hoàng Văn Thụ, P.9, Q. Phú Nhuận, TP.HCM', phone: '028 3997 3842', type: 'Chính quyền' as const, personnelCount: 24, createdAt: '2024-02-01' },
+  { id: 'unit-6', name: 'Đoàn Thanh niên Báo Tuổi Trẻ', address: '60A Hoàng Văn Thụ, P.9, Q. Phú Nhuận, TP.HCM', phone: '028 3997 3850', type: 'Đoàn, công đoàn' as const, personnelCount: 8, createdAt: '2024-01-20' },
+  { id: 'unit-7', name: 'Công đoàn Báo Tuổi Trẻ', address: '60A Hoàng Văn Thụ, P.9, Q. Phú Nhuận, TP.HCM', phone: '028 3997 3851', type: 'Đoàn, công đoàn' as const, personnelCount: 6, createdAt: '2024-01-20' },
+  { id: 'unit-8', name: 'Đảng ủy Báo Tuổi Trẻ', address: '60A Hoàng Văn Thụ, P.9, Q. Phú Nhuận, TP.HCM', phone: '028 3997 3860', type: 'Đảng' as const, personnelCount: 5, createdAt: '2024-01-10' },
+];
+
+export const initialPositionTitles = [
+  { id: 'pos-1', name: 'Tổng Biên tập', unitType: 'Chính quyền' as const, personnelCount: 1, createdAt: '2024-01-01' },
+  { id: 'pos-2', name: 'Phó Tổng Biên tập', unitType: 'Chính quyền' as const, personnelCount: 3, createdAt: '2024-01-01' },
+  { id: 'pos-3', name: 'Trưởng ban', unitType: 'Chính quyền' as const, personnelCount: 8, createdAt: '2024-01-15' },
+  { id: 'pos-4', name: 'Phó Trưởng ban', unitType: 'Chính quyền' as const, personnelCount: 14, createdAt: '2024-01-15' },
+  { id: 'pos-5', name: 'Phóng viên cao cấp', unitType: 'Chính quyền' as const, personnelCount: 22, createdAt: '2024-01-15' },
+  { id: 'pos-6', name: 'Biên tập viên chính', unitType: 'Chính quyền' as const, personnelCount: 35, createdAt: '2024-01-15' },
+  { id: 'pos-7', name: 'Bí thư Đoàn Thanh niên', unitType: 'Đoàn, công đoàn' as const, personnelCount: 1, createdAt: '2024-02-01' },
+  { id: 'pos-8', name: 'Chủ tịch Công đoàn', unitType: 'Đoàn, công đoàn' as const, personnelCount: 1, createdAt: '2024-02-01' },
+  { id: 'pos-9', name: 'Bí thư Đảng ủy', unitType: 'Đảng' as const, personnelCount: 1, createdAt: '2024-01-10' },
+  { id: 'pos-10', name: 'Chuyên viên Nhân sự', unitType: 'Tất cả' as const, personnelCount: 6, createdAt: '2024-02-10' },
+];
+
+export const initialSpecialties = [
+  { id: 'spec-1', name: 'Y tế & An toàn sức khỏe', description: 'Phụ trách công tác y tế cơ quan, chăm sóc sức khỏe cán bộ nhân viên', personnelCount: 4, createdAt: '2024-01-10' },
+  { id: 'spec-2', name: 'Tổ giám sát an toàn cơ quan', description: 'Đảm bảo an ninh trật tự, giám sát an toàn lao động và phòng chống cháy nổ', personnelCount: 6, createdAt: '2024-01-15' },
+  { id: 'spec-3', name: 'Kế toán phát hành & Kho vận', description: 'Quản lý tài chính phát hành báo chí, đối soát và theo dõi mạng lưới phân phối', personnelCount: 8, createdAt: '2024-01-15' },
+  { id: 'spec-4', name: 'Nhiếp ảnh & Báo chí thị giác', description: 'Sản xuất ảnh phóng sự, đồ họa báo chí và nội dung thị giác đa phương tiện', personnelCount: 12, createdAt: '2024-02-01' },
+  { id: 'spec-5', name: 'IT & Quản trị Hệ thống ERP', description: 'Quản trị hạ tầng công nghệ, vận hành ERP nội bộ và an ninh mạng', personnelCount: 10, createdAt: '2024-02-01' },
+  { spec_id: 'spec-6', id: 'spec-6', name: 'Truyền hình & Sản xuất Video', description: 'Quay phim, dựng phim và sản xuất các bản tin video đa nền tảng', personnelCount: 9, createdAt: '2024-02-10' },
+];
+
+export const initialUnitPositionMappings = [
+  { id: 'map-1', unitId: 'unit-1', unitName: 'Ban Biên tập', positionId: 'pos-1', positionName: 'Tổng Biên tập', createdAt: '2024-01-01' },
+  { id: 'map-2', unitId: 'unit-1', unitName: 'Ban Biên tập', positionId: 'pos-2', positionName: 'Phó Tổng Biên tập', createdAt: '2024-01-01' },
+  { id: 'map-3', unitId: 'unit-2', unitName: 'Ban Nội dung & Xuất bản', positionId: 'pos-3', positionName: 'Trưởng ban', createdAt: '2024-01-15' },
+  { id: 'map-4', unitId: 'unit-2', unitName: 'Ban Nội dung & Xuất bản', positionId: 'pos-5', positionName: 'Phóng viên cao cấp', createdAt: '2024-01-15' },
+  { id: 'map-5', unitId: 'unit-3', unitName: 'Ban Tài chính - Kế toán', positionId: 'pos-3', positionName: 'Trưởng ban', createdAt: '2024-01-15' },
+  { id: 'map-6', unitId: 'unit-4', unitName: 'Ban Kỹ thuật & Công nghệ', positionId: 'pos-4', positionName: 'Phó Trưởng ban', createdAt: '2024-02-01' },
+  { id: 'map-7', unitId: 'unit-6', unitName: 'Đoàn Thanh niên Báo Tuổi Trẻ', positionId: 'pos-7', positionName: 'Bí thư Đoàn Thanh niên', createdAt: '2024-02-01' },
+  { id: 'map-8', unitId: 'unit-8', unitName: 'Đảng ủy Báo Tuổi Trẻ', positionId: 'pos-9', positionName: 'Bí thư Đảng ủy', createdAt: '2024-01-10' },
+];
+
+export const initialResignedEmployees = [
+  { id: 'res-1', employeeCode: 'NV-2023-088', fullName: 'Vũ Hoàng Nam', department: 'Ban Kinh tế - Xã hội', reason: 'Chuyển công tác theo nguyện vọng cá nhân', resignationDate: '15/12/2025', attachmentName: 'Quyet_Dinh_Nghi_Viec_VuHoangNam.pdf' },
+  { id: 'res-2', employeeCode: 'NV-2022-045', fullName: 'Trần Thị Thu Hà', department: 'Ban Tài chính - Kế toán', reason: 'Nghỉ hưởng chế độ hưu trí theo quy định', resignationDate: '01/11/2025', attachmentName: 'Quyet_Dinh_Huu_Tri_TranThuHa.pdf' },
+  { id: 'res-3', employeeCode: 'NV-2024-012', fullName: 'Đặng Quốc Bảo', department: 'Ban Kỹ thuật & Công nghệ', reason: 'Đi học tập chuyên sâu tại nước ngoài', resignationDate: '20/10/2025', attachmentName: 'Don_Xin_Thoi_Viec_DangQuocBao.pdf' },
+  { id: 'res-4', employeeCode: 'NV-2021-099', fullName: 'Ngô Thanh Sơn', department: 'Ban Nội dung & Xuất bản', reason: 'Thay đổi định hướng nghề nghiệp', resignationDate: '30/08/2025', attachmentName: 'Quyet_Dinh_Thoi_Viec_NgoThanhSon.pdf' },
+];
+
