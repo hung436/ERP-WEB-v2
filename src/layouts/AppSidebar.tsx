@@ -28,7 +28,7 @@ const navItems: NavItem[] = [
       { path: '/personnel/list', label: 'Danh sách hồ sơ' },
       { path: '/personnel/management', label: 'Quản lý' },
       { path: '/personnel/change-requests', label: 'Yêu cầu thay đổi' },
-      { path: '/personnel/profile', label: 'Hồ sơ cá nhân' },
+      { path: '/personnel/profile', label: 'Lý lịch cá nhân' },
       { path: '/personnel/create', label: 'Tạo hồ sơ mới' },
     ],
   },
