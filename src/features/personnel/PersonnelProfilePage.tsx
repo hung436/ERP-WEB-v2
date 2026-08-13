@@ -6,7 +6,6 @@ import { useParams } from 'react-router-dom';
 
 import { ContentSkeleton, EmptyState, ErrorState } from '@/components/AsyncState';
 import { ModuleIcon } from '@/components/ModuleIcon';
-import { AccountSettingsTab } from '@/features/personnel/components/AccountSettingsTab';
 import { ChangeHistoryDrawer } from '@/features/personnel/components/ChangeHistoryDrawer';
 import { RequestChangeModal } from '@/features/personnel/components/RequestChangeModal';
 import { useAsyncData } from '@/hooks/useAsyncData';
@@ -310,7 +309,6 @@ function ProfileDocument({ profile }: { profile: PersonalProfile }) {
 
 export function PersonnelProfilePage() {
   const { id } = useParams<{ id?: string }>();
-  const [activeTab, setActiveTab] = useState<'profile' | 'account'>('profile');
 
   const state = useAsyncData(async () => {
     if (id) {
@@ -324,28 +322,7 @@ export function PersonnelProfilePage() {
 
   return (
     <div className="module-page personnel-profile-page">
-      {!id && (
-        <div style={{ maxWidth: 1440, margin: '0 auto 16px', display: 'flex', gap: 12 }}>
-          <Button
-            onClick={() => setActiveTab('profile')}
-            type={activeTab === 'profile' ? 'primary' : 'default'}
-            danger={activeTab === 'profile'}
-          >
-            Sơ yếu lý lịch (Mẫu 2A)
-          </Button>
-          <Button
-            onClick={() => setActiveTab('account')}
-            type={activeTab === 'account' ? 'primary' : 'default'}
-            danger={activeTab === 'account'}
-          >
-            Cài đặt tài khoản
-          </Button>
-        </div>
-      )}
-
-      {activeTab === 'account' && !id ? (
-        <AccountSettingsTab />
-      ) : state.loading ? (
+      {state.loading ? (
         <ContentSkeleton rows={12} />
       ) : state.error ? (
         <ErrorState message={state.error} onRetry={state.reload} />
