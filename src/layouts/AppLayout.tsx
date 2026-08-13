@@ -74,7 +74,7 @@ export function AppLayout() {
 
   return <Layout className="min-h-screen">
     <AppSidebar collapsed={collapsed} onCollapse={setCollapsed} />
-    <Layout className={collapsed ? 'app-frame app-frame-collapsed' : 'app-frame'}>
+    <Layout className={`app-frame${collapsed ? ' app-frame-collapsed' : ''}${isPersonnelPage ? ' app-frame-personnel' : ''}`}>
       <header className="app-header">
         <HeaderDirectorySearch onSelect={setSelectedContact} />
         <div className="app-header-account">
@@ -96,7 +96,7 @@ export function AppLayout() {
           </Dropdown>
         </div>
       </header>
-      <main className="app-content"><Outlet /></main>
+      <main className={isPersonnelPage ? 'app-content app-content-personnel' : 'app-content'}><Outlet /></main>
       <ContactQuickView chatting={contactChatting} contact={selectedContact} onChat={startContactChat} onClose={() => { setSelectedContact(null); setContactChatting(false); }} />
     </Layout>
   </Layout>;

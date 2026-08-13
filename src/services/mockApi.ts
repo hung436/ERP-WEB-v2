@@ -3,9 +3,9 @@ import { cloudRecords, evaluationRecords, expertRecords, libraryRecords, meeting
 import { documentSubmissions, documentTemplates } from '@/mocks/documentFixtures';
 import { evaluationPeriods, evaluationSheets } from '@/mocks/evaluationFixtures';
 import { initialChangeRequests, initialPersonnelList, initialPositionTitles, initialResignedEmployees, initialSpecialties, initialUnitPositionMappings, initialWorkUnits, personalProfile } from '@/mocks/personnelFixtures';
-import type { Announcement, ApiResponse, ApiState, CalendarEvent, ChatAttachment, ChatConversation, ChatMessage, DashboardSummary, DirectoryContact, DocumentSubmission, MailComposePayload, MailItem, MailReply, Task, User } from '@/types/domain';
+import type { Announcement, ApiResponse, ApiState, CalendarEvent, ChatAttachment, ChatConversation, ChatMessage, CustomDocumentTemplateItem, DashboardSummary, DirectoryContact, DocumentSubmission, MailComposePayload, MailItem, MailReply, Task, User } from '@/types/domain';
 import type { EvaluationSheet, EvaluationSummary } from '@/types/evaluation';
-import type { PositionTitleItem, PersonnelChangeRequest, PersonnelRecordItem, ResignedEmployeeItem, SpecialtyItem, UnitPositionMapping, WorkUnitItem } from '@/types/personnel';
+import type { PositionTitleItem, PersonnelChangeRequest, PersonnelRecordItem, PermissionAssignmentItem, PermissionGroupItem, PermissionItem, ResignedEmployeeItem, SpecialtyItem, UnitPositionMapping, WorkUnitItem } from '@/types/personnel';
 
 let activeUser: User = demoUser;
 let chatConversationStore: ChatConversation[] = conversations.map((item) => ({ ...item, members: [...item.members] }));
@@ -26,6 +26,94 @@ let positionTitlesStore: PositionTitleItem[] = [...initialPositionTitles];
 let specialtiesStore: SpecialtyItem[] = [...initialSpecialties];
 let unitPositionMappingsStore: UnitPositionMapping[] = [...initialUnitPositionMappings];
 let resignedEmployeesStore: ResignedEmployeeItem[] = [...initialResignedEmployees];
+
+let permissionItemsStore: PermissionItem[] = [
+  { id: 'perm-1', name: 'Xem danh sách hồ sơ nhân sự', uri: '/api/personnel/list', method: 'GET', serviceName: 'personnel-service', createdAt: '2026-01-10' },
+  { id: 'perm-2', name: 'Tạo mới hồ sơ cán bộ', uri: '/api/personnel/create', method: 'POST', serviceName: 'personnel-service', createdAt: '2026-01-10' },
+  { id: 'perm-3', name: 'Cập nhật sơ yếu lý lịch', uri: '/api/personnel/profile', method: 'PUT', serviceName: 'personnel-service', createdAt: '2026-01-10' },
+  { id: 'perm-4', name: 'Duyệt yêu cầu thay đổi thông tin', uri: '/api/personnel/change-requests/approve', method: 'POST', serviceName: 'personnel-service', createdAt: '2026-01-10' },
+  { id: 'perm-5', name: 'Xem danh sách đặt xe & phòng họp', uri: '/api/booking/list', method: 'GET', serviceName: 'booking-service', createdAt: '2026-01-12' },
+  { id: 'perm-6', name: 'Đăng ký đặt xe & phòng họp', uri: '/api/booking/create', method: 'POST', serviceName: 'booking-service', createdAt: '2026-01-12' },
+  { id: 'perm-7', name: 'Duyệt đăng ký lịch xe Công đoàn', uri: '/api/booking/approve', method: 'POST', serviceName: 'booking-service', createdAt: '2026-01-12' },
+  { id: 'perm-8', name: 'Khởi tạo quy trình phê duyệt', uri: '/api/workflow/start', method: 'POST', serviceName: 'workflow-service', createdAt: '2026-01-15' },
+  { id: 'perm-9', name: 'Phê duyệt hồ sơ quy trình', uri: '/api/workflow/approve', method: 'POST', serviceName: 'workflow-service', createdAt: '2026-01-15' },
+  { id: 'perm-10', name: 'Xóa tài liệu lưu trữ', uri: '/api/documents/archive', method: 'DELETE', serviceName: 'document-service', createdAt: '2026-01-18' },
+];
+
+let permissionGroupsStore: PermissionGroupItem[] = [
+  { id: 'group-1', code: '[PROFILE]', name: '[PROFILE] Quyền Nhân sự', description: 'Nhóm quyền quản lý, duyệt và trích xuất sơ yếu lý lịch nhân sự', permissionIds: ['perm-1', 'perm-2', 'perm-3', 'perm-4'], createdAt: '2026-01-10' },
+  { id: 'group-2', code: '[BOOKING]', name: '[BOOKING] Quyền Tổ trưởng Công đoàn', description: 'Nhóm quyền duyệt và quản lý lịch họp, đặt xe dành cho Tổ trưởng Công đoàn', permissionIds: ['perm-5', 'perm-6', 'perm-7'], createdAt: '2026-01-12' },
+  { id: 'group-3', code: '[WORKFLOW]', name: '[WORKFLOW] Quyền Trưởng ban', description: 'Nhóm quyền khởi tạo và phê duyệt quy trình xử lý công văn, bài viết', permissionIds: ['perm-8', 'perm-9'], createdAt: '2026-01-15' },
+  { id: 'group-4', code: '[DOCUMENT]', name: '[DOCUMENT] Quyền Văn thư Toà soạn', description: 'Nhóm quyền tiếp nhận, quản lý và lưu trữ tài liệu công văn', permissionIds: ['perm-5', 'perm-10'], createdAt: '2026-01-18' },
+];
+
+let permissionAssignmentsStore: PermissionAssignmentItem[] = [
+  { id: 'assign-1', unitId: 'unit-5', unitName: 'Ban Tổ chức - Nhân sự', positionId: 'pos-3', positionName: 'Trưởng ban', specialtyId: 'spec-3', specialtyName: 'Quản trị nhân sự & Đào tạo', groupId: 'group-1', groupName: '[PROFILE] Quyền Nhân sự', createdAt: '2026-01-10' },
+  { id: 'assign-2', unitId: 'unit-2', unitName: 'Ban Thư ký toà soạn', positionId: 'pos-3', positionName: 'Trưởng ban', specialtyId: 'spec-1', specialtyName: 'Biên tập & Xuất bản tin bài', groupId: 'group-3', groupName: '[WORKFLOW] Quyền Trưởng ban', createdAt: '2026-01-15' },
+  { id: 'assign-3', unitId: 'unit-1', unitName: 'Ban Biên tập', positionId: 'pos-1', positionName: 'Tổng Biên tập', specialtyId: 'spec-1', specialtyName: 'Biên tập & Xuất bản tin bài', groupId: 'group-3', groupName: '[WORKFLOW] Quyền Trưởng ban', createdAt: '2026-01-15' },
+  { id: 'assign-4', unitId: 'unit-3', unitName: 'Công đoàn Báo Tuổi Trẻ', positionId: 'pos-4', positionName: 'Chủ tịch Công đoàn', specialtyId: 'spec-2', specialtyName: 'Y tế & An toàn sức khỏe', groupId: 'group-2', groupName: '[BOOKING] Quyền Tổ trưởng Công đoàn', createdAt: '2026-01-12' },
+];
+
+let customDocumentTemplatesStore: CustomDocumentTemplateItem[] = [
+  {
+    id: 'tpl-1',
+    category: 'Hành chính - Nhân sự',
+    name: 'Đơn xin nghỉ phép',
+    fileName: 'don_xin_nghi_phep.html',
+    fileContent: `<!DOCTYPE html>
+<html>
+<head><style>body { font-family: sans-serif; line-height: 1.6; padding: 20px; }</style></head>
+<body>
+  <h2 style="text-align: center;">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</h2>
+  <h3 style="text-align: center;">Độc lập - Tự do - Hạnh phúc</h3>
+  <h1 style="text-align: center; margin-top: 30px;">ĐƠN XIN NGHỈ PHÉP</h1>
+  <p><b>Kính gửi:</b> Ban Tổ chức - Nhân sự và Ban Biên tập</p>
+  <p>Tôi tên là: ..................................................... Chức danh: .....................................................</p>
+  <p>Đơn vị công tác: ......................................................................................................................</p>
+  <p>Xin được nghỉ phép từ ngày ...../...../2026 đến hết ngày ...../...../2026.</p>
+  <p>Lý do xin nghỉ: ........................................................................................................................</p>
+</body>
+</html>`,
+    steps: [
+      { stepIndex: 1, positionName: 'Trưởng ban', departmentName: 'Ban Tổ chức - Nhân sự', roleName: 'Người phê duyệt chính' },
+      { stepIndex: 2, positionName: 'Phó Tổng Biên tập', departmentName: 'Ban Biên tập', roleName: 'Người xem xét', actionType: 'process', continueOnReject: false },
+      { stepIndex: 3, positionName: 'Chuyên viên Nhân sự', departmentName: 'Ban Tổ chức - Nhân sự', roleName: 'Người theo dõi', actionType: 'notify_only', continueOnReject: true },
+    ],
+    createdAt: '2026-01-15',
+  },
+  {
+    id: 'tpl-2',
+    category: 'Tài chính - Kế toán',
+    name: 'Tờ trình phê duyệt kinh phí mua sắm',
+    fileName: 'to_trinh_kinh_phi_mua_sam.html',
+    fileContent: `<!DOCTYPE html>
+<html>
+<body>
+  <h2 style="text-align: center;">TỜ TRÌNH PHÊ DUYỆT KINH PHÍ MUA SẮM THIẾT BỊ</h2>
+  <p><b>Kính gửi:</b> Ban Tài chính - Kế toán và Ban Biên tập</p>
+  <p>Căn cứ nhu cầu mua sắm thiết bị công nghệ chuyên môn năm 2026...</p>
+</body>
+</html>`,
+    steps: [
+      { stepIndex: 1, positionName: 'Trưởng ban', departmentName: 'Ban Công nghệ thông tin', roleName: 'Người đề xuất' },
+      { stepIndex: 2, positionName: 'Kế toán trưởng', departmentName: 'Ban Tài chính - Kế toán', roleName: 'Người thẩm định', actionType: 'process', continueOnReject: false },
+      { stepIndex: 3, positionName: 'Tổng Biên tập', departmentName: 'Ban Biên tập', roleName: 'Người phê duyệt cuối', actionType: 'process', continueOnReject: false },
+    ],
+    createdAt: '2026-01-18',
+  },
+  {
+    id: 'tpl-3',
+    category: 'Hành chính - Nhân sự',
+    name: 'Phiếu đăng ký xe công tác',
+    fileName: 'phieu_dang_ky_xe_cong_tac.html',
+    fileContent: `<!DOCTYPE html><html><body><h2>PHIẾU ĐĂNG KÝ SỬ DỤNG XE Ô TÔ CÔNG TÁC</h2></body></html>`,
+    steps: [
+      { stepIndex: 1, positionName: 'Trưởng ban', departmentName: 'Ban Thư ký toà soạn', roleName: 'Người phê duyệt ban' },
+      { stepIndex: 2, positionName: 'Chủ tịch Công đoàn', departmentName: 'Công đoàn Báo Tuổi Trẻ', roleName: 'Người điều xe', actionType: 'process', continueOnReject: false },
+    ],
+    createdAt: '2026-01-20',
+  },
+];
 
 
 const wait = (milliseconds: number) => new Promise((resolve) => window.setTimeout(resolve, milliseconds));
@@ -209,6 +297,60 @@ export async function mockRequest<T>(path: string, options?: { method?: string; 
       const matchPos = !position || item.position === position || item.assignments?.some((a) => a.position === position);
       const matchType = !profileType || (item.profileType || '2A') === profileType;
       return matchSearch && matchDept && matchPos && matchType;
+    });
+  }
+  else if (pathname === '/api/personnel/extraction' && options?.method === 'POST') {
+    const filters = (options.body ?? {}) as Record<string, any>;
+    const fullName = normalizeSearch(filters.fullName?.trim() ?? '');
+    const penName = normalizeSearch(filters.penName?.trim() ?? '');
+    const department = filters.department ?? '';
+    const position = filters.position ?? '';
+    const gender = filters.gender ?? '';
+    const currentAddress = normalizeSearch(filters.currentAddress?.trim() ?? '');
+    const permanentAddress = normalizeSearch(filters.permanentAddress?.trim() ?? '');
+    const employmentType = filters.employmentType ?? '';
+    const hometown = normalizeSearch(filters.hometown?.trim() ?? '');
+    const birthPlace = normalizeSearch(filters.birthPlace?.trim() ?? '');
+    const ethnicity = normalizeSearch(filters.ethnicity?.trim() ?? '');
+    const religion = normalizeSearch(filters.religion?.trim() ?? '');
+    const recruitmentDate = filters.recruitmentDate ?? '';
+    const isPartyMember = filters.isPartyMember ?? '';
+    const isYouthUnionMember = filters.isYouthUnionMember ?? '';
+
+    data = personnelRecordStore.filter((item) => {
+      const matchName = !fullName || normalizeSearch(item.fullName).includes(fullName);
+      const matchPenName = !penName || normalizeSearch(item.penName ?? '').includes(penName);
+      const matchDept = !department || item.department === department || item.assignments?.some((a) => a.department === department);
+      const matchPos = !position || item.position === position || item.assignments?.some((a) => a.position === position);
+      const matchGender = !gender || (item.gender || 'Nam') === gender;
+      const matchCurrentAddress = !currentAddress || normalizeSearch(item.notes ?? '123 Tuổi Trẻ, P.8, Q. Phú Nhuận, TP.HCM').includes(currentAddress);
+      const matchPermanentAddress = !permanentAddress || normalizeSearch(item.notes ?? '123 Tuổi Trẻ, P.8, Q. Phú Nhuận, TP.HCM').includes(permanentAddress);
+      const matchEmpType = !employmentType || item.employmentType === employmentType;
+      const matchHometown = !hometown || normalizeSearch('TP. Hồ Chí Minh').includes(hometown);
+      const matchBirthPlace = !birthPlace || normalizeSearch('TP. Hồ Chí Minh').includes(birthPlace);
+      const matchEthnicity = !ethnicity || normalizeSearch('Kinh').includes(ethnicity);
+      const matchReligion = !religion || normalizeSearch('Không').includes(religion);
+      const matchRecruitment = !recruitmentDate || item.createdAt.includes(recruitmentDate);
+      const matchParty = !isPartyMember || (isPartyMember === 'yes' ? item.isPartyMember : !item.isPartyMember);
+      const matchYouth = !isYouthUnionMember || (isYouthUnionMember === 'yes' ? item.isYouthUnionMember : !item.isYouthUnionMember);
+
+      return (
+        matchName &&
+        matchPenName &&
+        matchDept &&
+        matchPos &&
+        matchGender &&
+        matchCurrentAddress &&
+        matchPermanentAddress &&
+        matchEmpType &&
+        matchHometown &&
+        matchBirthPlace &&
+        matchEthnicity &&
+        matchReligion &&
+        matchRecruitment &&
+        matchParty &&
+        matchYouth
+      );
     });
   }
   else if (pathname === '/api/personnel/create' && options?.method === 'POST') {
@@ -529,6 +671,156 @@ export async function mockRequest<T>(path: string, options?: { method?: string; 
     const id = pathname.replace('/api/personnel/management/resigned/', '');
     resignedEmployeesStore = resignedEmployeesStore.filter((r) => r.id !== id);
     data = { success: true, message: 'Đã xóa ghi nhận nghỉ việc.' };
+  }
+  else if (pathname === '/api/personnel/permissions/items') {
+    if (options?.method === 'POST') {
+      const body = options.body as Partial<PermissionItem>;
+      if (body.id) {
+        const index = permissionItemsStore.findIndex((p) => p.id === body.id);
+        if (index !== -1) {
+          permissionItemsStore[index] = { ...permissionItemsStore[index], ...body } as PermissionItem;
+          data = { success: true, message: 'Đã cập nhật quyền thành công.' };
+        } else throw new Error('Không tìm thấy quyền.');
+      } else {
+        const newItem: PermissionItem = {
+          id: `perm-${Date.now()}`,
+          name: body.name || 'Quyền mới',
+          uri: body.uri || '/api/new-permission',
+          method: body.method || 'GET',
+          serviceName: body.serviceName || 'personnel-service',
+          createdAt: new Date().toISOString().slice(0, 10),
+        };
+        permissionItemsStore = [newItem, ...permissionItemsStore];
+        data = { success: true, message: 'Đã thêm quyền mới thành công.' };
+      }
+    } else {
+      const search = normalizeSearch(url.searchParams.get('search')?.trim() ?? '');
+      data = permissionItemsStore.filter((p) => !search || normalizeSearch(`${p.name} ${p.uri} ${p.serviceName}`).includes(search));
+    }
+  }
+  else if (pathname.startsWith('/api/personnel/permissions/items/') && options?.method === 'DELETE') {
+    const id = pathname.replace('/api/personnel/permissions/items/', '');
+    permissionItemsStore = permissionItemsStore.filter((p) => p.id !== id);
+    data = { success: true, message: 'Đã xóa quyền.' };
+  }
+  else if (pathname === '/api/personnel/permissions/groups') {
+    if (options?.method === 'POST') {
+      const body = options.body as Partial<PermissionGroupItem>;
+      if (body.id) {
+        const index = permissionGroupsStore.findIndex((g) => g.id === body.id);
+        if (index !== -1) {
+          permissionGroupsStore[index] = { ...permissionGroupsStore[index], ...body } as PermissionGroupItem;
+          data = { success: true, message: 'Đã cập nhật nhóm quyền thành công.' };
+        } else throw new Error('Không tìm thấy nhóm quyền.');
+      } else {
+        const newGroup: PermissionGroupItem = {
+          id: `group-${Date.now()}`,
+          code: body.code || '[GROUP]',
+          name: body.name || '[NEW] Nhóm quyền mới',
+          description: body.description || '',
+          permissionIds: body.permissionIds || [],
+          createdAt: new Date().toISOString().slice(0, 10),
+        };
+        permissionGroupsStore = [newGroup, ...permissionGroupsStore];
+        data = { success: true, message: 'Đã thêm nhóm quyền mới thành công.' };
+      }
+    } else {
+      const search = normalizeSearch(url.searchParams.get('search')?.trim() ?? '');
+      data = permissionGroupsStore.filter((g) => !search || normalizeSearch(`${g.name} ${g.code} ${g.description ?? ''}`).includes(search));
+    }
+  }
+  else if (pathname.startsWith('/api/personnel/permissions/groups/') && options?.method === 'DELETE') {
+    const id = pathname.replace('/api/personnel/permissions/groups/', '');
+    permissionGroupsStore = permissionGroupsStore.filter((g) => g.id !== id);
+    data = { success: true, message: 'Đã xóa nhóm quyền.' };
+  }
+  else if (pathname === '/api/personnel/permissions/assignments') {
+    if (options?.method === 'POST') {
+      const body = options.body as Partial<PermissionAssignmentItem>;
+      const unit = workUnitsStore.find((u) => u.id === body.unitId);
+      const pos = positionTitlesStore.find((p) => p.id === body.positionId);
+      const spec = specialtiesStore.find((s) => s.id === body.specialtyId);
+      const group = permissionGroupsStore.find((g) => g.id === body.groupId);
+
+      if (body.id) {
+        const index = permissionAssignmentsStore.findIndex((a) => a.id === body.id);
+        if (index !== -1) {
+          permissionAssignmentsStore[index] = {
+            ...permissionAssignmentsStore[index],
+            unitId: body.unitId || permissionAssignmentsStore[index].unitId,
+            unitName: unit ? unit.name : body.unitName || permissionAssignmentsStore[index].unitName,
+            positionId: body.positionId || permissionAssignmentsStore[index].positionId,
+            positionName: pos ? pos.name : body.positionName || permissionAssignmentsStore[index].positionName,
+            specialtyId: body.specialtyId,
+            specialtyName: spec ? spec.name : body.specialtyName || 'Tất cả chuyên môn',
+            groupId: body.groupId || permissionAssignmentsStore[index].groupId,
+            groupName: group ? group.name : body.groupName || permissionAssignmentsStore[index].groupName,
+          };
+          data = { success: true, message: 'Đã cập nhật phân quyền thành công.' };
+        } else throw new Error('Không tìm thấy phân quyền.');
+      } else {
+        const newAssign: PermissionAssignmentItem = {
+          id: `assign-${Date.now()}`,
+          unitId: body.unitId || 'unit-1',
+          unitName: unit ? unit.name : body.unitName || 'Ban Biên tập',
+          positionId: body.positionId || 'pos-3',
+          positionName: pos ? pos.name : body.positionName || 'Trưởng ban',
+          specialtyId: body.specialtyId,
+          specialtyName: spec ? spec.name : body.specialtyName || 'Tất cả chuyên môn',
+          groupId: body.groupId || 'group-1',
+          groupName: group ? group.name : body.groupName || '[PROFILE] Quyền Nhân sự',
+          createdAt: new Date().toISOString().slice(0, 10),
+        };
+        permissionAssignmentsStore = [newAssign, ...permissionAssignmentsStore];
+        data = { success: true, message: 'Đã thêm phân quyền thành công.' };
+      }
+    } else {
+      const search = normalizeSearch(url.searchParams.get('search')?.trim() ?? '');
+      data = permissionAssignmentsStore.filter((a) => !search || normalizeSearch(`${a.unitName} ${a.positionName} ${a.specialtyName ?? ''} ${a.groupName}`).includes(search));
+    }
+  }
+  else if (pathname.startsWith('/api/personnel/permissions/assignments/') && options?.method === 'DELETE') {
+    const id = pathname.replace('/api/personnel/permissions/assignments/', '');
+    permissionAssignmentsStore = permissionAssignmentsStore.filter((a) => a.id !== id);
+    data = { success: true, message: 'Đã xóa phân quyền.' };
+  }
+  else if (pathname === '/api/documents/custom-templates') {
+    if (options?.method === 'POST') {
+      const body = options.body as Partial<CustomDocumentTemplateItem>;
+      if (body.id) {
+        const index = customDocumentTemplatesStore.findIndex((t) => t.id === body.id);
+        if (index !== -1) {
+          customDocumentTemplatesStore[index] = { ...customDocumentTemplatesStore[index], ...body } as CustomDocumentTemplateItem;
+          data = { success: true, message: 'Đã cập nhật tài liệu mẫu thành công.' };
+        } else throw new Error('Không tìm thấy tài liệu mẫu.');
+      } else {
+        const newTpl: CustomDocumentTemplateItem = {
+          id: `tpl-${Date.now()}`,
+          category: body.category || 'Hành chính - Nhân sự',
+          name: body.name || 'Tài liệu mẫu mới',
+          fileName: body.fileName || 'tai_lieu_mau.html',
+          fileContent: body.fileContent || '<html><body><p>Nội dung tài liệu mẫu</p></body></html>',
+          steps: body.steps || [],
+          createdAt: new Date().toISOString().slice(0, 10),
+        };
+        customDocumentTemplatesStore = [newTpl, ...customDocumentTemplatesStore];
+        data = { success: true, message: 'Đã tạo tài liệu mẫu mới thành công.' };
+      }
+    } else {
+      const search = normalizeSearch(url.searchParams.get('search')?.trim() ?? '');
+      data = customDocumentTemplatesStore.filter((t) => !search || normalizeSearch(`${t.name} ${t.category} ${t.fileName}`).includes(search));
+    }
+  }
+  else if (pathname.startsWith('/api/documents/custom-templates/')) {
+    const id = pathname.replace('/api/documents/custom-templates/', '');
+    if (options?.method === 'DELETE') {
+      customDocumentTemplatesStore = customDocumentTemplatesStore.filter((t) => t.id !== id);
+      data = { success: true, message: 'Đã xóa tài liệu mẫu.' };
+    } else {
+      const found = customDocumentTemplatesStore.find((t) => t.id === id);
+      if (found) data = found;
+      else throw new Error('Không tìm thấy tài liệu mẫu.');
+    }
   }
   else if (pathname.startsWith('/api/personnel/')) {
 

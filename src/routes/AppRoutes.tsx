@@ -15,8 +15,10 @@ import { TasksPage } from '@/features/tasks/TasksPage';
 import { EvaluationsPage } from '@/features/evaluations/EvaluationsPage';
 import { CreatePersonnelPage } from '@/features/personnel/CreatePersonnelPage';
 import { PersonnelChangeRequestsPage } from '@/features/personnel/PersonnelChangeRequestsPage';
+import { PersonnelDataExtractionPage } from '@/features/personnel/PersonnelDataExtractionPage';
 import { PersonnelListPage } from '@/features/personnel/PersonnelListPage';
 import { PersonnelManagementPage } from '@/features/personnel/PersonnelManagementPage';
+import { PersonnelPermissionsPage } from '@/features/personnel/PersonnelPermissionsPage';
 import { PersonnelProfilePage } from '@/features/personnel/PersonnelProfilePage';
 import { AppLayout } from '@/layouts/AppLayout';
 
@@ -32,6 +34,8 @@ export function AppRoutes() {
           <Route path="evaluations" element={<EvaluationsPage />} />
           <Route path="personnel/list" element={<PersonnelListPage />} />
           <Route path="personnel/management" element={<PersonnelManagementPage />} />
+          <Route path="personnel/extraction" element={<PersonnelDataExtractionPage />} />
+          <Route path="personnel/permissions" element={<PersonnelPermissionsPage />} />
           <Route path="personnel/change-requests" element={<PersonnelChangeRequestsPage />} />
 
           <Route path="personnel/profile" element={<PersonnelProfilePage />} />

@@ -29,6 +29,7 @@ export const calendarApi = {
 export const directoryApi = { list: (query = '') => mockRequest<DirectoryContact[]>(`/api/directory${query}`) };
 export const personnelApi = {
   list: (query = '') => mockRequest<PersonnelRecordItem[]>(`/api/personnel/list${query}`),
+  extraction: (filters: Record<string, any>) => mockRequest<PersonnelRecordItem[]>('/api/personnel/extraction', { method: 'POST', body: filters }),
   get: (id: string) => mockRequest<PersonnelRecordItem>(`/api/personnel/${id}`),
   profile: () => mockRequest<PersonalProfile | null>('/api/personnel/profile'),
   create: (payload: CreatePersonnelPayload) => mockRequest<{ id: string; code: string; message: string }>('/api/personnel/create', { method: 'POST', body: payload }),
@@ -75,6 +76,13 @@ export const documentApi = {
   action: (id: string, action: 'approve' | 'reject', note?: string) => mockRequest<DocumentSubmission>(`/api/documents/submissions/${id}/actions`, { method: 'POST', body: { action, note } }),
 };
 
+export const customDocumentTemplateApi = {
+  list: (query = '') => mockRequest<import('@/types/domain').CustomDocumentTemplateItem[]>(`/api/documents/custom-templates${query}`),
+  get: (id: string) => mockRequest<import('@/types/domain').CustomDocumentTemplateItem>(`/api/documents/custom-templates/${id}`),
+  save: (payload: Partial<import('@/types/domain').CustomDocumentTemplateItem>) => mockRequest<{ success: boolean; message: string }>('/api/documents/custom-templates', { method: 'POST', body: payload }),
+  delete: (id: string) => mockRequest<{ success: boolean; message: string }>(`/api/documents/custom-templates/${id}`, { method: 'DELETE' }),
+};
+
 const workspaceAction = (module: string, action: string, values: Record<string, unknown> = {}) => mockRequest<{ id: string; action: string; completedAt: string }>(`/api/${module}/actions`, { method: 'POST', body: { action, values } });
 export const extendedWorkspaceApi = {
   requests: () => mockRequest<WorkspaceRecord[]>('/api/requests'),
@@ -119,6 +127,24 @@ export const personnelManagementApi = {
     list: (query = '') => mockRequest<ResignedEmployeeItem[]>(`/api/personnel/management/resigned${query}`),
     save: (payload: Partial<ResignedEmployeeItem>) => mockRequest<{ success: boolean; message: string }>('/api/personnel/management/resigned', { method: 'POST', body: payload }),
     delete: (id: string) => mockRequest<{ success: boolean; message: string }>(`/api/personnel/management/resigned/${id}`, { method: 'DELETE' }),
+  },
+};
+
+export const personnelPermissionsApi = {
+  items: {
+    list: (query = '') => mockRequest<import('@/types/personnel').PermissionItem[]>(`/api/personnel/permissions/items${query}`),
+    save: (payload: Partial<import('@/types/personnel').PermissionItem>) => mockRequest<{ success: boolean; message: string }>('/api/personnel/permissions/items', { method: 'POST', body: payload }),
+    delete: (id: string) => mockRequest<{ success: boolean; message: string }>(`/api/personnel/permissions/items/${id}`, { method: 'DELETE' }),
+  },
+  groups: {
+    list: (query = '') => mockRequest<import('@/types/personnel').PermissionGroupItem[]>(`/api/personnel/permissions/groups${query}`),
+    save: (payload: Partial<import('@/types/personnel').PermissionGroupItem>) => mockRequest<{ success: boolean; message: string }>('/api/personnel/permissions/groups', { method: 'POST', body: payload }),
+    delete: (id: string) => mockRequest<{ success: boolean; message: string }>(`/api/personnel/permissions/groups/${id}`, { method: 'DELETE' }),
+  },
+  assignments: {
+    list: (query = '') => mockRequest<import('@/types/personnel').PermissionAssignmentItem[]>(`/api/personnel/permissions/assignments${query}`),
+    save: (payload: Partial<import('@/types/personnel').PermissionAssignmentItem>) => mockRequest<{ success: boolean; message: string }>('/api/personnel/permissions/assignments', { method: 'POST', body: payload }),
+    delete: (id: string) => mockRequest<{ success: boolean; message: string }>(`/api/personnel/permissions/assignments/${id}`, { method: 'DELETE' }),
   },
 };
 

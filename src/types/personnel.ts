@@ -228,3 +228,36 @@ export interface ResignedEmployeeItem {
   attachmentName: string;
   attachmentUrl?: string;
 }
+
+export type HttpMethodCategory = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
+
+export interface PermissionItem {
+  id: string;
+  name: string;
+  uri: string;
+  method: HttpMethodCategory;
+  serviceName: string;
+  createdAt: string;
+}
+
+export interface PermissionGroupItem {
+  id: string;
+  code: string;
+  name: string;
+  description?: string;
+  permissionIds: string[];
+  createdAt: string;
+}
+
+export interface PermissionAssignmentItem {
+  id: string;
+  unitId: string;
+  unitName: string;
+  positionId: string;
+  positionName: string;
+  specialtyId?: string;
+  specialtyName?: string;
+  groupId: string;
+  groupName: string;
+  createdAt: string;
+}
