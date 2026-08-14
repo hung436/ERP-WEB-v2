@@ -112,12 +112,6 @@ export function NotificationDetailModal({
                     <Tag color="geekblue" key={grp}>{grp}</Tag>
                   ))}
                 </Space>
-              ) : item.recipients.targetType === 'departments' ? (
-                <Space wrap size={[0, 4]}>
-                  {item.recipients.departments?.map((dept) => (
-                    <Tag color="geekblue" key={dept}>{dept}</Tag>
-                  ))}
-                </Space>
               ) : (
                 <Space wrap size={[0, 4]}>
                   {item.recipients.individuals?.map((person) => (
