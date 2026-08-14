@@ -3,11 +3,13 @@ import type { Announcement, CalendarEvent, ChatConversation, ChatMember, ChatMes
 export const demoUser: User = {
   id: 'user-001', username: 'nhanvien', fullName: 'Nguyễn Minh Anh', email: 'minhanh@noibo.vn',
   department: 'Ban Nội dung', position: 'Phóng viên', role: 'employee',
+  birthDate: '1995-08-14',
 };
 
 export const adminUser: User = {
   id: 'user-admin', username: 'admin', fullName: 'Phạm Đức Long (Admin)', email: 'admin@noibo.vn',
   department: 'Ban Quản trị & Công nghệ', position: 'Quản trị viên Hệ thống', role: 'admin',
+  birthDate: '1990-08-14',
 };
 
 export const tasks: Task[] = [
