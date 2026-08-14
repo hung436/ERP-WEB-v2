@@ -9,7 +9,7 @@ describe('Trang chủ và điều hướng', () => {
     renderApp('/', true);
     expect(await screen.findByText('Công việc của tôi')).toBeInTheDocument();
     expect(screen.getAllByText('Thông báo').length).toBeGreaterThan(0);
-    expect(screen.getAllByText('Lịch hôm nay').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Họp trực tuyến').length).toBeGreaterThan(0);
     expect(screen.getAllByText('Mail chưa đọc').length).toBeGreaterThan(0);
     expect(screen.getAllByText('Tin nhắn mới').length).toBeGreaterThan(0);
     expect(screen.queryByText('Truy cập nhanh')).not.toBeInTheDocument();
@@ -55,14 +55,13 @@ describe('Trang chủ và điều hướng', () => {
     expect(window.location.pathname).toBe('/');
   });
 
-  it('phản hồi lịch trực tiếp trên Trang chủ', async () => {
+  it('mở họp trực tuyến trực tiếp trên Trang chủ', async () => {
     const user = userEvent.setup(); const { container } = renderApp('/', true);
     await screen.findByText('Công việc của tôi');
     await user.click(container.querySelector('.widget-event') as HTMLElement);
     const dialog = await screen.findByRole('dialog');
-    expect(within(dialog).getByText('Lịch làm việc')).toBeInTheDocument();
-    await user.click(within(dialog).getByRole('button', { name: 'Xác nhận tham gia' }));
-    expect(await within(dialog).findByText('Sẽ tham gia')).toBeInTheDocument();
+    expect(within(dialog).getByText(/Chương trình \/ Nội dung họp trực tuyến/i)).toBeInTheDocument();
+    expect(within(dialog).getByRole('button', { name: /Tham gia phòng họp trực tuyến/i })).toBeInTheDocument();
     expect(window.location.pathname).toBe('/');
   });
 

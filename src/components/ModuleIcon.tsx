@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 
-export type ModuleName = 'home' | 'tasks' | 'documents' | 'calendar' | 'chat' | 'mail' | 'announcements' | 'directory' | 'personnel' | 'requests' | 'cloud' | 'meetings' | 'evaluations' | 'library' | 'experts';
+export type ModuleName = 'home' | 'tasks' | 'documents' | 'calendar' | 'chat' | 'mail' | 'announcements' | 'directory' | 'personnel' | 'requests' | 'cloud' | 'meetings' | 'meeting' | 'evaluations' | 'library' | 'experts';
 
 const paths: Record<ModuleName, ReactNode> = {
   home: <><path d="M3.5 10.5 12 3l8.5 7.5" /><path d="M5.5 9.5V21h13V9.5M9 21v-6h6v6" /></>,
@@ -15,6 +15,7 @@ const paths: Record<ModuleName, ReactNode> = {
   requests: <><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9Z" /><path d="M14 3v6h6M8 14h8M8 17h5" /></>,
   cloud: <path d="M17.5 19H6a4 4 0 0 1-.8-7.9A7 7 0 0 1 18.7 9 5 5 0 0 1 17.5 19Z" />,
   meetings: <><rect x="3" y="5" width="14" height="14" rx="2" /><path d="m17 10 4-2v8l-4-2" /></>,
+  meeting: <><rect x="3" y="5" width="14" height="14" rx="2" /><path d="m17 10 4-2v8l-4-2" /></>,
   evaluations: <><path d="M4 20V10M9 20V4M14 20v-7M19 20V7M2 20h20" /></>,
   library: <><path d="M3 6a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z" /></>,
   experts: <><circle cx="12" cy="8" r="4" /><path d="M5 21a7 7 0 0 1 14 0M18.5 3.5l.6 1.3 1.4.2-1 .9.3 1.4-1.3-.7-1.2.7.2-1.4-1-.9 1.4-.2Z" /></>,

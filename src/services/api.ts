@@ -1,9 +1,11 @@
 import { mockRequest } from '@/services/mockApi';
-import type { Announcement, CalendarEvent, ChatAttachment, ChatConversation, ChatMember, ChatMessage, ChatReply, DashboardSummary, DirectoryContact, DocumentSubmission, DocumentTemplate, MailAttachment, MailComposePayload, MailItem, MailReply, Task, User } from '@/types/domain';
+import type { Announcement, CalendarEvent, ChatAttachment, ChatConversation, ChatMember, ChatMessage, ChatReply, DashboardSummary, DirectoryContact, DocumentSubmission, DocumentTemplate, MailAttachment, MailComposePayload, MailItem, MailReply, MeetingEvent, Task, User } from '@/types/domain';
 import type { ExpertRecord, WorkspaceFile, WorkspaceRecord } from '@/types/extended';
 import type { EvaluationPeriod, EvaluationSheet, EvaluationSummary } from '@/types/evaluation';
 import type { CreatePersonnelPayload, PersonalProfile, PersonnelRecordItem, PositionTitleItem, ResignedEmployeeItem, SpecialtyItem, UnitPositionMapping, WorkUnitItem } from '@/types/personnel';
 
+
+import type { CalendarNotificationItem, CalendarRecipientGroup, CreateCalendarNotificationPayload, CreateRecipientGroupPayload } from '@/types/calendar';
 
 export const authApi = {
   login: (username: string, password: string) => mockRequest<{ token: string; user: User }>('/api/auth/login', { method: 'POST', body: { username, password } }),
@@ -14,17 +16,37 @@ export const authApi = {
 export const dashboardApi = {
   summary: () => mockRequest<DashboardSummary>('/api/dashboard/summary'),
   tasks: () => mockRequest<Task[]>('/api/dashboard/tasks'),
-  events: () => mockRequest<CalendarEvent[]>('/api/dashboard/today-events'),
+  events: () => mockRequest<MeetingEvent[]>('/api/dashboard/today-events'),
   mails: () => mockRequest<MailItem[]>('/api/dashboard/mail-summary'),
   chats: () => mockRequest<ChatConversation[]>('/api/dashboard/chat-summary'),
   announcements: () => mockRequest<Announcement[]>('/api/dashboard/announcements'),
 };
 
 export const taskApi = { list: (query = '') => mockRequest<Task[]>(`/api/tasks${query}`) };
+export const meetingApi = {
+  list: (query = '') => mockRequest<MeetingEvent[]>(`/api/meeting/events${query}`),
+  respond: (id: string, responseStatus: NonNullable<MeetingEvent['responseStatus']>) => mockRequest<MeetingEvent>(`/api/meeting/events/${id}/respond`, { method: 'POST', body: { responseStatus } }),
+  create: (data: Partial<MeetingEvent>) => mockRequest<MeetingEvent>('/api/meeting/events', { method: 'POST', body: data }),
+};
 export const calendarApi = {
   list: (query = '') => mockRequest<CalendarEvent[]>(`/api/calendar/events${query}`),
   respond: (id: string, responseStatus: NonNullable<CalendarEvent['responseStatus']>) => mockRequest<CalendarEvent>(`/api/calendar/events/${id}/respond`, { method: 'POST', body: { responseStatus } }),
   create: (data: Partial<CalendarEvent>) => mockRequest<CalendarEvent>('/api/calendar/events', { method: 'POST', body: data }),
+};
+export const calendarNotificationApi = {
+  list: (query = '') => mockRequest<CalendarNotificationItem[]>(`/api/calendar/notifications${query}`),
+  get: (id: string) => mockRequest<CalendarNotificationItem>(`/api/calendar/notifications/${id}`),
+  create: (data: CreateCalendarNotificationPayload) => mockRequest<CalendarNotificationItem>('/api/calendar/notifications', { method: 'POST', body: data }),
+  update: (id: string, data: Partial<CalendarNotificationItem>) => mockRequest<CalendarNotificationItem>(`/api/calendar/notifications/${id}`, { method: 'PUT', body: data }),
+  send: (id: string) => mockRequest<CalendarNotificationItem>(`/api/calendar/notifications/${id}/send`, { method: 'POST' }),
+  delete: (id: string) => mockRequest<{ success: boolean }>(`/api/calendar/notifications/${id}`, { method: 'DELETE' }),
+};
+export const calendarGroupApi = {
+  list: (query = '') => mockRequest<CalendarRecipientGroup[]>(`/api/calendar/groups${query}`),
+  get: (id: string) => mockRequest<CalendarRecipientGroup>(`/api/calendar/groups/${id}`),
+  create: (data: CreateRecipientGroupPayload) => mockRequest<CalendarRecipientGroup>('/api/calendar/groups', { method: 'POST', body: data }),
+  update: (id: string, data: Partial<CalendarRecipientGroup>) => mockRequest<CalendarRecipientGroup>(`/api/calendar/groups/${id}`, { method: 'PUT', body: data }),
+  delete: (id: string) => mockRequest<{ success: boolean }>(`/api/calendar/groups/${id}`, { method: 'DELETE' }),
 };
 export const directoryApi = { list: (query = '') => mockRequest<DirectoryContact[]>(`/api/directory${query}`) };
 export const personnelApi = {
