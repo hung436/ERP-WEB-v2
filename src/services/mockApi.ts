@@ -317,7 +317,7 @@ export async function mockRequest<T>(path: string, options?: { method?: string; 
   else if (pathname === '/api/calendar/notifications') {
     if (options?.method === 'POST') {
       const payload = options.body as CreateCalendarNotificationPayload;
-      const isSendNow = payload.sendNow ?? !payload.scheduledAt;
+      const isSendNow = !payload.scheduledAt;
       const nowIso = new Date().toISOString();
       const newNotif: CalendarNotificationItem = {
         id: `notif-${Date.now()}`,

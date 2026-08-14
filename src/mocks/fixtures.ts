@@ -36,7 +36,10 @@ export const meetingEvents: MeetingEvent[] = [
   { id:'event-08', title:'Tổng kết công việc tuần', startAt:'2026-08-11T16:00:00+07:00', endAt:'2026-08-11T17:00:00+07:00', location:'meeting.tuoitre.vn', meetingUrl:'https://meeting.tuoitre.vn/tong-ket-tuan', type:'meeting', organizer:'Trần Thu Hà', responseStatus:'pending', meetingId:'TT-557-142', platform:'meeting.tuoitre.vn', agenda:'Tổng kết kết quả trong tuần và thống nhất ưu tiên tuần tiếp theo.', participants:['Trần Thu Hà','Nguyễn Minh Anh','Lê Thanh Vân','Đỗ Quang Huy'] },
 ];
 
-export const calendarEvents: CalendarEvent[] = [...meetingEvents];
+export const calendarEvents: CalendarEvent[] = meetingEvents.map((m) => ({
+  ...m,
+  type: 'meeting' as const,
+}));
 
 export const chatMembers: ChatMember[] = [
   { id: 'user-001', name: 'Nguyễn Minh Anh', email: 'minhanh@noibo.vn', department: 'Ban Nội dung', online: true },
