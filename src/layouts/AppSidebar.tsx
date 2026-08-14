@@ -6,7 +6,7 @@ import { ModuleIcon, type ModuleName } from '@/components/ModuleIcon';
 import tuoiTreLogo from '@/assets/logo-tuoitre-2026-do-chu.svg';
 import { collapsedLogo } from '@/assets/collapsedLogo';
 import { useAsyncData } from '@/hooks/useAsyncData';
-import { calendarApi, chatApi, documentApi, evaluationApi, mailApi, taskApi } from '@/services/api';
+import { chatApi, documentApi, evaluationApi, mailApi, meetingApi, taskApi } from '@/services/api';
 
 interface NavItem {
   path: string;
@@ -30,20 +30,29 @@ const navItems: NavItem[] = [
   },
   { path: '/evaluations', module: 'evaluations', label: 'Đánh giá lao động' },
   {
-    path: '/personnel/list',
+    path: '/personnel/profile',
     module: 'personnel',
     label: 'Nhân sự',
     children: [
-      { path: '/personnel/list', label: 'Danh sách hồ sơ' },
-      { path: '/personnel/management', label: 'Quản lý' },
-      { path: '/personnel/extraction', label: 'Trích xuất dữ liệu' },
-      { path: '/personnel/permissions', label: 'Quyền' },
-      { path: '/personnel/change-requests', label: 'Yêu cầu thay đổi' },
       { path: '/personnel/profile', label: 'Lý lịch cá nhân' },
       { path: '/personnel/create', label: 'Tạo hồ sơ mới' },
+      { path: '/personnel/change-requests', label: 'Yêu cầu thay đổi' },
+      { path: '/personnel/extraction', label: 'Trích xuất dữ liệu' },
+      { path: '/personnel/list', label: 'Danh sách hồ sơ' },
+      { path: '/personnel/management', label: 'Quản lý' },
+      { path: '/personnel/permissions', label: 'Quyền' },
     ],
   },
-  { path: '/calendar', module: 'meetings', label: 'Họp trực tuyến' },
+  {
+    path: '/calendar',
+    module: 'calendar',
+    label: 'Lịch làm việc',
+    children: [
+      { path: '/calendar/notifications', label: 'Quản lý thông báo' },
+      { path: '/calendar/groups', label: 'Quản lý nhóm' },
+    ],
+  },
+  { path: '/meeting', module: 'meetings', label: 'Họp trực tuyến' },
   { path: '/chat', module: 'chat', label: 'Chat' },
   { path: '/mail', module: 'mail', label: 'Mail' },
   { path: '/directory', module: 'directory', label: 'Danh bạ' },
@@ -58,7 +67,7 @@ export function AppSidebar({ collapsed, onCollapse }: { collapsed: boolean; onCo
       taskApi.list(),
       documentApi.submissions(),
       evaluationApi.sheets(),
-      calendarApi.list(),
+      meetingApi.list(),
       chatApi.conversations(),
       mailApi.list(),
     ]);
@@ -67,7 +76,7 @@ export function AppSidebar({ collapsed, onCollapse }: { collapsed: boolean; onCo
       '/tasks': tasks.data.filter((item) => item.status !== 'completed').length,
       '/documents': documents.data.filter((item) => item.viewScope === 'pending_review' && item.status === 'pending').length,
       '/evaluations': evaluations.data.filter((item) => item.status === 'draft' || item.status === 'waiting' || item.status === 'in_review').length,
-      '/calendar': meetings.data.filter((item) => item.startAt.startsWith(currentDate)).length,
+      '/meeting': meetings.data.filter((item) => item.startAt.startsWith(currentDate)).length,
       '/chat': chats.data.reduce((total, item) => total + item.unreadCount, 0),
       '/mail': mails.data.filter((item) => (item.folder ?? 'inbox') === 'inbox' && !item.isRead).length,
     } satisfies Record<string, number>;
@@ -91,8 +100,22 @@ export function AppSidebar({ collapsed, onCollapse }: { collapsed: boolean; onCo
   return (
     <Layout.Sider collapsed={collapsed} collapsedWidth={76} onCollapse={onCollapse} theme="light" width={244} className="app-sidebar">
       <div className="sidebar-head">
-        <button aria-label={collapsed ? 'Mở rộng menu' : 'Thu gọn menu'} className="sidebar-top-collapse" onClick={() => onCollapse(!collapsed)} title={collapsed ? 'Mở rộng menu' : 'Thu gọn menu'} type="button">
-          <span aria-hidden>{collapsed ? '›' : '‹'}</span>
+        <button
+          aria-label={collapsed ? 'Mở rộng menu' : 'Thu gọn menu'}
+          className="sidebar-top-collapse"
+          onClick={() => onCollapse(!collapsed)}
+          title={collapsed ? 'Mở rộng menu' : 'Thu gọn menu'}
+          type="button"
+        >
+          {collapsed ? (
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="9 18 15 12 9 6" />
+            </svg>
+          ) : (
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="15 18 9 12 15 6" />
+            </svg>
+          )}
         </button>
         <NavLink aria-label="Về trang chủ" className="brand" onClick={handleNavClick} to="/">
           <img alt="Tuổi Trẻ" className={collapsed ? 'brand-logo collapsed-brand-logo' : 'brand-logo'} src={collapsed ? collapsedLogo : tuoiTreLogo} />

@@ -1,9 +1,11 @@
-import { adminUser, announcements, calendarEvents, chatMembers, conversations, demoUser, directoryContacts, mails, messages, tasks } from '@/mocks/fixtures';
+import { adminUser, announcements, calendarEvents, chatMembers, conversations, demoUser, directoryContacts, mails, messages, meetingEvents, tasks } from '@/mocks/fixtures';
 import { cloudRecords, evaluationRecords, expertRecords, libraryRecords, meetingRecords, requestRecords } from '@/mocks/extendedFixtures';
 import { documentSubmissions, documentTemplates } from '@/mocks/documentFixtures';
 import { evaluationPeriods, evaluationSheets } from '@/mocks/evaluationFixtures';
 import { initialChangeRequests, initialPersonnelList, initialPositionTitles, initialResignedEmployees, initialSpecialties, initialUnitPositionMappings, initialWorkUnits, personalProfile } from '@/mocks/personnelFixtures';
-import type { Announcement, ApiResponse, ApiState, CalendarEvent, ChatAttachment, ChatConversation, ChatMessage, CustomDocumentTemplateItem, DashboardSummary, DirectoryContact, DocumentSubmission, MailComposePayload, MailItem, MailReply, Task, User } from '@/types/domain';
+import { initialCalendarNotifications, initialRecipientGroups } from '@/mocks/calendarNotificationFixtures';
+import type { Announcement, ApiResponse, ApiState, CalendarEvent, ChatAttachment, ChatConversation, ChatMessage, CustomDocumentTemplateItem, DashboardSummary, DirectoryContact, DocumentSubmission, MailComposePayload, MailItem, MailReply, MeetingEvent, Task, User } from '@/types/domain';
+import type { CalendarNotificationItem, CalendarRecipientGroup, CreateCalendarNotificationPayload, CreateRecipientGroupPayload } from '@/types/calendar';
 import type { EvaluationSheet, EvaluationSummary } from '@/types/evaluation';
 import type { PositionTitleItem, PersonnelChangeRequest, PersonnelRecordItem, PermissionAssignmentItem, PermissionGroupItem, PermissionItem, ResignedEmployeeItem, SpecialtyItem, UnitPositionMapping, WorkUnitItem } from '@/types/personnel';
 
@@ -11,7 +13,10 @@ let activeUser: User = demoUser;
 let chatConversationStore: ChatConversation[] = conversations.map((item) => ({ ...item, members: [...item.members] }));
 let chatMessageStore: ChatMessage[] = [...messages];
 let chatSequence = 100;
+let meetingEventStore: MeetingEvent[] = meetingEvents.map((item) => ({ ...item, responseStatus: item.responseStatus ?? 'pending' }));
 let calendarEventStore: CalendarEvent[] = calendarEvents.map((item) => ({ ...item, responseStatus: item.responseStatus ?? 'pending' }));
+let calendarNotificationStore: CalendarNotificationItem[] = [...initialCalendarNotifications];
+let recipientGroupStore: CalendarRecipientGroup[] = [...initialRecipientGroups];
 let mailStore: MailItem[] = mails.map((item) => ({ ...item }));
 const announcementSources: NonNullable<Announcement['sourceModule']>[] = ['agency', 'agency', 'documents', 'agency', 'mail', 'agency', 'evaluations', 'system', 'documents', 'mail'];
 let announcementStore: Announcement[] = announcements.map((item, index) => ({ ...item, acknowledged: item.acknowledged ?? false, sourceModule: item.sourceModule ?? announcementSources[index % announcementSources.length] }));
@@ -228,9 +233,9 @@ export async function mockRequest<T>(path: string, options?: { method?: string; 
       unreadChatCount: chatConversationStore.reduce((sum, item) => sum + item.unreadCount, 0),
     } satisfies DashboardSummary;
   } else if (pathname === '/api/dashboard/tasks') data = currentTaskStore().filter((item) => item.status !== 'completed');
-  else if (pathname === '/api/dashboard/today-events') {
+  else if (pathname === '/api/dashboard/today-events' || pathname === '/api/dashboard/today-meetings') {
     const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Bangkok' }).format(new Date());
-    data = calendarEventStore.filter((item) => item.startAt.startsWith(today)).slice(0, 4);
+    data = meetingEventStore.filter((item) => item.startAt.startsWith(today)).slice(0, 4);
   }
   else if (pathname === '/api/dashboard/mail-summary') data = mailStore.filter((item) => (item.folder ?? 'inbox') === 'inbox' && !item.isRead).slice(0, 3);
   else if (pathname === '/api/dashboard/chat-summary') data = chatConversationStore.filter((item) => item.unreadCount > 0).slice(0, 3);
@@ -242,7 +247,41 @@ export async function mockRequest<T>(path: string, options?: { method?: string; 
       if (statusParam === 'dueSoon') return item.status !== 'completed';
       return (!statusParam || item.status === statusParam) && (!priorityParam || item.priority === priorityParam);
     });
-  } else if (pathname === '/api/calendar/events') {
+  } else if (pathname === '/api/meeting/events' || pathname === '/api/meetings') {
+    if (options?.method === 'POST') {
+      const body = options.body as Partial<MeetingEvent>;
+      const newEvent: MeetingEvent = {
+        id: `meeting-${Date.now()}`,
+        title: body.title ?? 'Cuộc họp mới',
+        startAt: body.startAt ?? new Date().toISOString(),
+        endAt: body.endAt ?? new Date(Date.now() + 3600000).toISOString(),
+        location: body.location ?? 'meeting.tuoitre.vn',
+        meetingUrl: body.meetingUrl ?? 'https://meeting.tuoitre.vn/truc-tuyen',
+        type: body.type ?? 'meeting',
+        organizer: activeUser.fullName,
+        responseStatus: 'accepted',
+        meetingId: `TT-${Math.floor(100 + Math.random() * 900)}-${Math.floor(100 + Math.random() * 900)}`,
+        platform: body.platform ?? 'meeting.tuoitre.vn',
+        agenda: body.agenda ?? 'Trao đổi nội dung công việc',
+        participants: body.participants?.length ? body.participants : [activeUser.fullName],
+        recordingAvailable: body.recordingAvailable ?? true,
+      };
+      meetingEventStore = [newEvent, ...meetingEventStore];
+      data = newEvent;
+    } else {
+      data = meetingEventStore.filter((item) => !url.searchParams.get('type') || item.type === url.searchParams.get('type'));
+    }
+  }
+  else if (/^\/api\/meeting\/events\/[^/]+\/respond$/.test(pathname) && options?.method === 'POST') {
+    const eventId = pathname.split('/')[4];
+    const body = options.body as { responseStatus?: MeetingEvent['responseStatus'] };
+    const event = meetingEventStore.find((item) => item.id === eventId);
+    if (!event || !body.responseStatus) throw new Error('Không thể cập nhật phản hồi cuộc họp.');
+    const updated = { ...event, responseStatus: body.responseStatus };
+    meetingEventStore = meetingEventStore.map((item) => item.id === eventId ? updated : item);
+    data = updated;
+  }
+  else if (pathname === '/api/calendar/events') {
     if (options?.method === 'POST') {
       const body = options.body as Partial<CalendarEvent>;
       const newEvent: CalendarEvent = {
@@ -274,6 +313,122 @@ export async function mockRequest<T>(path: string, options?: { method?: string; 
     const updated = { ...event, responseStatus: body.responseStatus };
     calendarEventStore = calendarEventStore.map((item) => item.id === eventId ? updated : item);
     data = updated;
+  }
+  else if (pathname === '/api/calendar/notifications') {
+    if (options?.method === 'POST') {
+      const payload = options.body as CreateCalendarNotificationPayload;
+      const isSendNow = payload.sendNow ?? !payload.scheduledAt;
+      const nowIso = new Date().toISOString();
+      const newNotif: CalendarNotificationItem = {
+        id: `notif-${Date.now()}`,
+        type: payload.type,
+        title: payload.title,
+        content: payload.content,
+        isHtmlContent: payload.isHtmlContent ?? false,
+        recipients: payload.recipients,
+        scheduledAt: isSendNow ? nowIso : payload.scheduledAt,
+        sentAt: isSendNow ? nowIso : undefined,
+        status: isSendNow ? 'sent' : 'pending',
+        sendMailCopy: payload.sendMailCopy ?? false,
+        applyWatermark: payload.applyWatermark ?? false,
+        attachments: payload.attachments ?? [],
+        createdBy: activeUser.fullName,
+        createdAt: nowIso,
+      };
+      calendarNotificationStore = [newNotif, ...calendarNotificationStore];
+      data = newNotif;
+    } else {
+      const search = (url.searchParams.get('search') ?? '').trim().toLowerCase();
+      const type = url.searchParams.get('type');
+      const status = url.searchParams.get('status');
+      data = calendarNotificationStore.filter((item) => {
+        if (type && type !== 'all' && item.type !== type) return false;
+        if (status && status !== 'all' && item.status !== status) return false;
+        if (search) {
+          const searchable = `${item.title} ${item.content} ${item.createdBy} ${item.recipients.departments?.join(' ') ?? ''} ${item.recipients.individuals?.join(' ') ?? ''}`.toLowerCase();
+          if (!searchable.includes(search)) return false;
+        }
+        return true;
+      });
+    }
+  }
+  else if (/^\/api\/calendar\/notifications\/[^/]+$/.test(pathname)) {
+    const id = pathname.split('/')[4];
+    if (options?.method === 'DELETE') {
+      calendarNotificationStore = calendarNotificationStore.filter((item) => item.id !== id);
+      data = { success: true };
+    } else if (options?.method === 'PUT' || options?.method === 'PATCH') {
+      const body = options.body as Partial<CalendarNotificationItem>;
+      const existing = calendarNotificationStore.find((item) => item.id === id);
+      if (!existing) throw new Error('Không tìm thấy thông báo');
+      const updated = { ...existing, ...body };
+      calendarNotificationStore = calendarNotificationStore.map((item) => item.id === id ? updated : item);
+      data = updated;
+    } else {
+      const notif = calendarNotificationStore.find((item) => item.id === id);
+      if (!notif) throw new Error('Không tìm thấy thông báo');
+      data = notif;
+    }
+  }
+  else if (/^\/api\/calendar\/notifications\/[^/]+\/send$/.test(pathname) && options?.method === 'POST') {
+    const id = pathname.split('/')[4];
+    const notif = calendarNotificationStore.find((item) => item.id === id);
+    if (!notif) throw new Error('Không tìm thấy thông báo');
+    const updated: CalendarNotificationItem = {
+      ...notif,
+      status: 'sent',
+      sentAt: new Date().toISOString(),
+    };
+    calendarNotificationStore = calendarNotificationStore.map((item) => item.id === id ? updated : item);
+    data = updated;
+  }
+  else if (pathname === '/api/calendar/groups') {
+    if (options?.method === 'POST') {
+      const payload = options.body as CreateRecipientGroupPayload;
+      const newGroup: CalendarRecipientGroup = {
+        id: `grp-${Date.now()}`,
+        name: payload.name,
+        description: payload.description,
+        members: payload.members ?? [],
+        status: payload.status ?? 'active',
+        createdAt: new Date().toISOString(),
+      };
+      recipientGroupStore = [newGroup, ...recipientGroupStore];
+      data = newGroup;
+    } else {
+      const search = (url.searchParams.get('search') ?? '').trim().toLowerCase();
+      const status = url.searchParams.get('status');
+      data = recipientGroupStore.filter((item) => {
+        if (status && status !== 'all' && item.status !== status) return false;
+        if (search) {
+          const searchable = `${item.name} ${item.description ?? ''} ${item.members.join(' ')}`.toLowerCase();
+          if (!searchable.includes(search)) return false;
+        }
+        return true;
+      });
+    }
+  }
+  else if (/^\/api\/calendar\/groups\/[^/]+$/.test(pathname)) {
+    const id = pathname.split('/')[4];
+    if (options?.method === 'DELETE') {
+      recipientGroupStore = recipientGroupStore.filter((item) => item.id !== id);
+      data = { success: true };
+    } else if (options?.method === 'PUT' || options?.method === 'PATCH') {
+      const body = options.body as Partial<CalendarRecipientGroup>;
+      const existing = recipientGroupStore.find((item) => item.id === id);
+      if (!existing) throw new Error('Không tìm thấy nhóm nhận');
+      const updated: CalendarRecipientGroup = {
+        ...existing,
+        ...body,
+        updatedAt: new Date().toISOString(),
+      };
+      recipientGroupStore = recipientGroupStore.map((item) => item.id === id ? updated : item);
+      data = updated;
+    } else {
+      const group = recipientGroupStore.find((item) => item.id === id);
+      if (!group) throw new Error('Không tìm thấy nhóm nhận');
+      data = group;
+    }
   }
   else if (pathname === '/api/directory') {
     const search = normalizeSearch(url.searchParams.get('search')?.trim() ?? '');

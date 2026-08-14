@@ -54,6 +54,24 @@ export interface Task {
   documentId?: string;
 }
 
+export type MeetingEventType = 'meeting' | 'urgent' | 'regular' | 'external';
+export interface MeetingEvent {
+  id: string;
+  title: string;
+  startAt: string;
+  endAt: string;
+  location?: string;
+  meetingUrl?: string;
+  type: MeetingEventType | string;
+  organizer: string;
+  responseStatus?: 'pending' | 'accepted' | 'declined';
+  meetingId?: string;
+  platform?: string;
+  agenda?: string;
+  participants?: string[];
+  recordingAvailable?: boolean;
+}
+
 export type CalendarEventType = 'meeting' | 'work' | 'deadline' | 'personal';
 export interface CalendarEvent {
   id: string;

@@ -22,10 +22,10 @@ describe('Chi tiết phù hợp cho từng module', () => {
     expect(screen.getByRole('button', { name: 'Cập nhật xử lý' })).toBeInTheDocument();
   });
 
-  it('mở chi tiết Lịch làm việc', async () => {
-    await clickFirst('.meeting-card', '/calendar');
+  it('mở chi tiết Họp trực tuyến', async () => {
+    await clickFirst('.meet-wow-item-card .item-main-col', '/meeting');
     const dialog = await screen.findByRole('dialog');
-    expect(within(dialog).getByText('Lịch làm việc')).toBeInTheDocument();
+    expect(within(dialog).getByText(/Chương trình \/ Nội dung họp trực tuyến/i)).toBeInTheDocument();
   });
 
   it('hiển thị hội thoại Chat trong khung chi tiết có sẵn', async () => {

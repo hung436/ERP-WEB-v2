@@ -1,4 +1,4 @@
-import type { Announcement, CalendarEvent, ChatConversation, ChatMember, ChatMessage, DirectoryContact, MailItem, Task, User } from '@/types/domain';
+import type { Announcement, CalendarEvent, ChatConversation, ChatMember, ChatMessage, DirectoryContact, MailItem, MeetingEvent, Task, User } from '@/types/domain';
 
 export const demoUser: User = {
   id: 'user-001', username: 'nhanvien', fullName: 'Nguyễn Minh Anh', email: 'minhanh@noibo.vn',
@@ -25,7 +25,7 @@ export const tasks: Task[] = [
   { id: 'task-12', title: 'Chấm điểm đánh giá lao động của Cao Thanh Tâm', status: 'completed', priority: 'low', dueAt: '2026-07-08T17:00:00+07:00', assignedBy: 'Hệ thống Đánh giá lao động', department: 'Phòng Tài chính', progress: 100, sourceModule: 'evaluations', workflowKind: 'subordinate_evaluation', subjectName: 'Cao Thanh Tâm', period: 'Quý II/2026', workflowStep: 'Đã hoàn thành' },
 ];
 
-export const calendarEvents: CalendarEvent[] = [
+export const meetingEvents: MeetingEvent[] = [
   { id:'event-01', title:'Họp giao ban Ban Nội dung', startAt:'2026-08-07T08:30:00+07:00', endAt:'2026-08-07T09:30:00+07:00', location:'meeting.tuoitre.vn', meetingUrl:'https://meeting.tuoitre.vn/giao-ban-noi-dung', type:'meeting', organizer:'Trần Thu Hà', responseStatus:'accepted', meetingId:'TT-482-193', platform:'meeting.tuoitre.vn', agenda:'Cập nhật tiến độ tuyến bài, kế hoạch xuất bản và các công việc cần phối hợp trong tuần.', participants:['Trần Thu Hà','Nguyễn Minh Anh','Lê Thanh Vân','Nguyễn Hoài Nam'], recordingAvailable:true },
   { id:'event-02', title:'Trao đổi tuyến bài chuyển đổi số', startAt:'2026-08-07T10:00:00+07:00', endAt:'2026-08-07T11:00:00+07:00', location:'meeting.tuoitre.vn', meetingUrl:'https://meeting.tuoitre.vn/chuyen-doi-so', type:'meeting', organizer:'Nguyễn Hoài Nam', responseStatus:'pending', meetingId:'TT-610-245', platform:'meeting.tuoitre.vn', agenda:'Thống nhất góc tiếp cận và phân công nguồn tin cho tuyến bài chuyển đổi số.', participants:['Nguyễn Hoài Nam','Nguyễn Minh Anh','Đỗ Quang Huy'] },
   { id:'event-03', title:'Họp duyệt kế hoạch nội dung tuần 33', startAt:'2026-08-07T15:00:00+07:00', endAt:'2026-08-07T16:00:00+07:00', location:'meeting.tuoitre.vn', meetingUrl:'https://meeting.tuoitre.vn/duyet-noi-dung-33', type:'meeting', organizer:'Ban Thư ký', responseStatus:'pending', meetingId:'TT-775-024', platform:'meeting.tuoitre.vn', agenda:'Duyệt kế hoạch nội dung và nguồn lực sản xuất cho tuần 33.', participants:['Hoàng Tuấn Anh','Trần Thu Hà','Nguyễn Minh Anh'] },
@@ -35,6 +35,8 @@ export const calendarEvents: CalendarEvent[] = [
   { id:'event-07', title:'Họp nhóm dự án số hóa', startAt:'2026-08-10T15:00:00+07:00', endAt:'2026-08-10T15:45:00+07:00', location:'meeting.tuoitre.vn', meetingUrl:'https://meeting.tuoitre.vn/du-an-so-hoa', type:'meeting', organizer:'Phòng Công nghệ', responseStatus:'pending', meetingId:'TT-218-563', platform:'meeting.tuoitre.vn', agenda:'Rà soát tiến độ số hóa kho tư liệu và các vướng mắc kỹ thuật.', participants:['Tạ Minh Châu','Mai Phương Thảo','Phan Thùy Dung'] },
   { id:'event-08', title:'Tổng kết công việc tuần', startAt:'2026-08-11T16:00:00+07:00', endAt:'2026-08-11T17:00:00+07:00', location:'meeting.tuoitre.vn', meetingUrl:'https://meeting.tuoitre.vn/tong-ket-tuan', type:'meeting', organizer:'Trần Thu Hà', responseStatus:'pending', meetingId:'TT-557-142', platform:'meeting.tuoitre.vn', agenda:'Tổng kết kết quả trong tuần và thống nhất ưu tiên tuần tiếp theo.', participants:['Trần Thu Hà','Nguyễn Minh Anh','Lê Thanh Vân','Đỗ Quang Huy'] },
 ];
+
+export const calendarEvents: CalendarEvent[] = [...meetingEvents];
 
 export const chatMembers: ChatMember[] = [
   { id: 'user-001', name: 'Nguyễn Minh Anh', email: 'minhanh@noibo.vn', department: 'Ban Nội dung', online: true },

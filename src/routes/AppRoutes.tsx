@@ -1,10 +1,12 @@
-import { Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes } from 'react-router-dom';
 
 import { AccountProfilePage } from '@/features/account/AccountProfilePage';
 import { AnnouncementsPage } from '@/features/announcements/AnnouncementsPage';
 import { LoginPage } from '@/features/auth/LoginPage';
 import { ProtectedRoute } from '@/features/auth/ProtectedRoute';
-import { CalendarPage } from '@/features/calendar/CalendarPage';
+import { CalendarGroupsPage } from '@/features/calendar/CalendarGroupsPage';
+import { CalendarNotificationsPage } from '@/features/calendar/CalendarNotificationsPage';
+import { MeetingPage } from '@/features/meeting/MeetingPage';
 import { ChatPage } from '@/features/chat/ChatPage';
 import { DashboardPage } from '@/features/dashboard/DashboardPage';
 import { DirectoryPage } from '@/features/directory/DirectoryPage';
@@ -39,6 +41,7 @@ export function AppRoutes() {
           <Route path="documents/templates/edit/:id" element={<CreateDocumentTemplatePage />} />
           <Route path="documents/statistics" element={<DocumentStatisticsPage />} />
           <Route path="evaluations" element={<EvaluationsPage />} />
+          <Route path="personnel" element={<Navigate replace to="/personnel/profile" />} />
           <Route path="personnel/list" element={<PersonnelListPage />} />
           <Route path="personnel/management" element={<PersonnelManagementPage />} />
           <Route path="personnel/extraction" element={<PersonnelDataExtractionPage />} />
@@ -49,8 +52,12 @@ export function AppRoutes() {
           <Route path="personnel/resume/:id" element={<PersonnelProfilePage />} />
           <Route path="personnel/create" element={<CreatePersonnelPage />} />
           <Route path="personnel/edit/:id" element={<CreatePersonnelPage />} />
+          <Route path="calendar" element={<CalendarNotificationsPage />} />
+          <Route path="calendar/notifications" element={<CalendarNotificationsPage />} />
+          <Route path="calendar/groups" element={<CalendarGroupsPage />} />
           <Route path="account" element={<AccountProfilePage />} />
-          <Route path="calendar" element={<CalendarPage />} />
+          <Route path="meeting" element={<MeetingPage />} />
+          <Route path="meetings" element={<MeetingPage />} />
           <Route path="chat" element={<ChatPage />} />
           <Route path="mail" element={<MailPage />} />
           <Route path="announcements" element={<AnnouncementsPage />} />

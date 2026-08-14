@@ -5,14 +5,14 @@ import { ContentSkeleton, EmptyState, ErrorState } from '@/components/AsyncState
 import { ModuleIcon } from '@/components/ModuleIcon';
 import { StatusTag } from '@/components/StatusTag';
 import { AnnouncementQuickView } from '@/features/dashboard/quickViews/AnnouncementQuickView';
-import { CalendarQuickView } from '@/features/dashboard/quickViews/CalendarQuickView';
+import { MeetingQuickView } from '@/features/dashboard/quickViews/MeetingQuickView';
 import { ChatQuickView } from '@/features/dashboard/quickViews/ChatQuickView';
 import { MailQuickView } from '@/features/dashboard/quickViews/MailQuickView';
 import { TaskDetailQuickView } from '@/features/dashboard/quickViews/TaskDetailQuickView';
 import { DocumentDetailModal } from '@/features/documents/components/DocumentDetailModal';
 import { useAsyncData } from '@/hooks/useAsyncData';
 import { dashboardApi, documentApi } from '@/services/api';
-import type { Announcement, CalendarEvent, ChatConversation, DocumentSubmission, MailItem, Task, TaskStatus } from '@/types/domain';
+import type { Announcement, ChatConversation, DocumentSubmission, MailItem, MeetingEvent, Task, TaskStatus } from '@/types/domain';
 import { avatarTone } from '@/utils/avatar';
 
 const taskDue = (value: string) => new Date(value).toLocaleString('vi-VN', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
@@ -22,7 +22,7 @@ export function DashboardPage() {
   const navigate = useNavigate();
   const [detailTask, setDetailTask] = useState<Task | null>(null);
   const [detailDocument, setDetailDocument] = useState<DocumentSubmission | null>(null);
-  const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
+  const [selectedEvent, setSelectedEvent] = useState<MeetingEvent | null>(null);
   const [selectedMail, setSelectedMail] = useState<MailItem | null>(null);
   const [selectedChat, setSelectedChat] = useState<ChatConversation | null>(null);
   const [selectedAnnouncement, setSelectedAnnouncement] = useState<Announcement | null>(null);
@@ -90,7 +90,7 @@ export function DashboardPage() {
           <div className="widget-heading"><div><span className="section-icon meetings"><ModuleIcon module="meetings" /></span><span><h2>Họp trực tuyến</h2><p>{events.length} cuộc họp hôm nay</p></span></div></div>
           <div className="widget-body widget-timeline">{events.map((event) => <button className="widget-event" key={event.id} onClick={() => setSelectedEvent(event)} type="button"><time>{shortTime(event.startAt)}</time><span><strong>{event.title}</strong><small>{event.platform ?? event.location}</small></span></button>)}</div>
           <footer className="widget-footer">
-            <Link aria-label="Xem tất cả họp trực tuyến" to="/calendar">Xem tất cả →</Link>
+            <Link aria-label="Xem tất cả họp trực tuyến" to="/meeting">Xem tất cả →</Link>
           </footer>
         </section>
 
@@ -121,7 +121,7 @@ export function DashboardPage() {
     </div>
     {detailTask && <TaskDetailQuickView onClose={() => setDetailTask(null)} onSave={(status, progress) => setTaskUpdates((current) => ({ ...current, [detailTask.id]: { status, progress } }))} task={detailTask} />}
     <DocumentDetailModal document={detailDocument} onClose={() => setDetailDocument(null)} onUpdated={async (updated) => { setDetailDocument(updated); await state.reload(); }} />
-    {selectedEvent && <CalendarQuickView event={selectedEvent} onClose={() => setSelectedEvent(null)} />}
+    {selectedEvent && <MeetingQuickView event={selectedEvent} onClose={() => setSelectedEvent(null)} />}
     {selectedMail && <MailQuickView mail={selectedMail} onClose={() => setSelectedMail(null)} />}
     {selectedChat && <ChatQuickView chat={selectedChat} onClose={() => setSelectedChat(null)} />}
     {selectedAnnouncement && <AnnouncementQuickView announcement={selectedAnnouncement} onClose={() => setSelectedAnnouncement(null)} />}
