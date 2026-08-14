@@ -17,6 +17,7 @@ export interface User {
   department: string;
   position: string;
   role?: 'employee' | 'admin' | string;
+  birthDate?: string;
 }
 
 export interface DirectoryContact {
