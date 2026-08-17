@@ -176,7 +176,7 @@ function evaluationToTask(sheet: EvaluationSheet): Task {
     priority: 'medium',
     dueAt: sheet.dueAt,
     receivedAt: sheet.updatedAt,
-    assignedBy: isSelf ? sheet.employeeName : (sheet.stageEvaluators?.[sheet.stage] || 'Hội đồng đánh giá'),
+    assignedBy: isSelf ? sheet.employeeName : (sheet.stageEvaluators?.[sheet.stage] || 'Hội đồng kiểm tra'),
     department: sheet.department,
     progress: sheet.progress,
     sourceModule: 'evaluations',
