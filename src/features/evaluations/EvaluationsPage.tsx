@@ -42,8 +42,8 @@ const CouncilIcon = ({ size = 16 }: { size?: number }) => (
 
 const modeOptions = [
   { value: 'self', label: 'Phiếu của tôi', icon: <UserIcon /> },
-  { value: 'scoring', label: 'Chấm nhân viên', icon: <TeamIcon /> },
-  { value: 'council', label: 'Hội đồng đánh giá', icon: <CouncilIcon /> },
+  { value: 'scoring', label: 'Chấm điểm', icon: <TeamIcon /> },
+  { value: 'council', label: 'Hội đồng kiểm tra', icon: <CouncilIcon /> },
 ];
 
 const stageOrder: EvaluationStage[] = ['self', 'deputy', 'manager', 'editorial', 'council'];
@@ -253,12 +253,12 @@ function EmployeeEvaluationListTable({
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             allowClear
-            style={{ width: 220 }}
+            style={{ width: 360, minWidth: 320 }}
           />
           <Select
             value={selectedDept}
             onChange={setSelectedDept}
-            style={{ width: 160 }}
+            style={{ width: 230, minWidth: 200 }}
             className="filter-select"
             options={[
               { value: 'all', label: 'Tất cả phòng ban' },
@@ -268,7 +268,7 @@ function EmployeeEvaluationListTable({
           <Select
             value={selectedPos}
             onChange={setSelectedPos}
-            style={{ width: 160 }}
+            style={{ width: 200, minWidth: 180 }}
             className="filter-select"
             options={[
               { value: 'all', label: 'Tất cả chức danh' },

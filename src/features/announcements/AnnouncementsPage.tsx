@@ -60,7 +60,7 @@ export function AnnouncementsPage() {
   return <div className="module-page announcements-module-page notification-center-page">
     <section className="notification-center surface-panel">
       <header className="notification-center-header">
-        <div className="notification-center-title"><span><ModuleIcon module="announcements" size={21} /></span><div><h1>Thông báo</h1><p>Cập nhật tập trung từ các module trong hệ thống</p></div></div>
+        <div className="notification-center-title"><span><ModuleIcon module="announcements" size={21} /></span><div><h1>Thông báo</h1></div></div>
         <div className="notification-center-actions"><Input aria-label="Tìm thông báo" allowClear onChange={(event) => setSearch(event.target.value)} placeholder="Tìm theo tiêu đề, nội dung hoặc đơn vị" prefix={<ModuleIcon module="announcements" size={17} />} value={search} /><Button disabled={!unreadCount} onClick={() => void markAllRead()}>Đánh dấu tất cả đã xem</Button></div>
       </header>
 

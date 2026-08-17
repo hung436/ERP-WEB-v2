@@ -40,11 +40,11 @@ describe('Workspace Đánh giá lao động', () => {
     expect(within(firstRow).getByText(/Hoàn thành đúng tiến độ/)).toBeInTheDocument();
   });
 
-  it('chuyển sang chấm nhân viên trong cùng workspace và xem nhanh lịch sử điểm', async () => {
+  it('chuyển sang chấm điểm trong cùng workspace và xem nhanh lịch sử điểm', async () => {
     const user = userEvent.setup();
     renderApp('/evaluations', true);
     await screen.findByRole('heading', { name: 'Đánh giá lao động' });
-    await selectMode(user, 'Chấm nhân viên');
+    await selectMode(user, 'Chấm điểm');
     await user.click(await screen.findByText(/Đỗ Quang Huy/));
     const firstRow = (await screen.findAllByRole('article'))[0];
     const history = within(firstRow).getByLabelText(/Chi tiết đánh giá các cấp: Thực hiện nhiệm vụ chuyên môn/);
@@ -57,7 +57,7 @@ describe('Workspace Đánh giá lao động', () => {
     const user = userEvent.setup();
     renderApp('/evaluations', true);
     await screen.findByRole('heading', { name: 'Đánh giá lao động' });
-    await selectMode(user, 'Hội đồng đánh giá');
+    await selectMode(user, 'Hội đồng kiểm tra');
     await user.click((await screen.findAllByText(/Chấm điểm|Xem phiếu/))[0]);
     const firstRow = (await screen.findAllByRole('article'))[0];
     const history = within(firstRow).getByLabelText(/Chi tiết đánh giá các cấp: Thực hiện nhiệm vụ chuyên môn/);

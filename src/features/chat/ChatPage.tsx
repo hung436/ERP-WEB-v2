@@ -160,7 +160,7 @@ export function ChatPage() {
     <section className={`messaging-shell chat-workspace surface-panel${infoOpen ? ' with-info' : ''}`}>
       <aside className="conversation-pane">
         <div className="chat-list-heading">
-          <div><h2>Tin nhắn</h2><span>{conversationsState.data.length}</span></div>
+          <div><h2>Tin nhắn</h2></div>
           <div className="chat-heading-actions" style={{ display: 'flex', gap: 6 }}>
             <Tooltip title="Đoạn chat mới"><Button aria-label="Đoạn chat mới" icon={<UserPlus size={16} />} onClick={() => setDirectChatOpen(true)} /></Tooltip>
             <Tooltip title="Nhóm mới"><Button aria-label="Nhóm mới" icon={<Users size={16} />} onClick={() => setGroupOpen(true)} type="primary" /></Tooltip>
@@ -168,7 +168,7 @@ export function ChatPage() {
         </div>
         <div className="chat-list-tools">
           <Input aria-label="Tìm cuộc trò chuyện" allowClear onChange={(event) => setSearch(event.target.value)} placeholder="Tìm kiếm" value={search} />
-          <Segmented block onChange={(value) => setConversationFilter(value as 'all' | 'unread')} options={[{ label: <CountedTabLabel count={conversationsState.data.length} label="Tất cả" />, value: 'all' }, { label: <CountedTabLabel count={unreadConversations} label="Chưa đọc" />, value: 'unread' }]} value={conversationFilter} />
+          <Segmented block onChange={(value) => setConversationFilter(value as 'all' | 'unread')} options={[{ label: 'Tất cả', value: 'all' }, { label: <CountedTabLabel count={unreadConversations} label="Chưa đọc" />, value: 'unread' }]} value={conversationFilter} />
         </div>
         <div className="conversation-list">
           {filtered.length ? filtered.map((item) => <button className={item.id === effectiveId ? 'conversation active' : 'conversation'} key={item.id} onClick={() => { setSelectedId(item.id); setReplyTo(undefined); setMessageSearch(''); setMessageSearchOpen(false); }} type="button">

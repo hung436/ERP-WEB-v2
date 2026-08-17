@@ -774,7 +774,7 @@
 
 .evaluation-filter-toolbar .toolbar-search {
   flex: 1;
-  max-width: 340px;
+  max-width: 480px;
 }
 
 .evaluation-filter-toolbar .toolbar-search .ant-input-affix-wrapper {
@@ -1628,6 +1628,11 @@ input[type='number'] {
   align-items: center;
   gap: 10px;
   flex-wrap: wrap;
+}
+
+.filter-left-group .search-employee-input {
+  min-width: 320px;
+  width: 360px !important;
 }
 
 /* Redesigned Clean & Elegant Quick Evaluate Button - System Red Brand Theme */
