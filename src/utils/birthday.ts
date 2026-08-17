@@ -3,12 +3,16 @@ import type { User } from '@/types/domain';
 
 /**
  * Checks if today matches the user's birthday.
- * If user has no birthDate specified, defaults to true for demo user so birthday feature is active.
+ * Configured to always return true so birthday celebration is active every day.
  */
 export function isUserBirthday(user: User | null): boolean {
   if (!user) return false;
+
+  // Fake: luôn kích hoạt sinh nhật mỗi ngày
+  return true;
+
+  /* Code kiểm tra ngày sinh nhật thực tế:
   if (!user.birthDate) {
-    // Default demo users to today for instant live presentation
     return true;
   }
 
@@ -17,4 +21,5 @@ export function isUserBirthday(user: User | null): boolean {
   if (!dob.isValid()) return true;
 
   return today.month() === dob.month() && today.date() === dob.date();
+  */
 }
