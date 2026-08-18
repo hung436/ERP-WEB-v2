@@ -1,241 +1,512 @@
-/* Ultra-Modern Account Profile Styling */
-.account-page-shell {
-  max-width: 1140px;
+/* =============================================================
+   Enterprise-Grade Account & Profile Settings CSS
+   ============================================================= */
+
+.account-page-wrapper {
+  max-width: 1040px;
   margin: 0 auto;
-  padding-bottom: 60px;
+  padding-bottom: 48px;
   box-sizing: border-box;
 }
 
-.account-cover-frame {
+/* 1. Cover Photo Banner (Uncropped Natural Aspect Ratio) */
+.account-cover-banner {
   width: 100%;
-  border-radius: 20px 20px 0 0;
+  border-radius: 16px 16px 0 0;
   overflow: hidden;
-  background: #0f172a;
+  background: #ffffff;
   border: 1px solid #eaecf0;
   border-bottom: 0;
-  box-shadow: 0 4px 20px rgba(16, 24, 40, 0.04);
+  box-shadow: 0 2px 8px rgba(16, 24, 40, 0.04);
 }
 
-.account-cover-frame img {
+.account-cover-banner img {
   width: 100%;
   height: auto;
   display: block;
-  object-fit: contain;
 }
 
-.account-identity-hero {
-  position: relative;
-  background: #fff;
+/* 2. Profile Identity Hero Card */
+.account-profile-hero {
+  background: #ffffff;
   border: 1px solid #eaecf0;
   border-top: 0;
-  border-radius: 0 0 20px 20px;
-  padding: 24px 32px 28px;
-  box-shadow: 0 10px 30px rgba(16, 24, 40, 0.05);
+  border-radius: 0 0 16px 16px;
+  padding: 0 28px;
+  box-shadow: 0 4px 20px -2px rgba(16, 24, 40, 0.05);
+  margin-bottom: 20px;
 }
 
-.account-hero-top {
+.hero-top-row {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 24px;
-  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 20px;
+  padding-bottom: 4px;
 }
 
-.account-user-meta {
-  display: flex;
-  align-items: center;
-  gap: 24px;
-}
-
-.account-avatar-ring {
+.hero-avatar-wrapper {
   position: relative;
+  margin-top: -38px;
   flex-shrink: 0;
 }
 
-.account-avatar-ring .ant-avatar {
-  border: 4px solid #fff;
-  box-shadow: 0 8px 24px rgba(217, 45, 32, 0.18);
+.hero-avatar {
+  border: 4px solid #ffffff !important;
+  box-shadow: 0 8px 24px -4px rgba(16, 24, 40, 0.14) !important;
 }
 
-.avatar-upload-trigger {
+.hero-avatar-badge {
   position: absolute;
   right: 0;
   bottom: 2px;
-  width: 34px;
-  height: 34px;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
   background: #d92d20;
-  color: #fff;
-  border: 3px solid #fff;
+  color: #ffffff;
+  border: 2px solid #ffffff;
   display: grid;
   place-items: center;
   cursor: pointer;
-  box-shadow: 0 4px 10px rgba(217, 45, 32, 0.4);
-  transition: transform 0.2s ease, background-color 0.2s ease;
+  box-shadow: 0 2px 6px rgba(217, 45, 32, 0.35);
+  transition: transform 0.15s ease, background-color 0.15s ease;
 }
 
-.avatar-upload-trigger:hover {
-  transform: scale(1.08);
+.hero-avatar-badge:hover {
+  transform: scale(1.1);
   background: #b42318;
 }
 
-.account-user-names h1 {
-  margin: 0;
-  font-size: 26px;
-  font-weight: 800;
-  color: #0f172a;
-  letter-spacing: -0.02em;
-  line-height: 1.2;
+.hero-info-wrapper {
+  flex: 1;
+  min-width: 0;
+  padding: 14px 0 8px;
 }
 
-.account-user-names p {
-  margin: 6px 0 0;
-  color: #475467;
-  font-size: 14px;
-  font-weight: 500;
-}
-
-.account-stats-row {
-  display: flex;
-  gap: 12px;
-}
-
-.account-stat-card {
+.hero-name-row {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 18px;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 14px;
-  transition: transform 0.2s ease, border-color 0.2s ease;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
-.account-stat-card:hover {
-  transform: translateY(-2px);
-  border-color: #cbd5e1;
-}
-
-.account-stat-card strong {
-  display: block;
-  font-size: 15px;
+.hero-name-row h1 {
+  margin: 0;
+  font-size: 22px;
   font-weight: 700;
-  color: #0f172a;
-  line-height: 1.2;
+  color: #101828;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
 }
 
-.account-stat-card small {
-  color: #64748b;
+.live-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   font-size: 12px;
   font-weight: 500;
+  color: #027a48;
+  background: #ecfdf3;
+  padding: 2px 10px;
+  border-radius: 16px;
+  border: 1px solid #abefc6;
 }
 
-/* Vertical Tab Layout Structure - Zero Jump Stability */
-.account-vertical-layout {
-  display: grid;
-  grid-template-columns: 260px minmax(0, 1fr);
-  gap: 24px;
-  margin-top: 24px;
-  align-items: start;
+.live-status-pill .live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #12b76a;
 }
 
-.account-vertical-sidebar {
-  background: #fff;
-  border: 1px solid #eaecf0;
-  border-radius: 18px;
-  padding: 16px;
-  min-height: 520px;
-  box-shadow: 0 4px 16px rgba(16, 24, 40, 0.04);
-  box-sizing: border-box;
+.hero-subtext {
+  margin: 4px 0 0;
+  font-size: 13.5px;
+  color: #475467;
+  line-height: 1.4;
 }
 
-.account-vertical-btn {
-  width: 100%;
+/* 3. Underline Tabs Bar */
+.hero-tabs-bar {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 13px 18px;
-  border-radius: 12px;
-  border: 1px solid transparent;
+  gap: 4px;
+  margin-top: 14px;
+  border-top: 1px solid #f2f4f7;
+  overflow-x: auto;
+}
+
+.hero-tab-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 18px;
+  border: none;
   background: transparent;
-  color: #475467;
-  font-weight: 600;
+  border-bottom: 2px solid transparent;
+  color: #667085;
   font-size: 14px;
+  font-weight: 600;
   cursor: pointer;
-  text-align: left;
+  white-space: nowrap;
   transition: all 0.15s ease;
-  margin-bottom: 6px;
+  margin-bottom: -1px;
 }
 
-.account-vertical-btn:hover {
-  background: #f8fafc;
-  color: #0f172a;
+.hero-tab-item:hover {
+  color: #101828;
 }
 
-.account-vertical-btn.active {
-  background: #fef3f2;
+.hero-tab-item.active {
   color: #d92d20;
-  border-color: #fee4e2;
+  border-bottom-color: #d92d20;
+}
+
+/* 4. Active Content Container */
+.account-content-container {
+  min-width: 0;
+}
+
+.cards-stack-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.account-card-panel {
+  background: #ffffff;
+  border: 1px solid #eaecf0;
+  border-radius: 16px;
+  padding: 24px 28px;
+  box-shadow: 0 1px 3px rgba(16, 24, 40, 0.04);
+}
+
+.card-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #f2f4f7;
+}
+
+.card-panel-header h2 {
+  margin: 0;
+  font-size: 16px;
   font-weight: 700;
+  color: #101828;
 }
 
-/* Right Content Panel Stable Min-Height */
-.account-tab-content-wrapper {
-  min-height: 520px;
-  box-sizing: border-box;
+.card-panel-header p {
+  margin: 2px 0 0;
+  font-size: 13px;
+  color: #667085;
 }
 
-/* Detail Card Grid for Personnel Profile */
-.info-detail-grid {
+/* =========================================================
+   SPEC INFO GRID (REDESIGNED PERSONAL INFO ITEMS)
+   ========================================================= */
+.spec-info-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 16px;
-  margin-top: 20px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
 }
 
-.info-detail-card {
+.spec-item-card {
   display: flex;
   align-items: flex-start;
   gap: 14px;
-  padding: 18px;
-  border-radius: 14px;
-  background: #ffffff;
-  border: 1px solid #eaecf0;
-  box-shadow: 0 2px 8px rgba(16, 24, 40, 0.03);
-  transition: transform 0.15s ease, border-color 0.15s ease;
-}
-
-.info-detail-card:hover {
-  border-color: #d0d5dd;
-  transform: translateY(-2px);
-}
-
-.info-detail-icon {
-  width: 42px;
-  height: 42px;
+  padding: 16px 18px;
+  background: #f8fafc;
+  border: 1px solid #eef2f6;
   border-radius: 12px;
+  transition: all 0.15s ease;
+}
+
+.spec-item-card:hover {
+  background: #ffffff;
+  border-color: #cbd5e1;
+  box-shadow: 0 4px 12px rgba(16, 24, 40, 0.04);
+}
+
+.spec-icon-box {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: #e0f2fe;
+  color: #0284c7;
   display: grid;
   place-items: center;
   flex-shrink: 0;
 }
 
-.info-detail-body {
-  min-width: 0;
-  flex: 1;
+.spec-icon-blue {
+  background: #eff6ff;
+  color: #2563eb;
 }
 
-.info-detail-body small {
-  display: block;
+.spec-icon-red {
+  background: #fef2f2;
+  color: #d92d20;
+}
+
+.spec-icon-green {
+  background: #ecfdf3;
+  color: #027a48;
+}
+
+.spec-icon-purple {
+  background: #f5f3ff;
+  color: #7c3aed;
+}
+
+.spec-icon-amber {
+  background: #fffbeb;
+  color: #d97706;
+}
+
+.spec-content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.spec-label {
+  font-size: 11.5px;
+  font-weight: 600;
   color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.spec-value {
+  font-size: 14.5px;
+  font-weight: 600;
+  color: #0f172a;
+  word-break: break-word;
+  line-height: 1.4;
+}
+
+/* =========================================================
+   ASSIGNMENTS TABLE & ROLES STYLING
+   ========================================================= */
+.assignments-styled-table .ant-table {
+  border-radius: 10px;
+  border: 1px solid #eaecf0;
+  overflow: hidden;
+}
+
+.assignments-styled-table .ant-table-thead > tr > th {
+  background: #f8fafc;
+  color: #475467;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.table-dept-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #101828;
+}
+
+.table-role-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #334155;
+}
+
+.table-cell-icon {
+  color: #64748b;
+  flex-shrink: 0;
+}
+
+.tag-primary-assignment {
+  background: #fef2f2 !important;
+  color: #d92d20 !important;
+  border: 1px solid #fecdd3 !important;
+  border-radius: 6px !important;
+  font-weight: 600 !important;
+  padding: 2px 10px !important;
+}
+
+.tag-secondary-assignment {
+  background: #f1f5f9 !important;
+  color: #475467 !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 6px !important;
+  font-weight: 500 !important;
+  padding: 2px 10px !important;
+}
+
+.hr-notice-callout {
+  margin-top: 14px;
+  padding: 12px 16px;
+  background: #f8fafc;
+  border: 1px dashed #cbd5e1;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12.5px;
+  color: #475467;
+}
+
+.hr-notice-callout strong {
+  color: #101828;
+}
+
+/* =========================================================
+   PASSWORD & SECURITY STYLING
+   ========================================================= */
+.password-strength-box {
+  margin: -6px 0 16px;
+  padding: 8px 12px;
+  background: #f9fafb;
+  border-radius: 8px;
+  border: 1px solid #f2f4f7;
+}
+
+.strength-header {
+  display: flex;
+  justify-content: space-between;
   font-size: 12px;
-  font-weight: 500;
+  color: #667085;
+  margin-bottom: 4px;
+}
+
+.strength-header strong {
+  color: #101828;
+}
+
+.security-icon-circle {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: #ecfdf3;
+  color: #027a48;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.twofa-callout-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  background: #f0f9ff;
+  border: 1px solid #b9e6fe;
+  border-radius: 10px;
+}
+
+.twofa-callout-card strong {
+  display: block;
+  font-size: 13.5px;
+  color: #026aa2;
   margin-bottom: 2px;
 }
 
-.info-detail-body strong {
-  display: block;
-  color: #0f172a;
-  font-size: 15px;
-  font-weight: 700;
-  word-break: break-word;
+.twofa-callout-card p {
+  margin: 0;
+  font-size: 12.5px;
+  color: #065986;
+  line-height: 1.45;
+}
+
+/* =========================================================
+   SETTINGS & PREFERENCES STYLING
+   ========================================================= */
+.settings-list-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.setting-toggle-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  background: #f9fafb;
+  border: 1px solid #eaecf0;
+  border-radius: 10px;
+}
+
+.setting-text-block {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-right: 16px;
+}
+
+.setting-heading-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #101828;
+}
+
+.setting-heading-row strong {
+  font-size: 13.5px;
+  font-weight: 600;
+}
+
+.setting-text-block p {
+  margin: 0;
+  font-size: 12.5px;
+  color: #667085;
+  line-height: 1.4;
+}
+
+.info-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+
+.pref-dropdown-card {
+  padding: 16px;
+  background: #f9fafb;
+  border: 1px solid #eaecf0;
+  border-radius: 10px;
+}
+
+.pref-dropdown-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.pref-dropdown-header strong {
+  font-size: 13.5px;
+  color: #101828;
+}
+
+.pref-dropdown-card p {
+  margin: 0;
+  font-size: 12px;
+  color: #667085;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .hero-top-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .hero-avatar-wrapper {
+    margin-top: -30px;
+  }
+
+  .spec-info-grid,
+  .info-cards-grid {
+    grid-template-columns: 1fr;
+  }
 }
