@@ -1,0 +1,389 @@
+/* =============================================================
+   Soft & Elegant Minimalist Login Page CSS - Báo Tuổi Trẻ ERP
+   ============================================================= */
+
+.login-viewport-shell {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow-x: hidden;
+  background: 
+    radial-gradient(circle at 50% 12%, rgba(254, 226, 226, 0.5) 0%, transparent 60%),
+    linear-gradient(135deg, #fdf8f6 0%, #f8fafc 45%, #f1f5f9 100%);
+  padding: 32px 16px;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+/* Background Atmosphere Texture & Glow (Soft & Calming) */
+.login-bg-texture {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: 
+    radial-gradient(rgba(15, 23, 42, 0.04) 1px, transparent 1px),
+    radial-gradient(rgba(15, 23, 42, 0.02) 1px, transparent 1px);
+  background-size: 36px 36px, 18px 18px;
+  background-position: 0 0, 18px 18px;
+  opacity: 0.7;
+}
+
+.login-bg-glow {
+  position: absolute;
+  top: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 700px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(239, 68, 68, 0.08) 0%, rgba(244, 63, 94, 0.03) 50%, transparent 75%);
+  filter: blur(60px);
+  pointer-events: none;
+}
+
+/* 1. Header Large Logo */
+.login-masthead-center {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.masthead-large-logo {
+  background: transparent;
+  padding: 0;
+  border-radius: 0;
+  border: none;
+  box-shadow: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.25s ease;
+}
+
+.masthead-large-logo:hover {
+  transform: translateY(-2px) scale(1.02);
+}
+
+.masthead-large-logo img {
+  height: 72px;
+  width: auto;
+  display: block;
+}
+
+/* 2. Central Dual-Login Floating Card */
+.login-dual-card {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 820px;
+  background: #ffffff;
+  border-radius: 24px;
+  border: 1px solid #eaecf0;
+  box-shadow: 
+    0 20px 45px -10px rgba(16, 24, 40, 0.09),
+    0 4px 16px rgba(16, 24, 40, 0.04);
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.95fr);
+  overflow: hidden;
+  animation: cardFadeUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes cardFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Left Side: Traditional Form */
+.login-left-section {
+  padding: 36px 36px 32px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.login-form-heading {
+  margin-bottom: 20px;
+}
+
+.login-form-heading h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: #0f172a;
+  letter-spacing: -0.01em;
+}
+
+.login-form-heading p {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: #64748b;
+}
+
+.login-fields-form .ant-form-item {
+  margin-bottom: 16px;
+}
+
+.login-fields-form .ant-form-item-label > label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #334155;
+}
+
+.login-input-box {
+  border-radius: 10px !important;
+  border-color: #cbd5e1 !important;
+  transition: all 0.2s ease !important;
+}
+
+.login-input-box:hover,
+.login-input-box:focus-within {
+  border-color: #d92d20 !important;
+  box-shadow: 0 0 0 3px rgba(217, 45, 32, 0.12) !important;
+}
+
+.form-sub-options {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: -4px 0 16px;
+  font-size: 13px;
+}
+
+.btn-forgot-pass {
+  color: #d92d20;
+  font-weight: 600;
+  text-decoration: none;
+  font-size: 12.5px;
+  transition: color 0.15s ease;
+}
+
+.btn-forgot-pass:hover {
+  color: #991b1b;
+  text-decoration: underline;
+}
+
+.btn-submit-action {
+  height: 44px;
+  border-radius: 10px !important;
+  background: #d92d20 !important;
+  border-color: #d92d20 !important;
+  font-size: 15px;
+  font-weight: 700;
+  box-shadow: 0 4px 14px rgba(217, 45, 32, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s ease !important;
+}
+
+.btn-submit-action:hover {
+  background: #b42318 !important;
+  border-color: #b42318 !important;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(217, 45, 32, 0.4);
+}
+
+.login-error-alert {
+  margin-bottom: 16px;
+  border-radius: 10px;
+}
+
+/* Right Side: QR Code Login Panel */
+.login-right-section {
+  background: #f8fafc;
+  border-left: 1px solid #f1f5f9;
+  padding: 36px 32px 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  position: relative;
+}
+
+.qr-masthead-title {
+  margin: 0 0 16px;
+  font-size: 15px;
+  font-weight: 700;
+  color: #0f172a;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.qr-box-frame {
+  position: relative;
+  background: #ffffff;
+  padding: 14px;
+  border-radius: 18px;
+  border: 1px solid #eaecf0;
+  box-shadow: 0 4px 16px rgba(16, 24, 40, 0.05);
+  display: inline-block;
+  margin-bottom: 14px;
+}
+
+.qr-laser-scanner {
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #d92d20, transparent);
+  box-shadow: 0 0 8px #d92d20;
+  top: 14px;
+  animation: laserSweep 2.4s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+@keyframes laserSweep {
+  0% { top: 14px; opacity: 0.4; }
+  50% { opacity: 1; }
+  100% { top: calc(100% - 16px); opacity: 0.4; }
+}
+
+.qr-meta-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #64748b;
+  margin-bottom: 10px;
+}
+
+.qr-pulse-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 0 2px #d1fae5;
+  animation: pulseGreen 1.5s infinite;
+}
+
+@keyframes pulseGreen {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.3); opacity: 0.7; }
+}
+
+.btn-qr-refresh {
+  background: transparent;
+  border: none;
+  color: #d92d20;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.btn-qr-refresh:hover {
+  background: #fef2f2;
+}
+
+.qr-guide-text {
+  margin: 0;
+  font-size: 12.5px;
+  color: #475467;
+  line-height: 1.5;
+  max-width: 240px;
+}
+
+.qr-guide-text strong {
+  color: #0f172a;
+}
+
+/* 3. Demo Quick Selector Bar */
+.demo-accounts-pill-row {
+  position: relative;
+  z-index: 2;
+  margin-top: 18px;
+  background: #ffffff;
+  border: 1px solid #eaecf0;
+  border-radius: 30px;
+  padding: 6px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #475467;
+  font-size: 12.5px;
+  box-shadow: 0 4px 14px rgba(16, 24, 40, 0.04);
+}
+
+.demo-btn-chip {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  color: #334155;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.demo-btn-chip:hover {
+  background: #fef2f2;
+  border-color: #fee4e2;
+  color: #d92d20;
+  transform: translateY(-1px);
+}
+
+/* 4. Footer */
+.login-site-footer {
+  position: relative;
+  z-index: 2;
+  margin-top: 24px;
+  text-align: center;
+  font-size: 12px;
+  color: #64748b;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .login-dual-card {
+    grid-template-columns: 1fr;
+    max-width: 440px;
+  }
+
+  .login-right-section {
+    border-left: 0;
+    border-top: 1px solid #f1f5f9;
+    padding: 28px 24px;
+  }
+
+  .login-left-section {
+    padding: 28px 24px 20px;
+  }
+
+  .masthead-large-logo {
+    padding: 0;
+  }
+
+  .masthead-large-logo img {
+    height: 56px;
+  }
+
+  .demo-accounts-pill-row {
+    flex-direction: column;
+    gap: 6px;
+    border-radius: 16px;
+    padding: 10px 14px;
+    text-align: center;
+  }
+}
