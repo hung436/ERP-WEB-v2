@@ -5,6 +5,13 @@ import { useSearchParams } from 'react-router-dom';
 import { ContentSkeleton, ErrorState } from '@/components/AsyncState';
 import { ModuleIcon } from '@/components/ModuleIcon';
 import { EvaluationCriterionRow } from '@/features/evaluations/components/EvaluationCriterionRow';
+import {
+  computeCriterionMax,
+  computeCriterionScore,
+  isCriterionAnswered,
+  patchCriterionTree,
+  syncCriterionScores,
+} from '@/features/evaluations/criterionTree';
 import { useAsyncData } from '@/hooks/useAsyncData';
 import { evaluationApi } from '@/services/api';
 import { CheckCircle2, Save, Search, Send, Zap } from 'lucide-react';
@@ -1126,7 +1133,7 @@ function EvaluationWorkspace({
   };
 
   const criteria = useMemo(() => draft?.groups.flatMap((group) => group.criteria) ?? [], [draft]);
-  const answered = criteria.filter((criterion) => criterion.score !== null).length;
+  const answered = criteria.filter((criterion) => isCriterionAnswered(criterion)).length;
   const completion = criteria.length > 0 ? Math.round((answered / criteria.length) * 100) : 0;
   const currentStage: EvaluationStage =
     mode === 'self' ? 'self' : mode === 'council' ? 'council' : draft?.stage === 'published' ? 'council' : draft?.stage ?? 'deputy';
@@ -1141,7 +1148,8 @@ function EvaluationWorkspace({
             ...value,
             groups: value.groups.map((group) => ({
               ...group,
-              criteria: group.criteria.map((criterion) => (criterion.id === id ? { ...criterion, ...patch } : criterion)),
+              // patchCriterionTree cập nhật được cả ý con và tính lại điểm tổng của tiêu chí nhiều cấp
+              criteria: group.criteria.map((criterion) => patchCriterionTree(criterion, id, patch)),
             })),
           }
         : value
@@ -1197,15 +1205,20 @@ function EvaluationWorkspace({
         const updatedGroups = sheet.groups.map((group) => ({
           ...group,
           criteria: group.criteria.map((criterion) => {
-            const prevScore = criterion.stageScores?.[prevStage] ?? criterion.score ?? 0;
-            return {
-              ...criterion,
-              score: prevScore,
-              stageScores: {
-                ...criterion.stageScores,
-                [currentStage]: prevScore,
-              },
+            const applyPrevStage = (node: EvaluationCriterion): EvaluationCriterion => {
+              const prevScore = node.stageScores?.[prevStage] ?? node.score ?? 0;
+              return {
+                ...node,
+                score: prevScore,
+                stageScores: {
+                  ...node.stageScores,
+                  [currentStage]: prevScore,
+                },
+                children: node.children?.map(applyPrevStage),
+              };
             };
+            // syncCriterionScores đảm bảo tiêu chí cha kiểu "tự động cộng" lấy lại đúng tổng
+            return syncCriterionScores(applyPrevStage(criterion));
           }),
         }));
 
@@ -1690,7 +1703,7 @@ function EvaluationWorkspace({
               {/* Criteria Groups Stream */}
               <section className="evaluation-stream" aria-label="Danh sách tiêu chí đánh giá">
                 {draft.groups.map((group) => {
-                  const groupAnswered = group.criteria.filter((c) => c.score !== null).length;
+                  const groupAnswered = group.criteria.filter((c) => isCriterionAnswered(c)).length;
                   const groupScore = group.criteria.reduce((sum, c) => sum + (c.score ?? 0), 0);
 
                   return (
@@ -1710,6 +1723,7 @@ function EvaluationWorkspace({
                             readOnly={readOnly}
                             onOpenNote={() => openNote(criterion)}
                             onScoreChange={(score) => updateCriterion(criterion.id, { score })}
+                            onChildScoreChange={(childId, score) => updateCriterion(childId, { score })}
                           />
                         ))}
                       </div>
@@ -1764,7 +1778,7 @@ function EvaluationWorkspace({
                 <div className="side-criteria-list" aria-label="Danh sách điểm từng câu">
                   <div className="side-list-grid">
                     {criteria.map((c, idx) => {
-                      const isScored = c.score !== null;
+                      const isScored = isCriterionAnswered(c);
                       return (
                         <button
                           key={c.id}
@@ -1863,29 +1877,73 @@ function EvaluationWorkspace({
 
       {/* Note Modal */}
       <Modal
-        title="Ghi chú tiêu chí"
+        title={
+          <div className="note-modal-title">
+            <span className="note-modal-icon" aria-hidden="true">📝</span>
+            <div>
+              <h3>Ghi chú &amp; minh chứng</h3>
+              <p>Nội dung này hiển thị cho các cấp chấm điểm phía sau</p>
+            </div>
+          </div>
+        }
         open={Boolean(noteCriterion)}
-        onOk={saveNote}
         onCancel={() => setNoteCriterionId(null)}
-        okText="Lưu ghi chú"
-        cancelText="Hủy"
         destroyOnHidden
-        width={580}
+        width={600}
+        className="evaluation-note-popup"
+        footer={
+          <div className="note-modal-footer">
+            <Button
+              className="btn-clear-note"
+              danger
+              type="text"
+              disabled={!noteValue.trim()}
+              onClick={() => setNoteValue('')}
+            >
+              Xóa nội dung
+            </Button>
+            <div className="footer-actions">
+              <Button onClick={() => setNoteCriterionId(null)}>Hủy</Button>
+              <Button type="primary" onClick={saveNote}>
+                Lưu ghi chú
+              </Button>
+            </div>
+          </div>
+        }
       >
         <div className="evaluation-note-modal">
           {noteCriterion && (
             <>
-              <div className="note-criterion-header">
-                <Tag color="red">Tiêu chí {criteria.findIndex((c) => c.id === noteCriterion.id) + 1}</Tag>
-                <strong>{noteCriterion.title}</strong>
+              <div className="note-criterion-card">
+                <div className="note-criterion-top">
+                  <Tag color="red">Tiêu chí {criteria.findIndex((c) => c.id === noteCriterion.id) + 1}</Tag>
+                  <span className="note-criterion-score">
+                    {isCriterionAnswered(noteCriterion) ? (
+                      <>
+                        <strong>{computeCriterionScore(noteCriterion)}</strong>
+                        <small>/ {computeCriterionMax(noteCriterion)} điểm</small>
+                      </>
+                    ) : (
+                      <small>Chưa chấm điểm</small>
+                    )}
+                  </span>
+                </div>
+                <p className="note-criterion-title">{noteCriterion.title}</p>
               </div>
 
+              <label className="note-field-label" htmlFor="evaluation-note-input">
+                Nội dung ghi chú
+              </label>
               <Input.TextArea
+                id="evaluation-note-input"
                 aria-label="Nội dung ghi chú"
-                rows={6}
+                autoFocus
+                autoSize={{ minRows: 5, maxRows: 10 }}
+                maxLength={500}
+                showCount
                 value={noteValue}
                 onChange={(e) => setNoteValue(e.target.value)}
-                placeholder="Nhập nội dung ghi chú hoặc minh chứng..."
+                placeholder="Ví dụ: Hoàn thành 15 bài xuất bản đúng tiến độ, có số liệu đối chiếu kèm theo..."
               />
             </>
           )}

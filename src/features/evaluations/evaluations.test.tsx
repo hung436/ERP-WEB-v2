@@ -21,7 +21,7 @@ describe('Workspace Đánh giá lao động', () => {
     expect(await screen.findByRole('heading', { name: 'Đánh giá lao động' })).toBeInTheDocument();
     const stream = await screen.findByRole('region', { name: 'Danh sách tiêu chí đánh giá' });
     const rows = within(stream).getAllByRole('article');
-    expect(rows).toHaveLength(30);
+    expect(rows).toHaveLength(32);
 
     const firstRow = rows[0];
     const initialTotal = Number(document.querySelector('.live-score')?.textContent ?? 0);

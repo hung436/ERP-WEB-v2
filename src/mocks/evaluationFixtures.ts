@@ -1,4 +1,5 @@
-import type { EvaluationGroup, EvaluationPeriod, EvaluationSheet, EvaluationStage } from '@/types/evaluation';
+import { syncCriterionScores } from '@/features/evaluations/criterionTree';
+import type { EvaluationCriterion, EvaluationGroup, EvaluationPeriod, EvaluationSheet, EvaluationStage } from '@/types/evaluation';
 
 const stageOrder: EvaluationStage[] = ['self', 'deputy', 'manager', 'editorial', 'council'];
 
@@ -28,6 +29,42 @@ const choiceCriterion = (
     { label: 'Hoàn thành', min: Math.round(max * 0.5), max: Math.round(max * 0.79) },
     { label: 'Hoàn thành tốt', min: Math.round(max * 0.8), max },
   ],
+});
+
+/** Ý con chỉ để theo dõi (không có ô nhập điểm), ví dụ 1.1, 1.2... của câu 1. */
+const subItem = (id: string, groupId: string, title: string, max = 1): EvaluationCriterion => ({
+  id,
+  groupId,
+  title,
+  type: 'number',
+  min: 0,
+  max,
+  score: null,
+});
+
+/**
+ * Tiêu chí nhiều cấp.
+ * - scoreMode 'manual': chỉ nhập điểm ở tiêu chí cha (câu 1: 0 - 5đ, các ý 1.1..1.5 chỉ để theo dõi).
+ * - scoreMode 'sum': điểm cha cộng tự động từ các ý con (câu 3 = 3.1 + 3.2).
+ */
+const groupedCriterion = (
+  id: string,
+  groupId: string,
+  title: string,
+  max: number,
+  scoreMode: 'manual' | 'sum',
+  children: EvaluationCriterion[],
+  score: number | null = null
+): EvaluationCriterion => ({
+  id,
+  groupId,
+  title,
+  type: 'grouped',
+  min: 0,
+  max,
+  score,
+  scoreMode,
+  children,
 });
 
 const baseGroups: EvaluationGroup[] = [
@@ -98,6 +135,64 @@ const baseGroups: EvaluationGroup[] = [
     numberCriterion('m3', 'deduction', 'Vi phạm quy trình hoặc quy định của cơ quan', 5, 0),
     numberCriterion('m4', 'deduction', 'Ảnh hưởng đến tiến độ hoặc kết quả chung của tập thể', 5, 0),
   ] },
+  {
+    id: 'cadre',
+    title: 'VI. Tiêu chí đánh giá nhiều cấp',
+    kind: 'normal',
+    criteria: [
+      groupedCriterion(
+        'g1',
+        'cadre',
+        'Về chính trị, tư tưởng',
+        5,
+        'manual',
+        [
+          subItem('g1-1', 'cadre', 'Tuyệt đối trung thành với Đảng, với Tổ quốc và Nhân dân; kiên định lý tưởng cách mạng, chủ nghĩa Mác - Lênin, tư tưởng Hồ Chí Minh, mục tiêu độc lập dân tộc, chủ nghĩa xã hội và đường lối đổi mới của Đảng.'),
+          subItem('g1-2', 'cadre', 'Có lập trường, quan điểm, bản lĩnh chính trị vững vàng, không dao động trước mọi khó khăn, thách thức; kiên quyết bảo vệ nền tảng tư tưởng, Cương lĩnh, đường lối của Đảng, Hiến pháp và pháp luật của Nhà nước.'),
+          subItem('g1-3', 'cadre', 'Có tinh thần yêu nước sâu sắc, tận tuỵ phục vụ Nhân dân, sâu sát cơ sở, luôn hành động vì lợi ích của Nhân dân, đặt lợi ích của Đảng, quốc gia, dân tộc, Nhân dân, tập thể lên trên lợi ích cá nhân.'),
+          subItem('g1-4', 'cadre', 'Tuyệt đối chấp hành sự phân công của tổ chức, yên tâm công tác và hoàn thành tốt mọi nhiệm vụ được giao; tích cực nghiên cứu, học tập các chủ trương, nghị quyết của Đảng, chính sách, pháp luật của Nhà nước.'),
+          subItem('g1-5', 'cadre', 'Có năng lực tư duy và tầm nhìn đáp ứng với yêu cầu thay đổi của tình hình thực tiễn; phát huy tinh thần chủ động, đổi mới, sáng tạo; phấn đấu vì mục tiêu phát triển của tổ chức, cơ quan, đơn vị.'),
+        ],
+        4
+      ),
+      groupedCriterion(
+        'g3',
+        'cadre',
+        'Năng lực lãnh đạo, quản lý và năng lực chuyên môn, nghiệp vụ theo yêu cầu của vị trí việc làm; khả năng đáp ứng yêu cầu thực thi nhiệm vụ được giao; thái độ công tác trong thực hiện nhiệm vụ; tinh thần đổi mới sáng tạo, dám nghĩ, dám làm, dám chịu trách nhiệm vì lợi ích chung',
+        7,
+        'sum',
+        [
+          groupedCriterion(
+            'g3-1',
+            'cadre',
+            'Năng lực lãnh đạo, quản lý',
+            4,
+            'manual',
+            [
+              subItem('g3-1-1', 'cadre', 'Có tư duy, khả năng hoạch định đường lối, chính sách và lãnh đạo, chỉ đạo tổ chức thực hiện đóng góp vào mục tiêu phát triển chung của địa phương, tổ chức, cơ quan, đơn vị.'),
+              subItem('g3-1-2', 'cadre', 'Có tầm nhìn, phương pháp làm việc khoa học; có năng lực tổng hợp, phân tích và dự báo.'),
+              subItem('g3-1-3', 'cadre', 'Có năng lực, kinh nghiệm thực tiễn để cụ thể hoá và tổ chức thực hiện có hiệu quả đường lối, chủ trương của Đảng, chính sách, pháp luật của Nhà nước ở lĩnh vực, địa bàn công tác được phân công phụ trách.'),
+              subItem('g3-1-4', 'cadre', 'Có khả năng chỉ đạo, điều hành hoạt động của tổ chức, cơ quan, đơn vị, phân công công việc khoa học, giám sát chặt chẽ, giữ gìn kỷ cương, kỷ luật.'),
+            ],
+            3
+          ),
+          groupedCriterion(
+            'g3-2',
+            'cadre',
+            'Năng lực chuyên môn, nghiệp vụ theo vị trí việc làm',
+            3,
+            'manual',
+            [
+              subItem('g3-2-1', 'cadre', 'Có kiến thức chuyên sâu về lĩnh vực công tác được phân công; am hiểu quy định pháp luật, quy trình nghiệp vụ có liên quan đến vị trí việc làm.'),
+              subItem('g3-2-2', 'cadre', 'Có khả năng phát hiện các vấn đề mới, khó và những hạn chế, bất cập trong thực tiễn; chủ động đề xuất chủ trương, chính sách, nhiệm vụ, giải pháp phù hợp, khả thi, hiệu quả để tháo gỡ điểm nghẽn, thúc đẩy phát triển.'),
+              subItem('g3-2-3', 'cadre', 'Có kỹ năng xử lý công việc độc lập, làm việc nhóm hiệu quả.'),
+            ],
+            3
+          ),
+        ]
+      ),
+    ],
+  },
 ];
 
 const cloneGroups = (progress: number, stage: EvaluationStage | 'published' = 'self'): EvaluationGroup[] => {
@@ -140,13 +235,35 @@ const cloneGroups = (progress: number, stage: EvaluationStage | 'published' = 's
         ? council
         : self;
 
-      return {
-        ...criterion,
+      // Tiêu chí nhiều cấp kiểu "tự động cộng": điểm nằm ở các ý con nên phải nhân bản theo cấp
+      const cloneChildren = (node: EvaluationCriterion): EvaluationCriterion => {
+        if (!node.children) return { ...node };
+        if (node.scoreMode !== 'sum') return { ...node, children: node.children.map((child) => ({ ...child })) };
+        return {
+          ...node,
+          children: node.children.map((child) => {
+            const childSelf = child.score ?? 0;
+            const childScores: Partial<Record<EvaluationStage, number>> = {};
+            if (stageIdx >= 0) childScores.self = childSelf;
+            if (stageIdx >= 1) childScores.deputy = childSelf;
+            if (stageIdx >= 2) childScores.manager = childSelf;
+            if (stageIdx >= 3) childScores.editorial = childSelf;
+            if (stageIdx >= 4) childScores.council = childSelf;
+            if (isPublished) childScores.published = childSelf;
+            return { ...cloneChildren(child), score: childSelf, stageScores: childScores };
+          }),
+        };
+      };
+
+      const cloned: EvaluationCriterion = {
+        ...cloneChildren(criterion),
         score: progress < 100 && index > 5 && group.id === 'duties' ? null : currentScore,
         stageScores: scores,
         stageNotes: Object.values(notesObj).some(Boolean) ? notesObj : undefined,
         levels: criterion.levels?.map((level) => ({ ...level })),
       };
+
+      return syncCriterionScores(cloned);
     }),
   }));
 };

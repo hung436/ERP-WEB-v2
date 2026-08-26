@@ -1,6 +1,14 @@
 import { Button, InputNumber, Modal, Tooltip } from 'antd';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 
+import {
+  childCode,
+  computeCriterionMax,
+  computeCriterionScore,
+  hasChildren,
+  isCriterionAnswered,
+  isSumCriterion,
+} from '@/features/evaluations/criterionTree';
 import type { EvaluationCriterion, EvaluationLevel, EvaluationStage } from '@/types/evaluation';
 
 const stageLabels: Record<EvaluationStage, string> = {
@@ -22,12 +30,117 @@ const getStageOptionLevel = (criterion: EvaluationCriterion, score: number | nul
   return criterion.levels.find((level) => score >= level.min && score <= level.max) ?? null;
 };
 
+/**
+ * Một dòng ý con của tiêu chí nhiều cấp.
+ * - `editable`: ý con này được nhập điểm (cha của nó là node tính tổng).
+ * - Ý con chỉ để theo dõi sẽ hiển thị trần điểm thay cho ô nhập.
+ */
+function CriterionSubRow({
+  node,
+  code,
+  depth,
+  editable,
+  readOnly,
+  onScoreChange,
+}: {
+  node: EvaluationCriterion;
+  code: string;
+  depth: number;
+  editable: boolean;
+  readOnly: boolean;
+  onScoreChange: (id: string, score: number | null) => void;
+}) {
+  const isSum = isSumCriterion(node);
+  const nodeChildren = node.children ?? [];
+  const maxScore = computeCriterionMax(node);
+  const sumScore = computeCriterionScore(node);
+  const showInput = editable && !readOnly && !isSum;
+  // Từ cấp 2 trở đi (3.1.1, 3.1.2...) dùng dấu đầu dòng thay cho số hiệu cho đỡ rối
+  const useBullet = depth > 1 && nodeChildren.length === 0;
+  // Ý con tự chấm điểm (3.1, 3.2) hiển thị khoảng điểm giống tiêu chí cha
+  const showRange = editable && !isSum;
+
+  return (
+    <div className={`criterion-subtree-item depth-${depth}`}>
+      <div
+        className={`criterion-subtree-row${isSum ? ' is-sum' : ''}${
+          showInput ? ' is-editable' : ' is-readonly'
+        }`}
+      >
+        <p className="subtree-title">
+          {useBullet ? (
+            <span className="subtree-bullet" aria-hidden="true">
+              •
+            </span>
+          ) : (
+            <span className="subtree-code">{code}</span>
+          )}{' '}
+          {node.title}
+          {showRange && (
+            <span className="title-range-badge">
+              {node.min} - {maxScore} điểm
+            </span>
+          )}
+        </p>
+        <div className="subtree-score-slot">
+          {showInput ? (
+            <div className="evaluation-score-inline">
+              <label htmlFor={`evaluation-score-${node.id}`}>Điểm</label>
+              <InputNumber
+                id={`evaluation-score-${node.id}`}
+                aria-label={`Nhập điểm: ${node.title}`}
+                min={node.min}
+                max={maxScore || undefined}
+                precision={0}
+                controls={false}
+                value={node.score}
+                onChange={(value) => onScoreChange(node.id, value)}
+                placeholder={`${node.min} - ${maxScore}`}
+              />
+              <span className="score-max">/ {maxScore}</span>
+            </div>
+          ) : isSum ? (
+            <span className="subtree-sum-badge" aria-label={`Điểm tổng hợp: ${node.title}`}>
+              <strong>{sumScore ?? '—'}</strong>
+              <small>/ {maxScore} điểm</small>
+            </span>
+          ) : (
+            <span className="subtree-max-badge">
+              {node.score !== null && node.score !== undefined ? (
+                <strong>{node.score}</strong>
+              ) : null}
+              <small>{maxScore} điểm</small>
+            </span>
+          )}
+        </div>
+      </div>
+
+      {nodeChildren.length > 0 && (
+        <div className="criterion-subtree-children">
+          {nodeChildren.map((child, idx) => (
+            <CriterionSubRow
+              key={child.id}
+              node={child}
+              code={childCode(child, code, idx)}
+              depth={depth + 1}
+              editable={isSum && !isSumCriterion(child)}
+              readOnly={readOnly}
+              onScoreChange={onScoreChange}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function EvaluationCriterionRow({
   criterion,
   order,
   readOnly,
   previousStages,
   onScoreChange,
+  onChildScoreChange,
   onOpenNote,
 }: {
   criterion: EvaluationCriterion;
@@ -35,6 +148,8 @@ export function EvaluationCriterionRow({
   readOnly: boolean;
   previousStages: EvaluationStage[];
   onScoreChange: (score: number | null) => void;
+  /** Cập nhật điểm cho một ý con của tiêu chí nhiều cấp. */
+  onChildScoreChange?: (childId: string, score: number | null) => void;
   onOpenNote: () => void;
 }) {
   const [selectedLevel, setSelectedLevel] = useState<EvaluationLevel | null>(findLevel(criterion));
@@ -56,11 +171,17 @@ export function EvaluationCriterionRow({
     setSelectedLevel(matched);
   }, [criterion.score, criterion.levels]);
 
-  const isUnlimited = !criterion.max || criterion.max === 0;
+  const isGrouped = hasChildren(criterion);
+  const isSumMode = isSumCriterion(criterion);
+  const groupedMax = computeCriterionMax(criterion);
+  const groupedScore = computeCriterionScore(criterion);
+  const isUnlimited = isGrouped ? groupedMax === 0 : !criterion.max || criterion.max === 0;
   const hasLevels = Boolean(criterion.levels && criterion.levels.length > 0);
   const scoreLocked = readOnly;
   const minimum = criterion.min;
-  const maximum = isUnlimited ? undefined : criterion.max;
+  const maximum = isUnlimited ? undefined : isGrouped ? groupedMax : criterion.max;
+  const handleChildScoreChange = (childId: string, score: number | null) =>
+    onChildScoreChange?.(childId, score);
 
   const handleOpenScoreModal = (level?: EvaluationLevel | null) => {
     if (readOnly) return;
@@ -84,37 +205,43 @@ export function EvaluationCriterionRow({
     setIsScoreModalOpen(false);
   };
 
-  const isAnswered = criterion.score !== null;
+  const isAnswered = isCriterionAnswered(criterion);
 
   return (
     <article
       id={`evaluation-score-${criterion.id}`}
       className={`evaluation-stream-row evaluation-radio-card${isAnswered ? ' answered' : ''}${
         hasLevels ? ' has-levels' : ' no-levels'
-      }`}
+      }${isGrouped ? ' has-children' : ''}`}
     >
       {/* Top Header: Title, Stage Score Pills & Toolbar */}
       <header className={`radio-card-header${isSingleLine ? ' single-line' : ' multi-line'}`}>
         <div className="header-left">
-          <span className="card-index-badge">{String(order).padStart(2, '0')}</span>
+          <span className="card-index-badge">{criterion.code ?? String(order).padStart(2, '0')}</span>
           <div className="title-content">
-            <Tooltip title={criterion.title} mouseEnterDelay={0.4}>
-              <h4 ref={titleRef} className="title-heading">
-                <span>{criterion.title}</span>
-                {!hasLevels && (
-                  <span className="title-range-badge">
-                    {isUnlimited ? '(Điểm mở)' : `(${minimum} - ${maximum}đ)`}
-                  </span>
-                )}
-              </h4>
-            </Tooltip>
+            <h4 ref={titleRef} className="title-heading">
+              <span>{criterion.title}</span>
+              {!hasLevels && !isSumMode && (
+                <span className="title-range-badge">
+                  {isUnlimited ? 'Điểm mở' : `${minimum} - ${maximum} điểm`}
+                </span>
+              )}
+            </h4>
           </div>
         </div>
 
         {/* Top-Right Toolbar: Hide all input controls & note buttons in readOnly/published mode */}
-        {!readOnly ? (
+        {!readOnly || isSumMode ? (
           <div className="header-right-toolbar">
-            {!hasLevels && (
+            {isSumMode && (
+              <div className="evaluation-score-sum" aria-label={`Điểm tổng hợp: ${criterion.title}`}>
+                <label>Điểm tổng</label>
+                <strong className="sum-value">{groupedScore ?? '—'}</strong>
+                <span className="score-max">/ {groupedMax} điểm</span>
+              </div>
+            )}
+
+            {!readOnly && !hasLevels && !isSumMode && (
               <div className="evaluation-score-inline" id={`evaluation-score-${criterion.id}`}>
                 <label htmlFor={`evaluation-score-${criterion.id}`}>Điểm</label>
                 <InputNumber
@@ -133,6 +260,7 @@ export function EvaluationCriterionRow({
               </div>
             )}
 
+            {!readOnly && (
             <div className="card-note-wrapper">
               <Tooltip title={criterion.note ? `Ghi chú: ${criterion.note}` : 'Thêm ghi chú/minh chứng'}>
                 <Button
@@ -144,9 +272,27 @@ export function EvaluationCriterionRow({
                 </Button>
               </Tooltip>
             </div>
+            )}
           </div>
         ) : null}
       </header>
+
+      {/* Cây ý con của tiêu chí nhiều cấp (chỉ hiển thị để theo dõi hoặc nhập điểm từng ý) */}
+      {isGrouped && (
+        <div className="criterion-subtree" aria-label={`Các ý chi tiết: ${criterion.title}`}>
+          {criterion.children!.map((child, idx) => (
+            <CriterionSubRow
+              key={child.id}
+              node={child}
+              code={childCode(child, criterion.code ?? String(order), idx)}
+              depth={1}
+              editable={isSumMode && !isSumCriterion(child)}
+              readOnly={readOnly}
+              onScoreChange={handleChildScoreChange}
+            />
+          ))}
+        </div>
+      )}
 
       {/* Radio Options List Body (Sleek & Uncluttered) */}
       {hasLevels && (
@@ -183,7 +329,7 @@ export function EvaluationCriterionRow({
                 <div className="radio-content-inline">
                   <span className="radio-option-letter">{optionLetter}.</span>
                   <span className="radio-label-text">{level.label}</span>
-                  <span className="radio-range-badge">({level.min} - {level.max}đ)</span>
+                  <span className="radio-range-badge">{level.min} - {level.max} điểm</span>
                 </div>
                 {!readOnly && isSelected && criterion.score !== null && (
                   <span className="radio-evaluated-score">
@@ -308,7 +454,7 @@ export function EvaluationCriterionRow({
               style={{ width: 120, height: 46, fontSize: 22, fontWeight: 800, textAlign: 'center' }}
             />
             <span style={{ fontSize: 16, color: '#475467', fontWeight: 700 }}>
-              / {pendingLevel ? pendingLevel.max : (isUnlimited ? 'Mở' : criterion.max)} đ
+              / {pendingLevel ? pendingLevel.max : (isUnlimited ? 'Mở' : criterion.max)} điểm
             </span>
           </div>
           <small style={{ color: '#64748b', fontSize: 12 }}>
