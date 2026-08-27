@@ -379,7 +379,7 @@ export function EvaluationCriterionRow({
                   <span className="radio-option-letter">{optionLetter}.</span>
                   <span className="radio-label-text">{level.label}</span>
                   <span className="radio-range-badge" style={{ fontStyle: 'italic' }}>
-                    ({level.max} điểm)
+                    ({level.min} - {level.max} điểm)
                   </span>
                 </div>
                 {!readOnly && isSelected && criterion.score !== null && (

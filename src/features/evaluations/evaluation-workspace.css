@@ -1259,7 +1259,6 @@ input[type='number'] {
 .radio-option-item.selected .radio-range-badge,
 .radio-option-item.published-winner .radio-range-badge {
   color: #101828;
-  font-weight: 700;
 }
 
 /* Bỏ hậu tố "/ tối đa": ô nhập giãn hết phần còn lại, không để trống chỗ thừa */
