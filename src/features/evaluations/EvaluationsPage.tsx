@@ -8,6 +8,7 @@ import { EvaluationCriterionRow } from '@/features/evaluations/components/Evalua
 import {
   computeCriterionMax,
   computeCriterionScore,
+  findCriterionWithCode,
   isCriterionAnswered,
   patchCriterionTree,
   syncCriterionScores,
@@ -1139,7 +1140,9 @@ function EvaluationWorkspace({
     mode === 'self' ? 'self' : mode === 'council' ? 'council' : draft?.stage === 'published' ? 'council' : draft?.stage ?? 'deputy';
   const previousStages = draft ? previousStagesFor(draft, mode) : [];
   const readOnly = !draft || draft.status === 'published' || mode === 'council';
-  const noteCriterion = criteria.find((criterion) => criterion.id === noteCriterionId) ?? null;
+  // Ghi chú có thể thuộc một ý con (câu tính tổng), nên phải tra theo cả cây tiêu chí
+  const noteTarget = noteCriterionId ? findCriterionWithCode(criteria, noteCriterionId) : null;
+  const noteCriterion = noteTarget?.node ?? null;
 
   const updateCriterion = (id: string, patch: Partial<EvaluationCriterion>) =>
     setDraft((value) =>
@@ -1722,6 +1725,10 @@ function EvaluationWorkspace({
                             previousStages={previousStages}
                             readOnly={readOnly}
                             onOpenNote={() => openNote(criterion)}
+                            onOpenChildNote={(childId) => {
+                              const target = findCriterionWithCode([criterion], childId);
+                              if (target) openNote(target.node);
+                            }}
                             onScoreChange={(score) => updateCriterion(criterion.id, { score })}
                             onChildScoreChange={(childId, score) => updateCriterion(childId, { score })}
                           />
@@ -1916,7 +1923,7 @@ function EvaluationWorkspace({
             <>
               <div className="note-criterion-card">
                 <div className="note-criterion-top">
-                  <Tag color="red">Tiêu chí {criteria.findIndex((c) => c.id === noteCriterion.id) + 1}</Tag>
+                  <Tag color="red">Tiêu chí {noteTarget?.code}</Tag>
                   <span className="note-criterion-score">
                     {isCriterionAnswered(noteCriterion) ? (
                       <>

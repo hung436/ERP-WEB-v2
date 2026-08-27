@@ -59,3 +59,26 @@ export const patchCriterionTree = (
 /** Số hiệu hiển thị của ý con: ưu tiên code khai báo sẵn, nếu không thì sinh theo thứ tự. */
 export const childCode = (child: EvaluationCriterion, parentCode: string, index: number) =>
   child.code ?? `${parentCode}.${index + 1}`;
+
+/** Tìm một tiêu chí ở bất kỳ cấp nào kèm số hiệu hiển thị của nó (32, 32.1...). */
+export const findCriterionWithCode = (
+  criteria: EvaluationCriterion[],
+  id: string
+): { node: EvaluationCriterion; code: string } | null => {
+  const walk = (
+    list: EvaluationCriterion[],
+    parentCode: string
+  ): { node: EvaluationCriterion; code: string } | null => {
+    for (let index = 0; index < list.length; index += 1) {
+      const node = list[index];
+      const code = parentCode ? childCode(node, parentCode, index) : node.code ?? String(index + 1);
+      if (node.id === id) return { node, code };
+      if (node.children) {
+        const found = walk(node.children, code);
+        if (found) return found;
+      }
+    }
+    return null;
+  };
+  return walk(criteria, '');
+};

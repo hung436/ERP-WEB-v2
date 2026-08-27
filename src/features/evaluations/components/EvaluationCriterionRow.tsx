@@ -42,6 +42,7 @@ function CriterionSubRow({
   editable,
   readOnly,
   onScoreChange,
+  onOpenNote,
 }: {
   node: EvaluationCriterion;
   code: string;
@@ -49,23 +50,27 @@ function CriterionSubRow({
   editable: boolean;
   readOnly: boolean;
   onScoreChange: (id: string, score: number | null) => void;
+  /** Ghi chú đi kèm ô nhập điểm của chính ý con này. */
+  onOpenNote?: (id: string) => void;
 }) {
   const isSum = isSumCriterion(node);
   const nodeChildren = node.children ?? [];
   const maxScore = computeCriterionMax(node);
   const sumScore = computeCriterionScore(node);
   const showInput = editable && !readOnly && !isSum;
-  // Từ cấp 2 trở đi (3.1.1, 3.1.2...) dùng dấu đầu dòng thay cho số hiệu cho đỡ rối
-  const useBullet = depth > 1 && nodeChildren.length === 0;
-  // Ý con tự chấm điểm (3.1, 3.2) hiển thị khoảng điểm giống tiêu chí cha
+  // Ý không có con (31.1, 3.1.1...) dùng dấu đầu dòng; chỉ mục có ý con bên trong mới giữ số hiệu
+  const useBullet = nodeChildren.length === 0;
+  // Ý con tự chấm điểm (32.1, 32.2) hiển thị khoảng điểm giống tiêu chí cha
   const showRange = editable && !isSum;
+  // Ý chỉ để theo dõi: trần điểm viết liền cuối câu, không cần cột điểm riêng
+  const isDisplayOnly = !editable && !isSum;
 
   return (
     <div className={`criterion-subtree-item depth-${depth}`}>
       <div
         className={`criterion-subtree-row${isSum ? ' is-sum' : ''}${
-          showInput ? ' is-editable' : ' is-readonly'
-        }`}
+          nodeChildren.length > 0 ? ' is-section' : ''
+        }${showInput ? ' is-editable' : ' is-readonly'}`}
       >
         <p className="subtree-title">
           {useBullet ? (
@@ -77,11 +82,22 @@ function CriterionSubRow({
           )}{' '}
           {node.title}
           {showRange && (
-            <span className="title-range-badge">
-              {node.min} - {maxScore} điểm
+            <span className="title-range-badge" style={{ fontStyle: 'italic' }}>
+              ({maxScore} điểm)
+            </span>
+          )}
+          {isDisplayOnly && nodeChildren.length > 0 && (
+            <span className="title-range-badge" style={{ fontStyle: 'italic' }}>
+              ({maxScore} điểm)
+            </span>
+          )}
+          {isDisplayOnly && nodeChildren.length === 0 && (
+            <span className="subtree-max-inline" style={{ fontStyle: 'italic' }}>
+              ({maxScore} điểm)
             </span>
           )}
         </p>
+        {!isDisplayOnly && (
         <div className="subtree-score-slot">
           {showInput ? (
             <div className="evaluation-score-inline">
@@ -97,7 +113,6 @@ function CriterionSubRow({
                 onChange={(value) => onScoreChange(node.id, value)}
                 placeholder={`${node.min} - ${maxScore}`}
               />
-              <span className="score-max">/ {maxScore}</span>
             </div>
           ) : isSum ? (
             <span className="subtree-sum-badge" aria-label={`Điểm tổng hợp: ${node.title}`}>
@@ -109,11 +124,41 @@ function CriterionSubRow({
               {node.score !== null && node.score !== undefined ? (
                 <strong>{node.score}</strong>
               ) : null}
-              <small>{maxScore} điểm</small>
+              <small>/ {maxScore} điểm</small>
             </span>
           )}
         </div>
+        )}
+
+        {showInput && onOpenNote && (
+          <Tooltip title={node.note ? `Ghi chú: ${node.note}` : 'Thêm ghi chú/minh chứng'}>
+            <Button
+              aria-label={`${node.note ? 'Chỉnh sửa' : 'Thêm'} ghi chú: ${node.title}`}
+              className={`evaluation-note-button${node.note ? ' has-note' : ''}`}
+              onClick={() => onOpenNote(node.id)}
+            >
+              <span className="btn-icon" aria-hidden="true">{node.note ? '📝' : '💬'}</span>
+            </Button>
+          </Tooltip>
+        )}
       </div>
+
+      {node.note && (
+        <div
+          className="criterion-personal-note-card subtree-note-card"
+          aria-label={`Ghi chú cá nhân: ${node.title}`}
+          onClick={!readOnly && onOpenNote ? () => onOpenNote(node.id) : undefined}
+          style={{ cursor: !readOnly && onOpenNote ? 'pointer' : 'default' }}
+        >
+          <div className="note-card-header">
+            <span className="note-card-title">
+              <span className="note-icon" aria-hidden="true">📝</span>
+              <strong>Ghi chú &amp; minh chứng ý {code}:</strong>
+            </span>
+          </div>
+          <p className="note-card-body">{node.note}</p>
+        </div>
+      )}
 
       {nodeChildren.length > 0 && (
         <div className="criterion-subtree-children">
@@ -126,6 +171,7 @@ function CriterionSubRow({
               editable={isSum && !isSumCriterion(child)}
               readOnly={readOnly}
               onScoreChange={onScoreChange}
+              onOpenNote={onOpenNote}
             />
           ))}
         </div>
@@ -142,6 +188,7 @@ export function EvaluationCriterionRow({
   onScoreChange,
   onChildScoreChange,
   onOpenNote,
+  onOpenChildNote,
 }: {
   criterion: EvaluationCriterion;
   order: number;
@@ -151,6 +198,8 @@ export function EvaluationCriterionRow({
   /** Cập nhật điểm cho một ý con của tiêu chí nhiều cấp. */
   onChildScoreChange?: (childId: string, score: number | null) => void;
   onOpenNote: () => void;
+  /** Mở ghi chú của một ý con (câu tính tổng: ghi chú nằm cùng ô nhập điểm). */
+  onOpenChildNote?: (childId: string) => void;
 }) {
   const [selectedLevel, setSelectedLevel] = useState<EvaluationLevel | null>(findLevel(criterion));
   const [pendingLevel, setPendingLevel] = useState<EvaluationLevel | null>(null);
@@ -222,8 +271,8 @@ export function EvaluationCriterionRow({
             <h4 ref={titleRef} className="title-heading">
               <span>{criterion.title}</span>
               {!hasLevels && !isSumMode && (
-                <span className="title-range-badge">
-                  {isUnlimited ? 'Điểm mở' : `${minimum} - ${maximum} điểm`}
+                <span className="title-range-badge" style={{ fontStyle: 'italic' }}>
+                  {isUnlimited ? '(Điểm mở)' : `(${maximum} điểm)`}
                 </span>
               )}
             </h4>
@@ -256,11 +305,10 @@ export function EvaluationCriterionRow({
                   onChange={onScoreChange}
                   placeholder={isUnlimited ? 'Nhập điểm' : `${minimum} - ${maximum}`}
                 />
-                {!isUnlimited && <span className="score-max">/ {criterion.max}</span>}
               </div>
             )}
 
-            {!readOnly && (
+            {!readOnly && !isSumMode && (
             <div className="card-note-wrapper">
               <Tooltip title={criterion.note ? `Ghi chú: ${criterion.note}` : 'Thêm ghi chú/minh chứng'}>
                 <Button
@@ -289,6 +337,7 @@ export function EvaluationCriterionRow({
               editable={isSumMode && !isSumCriterion(child)}
               readOnly={readOnly}
               onScoreChange={handleChildScoreChange}
+              onOpenNote={onOpenChildNote}
             />
           ))}
         </div>
@@ -329,7 +378,9 @@ export function EvaluationCriterionRow({
                 <div className="radio-content-inline">
                   <span className="radio-option-letter">{optionLetter}.</span>
                   <span className="radio-label-text">{level.label}</span>
-                  <span className="radio-range-badge">{level.min} - {level.max} điểm</span>
+                  <span className="radio-range-badge" style={{ fontStyle: 'italic' }}>
+                    ({level.max} điểm)
+                  </span>
                 </div>
                 {!readOnly && isSelected && criterion.score !== null && (
                   <span className="radio-evaluated-score">
