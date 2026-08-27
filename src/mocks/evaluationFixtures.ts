@@ -160,7 +160,7 @@ const baseGroups: EvaluationGroup[] = [
         'cadre',
         'Năng lực lãnh đạo, quản lý và năng lực chuyên môn, nghiệp vụ theo yêu cầu của vị trí việc làm; khả năng đáp ứng yêu cầu thực thi nhiệm vụ được giao; thái độ công tác trong thực hiện nhiệm vụ; tinh thần đổi mới sáng tạo, dám nghĩ, dám làm, dám chịu trách nhiệm vì lợi ích chung',
         7,
-        'sum',
+        'manual',
         [
           groupedCriterion(
             'g3-1',
@@ -173,8 +173,7 @@ const baseGroups: EvaluationGroup[] = [
               subItem('g3-1-2', 'cadre', 'Có tầm nhìn, phương pháp làm việc khoa học; có năng lực tổng hợp, phân tích và dự báo.'),
               subItem('g3-1-3', 'cadre', 'Có năng lực, kinh nghiệm thực tiễn để cụ thể hoá và tổ chức thực hiện có hiệu quả đường lối, chủ trương của Đảng, chính sách, pháp luật của Nhà nước ở lĩnh vực, địa bàn công tác được phân công phụ trách.'),
               subItem('g3-1-4', 'cadre', 'Có khả năng chỉ đạo, điều hành hoạt động của tổ chức, cơ quan, đơn vị, phân công công việc khoa học, giám sát chặt chẽ, giữ gìn kỷ cương, kỷ luật.'),
-            ],
-            3
+            ]
           ),
           groupedCriterion(
             'g3-2',
@@ -186,10 +185,10 @@ const baseGroups: EvaluationGroup[] = [
               subItem('g3-2-1', 'cadre', 'Có kiến thức chuyên sâu về lĩnh vực công tác được phân công; am hiểu quy định pháp luật, quy trình nghiệp vụ có liên quan đến vị trí việc làm.'),
               subItem('g3-2-2', 'cadre', 'Có khả năng phát hiện các vấn đề mới, khó và những hạn chế, bất cập trong thực tiễn; chủ động đề xuất chủ trương, chính sách, nhiệm vụ, giải pháp phù hợp, khả thi, hiệu quả để tháo gỡ điểm nghẽn, thúc đẩy phát triển.'),
               subItem('g3-2-3', 'cadre', 'Có kỹ năng xử lý công việc độc lập, làm việc nhóm hiệu quả.'),
-            ],
-            3
+            ]
           ),
-        ]
+        ],
+        6
       ),
     ],
   },
