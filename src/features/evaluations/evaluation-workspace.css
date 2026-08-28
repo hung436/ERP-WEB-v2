@@ -893,25 +893,20 @@
   gap: 10px;
 }
 
+/* Bỏ viền bao quanh card lớn, chỉ dùng bóng đổ siêu nhẹ để tách khỏi nền trang */
 .evaluation-radio-card {
   display: flex;
   flex-direction: column;
   gap: 10px;
   padding: 16px 20px;
-  border: 1px solid #eaecf0;
   background: #ffffff;
   border-radius: 12px;
-  box-shadow: 0 2px 5px rgba(16, 24, 40, 0.03);
-  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: box-shadow 0.2s ease;
 }
 
 .evaluation-radio-card:hover {
-  border-color: #d0d5dd;
-  box-shadow: 0 4px 12px rgba(16, 24, 40, 0.06);
-}
-
-.evaluation-radio-card.answered {
-  border-left-color: #eaecf0;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.07);
 }
 
 /* Card Header: Title + History (Left) & Score Input + Note Button (Right Toolbar) */
@@ -3042,36 +3037,34 @@ input[type='number'] {
 }
 
 /* Premier Ultra-Sleek Stage History Container */
+/* Bỏ khung xám bao ngoài cả chuỗi lịch sử, chỉ còn khoảng cách với nội dung phía trên */
 .criterion-stage-history-container {
   margin-top: 10px;
   display: flex;
   flex-direction: column;
   gap: 8px;
-  padding: 8px 12px;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 10px;
 }
 
 .stage-comparison-strip {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   flex-wrap: wrap;
 }
 
 .stage-chip-item {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
 .stage-chip-arrow {
-  color: #94a3b8;
+  color: #98a2b3;
   font-size: 13px;
   font-weight: 700;
 }
 
+/* Tag nền phẳng, không viền, cho từng cấp trong chuỗi Tự đánh giá → Cấp 3 */
 .stage-score-chip {
   display: inline-flex;
   align-items: center;
@@ -3079,20 +3072,17 @@ input[type='number'] {
   padding: 6px 14px;
   border-radius: 9px;
   font-size: 14px;
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+  background: #f2f4f7;
+  color: #475467;
 }
 
 .stage-score-chip.stage-self {
   background: #eff8ff;
-  border-color: #b2ddff;
   color: #175cd3;
 }
 
 .stage-score-chip.stage-published {
   background: #ecfdf3;
-  border-color: #abefc6;
   color: #027a48;
 }
 

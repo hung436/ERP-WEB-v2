@@ -58,10 +58,10 @@ const stageOrder: EvaluationStage[] = ['self', 'deputy', 'manager', 'editorial',
 
 const stageLabels: Record<EvaluationStage, string> = {
   self: 'Tự đánh giá',
-  deputy: 'Phó phòng/ban',
-  manager: 'Trưởng phòng/ban',
-  editorial: 'Ban biên tập',
-  council: 'Hội đồng',
+  deputy: 'Cấp đánh giá thứ 1',
+  manager: 'Cấp đánh giá thứ 2',
+  editorial: 'Cấp đánh giá thứ 3',
+  council: 'Hội đồng đánh giá',
   published: 'Đã công bố',
 };
 
@@ -82,13 +82,13 @@ const getStageStatusText = (sheet: EvaluationSheet) => {
     case 'self':
       return `Tự chấm: ${sheet.employeeName}`;
     case 'deputy':
-      return `Phó ban: ${evaluator ?? 'Trần Văn Bình'}`;
+      return `Cấp đánh giá thứ 1: ${evaluator ?? 'Trần Văn Bình'}`;
     case 'manager':
-      return `Trưởng ban: ${evaluator ?? 'Phạm Quốc Nam'}`;
+      return `Cấp đánh giá thứ 2: ${evaluator ?? 'Phạm Quốc Nam'}`;
     case 'editorial':
-      return `Ban Biên tập: ${evaluator ?? 'Hoàng Thị Lan'}`;
+      return `Cấp đánh giá thứ 3: ${evaluator ?? 'Hoàng Thị Lan'}`;
     case 'council':
-      return `Hội đồng: ${evaluator ?? 'Hội đồng chuyên môn'}`;
+      return `Hội đồng đánh giá: ${evaluator ?? 'Hội đồng chuyên môn'}`;
     default:
       return statusLabels[sheet.status] ?? 'Đang đánh giá';
   }
@@ -316,10 +316,10 @@ function EmployeeEvaluationListTable({
               <th>Nhân sự</th>
               <th>Chức danh & Phòng ban</th>
               <th className="text-center">Tự đánh giá</th>
-              <th className="text-center">Phó phòng</th>
-              <th className="text-center">Trưởng phòng</th>
-              <th className="text-center">Ban biên tập</th>
-              <th className="text-center">Hội đồng</th>
+              <th className="text-center">Cấp đánh giá thứ 1</th>
+              <th className="text-center">Cấp đánh giá thứ 2</th>
+              <th className="text-center">Cấp đánh giá thứ 3</th>
+              <th className="text-center">Hội đồng đánh giá</th>
               <th className="text-center">Điểm bình quân</th>
               <th>Trạng thái</th>
             </tr>

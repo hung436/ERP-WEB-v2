@@ -13,10 +13,10 @@ import type { EvaluationCriterion, EvaluationLevel, EvaluationStage } from '@/ty
 
 const stageLabels: Record<EvaluationStage, string> = {
   self: 'Tự đánh giá',
-  deputy: 'Phó phòng/ban',
-  manager: 'Trưởng phòng/ban',
-  editorial: 'Ban biên tập',
-  council: 'Hội đồng',
+  deputy: 'Cấp đánh giá thứ 1',
+  manager: 'Cấp đánh giá thứ 2',
+  editorial: 'Cấp đánh giá thứ 3',
+  council: 'Hội đồng đánh giá',
   published: 'Đã công bố',
 };
 
