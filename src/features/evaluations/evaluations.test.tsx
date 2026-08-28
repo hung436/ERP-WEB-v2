@@ -49,7 +49,7 @@ describe('Workspace Đánh giá lao động', () => {
     const firstRow = (await screen.findAllByRole('article'))[0];
     const history = within(firstRow).getByLabelText(/Chi tiết đánh giá các cấp: Thực hiện nhiệm vụ chuyên môn/);
     expect(within(history).getByText(/Tự đánh giá/)).toBeInTheDocument();
-    expect(within(history).getByText(/Phó phòng\/ban/)).toBeInTheDocument();
+    expect(within(history).getByText(/Cấp đánh giá thứ 1/)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Hoàn tất chấm điểm/ })).toBeInTheDocument();
   });
 
@@ -62,9 +62,9 @@ describe('Workspace Đánh giá lao động', () => {
     const firstRow = (await screen.findAllByRole('article'))[0];
     const history = within(firstRow).getByLabelText(/Chi tiết đánh giá các cấp: Thực hiện nhiệm vụ chuyên môn/);
     expect(within(history).getByText(/Tự đánh giá/)).toBeInTheDocument();
-    expect(within(history).getByText(/Phó phòng\/ban/)).toBeInTheDocument();
-    expect(within(history).getByText(/Trưởng phòng\/ban/)).toBeInTheDocument();
-    expect(within(history).getByText(/Ban biên tập/)).toBeInTheDocument();
+    expect(within(history).getByText(/Cấp đánh giá thứ 1/)).toBeInTheDocument();
+    expect(within(history).getByText(/Cấp đánh giá thứ 2/)).toBeInTheDocument();
+    expect(within(history).getByText(/Cấp đánh giá thứ 3/)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Chốt kết quả/ })).toBeInTheDocument();
   });
 
@@ -100,9 +100,9 @@ describe('Workspace Đánh giá lao động', () => {
     // Verify Stage Review Feed Card is displayed
     const auditFeed = within(firstRow).getByLabelText(/Chi tiết đánh giá các cấp: Thực hiện nhiệm vụ chuyên môn/);
     expect(within(auditFeed).getByText(/Tự đánh giá/)).toBeInTheDocument();
-    expect(within(auditFeed).getByText(/Phó phòng\/ban/)).toBeInTheDocument();
-    expect(within(auditFeed).getByText(/Trưởng phòng\/ban/)).toBeInTheDocument();
-    expect(within(auditFeed).getByText(/Ban biên tập/)).toBeInTheDocument();
+    expect(within(auditFeed).getByText(/Cấp đánh giá thứ 1/)).toBeInTheDocument();
+    expect(within(auditFeed).getByText(/Cấp đánh giá thứ 2/)).toBeInTheDocument();
+    expect(within(auditFeed).getByText(/Cấp đánh giá thứ 3/)).toBeInTheDocument();
     expect(within(auditFeed).getByText(/Đã hoàn thành 15 bài xuất bản/i)).toBeInTheDocument();
   });
 });

@@ -60,10 +60,10 @@ export function DashboardPage() {
   return (
     <div className="dashboard-page">
       <section aria-label="Tổng quan không gian làm việc" className="workspace-metrics">
-        <Link className="workspace-metric metric-tasks" to="/tasks"><span className="metric-icon"><ModuleIcon module="tasks" /></span><span className="metric-copy"><small>Việc chờ xử lý</small><strong>{summary.taskSummary.total}</strong><em>{summary.taskSummary.dueSoon} sắp đến hạn</em></span><span className="metric-arrow">›</span></Link>
-        <Link className="workspace-metric metric-announcements" to="/announcements"><span className="metric-icon"><ModuleIcon module="announcements" /></span><span className="metric-copy"><small>Thông báo mới</small><strong>{announcements.filter((item) => !item.isRead).length}</strong><em>Cần xem</em></span><span className="metric-arrow">›</span></Link>
-        <Link className="workspace-metric metric-chat" to="/chat"><span className="metric-icon"><ModuleIcon module="chat" /></span><span className="metric-copy"><small>Chat chưa đọc</small><strong>{summary.unreadChatCount}</strong><em>{chats.length} hội thoại</em></span><span className="metric-arrow">›</span></Link>
-        <Link className="workspace-metric metric-mail" to="/mail"><span className="metric-icon"><ModuleIcon module="mail" /></span><span className="metric-copy"><small>Email chưa đọc</small><strong>{summary.unreadMailCount}</strong><em>Cần kiểm tra</em></span><span className="metric-arrow">›</span></Link>
+        <Link className="workspace-metric metric-tasks" to="/tasks"><span className="metric-icon"><ModuleIcon module="tasks" /></span><span className="metric-copy"><small>Việc chờ xử lý</small><strong>{summary.taskSummary.total}</strong></span><span className="metric-arrow">›</span></Link>
+        <Link className="workspace-metric metric-announcements" to="/announcements"><span className="metric-icon"><ModuleIcon module="announcements" /></span><span className="metric-copy"><small>Thông báo mới</small><strong>{announcements.filter((item) => !item.isRead).length}</strong></span><span className="metric-arrow">›</span></Link>
+        <Link className="workspace-metric metric-chat" to="/chat"><span className="metric-icon"><ModuleIcon module="chat" /></span><span className="metric-copy"><small>Tin nhắn chưa đọc</small><strong>{summary.unreadChatCount}</strong></span><span className="metric-arrow">›</span></Link>
+        <Link className="workspace-metric metric-mail" to="/mail"><span className="metric-icon"><ModuleIcon module="mail" /></span><span className="metric-copy"><small>Email chưa đọc</small><strong>{summary.unreadMailCount}</strong></span><span className="metric-arrow">›</span></Link>
       </section>
 
       <div className="dashboard-focus">
