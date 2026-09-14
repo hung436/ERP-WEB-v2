@@ -14,9 +14,9 @@ import { CreateDocumentTemplatePage } from '@/features/documents/CreateDocumentT
 import { DocumentsPage } from '@/features/documents/DocumentsPage';
 import { DocumentStatisticsPage } from '@/features/documents/DocumentStatisticsPage';
 import { DocumentTemplatesPage } from '@/features/documents/DocumentTemplatesPage';
+import { WorkTicketsPage } from '@/features/work-tickets/WorkTicketsPage';
 import { MailPage } from '@/features/mail/MailPage';
 import { NotFoundPage } from '@/features/not-found/NotFoundPage';
-import { TasksPage } from '@/features/tasks/TasksPage';
 import { EvaluationsPage } from '@/features/evaluations/EvaluationsPage';
 import { CreatePersonnelPage } from '@/features/personnel/CreatePersonnelPage';
 import { PersonnelChangeRequestsPage } from '@/features/personnel/PersonnelChangeRequestsPage';
@@ -34,12 +34,13 @@ export function AppRoutes() {
       <Route element={<ProtectedRoute />}>
         <Route element={<AppLayout />}>
           <Route index element={<DashboardPage />} />
-          <Route path="tasks" element={<TasksPage />} />
+          <Route path="tasks" element={<WorkTicketsPage />} />
           <Route path="documents" element={<DocumentsPage />} />
           <Route path="documents/templates" element={<DocumentTemplatesPage />} />
           <Route path="documents/templates/create" element={<CreateDocumentTemplatePage />} />
           <Route path="documents/templates/edit/:id" element={<CreateDocumentTemplatePage />} />
           <Route path="documents/statistics" element={<DocumentStatisticsPage />} />
+          <Route path="work-tickets" element={<Navigate replace to="/tasks" />} />
           <Route path="evaluations" element={<EvaluationsPage />} />
           <Route path="personnel" element={<Navigate replace to="/personnel/profile" />} />
           <Route path="personnel/list" element={<PersonnelListPage />} />

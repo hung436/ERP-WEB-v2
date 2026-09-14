@@ -6,7 +6,7 @@ import { ModuleIcon, type ModuleName } from '@/components/ModuleIcon';
 import tuoiTreLogo from '@/assets/logo-tuoitre-2026-do-chu.svg';
 import { collapsedLogo } from '@/assets/collapsedLogo';
 import { useAsyncData } from '@/hooks/useAsyncData';
-import { chatApi, documentApi, evaluationApi, mailApi, meetingApi, taskApi } from '@/services/api';
+import { chatApi, documentApi, evaluationApi, mailApi, meetingApi, taskApi, workTicketApi } from '@/services/api';
 
 interface NavItem {
   path: string;
@@ -17,7 +17,7 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   { path: '/', module: 'home', label: 'Trang chủ' },
-  { path: '/tasks', module: 'tasks', label: 'Công việc' },
+  { path: '/tasks', module: 'work-tickets', label: 'Công việc' },
   {
     path: '/documents',
     module: 'documents',
@@ -63,9 +63,10 @@ export function AppSidebar({ collapsed, onCollapse }: { collapsed: boolean; onCo
   const [openGroup, setOpenGroup] = useState<string | null>(null);
 
   const badgeState = useAsyncData<Record<string, number>>(async () => {
-    const [tasks, documents, evaluations, meetings, chats, mails] = await Promise.all([
+    const [tasks, documents, workTickets, evaluations, meetings, chats, mails] = await Promise.all([
       taskApi.list(),
       documentApi.submissions(),
+      workTicketApi.submissions(),
       evaluationApi.sheets(),
       meetingApi.list(),
       chatApi.conversations(),
@@ -73,7 +74,7 @@ export function AppSidebar({ collapsed, onCollapse }: { collapsed: boolean; onCo
     ]);
     const currentDate = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Bangkok' }).format(new Date());
     return {
-      '/tasks': tasks.data.filter((item) => item.status !== 'completed').length,
+      '/tasks': tasks.data.filter((item) => item.status !== 'completed').length + workTickets.data.filter((item) => item.viewScope === 'pending_review' && item.status === 'pending').length,
       '/documents': documents.data.filter((item) => item.viewScope === 'pending_review' && item.status === 'pending').length,
       '/evaluations': evaluations.data.filter((item) => item.status === 'draft' || item.status === 'waiting' || item.status === 'in_review').length,
       '/meeting': meetings.data.filter((item) => item.startAt.startsWith(currentDate)).length,

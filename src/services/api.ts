@@ -1,5 +1,5 @@
 import { mockRequest } from '@/services/mockApi';
-import type { Announcement, CalendarEvent, ChatAttachment, ChatConversation, ChatMember, ChatMessage, ChatReply, DashboardSummary, DirectoryContact, DocumentSubmission, DocumentTemplate, MailAttachment, MailComposePayload, MailItem, MailReply, MeetingEvent, Task, User } from '@/types/domain';
+import type { Announcement, CalendarEvent, ChatAttachment, ChatConversation, ChatMember, ChatMessage, ChatReply, DashboardSummary, DirectoryContact, DocumentSubmission, DocumentTemplate, MailAttachment, MailComposePayload, MailItem, MailReply, MeetingEvent, Task, User, WorkTicketAttachment, WorkTicketFollower, WorkTicketSubmission, WorkTicketTemplate } from '@/types/domain';
 import type { ExpertRecord, WorkspaceFile, WorkspaceRecord } from '@/types/extended';
 import type { EvaluationPeriod, EvaluationSheet, EvaluationSummary } from '@/types/evaluation';
 import type { CreatePersonnelPayload, PersonalProfile, PersonnelRecordItem, PositionTitleItem, ResignedEmployeeItem, SpecialtyItem, UnitPositionMapping, WorkUnitItem } from '@/types/personnel';
@@ -96,6 +96,15 @@ export const documentApi = {
   submissions: () => mockRequest<DocumentSubmission[]>('/api/documents/submissions'),
   submit: (templateId: string, fields: Record<string, string>) => mockRequest<DocumentSubmission>('/api/documents/submissions', { method: 'POST', body: { templateId, fields } }),
   action: (id: string, action: 'approve' | 'reject', note?: string) => mockRequest<DocumentSubmission>(`/api/documents/submissions/${id}/actions`, { method: 'POST', body: { action, note } }),
+};
+
+export const workTicketApi = {
+  templates: () => mockRequest<WorkTicketTemplate[]>('/api/work-tickets/templates'),
+  submissions: () => mockRequest<WorkTicketSubmission[]>('/api/work-tickets/submissions'),
+  submit: (payload: { templateId: string; fields: Record<string, string>; steps?: { name: string; assignee: string }[]; followers: WorkTicketFollower[]; attachments?: WorkTicketAttachment[] }) => mockRequest<WorkTicketSubmission>('/api/work-tickets/submissions', { method: 'POST', body: payload }),
+  action: (id: string, action: 'approve' | 'reject', note?: string, nextAssignee?: string) => mockRequest<WorkTicketSubmission>(`/api/work-tickets/submissions/${id}/actions`, { method: 'POST', body: { action, note, nextAssignee } }),
+  comment: (id: string, content: string) => mockRequest<WorkTicketSubmission>(`/api/work-tickets/submissions/${id}/comments`, { method: 'POST', body: { content } }),
+  addFollower: (id: string, followerId: string) => mockRequest<WorkTicketSubmission>(`/api/work-tickets/submissions/${id}/followers`, { method: 'POST', body: { followerId } }),
 };
 
 export const customDocumentTemplateApi = {
