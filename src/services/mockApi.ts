@@ -1,10 +1,11 @@
 import { adminUser, announcements, calendarEvents, chatMembers, conversations, demoUser, directoryContacts, mails, messages, meetingEvents, tasks } from '@/mocks/fixtures';
 import { cloudRecords, evaluationRecords, expertRecords, libraryRecords, meetingRecords, requestRecords } from '@/mocks/extendedFixtures';
 import { documentSubmissions, documentTemplates } from '@/mocks/documentFixtures';
+import { followerOptions, workTicketSubmissions, workTicketTemplates } from '@/mocks/workTicketFixtures';
 import { evaluationPeriods, evaluationSheets } from '@/mocks/evaluationFixtures';
 import { initialChangeRequests, initialPersonnelList, initialPositionTitles, initialResignedEmployees, initialSpecialties, initialUnitPositionMappings, initialWorkUnits, personalProfile } from '@/mocks/personnelFixtures';
 import { initialCalendarNotifications, initialRecipientGroups } from '@/mocks/calendarNotificationFixtures';
-import type { Announcement, ApiResponse, ApiState, CalendarEvent, ChatAttachment, ChatConversation, ChatMessage, CustomDocumentTemplateItem, DashboardSummary, DirectoryContact, DocumentSubmission, MailComposePayload, MailItem, MailReply, MeetingEvent, Task, User } from '@/types/domain';
+import type { Announcement, ApiResponse, ApiState, CalendarEvent, ChatAttachment, ChatConversation, ChatMessage, CustomDocumentTemplateItem, DashboardSummary, DirectoryContact, DocumentSubmission, DocumentWorkflowStep, MailComposePayload, MailItem, MailReply, MeetingEvent, Task, User, WorkTicketAttachment, WorkTicketFollower, WorkTicketSubmission } from '@/types/domain';
 import type { CalendarNotificationItem, CalendarRecipientGroup, CreateCalendarNotificationPayload, CreateRecipientGroupPayload } from '@/types/calendar';
 import type { EvaluationSheet, EvaluationSummary } from '@/types/evaluation';
 import type { PositionTitleItem, PersonnelChangeRequest, PersonnelRecordItem, PermissionAssignmentItem, PermissionGroupItem, PermissionItem, ResignedEmployeeItem, SpecialtyItem, UnitPositionMapping, WorkUnitItem } from '@/types/personnel';
@@ -22,6 +23,8 @@ const announcementSources: NonNullable<Announcement['sourceModule']>[] = ['agenc
 let announcementStore: Announcement[] = announcements.map((item, index) => ({ ...item, acknowledged: item.acknowledged ?? false, sourceModule: item.sourceModule ?? announcementSources[index % announcementSources.length] }));
 let documentSubmissionStore: DocumentSubmission[] = documentSubmissions.map((item) => ({ ...item, fields: { ...item.fields }, steps: item.steps.map((step) => ({ ...step })) }));
 let documentSequence = documentSubmissions.length + 20;
+let workTicketSubmissionStore: WorkTicketSubmission[] = workTicketSubmissions.map((item) => ({ ...item, fields: { ...item.fields }, steps: item.steps.map((step) => ({ ...step })), followers: item.followers.map((follower) => ({ ...follower })), comments: item.comments.map((comment) => ({ ...comment })), attachments: item.attachments.map((attachment) => ({ ...attachment })) }));
+let workTicketSequence = workTicketSubmissions.length + 20;
 let workspaceActionSequence = 100;
 let evaluationSheetStore: EvaluationSheet[] = evaluationSheets.map((sheet) => ({ ...sheet, groups: sheet.groups.map((group) => ({ ...group, criteria: group.criteria.map((criterion) => ({ ...criterion })) })) }));
 let personnelRecordStore: PersonnelRecordItem[] = [...initialPersonnelList];
@@ -1148,6 +1151,85 @@ export async function mockRequest<T>(path: string, options?: { method?: string; 
     }
     const updated: DocumentSubmission = { ...item, steps, status, currentStep, viewScope: 'reviewed' };
     documentSubmissionStore = documentSubmissionStore.map((entry) => entry.id === id ? updated : entry);
+    data = updated;
+  }
+  else if (pathname === '/api/work-tickets/templates') data = workTicketTemplates;
+  else if (pathname === '/api/work-tickets/submissions' && options?.method === 'POST') {
+    const body = options.body as { templateId?: string; fields?: Record<string, string>; steps?: { name: string; assignee: string }[]; followers?: WorkTicketFollower[]; attachments?: WorkTicketAttachment[] };
+    const template = workTicketTemplates.find((item) => item.id === body.templateId);
+    if (!template || !body.fields) throw new Error('Mẫu phiếu công việc không hợp lệ.');
+    const stepNames = template.kind === 'blank' ? (body.steps ?? []) : template.workflow.map((name) => ({ name, assignee: '' }));
+    if (!stepNames.length) throw new Error('Vui lòng thiết lập ít nhất 1 bước cho quy trình.');
+    const sequence = ++workTicketSequence;
+    const prefix = template.kind === 'blank' ? 'PT' : template.kind === 'leave_request' ? 'NP' : 'NN';
+    const steps: DocumentWorkflowStep[] = stepNames.map((step, index) => ({
+      id: `ticket-${sequence}-step-${index + 1}`,
+      name: step.name,
+      assignee: index === 0 ? (step.assignee || 'Nguyễn Hoàng Minh') : (step.assignee || 'Chờ phân công'),
+      status: index === 0 ? 'pending' : 'waiting',
+    }));
+    const created: WorkTicketSubmission = {
+      id: `ticket-${sequence}`,
+      code: `${prefix}-2026-${String(sequence).padStart(3, '0')}`,
+      templateId: template.id,
+      kind: template.kind,
+      title: body.fields.title || template.name,
+      createdBy: demoUser.fullName,
+      department: body.fields.department || demoUser.department,
+      createdAt: new Date().toISOString(),
+      status: 'pending',
+      currentStep: 0,
+      viewScope: 'sent',
+      fields: { ...body.fields },
+      steps,
+      followers: body.followers ?? [],
+      comments: [],
+      attachments: body.attachments ?? [],
+    };
+    workTicketSubmissionStore = [created, ...workTicketSubmissionStore];
+    data = created;
+  }
+  else if (pathname === '/api/work-tickets/submissions') data = workTicketSubmissionStore;
+  else if (/^\/api\/work-tickets\/submissions\/[^/]+\/comments$/.test(pathname) && options?.method === 'POST') {
+    const id = pathname.split('/')[4];
+    const body = options.body as { content?: string };
+    const item = workTicketSubmissionStore.find((entry) => entry.id === id);
+    if (!item || !body.content?.trim()) throw new Error('Không thể gửi bình luận.');
+    const comment = { id: `${id}-c${item.comments.length + 1}-${Date.now()}`, author: demoUser.fullName, content: body.content.trim(), createdAt: new Date().toISOString() };
+    const updated: WorkTicketSubmission = { ...item, comments: [...item.comments, comment] };
+    workTicketSubmissionStore = workTicketSubmissionStore.map((entry) => entry.id === id ? updated : entry);
+    data = updated;
+  }
+  else if (/^\/api\/work-tickets\/submissions\/[^/]+\/followers$/.test(pathname) && options?.method === 'POST') {
+    const id = pathname.split('/')[4];
+    const body = options.body as { followerId?: string };
+    const item = workTicketSubmissionStore.find((entry) => entry.id === id);
+    const follower = followerOptions.find((entry) => entry.id === body.followerId);
+    if (!item || !follower) throw new Error('Không thể thêm người theo dõi.');
+    if (item.followers.some((entry) => entry.id === follower.id)) throw new Error('Người này đã theo dõi phiếu.');
+    const updated: WorkTicketSubmission = { ...item, followers: [...item.followers, follower] };
+    workTicketSubmissionStore = workTicketSubmissionStore.map((entry) => entry.id === id ? updated : entry);
+    data = updated;
+  }
+  else if (/^\/api\/work-tickets\/submissions\/[^/]+\/actions$/.test(pathname) && options?.method === 'POST') {
+    const id = pathname.split('/')[4];
+    const body = options.body as { action?: 'approve' | 'reject'; note?: string; nextAssignee?: string };
+    const item = workTicketSubmissionStore.find((entry) => entry.id === id);
+    if (!item || item.status !== 'pending' || !body.action) throw new Error('Phiếu không còn ở trạng thái chờ xử lý.');
+    const actedAt = new Date().toISOString();
+    const steps = item.steps.map((step, index) => index === item.currentStep ? { ...step, status: body.action === 'approve' ? 'approved' as const : 'rejected' as const, actedAt, note: body.note?.trim() || undefined } : { ...step });
+    let status: WorkTicketSubmission['status'] = body.action === 'reject' ? 'rejected' : 'pending';
+    let currentStep = item.currentStep;
+    if (body.action === 'approve') {
+      if (item.currentStep >= steps.length - 1) status = 'approved';
+      else {
+        currentStep += 1;
+        const chosenAssignee = body.nextAssignee?.trim();
+        steps[currentStep] = { ...steps[currentStep], status: 'pending', assignee: chosenAssignee || (steps[currentStep].assignee === 'Chờ phân công' ? (currentStep === steps.length - 1 ? 'Lê Quốc Hùng' : 'Trần Thu Hà') : steps[currentStep].assignee) };
+      }
+    }
+    const updated: WorkTicketSubmission = { ...item, steps, status, currentStep, viewScope: 'reviewed' };
+    workTicketSubmissionStore = workTicketSubmissionStore.map((entry) => entry.id === id ? updated : entry);
     data = updated;
   }
   else if (pathname === '/api/requests') data = requestRecords;

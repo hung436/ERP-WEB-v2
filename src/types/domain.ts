@@ -254,3 +254,54 @@ export interface DocumentSubmission {
   fields: Record<string, string>;
   steps: DocumentWorkflowStep[];
 }
+
+export type WorkTicketTemplateKind = 'blank' | 'leave_request' | 'overseas_request';
+
+export interface WorkTicketTemplate {
+  id: string;
+  kind: WorkTicketTemplateKind;
+  name: string;
+  description: string;
+  estimatedDays: number;
+  workflow: string[];
+}
+
+export interface WorkTicketFollower {
+  id: string;
+  name: string;
+  positionName?: string;
+  departmentName?: string;
+}
+
+export interface WorkTicketComment {
+  id: string;
+  author: string;
+  content: string;
+  createdAt: string;
+}
+
+export interface WorkTicketAttachment {
+  id: string;
+  name: string;
+  size: number;
+  type: string;
+}
+
+export interface WorkTicketSubmission {
+  id: string;
+  code: string;
+  templateId: string;
+  kind: WorkTicketTemplateKind;
+  title: string;
+  createdBy: string;
+  department: string;
+  createdAt: string;
+  status: DocumentStatus;
+  currentStep: number;
+  viewScope: 'sent' | 'pending_review' | 'reviewed';
+  fields: Record<string, string>;
+  steps: DocumentWorkflowStep[];
+  followers: WorkTicketFollower[];
+  comments: WorkTicketComment[];
+  attachments: WorkTicketAttachment[];
+}

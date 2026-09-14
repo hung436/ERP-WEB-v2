@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { MessageSquare } from 'lucide-react';
 
 import { ModuleIcon } from '@/components/ModuleIcon';
+import { StatusTag } from '@/components/StatusTag';
 import tuoiTreLogo from '@/assets/logo-tuoitre-2026-do-chu.svg';
 import { documentApi } from '@/services/api';
 import type { DocumentConsultationSubStep, DocumentSubmission, DocumentWorkflowStep } from '@/types/domain';
@@ -13,13 +14,6 @@ const stepLabels: Record<DocumentWorkflowStep['status'], string> = {
   pending: 'Đang chờ duyệt',
   approved: 'Đã duyệt',
   rejected: 'Không đồng ý',
-};
-
-const statusLabels: Record<DocumentSubmission['status'], string> = {
-  draft: 'Bản nháp',
-  pending: 'Chờ xử lý',
-  approved: 'Đã duyệt',
-  rejected: 'Từ chối',
 };
 
 const defaultConsultants = [
@@ -284,7 +278,7 @@ export function DocumentDetailModal({
                     icon={<MessageSquare size={14} />}
                     onClick={() => setConsultModalOpen(true)}
                   >
-                    Lấy ý kiến
+                    {activeMainStep?.consultations?.length ? 'Thêm người lấy ý kiến' : 'Lấy ý kiến'}
                   </Button>
                   <Button
                     danger
@@ -316,7 +310,9 @@ export function DocumentDetailModal({
             <span className="section-icon documents">
               <ModuleIcon module="documents" size={20} />
             </span>
-            {document?.title} · {document && statusLabels[document.status]}
+            {/* Tên người gửi đã có trong nội dung phiếu và cột quy trình, chỉ nêu loại phiếu ở đây để tránh lặp */}
+            {document?.title.split(' · ')[0]}
+            {document && <StatusTag category="status" value={document.status} />}
           </span>
         }
         width={1100}
@@ -327,17 +323,14 @@ export function DocumentDetailModal({
               <ReadonlyDocument document={document} />
             </div>
             <aside className="document-workflow-panel">
-              <div>
+              <div className="workflow-sent-date">
                 <small>NGÀY GỬI</small>
                 <strong>
                   {new Date(document.createdAt).toLocaleDateString('vi-VN')}
                 </strong>
-                <span>
-                  {document.createdBy} · {document.department}
-                </span>
               </div>
               <h3>Quy trình xét duyệt</h3>
-              <ol>
+              <ol className="workflow-steps">
                 {document.steps.map((step, index) => {
                   return (
                     <li className={step.status} key={step.id}>
@@ -351,48 +344,44 @@ export function DocumentDetailModal({
                       <div>
                         <strong>{step.name}</strong>
                         <span>{step.assignee}</span>
-                        <em>{stepLabels[step.status]}</em>
-                        {step.actedAt && (
-                          <time>
-                            {new Date(step.actedAt).toLocaleString('vi-VN')}
-                          </time>
-                        )}
-                        {step.note && <p>“{step.note}”</p>}
+                        <div className="workflow-step-meta">
+                          <span className={`workflow-status-pill ${step.status}`}>{stepLabels[step.status]}</span>
+                          {step.actedAt && (
+                            <time>{new Date(step.actedAt).toLocaleString('vi-VN')}</time>
+                          )}
+                        </div>
+                        {step.note && <p className="workflow-step-note">{step.note}</p>}
 
                         {/* Sub-branch Consultations */}
                         {step.consultations && step.consultations.length > 0 && (
-                          <ul style={{ marginTop: 8, paddingLeft: 0, listStyle: 'none' }}>
+                          <div className="workflow-consult-group">
+                            {/* Tách nhãn rõ khỏi luồng duyệt chính: đây là ý kiến tham vấn phụ, không phải bước phê duyệt kế tiếp */}
+                            <span className="workflow-consult-label">Ý kiến tham vấn</span>
+                            <ul className="workflow-consult-list">
                             {step.consultations.map((sub) => (
-                              <li
-                                key={sub.id}
-                                style={{
-                                  display: 'flex',
-                                  alignItems: 'flex-start',
-                                  gap: 6,
-                                  marginTop: 6,
-                                  padding: '6px 10px',
-                                  background: '#f8fafc',
-                                  borderLeft: '3px solid #16a34a',
-                                  borderRadius: '0 6px 6px 0',
-                                  fontSize: 12,
-                                }}
-                              >
-                                <span style={{ color: '#16a34a', fontWeight: 'bold' }}>💬</span>
-                                <div style={{ flex: 1 }}>
-                                  <div style={{ fontWeight: 600, color: '#15803d' }}>{sub.name}</div>
-                                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 2, color: '#475467' }}>
-                                    {sub.status === 'pending' && (
-                                      <span style={{ fontWeight: 500, color: '#d97706' }}>
-                                        ⏳ Chờ cho ý kiến
-                                      </span>
-                                    )}
-                                    {sub.deadline && <span>Hạn: {sub.deadline}</span>}
-                                  </div>
-                                  {sub.note && <p style={{ margin: '4px 0 0 0', fontStyle: 'italic', color: '#334155' }}>“{sub.note}”</p>}
+                              <li className="workflow-consult-item" key={sub.id}>
+                                {/* Người được hỏi ý kiến hiện trực tiếp ở đây, không cần nhắc lại "Lấy ý kiến" */}
+                                <div className="workflow-consult-header">
+                                  <span className="workflow-consult-icon" aria-hidden="true">
+                                    <MessageSquare size={12} />
+                                  </span>
+                                  <strong>{sub.assignee}</strong>
+                                  <span className={`workflow-status-pill compact ${sub.status}`}>
+                                    {sub.status === 'approved' ? 'Đã cho ý kiến' : 'Chờ cho ý kiến'}
+                                  </span>
                                 </div>
+                                {sub.actedAt ? (
+                                  <span className="workflow-consult-meta">
+                                    {new Date(sub.actedAt).toLocaleString('vi-VN')}
+                                  </span>
+                                ) : (
+                                  sub.deadline && <span className="workflow-consult-meta">Hạn: {sub.deadline}</span>
+                                )}
+                                {sub.note && <p className="workflow-consult-note">{sub.note}</p>}
                               </li>
                             ))}
-                          </ul>
+                            </ul>
+                          </div>
                         )}
                       </div>
                     </li>

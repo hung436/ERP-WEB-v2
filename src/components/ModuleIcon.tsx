@@ -1,11 +1,12 @@
 import type { ReactNode } from 'react';
 
-export type ModuleName = 'home' | 'tasks' | 'documents' | 'calendar' | 'chat' | 'mail' | 'announcements' | 'directory' | 'personnel' | 'requests' | 'cloud' | 'meetings' | 'meeting' | 'evaluations' | 'library' | 'experts';
+export type ModuleName = 'home' | 'tasks' | 'documents' | 'work-tickets' | 'calendar' | 'chat' | 'mail' | 'announcements' | 'directory' | 'personnel' | 'requests' | 'cloud' | 'meetings' | 'meeting' | 'evaluations' | 'library' | 'experts';
 
 const paths: Record<ModuleName, ReactNode> = {
   home: <><path d="M3.5 10.5 12 3l8.5 7.5" /><path d="M5.5 9.5V21h13V9.5M9 21v-6h6v6" /></>,
   tasks: <><rect x="4" y="3" width="16" height="18" rx="3" /><path d="m8 9 1.5 1.5L12 8M14 9h2.5M8 15l1.5 1.5L12 14M14 15h2.5" /></>,
   documents: <><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></>,
+  'work-tickets': <><path d="M4 8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2a2 2 0 0 0 0-4Z" /><path d="M9 6v12" strokeDasharray="2 2" /></>,
   calendar: <><rect x="3.5" y="5" width="17" height="16" rx="3" /><path d="M8 3v4M16 3v4M3.5 10h17M8 14h.01M12 14h.01M16 14h.01M8 17.5h.01M12 17.5h.01" /></>,
   chat: <><path d="M20.5 11.5a8 8 0 0 1-8 8H7l-3.5 2 1-4A8 8 0 1 1 20.5 11.5Z" /><path d="M8.5 11.5h.01M12.5 11.5h.01M16.5 11.5h.01" /></>,
   mail: <><rect x="3" y="5" width="18" height="14" rx="3" /><path d="m4.5 7 7.5 6 7.5-6" /></>,
