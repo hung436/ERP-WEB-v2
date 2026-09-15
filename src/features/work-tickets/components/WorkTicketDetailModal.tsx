@@ -200,16 +200,17 @@ function useTicketAction(ticket: WorkTicketSubmission | null, onUpdated: (ticket
 
 // "Lấy ý kiến": gắn thêm nhánh tham vấn vào bước hiện tại mà không chuyển bước — chỉ lưu cục bộ qua onUpdated
 // (giống cơ chế đã dùng ở module Tài liệu), không có endpoint riêng trên mockApi.
-function useConsultation(ticket: WorkTicketSubmission, onUpdated: (ticket: WorkTicketSubmission) => Promise<void>) {
+function useConsultation(ticket: WorkTicketSubmission | null, onUpdated: (ticket: WorkTicketSubmission) => Promise<void>) {
   const [consultModalOpen, setConsultModalOpen] = useState(false);
   const [selectedConsultants, setSelectedConsultants] = useState<string[]>([]);
   const [consultDate, setConsultDate] = useState<Dayjs | null>(() => dayjs().add(1, 'day'));
   const [submittingConsult, setSubmittingConsult] = useState(false);
 
-  const activeStep = ticket.steps[ticket.currentStep];
+  const activeStep = ticket?.steps[ticket.currentStep];
   const pendingConsult = activeStep?.consultations?.find((sub) => sub.status === 'pending');
 
   const sendConsultation = async () => {
+    if (!ticket) return;
     if (!selectedConsultants.length) { message.error('Vui lòng chọn ít nhất 1 người cần lấy ý kiến'); return; }
     const deadline = consultDate ? consultDate.format('DD/MM/YYYY') : undefined;
     setSubmittingConsult(true);
@@ -255,18 +256,53 @@ function TicketDetailBody({ ticket, onUpdated, activeTab, setActiveTab }: { tick
 export function WorkTicketDetailModal({ ticket, onClose, onUpdated, initialTab = 'workflow' }: { ticket: WorkTicketSubmission | null; onClose: () => void; onUpdated: (ticket: WorkTicketSubmission) => Promise<void>; initialTab?: PanelTab }) {
   const [activeTab, setActiveTab] = useState<PanelTab>('workflow');
   const { note, setNote, saving, act } = useTicketAction(ticket, onUpdated);
+  const { consultModalOpen, setConsultModalOpen, selectedConsultants, setSelectedConsultants, consultDate, setConsultDate, submittingConsult, sendConsultation, pendingConsult } = useConsultation(ticket, onUpdated);
+  const [deployModalOpen, setDeployModalOpen] = useState(false);
+  const [deployAssignee, setDeployAssignee] = useState<string | undefined>();
 
   useEffect(() => { if (ticket) setActiveTab(initialTab); }, [ticket?.id, initialTab]);
 
-  return <Modal centered className="document-detail-modal work-ticket-detail-modal" footer={ticket && isMyTurn(ticket) ? <div className="document-approval-footer">
-    <Input.TextArea aria-label="Ý kiến xử lý" onChange={(event) => setNote(event.target.value)} placeholder="Nhập ý kiến xử lý (không bắt buộc)" rows={2} value={note} />
-    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-      <Button danger loading={saving === 'reject'} onClick={() => void act('reject')}>Không duyệt</Button>
-      <Button loading={saving === 'approve'} onClick={() => void act('approve')} type="primary">Duyệt</Button>
-    </div>
-  </div> : <Button onClick={onClose} type="primary">Đóng</Button>} onCancel={onClose} open={Boolean(ticket)} title={<span className="preview-title"><span className="section-icon documents"><ModuleIcon module="work-tickets" size={20} /></span>{ticket?.title.split(' · ')[0]}{ticket && <StatusTag category="status" value={ticket.status} />}</span>} width={1240}>
-    {ticket && <TicketDetailBody activeTab={activeTab} onUpdated={onUpdated} setActiveTab={setActiveTab} ticket={ticket} />}
-  </Modal>;
+  const hasNextStep = Boolean(ticket) && ticket!.currentStep < ticket!.steps.length - 1;
+  const consultantOptions = followerOptions.map((item) => ({ value: item.name, label: `${item.name} · ${item.positionName} · ${item.departmentName}` }));
+
+  const confirmDeploy = async () => {
+    if (!deployAssignee) { message.error('Vui lòng chọn người triển khai'); return; }
+    await act('approve', deployAssignee);
+    setDeployModalOpen(false);
+    setDeployAssignee(undefined);
+  };
+
+  return <>
+    <Modal centered className="document-detail-modal work-ticket-detail-modal" footer={ticket && isMyTurn(ticket) ? <div className="document-approval-footer">
+      <Input.TextArea aria-label="Ý kiến xử lý" onChange={(event) => setNote(event.target.value)} placeholder="Nhập ý kiến xử lý (không bắt buộc)" rows={2} value={note} />
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+        <Button icon={<MessageSquare size={14} />} onClick={() => setConsultModalOpen(true)}>{pendingConsult ? 'Thêm người lấy ý kiến' : 'Lấy ý kiến'}</Button>
+        {hasNextStep && <Button icon={<UserCog size={14} />} onClick={() => setDeployModalOpen(true)}>Triển khai</Button>}
+        <Button danger loading={saving === 'reject'} onClick={() => void act('reject')} style={{ marginLeft: 'auto' }}>Không duyệt</Button>
+        <Button loading={saving === 'approve'} onClick={() => void act('approve')} type="primary">Duyệt</Button>
+      </div>
+    </div> : <Button onClick={onClose} type="primary">Đóng</Button>} onCancel={onClose} open={Boolean(ticket)} title={<span className="preview-title"><span className="section-icon documents"><ModuleIcon module="work-tickets" size={20} /></span>{ticket?.title.split(' · ')[0]}{ticket && <StatusTag category="status" value={ticket.status} />}</span>} width={1240}>
+      {ticket && <TicketDetailBody activeTab={activeTab} onUpdated={onUpdated} setActiveTab={setActiveTab} ticket={ticket} />}
+    </Modal>
+    <Modal cancelText="Hủy" confirmLoading={submittingConsult} okText="Gửi xin ý kiến" onCancel={() => setConsultModalOpen(false)} onOk={() => void sendConsultation()} open={consultModalOpen} title="Lấy ý kiến" width={460}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 16, padding: '12px 0' }}>
+        <div>
+          <span style={{ display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 6 }}>Hạn chót cho ý kiến</span>
+          <DatePicker format="DD/MM/YYYY" onChange={setConsultDate} placeholder="Chọn ngày hạn chót…" style={{ width: '100%' }} value={consultDate} />
+        </div>
+        <div>
+          <span style={{ display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 6 }}>Chọn người lấy ý kiến</span>
+          <Select maxTagCount="responsive" mode="multiple" onChange={setSelectedConsultants} options={consultantOptions} placeholder="Chọn người cần lấy ý kiến…" showSearch style={{ width: '100%' }} value={selectedConsultants} />
+        </div>
+      </div>
+    </Modal>
+    <Modal cancelText="Hủy" confirmLoading={saving === 'approve'} okText="Duyệt và giao việc" onCancel={() => setDeployModalOpen(false)} onOk={() => void confirmDeploy()} open={deployModalOpen} title="Triển khai" width={420}>
+      <div style={{ padding: '12px 0' }}>
+        <span style={{ display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 6 }}>Người triển khai bước tiếp theo</span>
+        <Select onChange={setDeployAssignee} options={consultantOptions} placeholder="Chọn người triển khai…" showSearch style={{ width: '100%' }} value={deployAssignee} />
+      </div>
+    </Modal>
+  </>;
 }
 
 // Panel chi tiết gắn liền bên phải trang Công việc (thay vì Modal nổi) — danh sách bên trái thu hẹp lại khi mở.
