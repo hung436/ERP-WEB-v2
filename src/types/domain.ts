@@ -74,6 +74,26 @@ export interface MeetingEvent {
 }
 
 export type CalendarEventType = 'meeting' | 'work' | 'deadline' | 'personal';
+export type CalendarScope = 'editorial' | 'personal';
+
+export interface CalendarComment {
+  id: string;
+  author: string;
+  avatar?: string;
+  content: string;
+  createdAt: string;
+}
+
+export interface CalendarAttachmentItem {
+  id: string;
+  name: string;
+  size: number;
+  type: string;
+  url?: string;
+  uploadedAt?: string;
+  uploadedBy?: string;
+}
+
 export interface CalendarEvent {
   id: string;
   title: string;
@@ -82,13 +102,26 @@ export interface CalendarEvent {
   location?: string;
   meetingUrl?: string;
   type: CalendarEventType;
+  scope?: CalendarScope;
   organizer: string;
+  leader?: string;
+  participantText?: string;
+  participantCount?: number;
+  isUserParticipant?: boolean;
   responseStatus?: 'pending' | 'accepted' | 'declined';
   meetingId?: string;
   platform?: string;
   agenda?: string;
+  notes?: string;
+  dutyInfo?: string;
   participants?: string[];
+  attachments?: CalendarAttachmentItem[];
+  comments?: CalendarComment[];
   recordingAvailable?: boolean;
+  isInterested?: boolean;
+  reminderMinutes?: number;
+  isAdjusted?: boolean;
+  adjustedNote?: string;
 }
 
 export interface ChatMember {

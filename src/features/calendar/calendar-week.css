@@ -1,0 +1,1166 @@
+/* ==========================================================================
+   Tuoi Tre ERP - Minimalist & Modern Weekly Calendar (List-based by Time)
+   ========================================================================== */
+
+.calendar-week-page {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: calc(100vh - 110px);
+}
+
+/* Minimalist Unified Header Toolbar (3 Distinct Clusters) */
+.calendar-week-header {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px 16px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+/* 1. Cụm Trái: Tinh giản bộ điều hướng thời gian */
+.header-cluster-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.calendar-week-nav-group {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  background: #f8fafc;
+  padding: 2px 4px;
+  height: 36px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  box-sizing: border-box;
+}
+
+.calendar-week-nav-group .current-week-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1e293b;
+  padding: 0 8px;
+  min-width: 175px;
+  text-align: center;
+  line-height: 32px;
+}
+
+.header-cluster-left .ant-picker {
+  height: 36px;
+  border-radius: 8px;
+  border-color: #e2e8f0;
+}
+
+/* Đường phân tách giữa Cụm Trái và Cụm Giữa */
+.calendar-header-divider {
+  width: 1px;
+  height: 22px;
+  background: #e2e8f0;
+  flex-shrink: 0;
+}
+
+/* 2. Cụm Giữa: Bộ lọc trực quan, dễ nhận biết và sử dụng */
+.header-cluster-middle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.filter-lead-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+  margin-right: 2px;
+  user-select: none;
+}
+
+.calendar-filter-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 10px;
+  font-size: 12.5px;
+  font-weight: 500;
+  border-radius: 6px;
+  cursor: pointer;
+  user-select: none;
+  box-sizing: border-box;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  outline: none;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.calendar-filter-btn:active {
+  transform: scale(0.97);
+}
+
+/* Inactive State: Nền trắng, viền xám rõ ràng sắc nét, dễ nhận biết là nút bấm */
+.calendar-filter-btn.is-inactive {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #475569;
+}
+
+.calendar-filter-btn.is-inactive:hover {
+  background: #f8fafc;
+  border-color: #94a3b8;
+  color: #0f172a;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.calendar-filter-btn.is-inactive .filter-counter {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+/* Active State: Ban biên tập (Đỏ nổi bật + Checkmark) */
+.calendar-filter-btn.editorial.is-active {
+  background: #fee2e2;
+  border: 1px solid #f87171;
+  color: #991b1b;
+}
+
+.calendar-filter-btn.editorial.is-active:hover {
+  background: #fecaca;
+  border-color: #ef4444;
+}
+
+.calendar-filter-btn.editorial.is-active .filter-counter {
+  background: #fca5a5;
+  color: #7f1d1d;
+}
+
+.calendar-filter-btn.editorial.is-active .filter-check-icon {
+  color: #dc2626;
+}
+
+/* Active State: Cá nhân (Xanh nổi bật + Checkmark) */
+.calendar-filter-btn.personal.is-active {
+  background: #dbeafe;
+  border: 1px solid #60a5fa;
+  color: #1e40af;
+}
+
+.calendar-filter-btn.personal.is-active:hover {
+  background: #bfdbfe;
+  border-color: #3b82f6;
+}
+
+.calendar-filter-btn.personal.is-active .filter-counter {
+  background: #93c5fd;
+  color: #1e3a8a;
+}
+
+.calendar-filter-btn.personal.is-active .filter-check-icon {
+  color: #2563eb;
+}
+
+/* Active State: Tôi tham gia (Tím nổi bật + Checkmark) */
+.calendar-filter-btn.attending.is-active {
+  background: #ede9fe;
+  border: 1px solid #a78bfa;
+  color: #5b21b6;
+}
+
+.calendar-filter-btn.attending.is-active:hover {
+  background: #ddd6fe;
+  border-color: #8b5cf6;
+}
+
+.calendar-filter-btn.attending.is-active .filter-counter {
+  background: #c4b5fd;
+  color: #4c1d95;
+}
+
+.calendar-filter-btn.attending.is-active .filter-check-icon {
+  color: #7c3aed;
+}
+
+/* Icon / Dot representation */
+.filter-check-icon {
+  flex-shrink: 0;
+  stroke-width: 2.5;
+}
+
+.filter-user-icon {
+  flex-shrink: 0;
+  color: #64748b;
+}
+
+.filter-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: inline-block;
+}
+
+.filter-dot.editorial {
+  background: #e11d48;
+}
+
+.filter-dot.personal {
+  background: #2563eb;
+}
+
+.filter-name {
+  line-height: 1;
+  font-weight: 500;
+}
+
+/* Pill Counter */
+.filter-counter {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 10px;
+  line-height: 1.3;
+  margin-left: 2px;
+  transition: all 0.15s ease;
+}
+
+/* Mini Divider giữa nhóm Loại lịch và Tôi tham gia */
+.filter-mini-divider {
+  width: 1px;
+  height: 18px;
+  background: #e2e8f0;
+  margin: 0 2px;
+  flex-shrink: 0;
+}
+
+/* 3. Cụm Phải: Nút hành động chính (Primary Action) */
+.header-cluster-right {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.header-cluster-right .btn-create-meeting {
+  height: 36px;
+  border-radius: 8px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 16px;
+}
+
+/* Container for Weekly Timeline */
+.week-timeline-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.week-scroll-sentinel {
+  height: 1px;
+  margin: 0;
+  padding: 0;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+/* Unified Flat Sticky Header Strip (Dải phẳng đồng nhất 7 ô header) */
+.week-sticky-header-strip {
+  position: sticky;
+  top: 68px;
+  z-index: 25;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 6px 8px;
+  box-sizing: border-box;
+  /* Hiệu ứng đổ bóng mờ nhẹ ở đáy */
+  box-shadow: 0 4px 12px -2px rgba(15, 23, 42, 0.05), 0 2px 4px -1px rgba(15, 23, 42, 0.03);
+  transition: box-shadow 0.2s ease, padding 0.2s ease;
+}
+
+/* Khi cuộn: tăng độ nổi bóng mờ nhẹ nhàng ở đáy */
+.week-sticky-header-strip.is-scrolled {
+  box-shadow: 0 8px 18px -3px rgba(15, 23, 42, 0.08), 0 3px 6px -1px rgba(15, 23, 42, 0.04);
+}
+
+/* Hàng 7 ô header bên trong dải phẳng đồng nhất */
+.week-header-cells-row {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(170px, 1fr));
+  gap: 12px;
+  width: 100%;
+  align-items: stretch;
+  box-sizing: border-box;
+}
+
+/* Từng ô header trong dải phẳng */
+.week-day-header-cell {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  background: transparent;
+  border: 1px solid transparent;
+  box-sizing: border-box;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+/* Đường line nhẹ phân tách giữa các cột trên header */
+.week-day-header-cell:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  top: 6px;
+  bottom: 6px;
+  right: -6px;
+  width: 1px;
+  background: #e2e8f0;
+  pointer-events: none;
+}
+
+/* Ô ngày hôm nay trong dải phẳng - padding cân đối, không chạm viền ngoài */
+.week-day-header-cell.is-today {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+  box-shadow: 0 1px 3px rgba(37, 99, 235, 0.08);
+}
+
+.week-day-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.week-day-name {
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  color: #475467;
+}
+
+.week-day-header-cell.is-today .week-day-name,
+.week-day-column-card.is-today .week-day-name {
+  color: #1d4ed8;
+}
+
+/* Bổ sung ngày/tháng (ví dụ 05/10) dạng pill gọn gàng, sắc nét */
+.week-day-date-number {
+  font-size: 13px;
+  font-weight: 700;
+  color: #0f172a;
+  padding: 2px 7px;
+  min-width: 44px;
+  height: 23px;
+  line-height: 19px;
+  border-radius: 12px;
+  text-align: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #f1f5f9;
+  letter-spacing: 0.2px;
+  transition: all 0.15s ease;
+}
+
+.week-day-header-cell.is-today .week-day-date-number,
+.week-day-column-card.is-today .week-day-date-number {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+/* Dòng thông tin số lượng sự kiện - ẩn mượt mà khi cuộn trang */
+.week-day-sub-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+  color: #64748b;
+  font-weight: 500;
+  max-height: 22px;
+  opacity: 1;
+  overflow: hidden;
+  transition: max-height 0.22s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.18s ease, margin 0.18s ease;
+}
+
+.week-day-sub-info.is-hidden,
+.week-sticky-header-strip.is-scrolled .week-day-sub-info {
+  max-height: 0;
+  opacity: 0;
+  margin: 0;
+  padding: 0;
+  pointer-events: none;
+}
+
+.week-day-today-badge {
+  color: #2563eb;
+  font-weight: 600;
+}
+
+/* 7-Day Columns Board (Grid List) với khoảng đệm an toàn margin-top phía dưới header dính */
+.week-list-board {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(170px, 1fr));
+  gap: 12px;
+  align-items: stretch;
+  overflow: visible;
+  padding: 0 8px 8px; /* Cân xứng hoàn hảo với padding của header strip (8px) */
+  margin-top: 10px; /* Khoảng đệm an toàn (8px - 12px) để card không chạm sát đáy header khi trôi lên */
+  box-sizing: border-box;
+}
+
+/* Individual Day Column - Clean & Borderless (No box-in-box nesting) */
+.week-day-column-card {
+  display: flex;
+  flex-direction: column;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  overflow: visible;
+  transition: background 0.15s ease;
+}
+
+.week-day-column-card.is-today {
+  background: rgba(239, 246, 255, 0.4);
+  border: none;
+  box-shadow: none;
+  border-radius: 10px;
+}
+
+/* Editorial Duty Schedule (Người trực & Ca trực tòa soạn - Tối giản, không viền nặng) */
+.week-day-duty-box {
+  background: #f8fafc;
+  border: 1px solid #f1f5f9;
+  border-radius: 6px;
+  padding: 4px 8px;
+  margin-top: 2px;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.15s ease;
+}
+
+.week-day-duty-box:hover {
+  background: #f1f5f9;
+  border-color: #e2e8f0;
+}
+
+.week-day-duty-box.is-open {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.week-day-header-cell.is-today .week-day-duty-box,
+.week-day-column-card.is-today .week-day-duty-box {
+  background: #ffffff;
+  border: 1px solid #dbeafe;
+}
+
+.week-day-header-cell.is-today .week-day-duty-box:hover,
+.week-day-column-card.is-today .week-day-duty-box:hover {
+  background: #f8fafc;
+}
+
+.duty-box-leader-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+}
+
+.duty-leader-info {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  min-width: 0;
+  flex: 1;
+}
+
+.duty-leader-prefix {
+  font-size: 11px;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.2px;
+}
+
+.duty-leader-name {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #0f172a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.duty-chevron-icon {
+  color: #64748b;
+  flex-shrink: 0;
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), color 0.15s ease;
+}
+
+.duty-box-leader-btn:hover .duty-chevron-icon {
+  color: #0f172a;
+}
+
+.duty-chevron-icon.is-open {
+  transform: rotate(180deg);
+  color: #0f172a;
+}
+
+.duty-box-shifts {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 5px;
+  padding-top: 5px;
+  border-top: 1px dashed #e2e8f0;
+}
+
+.duty-shift-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 5px;
+  font-size: 12px;
+  line-height: 1.45;
+  color: #1e293b;
+  word-break: break-word;
+}
+
+.duty-shift-badge {
+  font-weight: 700;
+  color: #0f172a;
+  flex-shrink: 0;
+  font-size: 12px;
+}
+
+.duty-shift-details {
+  flex: 1;
+  min-width: 0;
+  white-space: normal;
+  word-break: break-word;
+}
+
+.duty-role-segment {
+  display: inline;
+}
+
+.duty-role-label {
+  font-weight: 600;
+  color: #475569;
+}
+
+.duty-role-dot {
+  margin: 0 4px;
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+/* Day Event List */
+.week-day-event-list {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
+.week-day-empty-state {
+  text-align: center;
+  padding: 24px 8px;
+  font-size: 12px;
+  color: #94a3b8;
+  font-style: italic;
+}
+
+/* Event List Card (Chronological Item) */
+.calendar-list-card {
+  border-radius: 8px;
+  padding: 9px 11px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  position: relative;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+}
+
+/* 1. Lịch BBT có bạn tham gia: Nền hồng sữa/đỏ sương mù (#FFF8F8), viền đỏ hairline siêu nhạt (#FECACA) */
+.calendar-list-card.card-editorial-user {
+  background: #fff8f8;
+  border: 1px solid #fecaca;
+  cursor: pointer;
+}
+
+.calendar-list-card.card-editorial-user:hover {
+  transform: translateY(-1px);
+  background: #fff1f2;
+  border-color: #fca5a5;
+  box-shadow: 0 3px 8px rgba(225, 29, 72, 0.07);
+}
+
+/* 2. Lịch BBT chung (Chỉ xem): Nền trắng thuần (#FFFFFF), viền xám nhạt (#E5E7EB), chữ thanh mảnh */
+.calendar-list-card.card-editorial-other {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  cursor: default;
+}
+
+.calendar-list-card.card-editorial-other:hover {
+  background: #fafafa;
+  border-color: #d1d5db;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
+}
+
+/* Giảm độ đậm chữ của các lịch chỉ xem */
+.calendar-list-card.card-editorial-other .card-title {
+  font-weight: 400; /* Regular nhẹ nhàng, thanh thoát */
+  color: #475569;   /* Xám dịu mắt thay vì đen đậm */
+  line-height: 1.4;
+}
+
+.calendar-list-card.card-editorial-other .card-time-tag {
+  font-weight: 500; /* Giảm độ đậm thời gian */
+  color: #64748b;
+}
+
+.calendar-list-card.card-editorial-other .card-location-row,
+.calendar-list-card.card-editorial-other .card-leader-row {
+  color: #94a3b8;
+}
+
+/* 3. Lịch cá nhân: Nền xanh lam tươi sáng rõ nét, viền xanh thanh lịch */
+.calendar-list-card.card-personal {
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  cursor: pointer;
+}
+
+.calendar-list-card.card-personal:hover {
+  transform: translateY(-1px);
+  background: #dbeafe;
+  border-color: #93c5fd;
+  box-shadow: 0 3px 8px rgba(37, 99, 235, 0.1);
+}
+
+.calendar-list-card.card-personal .card-title {
+  color: #1e3a8a; /* Xanh navy đậm đà, dễ đọc */
+  font-weight: 600;
+}
+
+.calendar-list-card.card-personal .card-time-tag {
+  color: #1d4ed8;
+}
+
+/* Card Row Elements */
+.card-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.card-time-tag {
+  font-size: 12px;
+  font-weight: 600;
+  color: #334155;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  letter-spacing: -0.1px;
+}
+
+.card-header-badges {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.card-status-badge {
+  font-size: 11px;
+  font-weight: 500;
+  padding: 2px 6px;
+  border-radius: 4px;
+  white-space: nowrap;
+  line-height: 1.25;
+}
+
+/* Tag Đã điều chỉnh */
+.card-status-badge.adjusted {
+  background: #fef3c7;
+  color: #b45309;
+  border: none;
+  font-size: 11px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  padding: 1.5px 6px;
+  border-radius: 4px;
+  letter-spacing: -0.1px;
+  cursor: pointer;
+}
+
+.card-status-badge.adjusted:hover {
+  background: #fde68a;
+  color: #92400e;
+}
+
+.card-status-badge.attending {
+  background: #fee2e2;
+  color: #be123c;
+}
+
+.card-status-badge.readonly {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+.card-status-badge.personal {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.card-title {
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: #0f172a;
+  margin: 0;
+  word-break: break-word;
+}
+
+.card-location-row {
+  font-size: 12px;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  min-width: 0;
+}
+
+.card-location-info {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card-location-info span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card-location-row .card-status-badge.adjusted {
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.card-leader-row {
+  font-size: 12px;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card-footer-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  font-size: 11.5px;
+  color: #64748b;
+  margin-top: 2px;
+  padding-top: 3px;
+  border-top: none;
+}
+
+.card-meta-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Readonly Popover content */
+.readonly-popover-content {
+  max-width: 300px;
+  font-size: 12.5px;
+}
+
+.readonly-popover-title {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 6px;
+  line-height: 1.35;
+}
+
+.readonly-popover-adjusted-alert {
+  background: #fffbeb;
+  border: 1px solid #fef3c7;
+  border-left: 3px solid #f59e0b;
+  border-radius: 4px;
+  padding: 6px 10px;
+  margin-bottom: 8px;
+  font-size: 12px;
+  line-height: 1.45;
+  color: #78350f;
+}
+
+.readonly-popover-adjusted-alert .readonly-adjusted-label {
+  font-weight: 700;
+  color: #b45309;
+  display: inline;
+}
+
+.readonly-popover-adjusted-alert .readonly-adjusted-note {
+  color: #78350f;
+  display: inline;
+}
+
+.readonly-popover-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  font-size: 12px;
+  color: #475569;
+  margin-bottom: 4px;
+}
+
+.readonly-popover-row svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: #94a3b8;
+}
+
+/* Star Interest Button on Readonly Cards: chỉ hiện khi hover vào thẻ và khi thẻ được quan tâm */
+.card-star-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  padding: 2px 4px;
+  border-radius: 4px;
+  cursor: pointer;
+  color: #94a3b8;
+  transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+  line-height: 1;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Hiện khi hover vào thẻ */
+.calendar-list-card:hover .card-star-btn {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Luôn hiện khi thẻ đã được quan tâm */
+.card-star-btn.active {
+  opacity: 1;
+  pointer-events: auto;
+  color: #d97706;
+}
+
+.card-star-btn:hover {
+  background: #fef3c7;
+  color: #d97706;
+  transform: scale(1.15);
+}
+
+.card-star-btn.active:hover {
+  background: #fde68a;
+  transform: scale(1.15);
+}
+
+/* Popover Star action */
+.readonly-popover-interest-row {
+  margin-top: 8px;
+  padding-top: 6px;
+  border-top: 1px dashed #e2e8f0;
+}
+
+.popover-star-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 5px 10px;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  width: 100%;
+  justify-content: center;
+}
+
+.popover-star-btn:hover {
+  background: #fef3c7;
+  border-color: #fde68a;
+  color: #b45309;
+}
+
+.popover-star-btn.active {
+  background: #fffbeb;
+  border-color: #fcd34d;
+  color: #b45309;
+  font-weight: 600;
+}
+
+/* Modal Styling */
+.calendar-detail-modal .ant-modal-content {
+  padding: 20px 24px;
+  border-radius: 12px;
+}
+
+.detail-modal-header {
+  margin-bottom: 14px;
+}
+
+.detail-modal-badges {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.detail-modal-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1.35;
+  margin: 0;
+}
+
+.detail-modal-adjusted-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 8px;
+  padding: 8px 12px;
+  background: #fffbeb;
+  border: 1px solid #fef3c7;
+  border-left: 3px solid #f59e0b;
+  border-radius: 4px;
+  color: #78350f;
+  font-size: 12.5px;
+  line-height: 1.45;
+}
+
+.detail-modal-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  background: #f8fafc;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  margin-bottom: 14px;
+}
+
+.detail-info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 12.5px;
+}
+
+.detail-info-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+}
+
+.detail-info-value {
+  color: #1e293b;
+  font-weight: 500;
+}
+
+.detail-section-title {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #0f172a;
+  margin: 12px 0 8px 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Discussions / Comments - Clean List Style */
+.fb-comments-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.fb-comments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 250px;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+
+.fb-comment-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 2px 0;
+}
+
+.fb-comment-avatar {
+  flex-shrink: 0;
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.fb-comment-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  gap: 3px;
+}
+
+.fb-comment-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.fb-comment-author {
+  font-size: 13px;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.fb-comment-time {
+  font-size: 11px;
+  color: #94a3b8;
+  font-weight: 400;
+  white-space: nowrap;
+  margin-left: auto;
+}
+
+.fb-comment-text {
+  font-size: 13px;
+  color: #334155;
+  white-space: pre-wrap;
+  word-break: break-word;
+  line-height: 1.45;
+}
+
+/* Facebook Composer */
+.fb-composer-wrapper {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.fb-composer-box {
+  flex: 1;
+  background-color: #f0f2f5;
+  border-radius: 20px;
+  padding: 4px 8px 4px 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.fb-composer-box:focus-within {
+  background-color: #ffffff;
+  border-color: #1877f2;
+  box-shadow: 0 0 0 2px rgba(24, 119, 242, 0.15);
+}
+
+.fb-composer-box textarea {
+  flex: 1;
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  resize: none !important;
+  padding: 6px 0 !important;
+  font-size: 13px !important;
+  color: #050505 !important;
+  line-height: 1.4 !important;
+  max-height: 100px;
+}
+
+.fb-composer-box textarea::placeholder {
+  color: #65676b;
+}
+
+.fb-send-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: none;
+  background: #1877f2;
+  color: #ffffff;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  flex-shrink: 0;
+}
+
+.fb-send-btn:hover:not(:disabled) {
+  background: #166fe5;
+  transform: scale(1.05);
+}
+
+.fb-send-btn:disabled {
+  background: #e4e6eb;
+  color: #bcc0c4;
+  cursor: not-allowed;
+}
+
+.fb-composer-hint {
+  font-size: 11px;
+  color: #8a8d91;
+  margin-top: 4px;
+  padding-left: 14px;
+}

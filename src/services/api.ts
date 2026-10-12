@@ -1,5 +1,5 @@
 import { mockRequest } from '@/services/mockApi';
-import type { Announcement, CalendarEvent, ChatAttachment, ChatConversation, ChatMember, ChatMessage, ChatReply, DashboardSummary, DirectoryContact, DocumentSubmission, DocumentTemplate, MailAttachment, MailComposePayload, MailItem, MailReply, MeetingEvent, Task, User, WorkTicketAttachment, WorkTicketFollower, WorkTicketSubmission, WorkTicketTemplate } from '@/types/domain';
+import type { Announcement, CalendarAttachmentItem, CalendarEvent, ChatAttachment, ChatConversation, ChatMember, ChatMessage, ChatReply, DashboardSummary, DirectoryContact, DocumentSubmission, DocumentTemplate, MailAttachment, MailComposePayload, MailItem, MailReply, MeetingEvent, Task, User, WorkTicketAttachment, WorkTicketFollower, WorkTicketSubmission, WorkTicketTemplate } from '@/types/domain';
 import type { ExpertRecord, WorkspaceFile, WorkspaceRecord } from '@/types/extended';
 import type { EvaluationPeriod, EvaluationSheet, EvaluationSummary } from '@/types/evaluation';
 import type { CreatePersonnelPayload, PersonalProfile, PersonnelRecordItem, PositionTitleItem, ResignedEmployeeItem, SpecialtyItem, UnitPositionMapping, WorkUnitItem } from '@/types/personnel';
@@ -32,6 +32,8 @@ export const calendarApi = {
   list: (query = '') => mockRequest<CalendarEvent[]>(`/api/calendar/events${query}`),
   respond: (id: string, responseStatus: NonNullable<CalendarEvent['responseStatus']>) => mockRequest<CalendarEvent>(`/api/calendar/events/${id}/respond`, { method: 'POST', body: { responseStatus } }),
   create: (data: Partial<CalendarEvent>) => mockRequest<CalendarEvent>('/api/calendar/events', { method: 'POST', body: data }),
+  addComment: (id: string, content: string) => mockRequest<CalendarEvent>(`/api/calendar/events/${id}/comments`, { method: 'POST', body: { content } }),
+  addAttachment: (id: string, attachment: CalendarAttachmentItem) => mockRequest<CalendarEvent>(`/api/calendar/events/${id}/attachments`, { method: 'POST', body: { attachment } }),
 };
 export const calendarNotificationApi = {
   list: (query = '') => mockRequest<CalendarNotificationItem[]>(`/api/calendar/notifications${query}`),

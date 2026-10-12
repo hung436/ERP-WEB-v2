@@ -6,6 +6,7 @@ import { LoginPage } from '@/features/auth/LoginPage';
 import { ProtectedRoute } from '@/features/auth/ProtectedRoute';
 import { CalendarGroupsPage } from '@/features/calendar/CalendarGroupsPage';
 import { CalendarNotificationsPage } from '@/features/calendar/CalendarNotificationsPage';
+import { CalendarWeekPage } from '@/features/calendar/CalendarWeekPage';
 import { MeetingPage } from '@/features/meeting/MeetingPage';
 import { ChatPage } from '@/features/chat/ChatPage';
 import { DashboardPage } from '@/features/dashboard/DashboardPage';
@@ -53,7 +54,8 @@ export function AppRoutes() {
           <Route path="personnel/resume/:id" element={<PersonnelProfilePage />} />
           <Route path="personnel/create" element={<CreatePersonnelPage />} />
           <Route path="personnel/edit/:id" element={<CreatePersonnelPage />} />
-          <Route path="calendar" element={<CalendarNotificationsPage />} />
+          <Route path="calendar" element={<Navigate replace to="/calendar/week" />} />
+          <Route path="calendar/week" element={<CalendarWeekPage />} />
           <Route path="calendar/notifications" element={<CalendarNotificationsPage />} />
           <Route path="calendar/groups" element={<CalendarGroupsPage />} />
           <Route path="account" element={<AccountProfilePage />} />

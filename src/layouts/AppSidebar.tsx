@@ -48,6 +48,7 @@ const navItems: NavItem[] = [
     module: 'calendar',
     label: 'Lịch làm việc',
     children: [
+      { path: '/calendar/week', label: 'Lịch tuần' },
       { path: '/calendar/notifications', label: 'Quản lý thông báo' },
       { path: '/calendar/groups', label: 'Quản lý nhóm' },
     ],

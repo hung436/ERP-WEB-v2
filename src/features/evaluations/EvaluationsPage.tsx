@@ -1723,6 +1723,7 @@ function EvaluationWorkspace({
                             criterion={criterion}
                             order={criteria.findIndex((item) => item.id === criterion.id) + 1}
                             previousStages={previousStages}
+                            currentStage={currentStage}
                             readOnly={readOnly}
                             onOpenNote={() => openNote(criterion)}
                             onOpenChildNote={(childId) => {
