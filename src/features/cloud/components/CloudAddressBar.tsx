@@ -55,11 +55,11 @@ export const CloudAddressBar: React.FC<CloudAddressBarProps> = ({
   const getTabLabel = () => {
     switch (currentTab) {
       case 'quick-access':
-        return 'Đã ghim (Quick Access)';
+        return 'Đã ghim';
       case 'recent':
-        return 'Tệp gần đây (Recent)';
+        return 'Tệp gần đây';
       case 'starred':
-        return 'Có gắn dấu sao (Starred)';
+        return 'Có gắn dấu sao';
       case 'shared-with-me':
         return 'Được chia sẻ với tôi';
       case 'shared-by-me':
@@ -67,7 +67,7 @@ export const CloudAddressBar: React.FC<CloudAddressBarProps> = ({
       case 'shared-drives':
         return 'Ổ đĩa dùng chung';
       case 'trash':
-        return 'Thùng rác (Recycle Bin)';
+        return 'Thùng rác';
       case 'my-cloud':
       default:
         return 'Cloud của tôi';

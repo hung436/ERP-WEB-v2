@@ -815,9 +815,9 @@ export const CloudDetailsPane: React.FC<CloudDetailsPaneProps> = ({
                           </div>
                         </div>
 
-                        {/* Bảng phân quyền chi tiết khi mở Settings (⚙️) - Tinh chỉnh chuẩn thị giác */}
+                        {/* Bảng phân quyền chi tiết khi mở Settings (⚙️) */}
                         {isExpanded && (
-                          <div className="mt-2.5 ml-8 p-3 bg-slate-50/90 rounded-lg border border-slate-200/60 space-y-2.5">
+                          <div className="mt-2 ml-8 space-y-2.5">
                             <div className="flex items-center gap-2">
                               <span className="text-slate-600 font-medium text-[11px] shrink-0">Thời hạn:</span>
                               <DatePicker
@@ -832,8 +832,8 @@ export const CloudDetailsPane: React.FC<CloudDetailsPaneProps> = ({
                               />
                             </div>
 
-                            {/* 5 Checkbox quyền hạn - Chuẩn Ant Design sắc nét, không bị lệch dấu tích */}
-                            <div className="grid grid-cols-2 gap-x-3 gap-y-2.5 pt-2 border-t border-slate-200/60 text-[12px] text-slate-700">
+                            {/* 5 Checkbox quyền hạn */}
+                            <div className="grid grid-cols-2 gap-x-3 gap-y-2 text-[12px] text-slate-700">
                               <Checkbox
                                 checked={Boolean(perms.canShare)}
                                 onChange={() => handleToggleUserPermission(user.id, 'canShare')}
