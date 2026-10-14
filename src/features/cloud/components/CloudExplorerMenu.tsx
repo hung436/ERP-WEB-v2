@@ -125,20 +125,6 @@ export const CloudExplorerMenu: React.FC<CloudExplorerMenuProps> = ({
             <Pin size={11} className="text-slate-400" />
           </div>
           <div className="space-y-0.5">
-            <button
-              type="button"
-              onClick={() => onSelectTab('quick-access')}
-              className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-md text-left transition-colors ${
-                currentTab === 'quick-access'
-                  ? 'bg-slate-100 font-semibold text-slate-900'
-                  : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900 font-normal'
-              }`}
-            >
-              <div className="flex items-center gap-2">
-                <Pin size={15} className={currentTab === 'quick-access' ? 'text-[#d92d20]' : 'text-slate-500'} />
-                <span className={currentTab === 'quick-access' ? 'font-semibold' : ''}>Đã ghim</span>
-              </div>
-            </button>
 
             <button
               type="button"

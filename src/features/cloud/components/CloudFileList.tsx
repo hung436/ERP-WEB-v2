@@ -11,9 +11,11 @@ import {
   Folder,
   FileText,
   UploadCloud,
+  ArrowUp,
+  ArrowDown,
 } from 'lucide-react';
 import { Dropdown, MenuProps, Tooltip } from 'antd';
-import { CloudItem, CloudViewMode } from '../types';
+import { CloudItem, CloudViewMode, CloudSortField, CloudSortOrder } from '../types';
 import { CloudFileIcon } from './CloudFileIcon';
 
 interface CloudFileListProps {
@@ -28,6 +30,9 @@ interface CloudFileListProps {
   onDownload: (item: CloudItem) => void;
   onToggleStar: (item: CloudItem) => void;
   viewMode: CloudViewMode;
+  sortField?: CloudSortField;
+  sortOrder?: CloudSortOrder;
+  onChangeSort?: (field: CloudSortField) => void;
   onContextMenu: (e: React.MouseEvent, item: CloudItem) => void;
   onEmptyAreaContextMenu: (e: React.MouseEvent) => void;
   onDropFiles: (files: FileList) => void;
@@ -45,6 +50,9 @@ export const CloudFileList: React.FC<CloudFileListProps> = ({
   onDownload,
   onToggleStar,
   viewMode,
+  sortField,
+  sortOrder,
+  onChangeSort,
   onContextMenu,
   onEmptyAreaContextMenu,
   onDropFiles,
@@ -179,7 +187,7 @@ export const CloudFileList: React.FC<CloudFileListProps> = ({
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
       onContextMenu={onEmptyAreaContextMenu}
-      className={`flex-1 overflow-y-auto p-4 select-none relative bg-white ${
+      className={`flex-1 overflow-y-auto ${viewMode === 'details' ? 'p-0' : 'p-4'} select-none relative bg-white ${
         isDragOver ? 'bg-rose-50/50 ring-2 ring-[#d92d20] ring-inset' : ''
       }`}
     >
@@ -194,20 +202,101 @@ export const CloudFileList: React.FC<CloudFileListProps> = ({
 
       {viewMode === 'details' ? (
         /* ================= DETAILS VIEW (BẢNG WINDOWS EXPLORER) ================= */
-        <div className="bg-white rounded-lg border border-slate-200 overflow-hidden shadow-sm">
+        <div className="w-full overflow-x-auto">
           <table className="w-full text-left text-[13px] border-collapse">
-            <thead>
-              <tr className="border-b border-slate-200 bg-slate-50/80 text-slate-600 font-medium text-[12px]">
-                <th className="py-2.5 px-3 w-10"></th>
-                <th className="py-2.5 px-3 font-semibold">Tên</th>
-                <th className="py-2.5 px-3 font-semibold w-40">Ngày sửa đổi</th>
-                <th className="py-2.5 px-3 font-semibold w-40">Người sở hữu</th>
-                <th className="py-2.5 px-3 font-semibold w-28">Kích thước</th>
-                <th className="py-2.5 px-3 font-semibold w-32">Chia sẻ</th>
-                <th className="py-2.5 px-3 w-16 text-right"></th>
+            <thead className="sticky top-0 bg-white z-10">
+              <tr className="text-slate-500 font-medium text-[12px] whitespace-nowrap">
+                <th className="py-2 px-3 w-10"></th>
+                {/* Cột 2: Tên */}
+                <th
+                  onClick={() => onChangeSort?.('name')}
+                  className={`py-2 px-3 font-medium cursor-pointer select-none transition-colors group/header ${
+                    sortField === 'name' ? 'text-slate-900 font-semibold' : 'text-slate-500 hover:text-slate-800'
+                  }`}
+                >
+                  <div className="flex items-center gap-1 whitespace-nowrap">
+                    <span>Tên</span>
+                    {sortField === 'name' ? (
+                      sortOrder === 'asc' ? (
+                        <ArrowUp size={13} className="text-[#d92d20] stroke-[2.5] shrink-0" />
+                      ) : (
+                        <ArrowDown size={13} className="text-[#d92d20] stroke-[2.5] shrink-0" />
+                      )
+                    ) : (
+                      <ArrowUp size={12} className="text-slate-300 opacity-0 group-hover/header:opacity-100 transition-opacity shrink-0" />
+                    )}
+                  </div>
+                </th>
+
+                {/* Cột 3: Ngày sửa đổi */}
+                <th
+                  onClick={() => onChangeSort?.('updatedAt')}
+                  className={`py-2 px-3 font-medium w-44 cursor-pointer select-none transition-colors group/header ${
+                    sortField === 'updatedAt' ? 'text-slate-900 font-semibold' : 'text-slate-500 hover:text-slate-800'
+                  }`}
+                >
+                  <div className="flex items-center gap-1 whitespace-nowrap">
+                    <span>Ngày sửa đổi</span>
+                    {sortField === 'updatedAt' ? (
+                      sortOrder === 'asc' ? (
+                        <ArrowUp size={13} className="text-[#d92d20] stroke-[2.5] shrink-0" />
+                      ) : (
+                        <ArrowDown size={13} className="text-[#d92d20] stroke-[2.5] shrink-0" />
+                      )
+                    ) : (
+                      <ArrowUp size={12} className="text-slate-300 opacity-0 group-hover/header:opacity-100 transition-opacity shrink-0" />
+                    )}
+                  </div>
+                </th>
+
+                {/* Cột 4: Người sở hữu */}
+                <th
+                  onClick={() => onChangeSort?.('owner')}
+                  className={`py-2 px-3 font-medium w-44 cursor-pointer select-none transition-colors group/header ${
+                    sortField === 'owner' ? 'text-slate-900 font-semibold' : 'text-slate-500 hover:text-slate-800'
+                  }`}
+                >
+                  <div className="flex items-center gap-1 whitespace-nowrap">
+                    <span>Người sở hữu</span>
+                    {sortField === 'owner' ? (
+                      sortOrder === 'asc' ? (
+                        <ArrowUp size={13} className="text-[#d92d20] stroke-[2.5] shrink-0" />
+                      ) : (
+                        <ArrowDown size={13} className="text-[#d92d20] stroke-[2.5] shrink-0" />
+                      )
+                    ) : (
+                      <ArrowUp size={12} className="text-slate-300 opacity-0 group-hover/header:opacity-100 transition-opacity shrink-0" />
+                    )}
+                  </div>
+                </th>
+
+                {/* Cột 5: Kích thước */}
+                <th
+                  onClick={() => onChangeSort?.('size')}
+                  className={`py-2 px-3 font-medium w-36 min-w-[120px] cursor-pointer select-none transition-colors group/header ${
+                    sortField === 'size' ? 'text-slate-900 font-semibold' : 'text-slate-500 hover:text-slate-800'
+                  }`}
+                >
+                  <div className="flex items-center gap-1 whitespace-nowrap">
+                    <span className="whitespace-nowrap">Kích thước</span>
+                    {sortField === 'size' ? (
+                      sortOrder === 'asc' ? (
+                        <ArrowUp size={13} className="text-[#d92d20] stroke-[2.5] shrink-0" />
+                      ) : (
+                        <ArrowDown size={13} className="text-[#d92d20] stroke-[2.5] shrink-0" />
+                      )
+                    ) : (
+                      <ArrowUp size={12} className="text-slate-300 opacity-0 group-hover/header:opacity-100 transition-opacity shrink-0" />
+                    )}
+                  </div>
+                </th>
+
+                {/* Cột 6: Chia sẻ */}
+                <th className="py-2 px-3 font-medium w-32 whitespace-nowrap">Chia sẻ</th>
+                <th className="py-2 px-3 w-16 text-right"></th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody>
               {items.map((item) => {
                 const selected = isSelected(item);
 
@@ -227,7 +316,7 @@ export const CloudFileList: React.FC<CloudFileListProps> = ({
                     }`}
                   >
                     {/* Cột 1: Star & Icon */}
-                    <td className="py-2.5 px-3 text-center">
+                    <td className="py-2 px-3 text-center">
                       <button
                         type="button"
                         onClick={(e) => {
@@ -243,7 +332,7 @@ export const CloudFileList: React.FC<CloudFileListProps> = ({
                     </td>
 
                     {/* Cột 2: Tên & Icon File - in đậm vừa phải khi focus */}
-                    <td className="py-2.5 px-3">
+                    <td className="py-2 px-3">
                       <div className="flex items-center gap-2.5 min-w-0">
                         <CloudFileIcon type={item.type} size="sm" />
                         <span className={`truncate ${selected ? 'font-semibold text-slate-900' : 'font-normal text-slate-700'}`}>
@@ -258,10 +347,10 @@ export const CloudFileList: React.FC<CloudFileListProps> = ({
                     </td>
 
                     {/* Cột 3: Ngày sửa đổi */}
-                    <td className="py-2.5 px-3 text-slate-500 text-[12px]">{item.updatedAt}</td>
+                    <td className="py-2 px-3 text-slate-500 text-[12px]">{item.updatedAt}</td>
 
                     {/* Cột 4: Chủ sở hữu */}
-                    <td className="py-2.5 px-3 text-slate-600">
+                    <td className="py-2 px-3 text-slate-600">
                       <div className="flex items-center gap-1.5 truncate">
                         <div className="w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-[10px] font-semibold flex items-center justify-center shrink-0">
                           {item.owner.name.charAt(0)}
@@ -273,12 +362,12 @@ export const CloudFileList: React.FC<CloudFileListProps> = ({
                     </td>
 
                     {/* Cột 5: Kích thước */}
-                    <td className="py-2.5 px-3 text-slate-500 text-[12px]">
+                    <td className="py-2 px-3 text-slate-500 text-[12px] whitespace-nowrap">
                       {item.type === 'folder' ? '—' : item.sizeFormatted || '—'}
                     </td>
 
                     {/* Cột 6: Quyền chia sẻ */}
-                    <td className="py-2.5 px-3">
+                    <td className="py-2 px-3">
                       {item.isShared ? (
                         <div className="flex items-center gap-1 text-[11px] text-[#b42318] bg-[#fef3f2] px-2 py-0.5 rounded-full w-fit font-medium">
                           <Users size={12} />
@@ -290,7 +379,7 @@ export const CloudFileList: React.FC<CloudFileListProps> = ({
                     </td>
 
                     {/* Cột 7: Thao tác nhanh */}
-                    <td className="py-2.5 px-3 text-right">
+                    <td className="py-2 px-3 text-right">
                       <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                         <Tooltip title="Chia sẻ">
                           <button

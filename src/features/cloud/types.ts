@@ -74,5 +74,5 @@ export type CloudNavigationTab =
 
 export type CloudViewMode = 'details' | 'grid';
 
-export type CloudSortField = 'name' | 'updatedAt' | 'size' | 'type';
+export type CloudSortField = 'name' | 'updatedAt' | 'owner' | 'size' | 'type';
 export type CloudSortOrder = 'asc' | 'desc';

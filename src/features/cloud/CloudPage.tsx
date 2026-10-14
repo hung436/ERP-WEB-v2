@@ -176,6 +176,8 @@ export const CloudPage: React.FC = () => {
         compare = a.name.localeCompare(b.name, 'vi');
       } else if (sortField === 'updatedAt') {
         compare = a.updatedAt.localeCompare(b.updatedAt);
+      } else if (sortField === 'owner') {
+        compare = (a.owner?.name || '').localeCompare(b.owner?.name || '', 'vi');
       } else if (sortField === 'size') {
         compare = (a.size || 0) - (b.size || 0);
       } else if (sortField === 'type') {
@@ -343,6 +345,15 @@ export const CloudPage: React.FC = () => {
     setContextMenuItem(null);
   };
 
+  const handleToggleSort = (field: CloudSortField) => {
+    if (sortField === field) {
+      setSortOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortField(field);
+      setSortOrder('asc');
+    }
+  };
+
   return (
     <div className="cloud-module-page h-full min-h-0 flex flex-col overflow-hidden font-sans">
       {/* Hidden file input */}
@@ -368,14 +379,7 @@ export const CloudPage: React.FC = () => {
         onChangeViewMode={setViewMode}
         sortField={sortField}
         sortOrder={sortOrder}
-        onChangeSort={(field) => {
-          if (sortField === field) {
-            setSortOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'));
-          } else {
-            setSortField(field);
-            setSortOrder('asc');
-          }
-        }}
+        onChangeSort={handleToggleSort}
         onNewFolder={() => setIsNewFolderOpen(true)}
         onUploadFile={triggerFileInput}
         onShare={(item) => handleOpenShare(item)}
@@ -432,6 +436,9 @@ export const CloudPage: React.FC = () => {
           onDownload={handleDownload}
           onToggleStar={handleToggleStar}
           viewMode={viewMode}
+          sortField={sortField}
+          sortOrder={sortOrder}
+          onChangeSort={handleToggleSort}
           onContextMenu={handleItemContextMenu}
           onEmptyAreaContextMenu={handleEmptyContextMenu}
           onDropFiles={handleUploadFiles}

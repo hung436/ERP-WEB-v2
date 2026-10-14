@@ -139,6 +139,16 @@ export const CloudCommandBar: React.FC<CloudCommandBarProps> = ({
       onClick: () => onChangeSort('updatedAt'),
     },
     {
+      key: 'owner',
+      label: (
+        <div className="flex items-center justify-between w-36 py-0.5">
+          <span>Người sở hữu</span>
+          {sortField === 'owner' && <Check size={14} className="text-[#d92d20]" />}
+        </div>
+      ),
+      onClick: () => onChangeSort('owner'),
+    },
+    {
       key: 'type',
       label: (
         <div className="flex items-center justify-between w-36 py-0.5">

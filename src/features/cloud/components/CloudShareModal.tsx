@@ -535,10 +535,10 @@ export const CloudShareModal: React.FC<CloudShareModalProps> = ({
 
                         {/* Bảng phân quyền chi tiết khi bấm vào icon Bánh răng Settings (⚙️) */}
                         {isExpanded && (
-                          <div className="mt-2.5 ml-10 p-2.5 bg-slate-50/90 rounded-lg border border-slate-200/80 text-[12px] space-y-2">
+                          <div className="mt-2 ml-10 space-y-2.5 text-[12px]">
                             {/* Hàng ngày hết hạn: Expiration */}
                             <div className="flex items-center gap-2">
-                              <span className="text-slate-600 font-medium">Thời hạn:</span>
+                              <span className="text-slate-600 font-medium text-[11px] shrink-0">Thời hạn:</span>
                               <div className="flex items-center gap-1">
                                 <DatePicker
                                   size="small"
@@ -547,26 +547,26 @@ export const CloudShareModal: React.FC<CloudShareModalProps> = ({
                                   onChange={(d) =>
                                     handleChangeUserExpiration(user.id, d ? d.format('YYYY-MM-DD') : null)
                                   }
-                                  className="text-[11px] [&_input]:!text-[11px] [&_input]:!placeholder:text-[11px]"
+                                  className="text-[11px] [&_input]:!text-[11px] [&_input]:!placeholder:text-[11px] h-6 rounded"
                                   allowClear
                                 />
                               </div>
                             </div>
 
                             {/* Hàng các Checkboxes: can share, can edit, create, change, delete */}
-                            <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 pt-1 text-slate-700">
+                            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-slate-700">
                               <Checkbox
                                 checked={Boolean(perms.canShare)}
                                 onChange={() => handleToggleUserPermission(user.id, 'canShare')}
                               >
-                                <span className="text-[12px]">Có thể chia sẻ</span>
+                                <span className="text-[12px]">Chia sẻ lại</span>
                               </Checkbox>
 
                               <Checkbox
                                 checked={Boolean(perms.canEdit)}
                                 onChange={() => handleToggleUserPermission(user.id, 'canEdit')}
                               >
-                                <span className="text-[12px]">Có thể chỉnh sửa</span>
+                                <span className="text-[12px]">Chỉnh sửa</span>
                               </Checkbox>
 
                               <Checkbox
