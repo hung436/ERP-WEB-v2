@@ -293,7 +293,7 @@ export async function mockRequest<T>(path: string, options?: { method?: string; 
         title: body.title ?? 'Cuộc họp trực tuyến mới',
         startAt: body.startAt ?? new Date().toISOString(),
         endAt: body.endAt ?? new Date(Date.now() + 3600000).toISOString(),
-        location: body.location ?? 'Trực tuyến (meeting.tuoitre.vn)',
+        location: body.location ?? 'https://meeting.tuoitre.vn/room-123',
         meetingUrl: body.meetingUrl ?? `https://meeting.tuoitre.vn/phong-${meetingCode}`,
         type: body.type ?? 'meeting',
         scope: body.scope ?? 'personal',
@@ -361,6 +361,24 @@ export async function mockRequest<T>(path: string, options?: { method?: string; 
     };
     calendarEventStore = calendarEventStore.map((item) => item.id === eventId ? updated : item);
     data = updated;
+  }
+  else if (/^\/api\/calendar\/events\/[^/]+$/.test(pathname)) {
+    const id = pathname.split('/')[4];
+    if (options?.method === 'DELETE') {
+      calendarEventStore = calendarEventStore.filter((item) => item.id !== id);
+      data = { success: true };
+    } else if (options?.method === 'PUT' || options?.method === 'PATCH') {
+      const body = options.body as Partial<CalendarEvent>;
+      const existing = calendarEventStore.find((item) => item.id === id);
+      if (!existing) throw new Error('Không tìm thấy sự kiện');
+      const updated = { ...existing, ...body };
+      calendarEventStore = calendarEventStore.map((item) => item.id === id ? updated : item);
+      data = updated;
+    } else {
+      const event = calendarEventStore.find((item) => item.id === id);
+      if (!event) throw new Error('Không tìm thấy sự kiện');
+      data = event;
+    }
   }
   else if (pathname === '/api/calendar/notifications') {
     if (options?.method === 'POST') {

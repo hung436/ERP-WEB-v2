@@ -14,17 +14,17 @@ export function DayDutyCard({ duty, isOpen, onToggle }: DayDutyCardProps) {
       <button
         aria-expanded={isOpen}
         aria-label={isOpen ? 'Thu gọn các ca trực tuần' : 'Mở rộng các ca trực tuần'}
-        className="duty-box-leader-btn"
+        className={`duty-box-leader-btn ${isOpen ? 'is-active' : ''}`}
         onClick={onToggle}
         type="button"
       >
         <div className="duty-leader-info">
-          <span className="duty-leader-prefix">Trực:</span>
+          <span className="duty-leader-prefix">TRỰC</span>
           <span className="duty-leader-name">{duty.leader}</span>
         </div>
         <ChevronDown
           className={`duty-chevron-icon ${isOpen ? 'is-open' : ''}`}
-          size={14}
+          size={13}
         />
       </button>
 
@@ -32,21 +32,24 @@ export function DayDutyCard({ duty, isOpen, onToggle }: DayDutyCardProps) {
       {isOpen && (
         <div className="duty-box-shifts">
           {duty.shifts.map((shift, idx) => (
-            <div className="duty-shift-item" key={idx}>
-              <span className="duty-shift-badge">{shift.name}:</span>
-              <span className="duty-shift-details">
+            <div className="timeline-duty-shift-card" key={idx}>
+              <div className="shift-card-header">
+                <span className="duty-shift-badge">{shift.name}:</span>
+              </div>
+              <div className="duty-shift-details">
                 {shift.tkts && (
-                  <span className="duty-role-segment">
-                    <span className="duty-role-label">TKTS:</span> {shift.tkts}
-                  </span>
+                  <div className="duty-role-segment">
+                    <span className="duty-role-label">TKTS:</span>{' '}
+                    <span className="duty-role-value">{shift.tkts}</span>
+                  </div>
                 )}
-                {shift.tkts && shift.btv && <span className="duty-role-dot">·</span>}
                 {shift.btv && (
-                  <span className="duty-role-segment">
-                    <span className="duty-role-label">BTV:</span> {shift.btv}
-                  </span>
+                  <div className="duty-role-segment">
+                    <span className="duty-role-label">BTV:</span>{' '}
+                    <span className="duty-role-value">{shift.btv}</span>
+                  </div>
                 )}
-              </span>
+              </div>
             </div>
           ))}
         </div>

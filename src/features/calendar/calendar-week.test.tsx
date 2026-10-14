@@ -158,5 +158,19 @@ describe('Lịch làm việc theo tuần (Google Calendar style)', () => {
     const currentWeekNumber = dayjs().isoWeek();
     expect(await screen.findByText(new RegExp(`Tuần ${currentWeekNumber}`, 'i'))).toBeInTheDocument();
   });
+
+  it('hiển thị drawer danh sách sự kiện trong ngày khi bấm vào một ngày trong tuần', async () => {
+    const user = userEvent.setup();
+    renderCalendarWeek('/calendar/week');
+    await screen.findByText(/Tuần 41/i);
+
+    // Bấm vào header ngày Thứ Hai
+    const mondayBtn = screen.getByRole('button', { name: /Xem danh sách lịch ngày Thứ Hai/i });
+    await user.click(mondayBtn);
+
+    // Mở drawer xem lịch trong ngày
+    expect(await screen.findByText(/Trực:/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Tạo lịch họp/i })).toBeInTheDocument();
+  });
 });
 

@@ -1,11 +1,12 @@
-import { Avatar, Button, Empty, Input, Modal, Tag, Tooltip, Upload, message } from 'antd';
+import { Avatar, Button, Drawer, Empty, Input, Popconfirm, Tag, Tooltip, Upload, message } from 'antd';
 import type { UploadFile } from 'antd/es/upload/interface';
 import dayjs from 'dayjs';
-import { AlertCircle, Calendar, Clock, Download, ExternalLink, MapPin, MessageSquare, Paperclip, Send, UploadCloud, Users, Video } from 'lucide-react';
+import { AlertCircle, Calendar, Clock, Copy, Download, Edit3, ExternalLink, MapPin, MessageSquare, Paperclip, Send, Star, Trash2, UploadCloud, Users, Video } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { calendarApi } from '@/services/api';
 import type { CalendarAttachmentItem, CalendarEvent } from '@/types/domain';
 import { formatBytes, getFileCategory } from './AttachedFilesList';
+import { CreatePersonalMeetingModal } from './CreatePersonalMeetingModal';
 
 const VI_DAY_NAMES = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
 
@@ -46,6 +47,7 @@ interface CalendarEventDetailModalProps {
   open: boolean;
   onClose: () => void;
   onUpdateEvent: (updated: CalendarEvent) => void;
+  onDeleteEvent?: (eventId: string) => void;
 }
 
 export function CalendarEventDetailModal({
@@ -53,17 +55,21 @@ export function CalendarEventDetailModal({
   open,
   onClose,
   onUpdateEvent,
+  onDeleteEvent,
 }: CalendarEventDetailModalProps) {
   const [commentText, setCommentText] = useState('');
   const [submittingComment, setSubmittingComment] = useState(false);
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const [activeTab, setActiveTab] = useState<'info' | 'comments' | 'attachments'>('info');
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const inputRef = useRef<any>(null);
 
   if (!event) return null;
 
   const isEditorial = event.scope === 'editorial';
   const isPersonal = event.scope === 'personal';
+  const isUserAttending = Boolean(event.isUserParticipant);
   const start = dayjs(event.startAt);
   const end = dayjs(event.endAt);
 
@@ -108,30 +114,95 @@ export function CalendarEventDetailModal({
     return false; // prevent default upload
   };
 
+  const handleToggleInterest = () => {
+    const nextState = !event.isInterested;
+    onUpdateEvent({ ...event, isInterested: nextState });
+    if (nextState) {
+      message.success(`Đã quan tâm: "${event.title}". Bạn sẽ được nhắc nhở trước 15 phút!`);
+    } else {
+      message.info(`Đã hủy nhắc nhở lịch "${event.title}".`);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!event) return;
+    try {
+      setDeleting(true);
+      await calendarApi.delete(event.id);
+      message.success(`Đã xóa lịch làm việc "${event.title}" thành công!`);
+      onDeleteEvent?.(event.id);
+      onClose();
+    } catch {
+      message.error('Không thể xóa lịch làm việc. Vui lòng thử lại.');
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  const handleEditSuccess = (updated: CalendarEvent) => {
+    onUpdateEvent(updated);
+    setEditModalOpen(false);
+  };
+
+  const handleCopyMeetingLink = () => {
+    if (!event?.meetingUrl) return;
+    navigator.clipboard.writeText(event.meetingUrl);
+    message.success('Đã sao chép liên kết phòng họp!');
+  };
+
   return (
-    <Modal
-      className="calendar-detail-modal"
-      footer={[
-        event.meetingUrl && (
-          <Button
-            href={event.meetingUrl}
-            icon={<Video size={15} />}
-            key="join"
-            target="_blank"
-            type="primary"
-          >
-            Vào phòng họp trực tuyến
-          </Button>
-        ),
-        <Button key="close" onClick={onClose}>
-          Đóng
-        </Button>,
-      ]}
-      onCancel={onClose}
-      open={open}
-      title={null}
-      width={680}
-    >
+    <>
+      <Drawer
+        className="calendar-detail-drawer"
+        destroyOnClose
+        extra={
+          isPersonal ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <Button
+                icon={<Edit3 size={14} />}
+                onClick={() => setEditModalOpen(true)}
+                size="small"
+              >
+                Chỉnh sửa
+              </Button>
+              <Popconfirm
+                cancelText="Hủy"
+                description="Bạn có chắc chắn muốn xóa lịch làm việc cá nhân này không?"
+                okButtonProps={{ danger: true }}
+                okText="Xóa"
+                onConfirm={handleDelete}
+                placement="bottomRight"
+                title="Xóa lịch làm việc"
+              >
+                <Button
+                  danger
+                  icon={<Trash2 size={14} />}
+                  loading={deleting}
+                  size="small"
+                >
+                  Xóa
+                </Button>
+              </Popconfirm>
+            </div>
+          ) : isEditorial && !isUserAttending ? (
+            <Button
+              aria-label={event.isInterested ? 'Bỏ quan tâm' : 'Quan tâm lịch họp'}
+              icon={<Star color={event.isInterested ? '#d97706' : '#64748b'} fill={event.isInterested ? '#f59e0b' : 'none'} size={14} />}
+              onClick={handleToggleInterest}
+              size="small"
+              style={event.isInterested ? { borderColor: '#fcd34d', background: '#fffbeb', color: '#b45309' } : undefined}
+            >
+              {event.isInterested ? 'Đang quan tâm' : 'Quan tâm'}
+            </Button>
+          ) : null
+        }
+        footer={null}
+        onClose={onClose}
+        open={open}
+        placement="right"
+        title={null}
+        width={540}
+      >
       <div className="detail-modal-header">
         <div className="detail-modal-badges">
           {event.isAdjusted && (
@@ -147,12 +218,6 @@ export function CalendarEventDetailModal({
           ) : (
             <Tag color="blue" style={{ fontSize: 12, padding: '2px 8px' }}>
               Lịch cá nhân
-            </Tag>
-          )}
-
-          {event.platform && (
-            <Tag color="purple" style={{ fontSize: 12, padding: '2px 8px' }}>
-              {event.platform}
             </Tag>
           )}
         </div>
@@ -213,36 +278,82 @@ export function CalendarEventDetailModal({
         </div>
       </div>
 
-      {/* Meeting link card nếu là họp trực tuyến */}
+      {/* Khung phòng họp trực tuyến */}
       {event.meetingUrl && (
         <div
           style={{
-            background: '#eff8ff',
-            border: '1px solid #b2ddff',
-            borderRadius: 8,
-            padding: '12px 16px',
+            background: '#f0f9ff',
+            border: '1px solid #bae6fd',
+            borderRadius: 10,
+            padding: '12px 14px',
             marginBottom: 16,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
+            gap: 12,
           }}
         >
-          <div>
-            <div style={{ fontSize: 13, fontWeight: 600, color: '#175cd3' }}>
-              <Video size={15} style={{ display: 'inline', marginRight: 6 }} />
-              Đường dẫn phòng họp trực tuyến Tuổi Trẻ
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0, flex: 1 }}>
+            <div
+              style={{
+                width: 36,
+                height: 36,
+                borderRadius: 8,
+                background: '#e0f2fe',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#0284c7',
+                flexShrink: 0,
+              }}
+            >
+              <Video size={18} />
             </div>
-            <div style={{ fontSize: 12, color: '#475569', marginTop: 2 }}>{event.meetingUrl}</div>
+            <div style={{ minWidth: 0, flex: 1 }}>
+              <div style={{ fontSize: 13, fontWeight: 600, color: '#0369a1', lineHeight: 1.3 }}>
+                Phòng họp trực tuyến
+              </div>
+              <a
+                href={event.meetingUrl}
+                rel="noopener noreferrer"
+                style={{
+                  fontSize: 12,
+                  color: '#475569',
+                  display: 'block',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  textDecoration: 'none',
+                  marginTop: 2,
+                }}
+                target="_blank"
+                title={event.meetingUrl}
+              >
+                {event.meetingUrl}
+              </a>
+            </div>
           </div>
-          <Button
-            href={event.meetingUrl}
-            icon={<ExternalLink size={14} />}
-            size="small"
-            target="_blank"
-            type="primary"
-          >
-            Mở phòng họp
-          </Button>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+            <Tooltip title="Sao chép liên kết">
+              <Button
+                aria-label="Sao chép liên kết"
+                icon={<Copy size={15} />}
+                onClick={handleCopyMeetingLink}
+                style={{ color: '#0284c7' }}
+                type="text"
+              />
+            </Tooltip>
+            <Button
+              href={event.meetingUrl}
+              icon={<ExternalLink size={13} />}
+              size="small"
+              target="_blank"
+              type="primary"
+            >
+              Tham gia
+            </Button>
+          </div>
         </div>
       )}
 
@@ -450,6 +561,15 @@ export function CalendarEventDetailModal({
           </div>
         </div>
       </div>
-    </Modal>
+    </Drawer>
+    {isPersonal && (
+      <CreatePersonalMeetingModal
+        editingEvent={event}
+        onClose={() => setEditModalOpen(false)}
+        onSuccess={handleEditSuccess}
+        open={editModalOpen}
+      />
+    )}
+  </>
   );
 }

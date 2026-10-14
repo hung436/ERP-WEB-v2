@@ -32,6 +32,8 @@ export const calendarApi = {
   list: (query = '') => mockRequest<CalendarEvent[]>(`/api/calendar/events${query}`),
   respond: (id: string, responseStatus: NonNullable<CalendarEvent['responseStatus']>) => mockRequest<CalendarEvent>(`/api/calendar/events/${id}/respond`, { method: 'POST', body: { responseStatus } }),
   create: (data: Partial<CalendarEvent>) => mockRequest<CalendarEvent>('/api/calendar/events', { method: 'POST', body: data }),
+  update: (id: string, data: Partial<CalendarEvent>) => mockRequest<CalendarEvent>(`/api/calendar/events/${id}`, { method: 'PUT', body: data }),
+  delete: (id: string) => mockRequest<{ success: boolean }>(`/api/calendar/events/${id}`, { method: 'DELETE' }),
   addComment: (id: string, content: string) => mockRequest<CalendarEvent>(`/api/calendar/events/${id}/comments`, { method: 'POST', body: { content } }),
   addAttachment: (id: string, attachment: CalendarAttachmentItem) => mockRequest<CalendarEvent>(`/api/calendar/events/${id}/attachments`, { method: 'POST', body: { attachment } }),
 };

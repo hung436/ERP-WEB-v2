@@ -1,8 +1,8 @@
 import { Button, DatePicker, Form, Input, Modal, Select, TimePicker, Tooltip, Upload, message } from 'antd';
 import type { UploadFile } from 'antd/es/upload/interface';
 import dayjs from 'dayjs';
-import { Copy, Plus, UploadCloud, Video } from 'lucide-react';
-import { useState } from 'react';
+import { Check, Copy, Edit3, Plus, UploadCloud, Video } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { calendarApi } from '@/services/api';
 import type { CalendarAttachmentItem, CalendarEvent } from '@/types/domain';
 import { AttachedFilesGrid } from './AttachedFilesList';
@@ -12,6 +12,7 @@ interface CreatePersonalMeetingModalProps {
   onClose: () => void;
   onSuccess: (newEvent: CalendarEvent) => void;
   initialDate?: dayjs.Dayjs;
+  editingEvent?: CalendarEvent | null;
 }
 
 const SUGGESTED_MEMBERS = [
@@ -30,10 +31,45 @@ export function CreatePersonalMeetingModal({
   onClose,
   onSuccess,
   initialDate,
+  editingEvent,
 }: CreatePersonalMeetingModalProps) {
   const [form] = Form.useForm();
   const [submitting, setSubmitting] = useState(false);
   const [files, setFiles] = useState<UploadFile[]>([]);
+  const isEdit = Boolean(editingEvent);
+
+  useEffect(() => {
+    if (open) {
+      if (editingEvent) {
+        form.setFieldsValue({
+          title: editingEvent.title,
+          date: dayjs(editingEvent.startAt),
+          timeRange: [dayjs(editingEvent.startAt), dayjs(editingEvent.endAt)],
+          location: editingEvent.location || '',
+          participants: editingEvent.participants?.length
+            ? editingEvent.participants
+            : [editingEvent.leader || 'Nguyễn Minh Anh (Phóng viên)'],
+          content: editingEvent.notes || '',
+        });
+        if (editingEvent.attachments?.length) {
+          setFiles(
+            editingEvent.attachments.map((att) => ({
+              uid: att.id,
+              name: att.name,
+              size: att.size,
+              type: att.type,
+              status: 'done',
+            }))
+          );
+        } else {
+          setFiles([]);
+        }
+      } else {
+        form.resetFields();
+        setFiles([]);
+      }
+    }
+  }, [open, editingEvent, form]);
 
   const handleUploadFile = (file: File) => {
     const uploadItem: UploadFile = {
@@ -69,7 +105,7 @@ export function CreatePersonalMeetingModal({
       const endAt = `${dateStr}T${values.timeRange[1].format('HH:mm')}:00+07:00`;
 
       const attachmentsPayload: CalendarAttachmentItem[] = files.map((f, i) => ({
-        id: `att-${Date.now()}-${i}`,
+        id: f.uid?.startsWith('file-') ? `att-${Date.now()}-${i}` : f.uid,
         name: f.name,
         size: f.size || 102400,
         type: f.name.split('.').pop() || 'file',
@@ -77,48 +113,69 @@ export function CreatePersonalMeetingModal({
         uploadedBy: 'Nguyễn Minh Anh',
       }));
 
-      const initialComments = values.content?.trim()
-        ? [
-            {
-              id: `cmt-${Date.now()}`,
-              author: 'Nguyễn Minh Anh',
-              content: values.content.trim(),
-              createdAt: new Date().toISOString(),
-            },
-          ]
-        : [];
-
       const locVal = values.location?.trim() || '';
       const isUrl = /^https?:\/\//i.test(locVal) || locVal.includes('meeting.');
       const meetingUrl = isUrl ? (locVal.startsWith('http') ? locVal : `https://${locVal}`) : undefined;
 
-      const payload: Partial<CalendarEvent> = {
-        title: values.title.trim(),
-        startAt,
-        endAt,
-        scope: 'personal',
-        type: 'meeting',
-        location: locVal || 'Trực tuyến (meeting.tuoitre.vn)',
-        meetingUrl: meetingUrl || (locVal.includes('meeting') ? 'https://meeting.tuoitre.vn' : undefined),
-        platform: isUrl ? 'meeting.tuoitre.vn' : undefined,
-        leader: 'Nguyễn Minh Anh',
-        participants: values.participants?.length ? values.participants : ['Nguyễn Minh Anh'],
-        participantText: values.participants?.join(', ') || 'Nguyễn Minh Anh',
-        participantCount: values.participants?.length || 1,
-        notes: values.content?.trim() || '',
-        attachments: attachmentsPayload,
-        comments: initialComments,
-        isUserParticipant: true,
-      };
+      if (isEdit && editingEvent) {
+        const payload: Partial<CalendarEvent> = {
+          title: values.title.trim(),
+          startAt,
+          endAt,
+          location: locVal || 'https://meeting.tuoitre.vn/room-123',
+          meetingUrl: meetingUrl || (locVal.includes('meeting') ? (locVal.startsWith('http') ? locVal : `https://${locVal}`) : 'https://meeting.tuoitre.vn/room-123'),
+          platform: isUrl ? 'meeting.tuoitre.vn' : undefined,
+          participants: values.participants?.length ? values.participants : ['Nguyễn Minh Anh'],
+          participantText: values.participants?.join(', ') || 'Nguyễn Minh Anh',
+          participantCount: values.participants?.length || 1,
+          notes: values.content?.trim() || '',
+          attachments: attachmentsPayload,
+        };
 
-      const res = await calendarApi.create(payload);
-      message.success('Đã tạo cuộc họp thành công!');
-      form.resetFields();
-      setFiles([]);
-      onSuccess(res.data);
-      onClose();
+        const res = await calendarApi.update(editingEvent.id, payload);
+        message.success('Đã cập nhật lịch làm việc thành công!');
+        onSuccess(res.data);
+        onClose();
+      } else {
+        const initialComments = values.content?.trim()
+          ? [
+              {
+                id: `cmt-${Date.now()}`,
+                author: 'Nguyễn Minh Anh',
+                content: values.content.trim(),
+                createdAt: new Date().toISOString(),
+              },
+            ]
+          : [];
+
+        const payload: Partial<CalendarEvent> = {
+          title: values.title.trim(),
+          startAt,
+          endAt,
+          scope: 'personal',
+          type: 'meeting',
+          location: locVal || 'https://meeting.tuoitre.vn/room-123',
+          meetingUrl: meetingUrl || (locVal.includes('meeting') ? (locVal.startsWith('http') ? locVal : `https://${locVal}`) : 'https://meeting.tuoitre.vn/room-123'),
+          platform: isUrl ? 'meeting.tuoitre.vn' : undefined,
+          leader: 'Nguyễn Minh Anh',
+          participants: values.participants?.length ? values.participants : ['Nguyễn Minh Anh'],
+          participantText: values.participants?.join(', ') || 'Nguyễn Minh Anh',
+          participantCount: values.participants?.length || 1,
+          notes: values.content?.trim() || '',
+          attachments: attachmentsPayload,
+          comments: initialComments,
+          isUserParticipant: true,
+        };
+
+        const res = await calendarApi.create(payload);
+        message.success('Đã tạo cuộc họp thành công!');
+        form.resetFields();
+        setFiles([]);
+        onSuccess(res.data);
+        onClose();
+      }
     } catch {
-      message.error('Không thể tạo cuộc họp. Vui lòng kiểm tra lại thông tin.');
+      message.error(isEdit ? 'Không thể cập nhật cuộc họp. Vui lòng kiểm tra lại thông tin.' : 'Không thể tạo cuộc họp. Vui lòng kiểm tra lại thông tin.');
     } finally {
       setSubmitting(false);
     }
@@ -134,20 +191,24 @@ export function CreatePersonalMeetingModal({
         <Button
           form="create-personal-meeting-form"
           htmlType="submit"
-          icon={<Plus size={15} />}
+          icon={isEdit ? <Check size={15} /> : <Plus size={15} />}
           key="submit"
           loading={submitting}
           type="primary"
         >
-          Tạo
+          {isEdit ? 'Lưu thay đổi' : 'Tạo'}
         </Button>,
       ]}
       onCancel={onClose}
       open={open}
       title={
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 16 }}>
-          <Video size={18} style={{ color: '#175cd3' }} />
-          <span>Tạo lịch họp</span>
+          {isEdit ? (
+            <Edit3 size={18} style={{ color: '#175cd3' }} />
+          ) : (
+            <Video size={18} style={{ color: '#175cd3' }} />
+          )}
+          <span>{isEdit ? 'Chỉnh sửa lịch làm việc' : 'Tạo lịch họp'}</span>
         </div>
       }
       width={600}
@@ -158,7 +219,7 @@ export function CreatePersonalMeetingModal({
         initialValues={{
           date: initialDate || dayjs('2026-10-09'),
           timeRange: [dayjs('09:00', 'HH:mm'), dayjs('10:00', 'HH:mm')],
-          location: 'Trực tuyến (meeting.tuoitre.vn)',
+          location: 'https://meeting.tuoitre.vn/room-123',
           participants: ['Nguyễn Minh Anh (Phóng viên)'],
         }}
         layout="vertical"
@@ -188,13 +249,40 @@ export function CreatePersonalMeetingModal({
               noStyle
               rules={[{ required: true, message: 'Vui lòng chọn khung giờ' }]}
             >
-              <TimePicker.RangePicker format="HH:mm" minuteStep={15} style={{ width: '100%' }} />
+              <TimePicker.RangePicker
+                format="HH:mm"
+                minuteStep={15}
+                needConfirm={false}
+                onCalendarChange={(dates, _dateStrings, info) => {
+                  if (info.range === 'start' && dates?.[0]) {
+                    const start = dates[0];
+                    const autoEnd = start.add(1, 'hour');
+                    form.setFieldValue('timeRange', [start, autoEnd]);
+                  } else if (info.range === 'end' && dates?.[1]) {
+                    const currentStart = form.getFieldValue('timeRange')?.[0] || dates[0];
+                    form.setFieldValue('timeRange', [currentStart, dates[1]]);
+                  }
+                }}
+                onChange={(dates) => {
+                  if (!dates) {
+                    form.setFieldValue('timeRange', null);
+                    return;
+                  }
+                  const [start, end] = dates;
+                  if (start && (!end || end.isBefore(start) || end.isSame(start))) {
+                    form.setFieldValue('timeRange', [start, start.add(1, 'hour')]);
+                  } else {
+                    form.setFieldValue('timeRange', [start, end]);
+                  }
+                }}
+                popupClassName="clean-time-picker-popup"
+                style={{ width: '100%' }}
+              />
             </Form.Item>
           </div>
         </Form.Item>
 
         <Form.Item
-          extra="Bạn có thể chọn từ danh sách hoặc nhập tên người tham gia rồi nhấn Enter"
           label="Thành phần tham gia"
           name="participants"
           rules={[{ required: true, message: 'Vui lòng chọn hoặc nhập ít nhất một người tham dự' }]}
@@ -208,7 +296,7 @@ export function CreatePersonalMeetingModal({
 
         <Form.Item label="Địa điểm" name="location">
           <Input
-            placeholder="Nhập địa điểm hoặc đường link phòng họp (meeting.tuoitre.vn)..."
+            placeholder="Nhập địa điểm hoặc đường link phòng họp (https://meeting.tuoitre.vn/room-123)..."
             suffix={
               <Tooltip title="Sao chép đường link">
                 <Button

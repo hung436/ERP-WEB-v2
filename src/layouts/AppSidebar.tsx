@@ -28,6 +28,7 @@ const navItems: NavItem[] = [
       { path: '/documents/statistics', label: 'Thống kê' },
     ],
   },
+  { path: '/cloud', module: 'cloud', label: 'Cloud' },
   { path: '/evaluations', module: 'evaluations', label: 'Đánh giá lao động' },
   {
     path: '/personnel/profile',

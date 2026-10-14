@@ -814,6 +814,31 @@ export const calendarEvents: CalendarEvent[] = [
     isUserParticipant: false
   },
   {
+    id: 'pers-w42-01',
+    title: 'Họp trực tuyến: Tuyến bài Điều tra Tiêu dùng số & An toàn giao dịch',
+    startAt: '2026-10-12T10:30:00+07:00',
+    endAt: '2026-10-12T11:45:00+07:00',
+    location: 'Trực tuyến',
+    meetingUrl: 'https://meeting.tuoitre.vn/tieu-dung-so-w42',
+    platform: 'meeting.tuoitre.vn',
+    meetingId: 'TT-839-401',
+    type: 'meeting',
+    scope: 'personal',
+    organizer: 'Nguyễn Minh Anh',
+    leader: 'Nguyễn Minh Anh',
+    participantText: 'Nguyễn Minh Anh, Lê Thanh Vân, Trần Thu Hà',
+    participants: ['Nguyễn Minh Anh', 'Lê Thanh Vân', 'Trần Thu Hà'],
+    isUserParticipant: true,
+    responseStatus: 'accepted',
+    agenda: 'Thống nhất dàn ý, phân công phỏng vấn các chuyên gia an ninh mạng và đại diện ngân hàng.',
+    attachments: [
+      { id: 'att-pw42-1', name: 'De-cuong-tieu-dung-so-tuan-42.docx', size: 345000, type: 'docx', uploadedAt: '2026-10-12T09:00:00+07:00', uploadedBy: 'Nguyễn Minh Anh' }
+    ],
+    comments: [
+      { id: 'cmt-pw42-1-1', author: 'Lê Thanh Vân', content: 'Chị đã rà soát lại nguồn tin, sáng nay ta chốt phân công nhé.', createdAt: '2026-10-12T09:30:00+07:00' }
+    ]
+  },
+  {
     id: 'w42-05',
     title: 'Hội ý kiểm tra tiến độ lễ trao giải Thương hiệu Vàng',
     startAt: '2026-10-12T11:00:00+07:00',
@@ -963,6 +988,26 @@ export const calendarEvents: CalendarEvent[] = [
     adjustedNote: 'Dời sang 09:30 tại PH3A'
   },
   {
+    id: 'pers-w42-02',
+    title: 'Họp nhóm phóng viên: Chuẩn bị nội dung Diễn đàn Kinh tế xanh 2026',
+    startAt: '2026-10-13T14:00:00+07:00',
+    endAt: '2026-10-13T15:15:00+07:00',
+    location: 'P/Họp 4.2',
+    type: 'meeting',
+    scope: 'personal',
+    organizer: 'Nguyễn Minh Anh',
+    leader: 'Nguyễn Minh Anh',
+    participantText: 'Nguyễn Minh Anh, Đỗ Quang Huy, Nguyễn Hoài Nam',
+    participants: ['Nguyễn Minh Anh', 'Đỗ Quang Huy', 'Nguyễn Hoài Nam'],
+    isUserParticipant: true,
+    responseStatus: 'accepted',
+    agenda: 'Lập danh sách doanh nghiệp ESG tiêu biểu và câu hỏi phỏng vấn các diễn giả chính.',
+    attachments: [
+      { id: 'att-pw42-2', name: 'Ke-hoach-tac-nghiep-kinh-te-xanh.pdf', size: 520000, type: 'pdf', uploadedAt: '2026-10-13T11:00:00+07:00', uploadedBy: 'Nguyễn Minh Anh' }
+    ],
+    comments: []
+  },
+  {
     id: 'w42-16',
     title: 'Họp HĐTĐ đánh giá LĐ Q.3 & Họp Ban Biên tập',
     startAt: '2026-10-13T14:00:00+07:00',
@@ -1031,6 +1076,31 @@ export const calendarEvents: CalendarEvent[] = [
     isUserParticipant: false
   },
   {
+    id: 'pers-w42-03',
+    title: 'Họp trao đổi ý tưởng sản xuất video số & phóng sự đa phương tiện',
+    startAt: '2026-10-14T10:30:00+07:00',
+    endAt: '2026-10-14T11:30:00+07:00',
+    location: 'Trực tuyến',
+    meetingUrl: 'https://meeting.tuoitre.vn/video-so-w42',
+    platform: 'meeting.tuoitre.vn',
+    meetingId: 'TT-512-882',
+    type: 'meeting',
+    scope: 'personal',
+    organizer: 'Nguyễn Minh Anh',
+    leader: 'Nguyễn Minh Anh',
+    participantText: 'Nguyễn Minh Anh, Hoàng Điệp, Đỗ Quang Huy',
+    participants: ['Nguyễn Minh Anh', 'Hoàng Điệp', 'Đỗ Quang Huy'],
+    isUserParticipant: true,
+    responseStatus: 'accepted',
+    agenda: 'Chọn góc quay, kịch bản dẫn hiện trường và đồ họa motion cho phóng sự phát hành cuối tuần.',
+    attachments: [
+      { id: 'att-pw42-3', name: 'Storyboard-video-phong-su.pdf', size: 1200000, type: 'pdf', uploadedAt: '2026-10-14T09:15:00+07:00', uploadedBy: 'Hoàng Điệp' }
+    ],
+    comments: [
+      { id: 'cmt-pw42-3-1', author: 'Hoàng Điệp', content: 'Mình đã cập nhật storyboard mẫu, mọi người xem trước nhé.', createdAt: '2026-10-14T09:40:00+07:00' }
+    ]
+  },
+  {
     id: 'w42-21',
     title: 'Lễ trao học bổng "Tiếp Sức đến trường" 2026 - Huế',
     startAt: '2026-10-14T09:30:00+07:00',
@@ -1094,6 +1164,25 @@ export const calendarEvents: CalendarEvent[] = [
     leader: 'Anh Lê Cường',
     participantText: 'Anh Lê Cường, C.V.Kình, Bảo Kỳ, Bình Khánh, Mỹ Trâm',
     isUserParticipant: false
+  },
+  {
+    id: 'pers-w42-04',
+    title: 'Hội ý nhanh chuyên môn: Xử lý dữ liệu điều tra bạn đọc',
+    startAt: '2026-10-14T15:00:00+07:00',
+    endAt: '2026-10-14T16:00:00+07:00',
+    location: 'P/Họp T/Trệt',
+    type: 'meeting',
+    scope: 'personal',
+    organizer: 'Nguyễn Minh Anh',
+    leader: 'Nguyễn Minh Anh',
+    participantText: 'Nguyễn Minh Anh, Nguyễn Hoài Nam',
+    participants: ['Nguyễn Minh Anh', 'Nguyễn Hoài Nam'],
+    isUserParticipant: true,
+    responseStatus: 'accepted',
+    isAdjusted: true,
+    adjustedNote: 'Dời từ 14:30 sang 15:00 để tránh trùng giờ họp ban',
+    agenda: 'Đối chiếu số liệu đơn thư bạn đọc và biểu đồ thống kê để chuẩn bị bài viết chuyên đề.',
+    attachments: []
   },
   {
     id: 'w42-26',
@@ -1187,6 +1276,29 @@ export const calendarEvents: CalendarEvent[] = [
     leader: 'Anh Thái Bình',
     participantText: 'Anh Thái Bình, Tiến Hùng, TTC',
     isUserParticipant: false
+  },
+  {
+    id: 'pers-w42-05',
+    title: 'Họp trực tuyến phỏng vấn chuyên gia kinh tế vĩ mô quý 4',
+    startAt: '2026-10-15T11:00:00+07:00',
+    endAt: '2026-10-15T12:00:00+07:00',
+    location: 'Trực tuyến',
+    meetingUrl: 'https://meeting.tuoitre.vn/phong-van-kinh-te-q4',
+    platform: 'meeting.tuoitre.vn',
+    meetingId: 'TT-619-328',
+    type: 'meeting',
+    scope: 'personal',
+    organizer: 'Nguyễn Minh Anh',
+    leader: 'Nguyễn Minh Anh',
+    participantText: 'Nguyễn Minh Anh, Trần Thu Hà, Chuyên gia TS. Trần Nam',
+    participants: ['Nguyễn Minh Anh', 'Trần Thu Hà', 'TS. Trần Nam'],
+    isUserParticipant: true,
+    responseStatus: 'accepted',
+    agenda: 'Phỏng vấn chuyên sâu về dự báo tăng trưởng kinh tế, lãi suất và thị trường xuất khẩu cuối năm 2026.',
+    attachments: [
+      { id: 'att-pw42-5', name: 'Cau-hoi-phong-van-kinh-te-q4.docx', size: 210000, type: 'docx', uploadedAt: '2026-10-15T08:30:00+07:00', uploadedBy: 'Nguyễn Minh Anh' }
+    ],
+    comments: []
   },
   {
     id: 'w42-33',
@@ -1311,6 +1423,31 @@ export const calendarEvents: CalendarEvent[] = [
     isUserParticipant: false
   },
   {
+    id: 'pers-w42-06',
+    title: 'Họp rà soát và đóng tuyến bài tuần 42 với nhóm Biên tập',
+    startAt: '2026-10-16T10:00:00+07:00',
+    endAt: '2026-10-16T11:15:00+07:00',
+    location: 'Trực tuyến',
+    meetingUrl: 'https://meeting.tuoitre.vn/dong-tuyen-bai-w42',
+    platform: 'meeting.tuoitre.vn',
+    meetingId: 'TT-904-712',
+    type: 'meeting',
+    scope: 'personal',
+    organizer: 'Nguyễn Minh Anh',
+    leader: 'Nguyễn Minh Anh',
+    participantText: 'Nguyễn Minh Anh, Lê Thanh Vân, Trần Thu Hà, Đỗ Quang Huy',
+    participants: ['Nguyễn Minh Anh', 'Lê Thanh Vân', 'Trần Thu Hà', 'Đỗ Quang Huy'],
+    isUserParticipant: true,
+    responseStatus: 'accepted',
+    agenda: 'Kiểm tra lần cuối các bài viết, infographic và hình ảnh trước khi lên trang ấn bản cuối tuần.',
+    attachments: [
+      { id: 'att-pw42-6', name: 'Checklist-dong-tuyen-bai-w42.xlsx', size: 180000, type: 'xlsx', uploadedAt: '2026-10-16T08:00:00+07:00', uploadedBy: 'Lê Thanh Vân' }
+    ],
+    comments: [
+      { id: 'cmt-pw42-6-1', author: 'Trần Thu Hà', content: 'Đã hoàn tất 4 bài, còn 1 bài đang chờ duyệt tít sẽ bổ sung trước giờ họp.', createdAt: '2026-10-16T08:40:00+07:00' }
+    ]
+  },
+  {
     id: 'w42-42',
     title: 'Họp Cơ quan báo và phát thanh truyền hình TP',
     startAt: '2026-10-16T14:00:00+07:00',
@@ -1402,6 +1539,26 @@ export const calendarEvents: CalendarEvent[] = [
     leader: 'Anh Đức Thọ',
     participantText: 'Anh Đức Thọ, Phan Đắc, Tấn Vũ, VPMT và nhóm CTXH',
     isUserParticipant: false
+  },
+  {
+    id: 'pers-w42-07',
+    title: 'Họp trực tuyến trao đổi nghiệp vụ: Ứng dụng công cụ số trong xử lý tin nhanh',
+    startAt: '2026-10-17T14:00:00+07:00',
+    endAt: '2026-10-17T15:15:00+07:00',
+    location: 'Trực tuyến',
+    meetingUrl: 'https://meeting.tuoitre.vn/cong-cu-so-tin-nhanh',
+    platform: 'meeting.tuoitre.vn',
+    meetingId: 'TT-331-509',
+    type: 'meeting',
+    scope: 'personal',
+    organizer: 'Nguyễn Minh Anh',
+    leader: 'Nguyễn Minh Anh',
+    participantText: 'Nguyễn Minh Anh, Nguyễn Hoài Nam, Đỗ Quang Huy',
+    participants: ['Nguyễn Minh Anh', 'Nguyễn Hoài Nam', 'Đỗ Quang Huy'],
+    isUserParticipant: true,
+    responseStatus: 'accepted',
+    agenda: 'Chia sẻ kinh nghiệm sử dụng các tool phiên âm tự động và trích xuất dữ liệu nhanh từ họp báo.',
+    attachments: []
   },
   {
     id: 'w42-49',

@@ -1415,6 +1415,71 @@ body { font-size:var(--font-main); line-height:1.5; }
 }
 
 /* -------------------------------------------------------------
+   Cloud Explorer 100% Full Screen Viewport Fit (Zero Outer Scroll)
+   ------------------------------------------------------------- */
+body.cloud-page-open {
+  height: 100vh !important;
+  max-height: 100vh !important;
+  overflow: hidden !important;
+}
+
+body.cloud-page-open #root,
+body.cloud-page-open #root > .ant-layout {
+  height: 100vh !important;
+  max-height: 100vh !important;
+  overflow: hidden !important;
+}
+
+.app-frame.app-frame-cloud {
+  height: 100vh !important;
+  max-height: 100vh !important;
+  min-height: 100vh !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.app-content.app-content-cloud {
+  height: calc(100vh - 68px) !important;
+  max-height: calc(100vh - 68px) !important;
+  min-height: 0 !important;
+  flex: 1 1 auto !important;
+  padding: 22px 26px 24px 26px !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.cloud-module-page {
+  height: 100% !important;
+  max-height: 100% !important;
+  min-height: 0 !important;
+  flex: 1 1 0% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+}
+
+.cloud-module-page .ant-segmented {
+  padding: 3px;
+  border-radius: 9px;
+  background: #f1f5f9;
+}
+
+.cloud-module-page .ant-segmented-item {
+  border-radius: 7px;
+}
+
+.cloud-module-page .ant-segmented-item-selected {
+  color: #b42318 !important;
+  font-weight: 600 !important;
+  background: #fff !important;
+  box-shadow: 0 1px 3px rgba(16, 24, 40, 0.08) !important;
+}
+
+/* -------------------------------------------------------------
    Mail & Chat 100% Full Screen Viewport Fit (Zero Outer Scroll)
    ------------------------------------------------------------- */
 .mail-module-page,
