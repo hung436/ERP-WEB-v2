@@ -1,3 +1,4 @@
+export { CalendarWeekPage } from './CalendarWeekPage';
 export { CalendarNotificationsPage, CalendarPage } from './CalendarNotificationsPage';
 export { CalendarGroupsPage } from './CalendarGroupsPage';
 export { CreateEditorialMeetingModal } from './components/CreateEditorialMeetingModal';

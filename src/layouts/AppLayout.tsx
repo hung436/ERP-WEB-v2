@@ -28,11 +28,17 @@ export function AppLayout() {
   const navigate = useNavigate();
   const location = useLocation();
   const isPersonnelPage = location.pathname.startsWith('/personnel');
+  const isCloudPage = location.pathname.startsWith('/cloud');
 
   useEffect(() => {
     document.body.classList.toggle('personnel-page-open', isPersonnelPage);
     return () => document.body.classList.remove('personnel-page-open');
   }, [isPersonnelPage]);
+
+  useEffect(() => {
+    document.body.classList.toggle('cloud-page-open', isCloudPage);
+    return () => document.body.classList.remove('cloud-page-open');
+  }, [isCloudPage]);
 
   // Auto-open birthday celebration card once per session if today is user's birthday
   useEffect(() => {
@@ -101,7 +107,7 @@ export function AppLayout() {
   return (
     <Layout className="min-h-screen">
       <AppSidebar collapsed={collapsed} onCollapse={setCollapsed} />
-      <Layout className={`app-frame${collapsed ? ' app-frame-collapsed' : ''}${isPersonnelPage ? ' app-frame-personnel' : ''}`}>
+      <Layout className={`app-frame${collapsed ? ' app-frame-collapsed' : ''}${isPersonnelPage ? ' app-frame-personnel' : ''}${isCloudPage ? ' app-frame-cloud' : ''}`}>
         <header className="app-header">
           <HeaderDirectorySearch onSelect={setSelectedContact} />
           <div className="app-header-account">
@@ -138,7 +144,7 @@ export function AppLayout() {
             </Dropdown>
           </div>
         </header>
-        <main className={isPersonnelPage ? 'app-content app-content-personnel' : 'app-content'}><Outlet /></main>
+        <main className={`app-content${isPersonnelPage ? ' app-content-personnel' : ''}${isCloudPage ? ' app-content-cloud' : ''}`}><Outlet /></main>
         <ContactQuickView chatting={contactChatting} contact={selectedContact} onChat={startContactChat} onClose={() => { setSelectedContact(null); setContactChatting(false); }} />
         
         {/* BIRTHDAY CELEBRATION MODAL */}

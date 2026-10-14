@@ -6,6 +6,7 @@ import { LoginPage } from '@/features/auth/LoginPage';
 import { ProtectedRoute } from '@/features/auth/ProtectedRoute';
 import { CalendarGroupsPage } from '@/features/calendar/CalendarGroupsPage';
 import { CalendarNotificationsPage } from '@/features/calendar/CalendarNotificationsPage';
+import { CalendarWeekPage } from '@/features/calendar/CalendarWeekPage';
 import { MeetingPage } from '@/features/meeting/MeetingPage';
 import { ChatPage } from '@/features/chat/ChatPage';
 import { DashboardPage } from '@/features/dashboard/DashboardPage';
@@ -14,6 +15,7 @@ import { CreateDocumentTemplatePage } from '@/features/documents/CreateDocumentT
 import { DocumentsPage } from '@/features/documents/DocumentsPage';
 import { DocumentStatisticsPage } from '@/features/documents/DocumentStatisticsPage';
 import { DocumentTemplatesPage } from '@/features/documents/DocumentTemplatesPage';
+import { CloudPage } from '@/features/cloud/CloudPage';
 import { WorkTicketsPage } from '@/features/work-tickets/WorkTicketsPage';
 import { MailPage } from '@/features/mail/MailPage';
 import { NotFoundPage } from '@/features/not-found/NotFoundPage';
@@ -40,6 +42,7 @@ export function AppRoutes() {
           <Route path="documents/templates/create" element={<CreateDocumentTemplatePage />} />
           <Route path="documents/templates/edit/:id" element={<CreateDocumentTemplatePage />} />
           <Route path="documents/statistics" element={<DocumentStatisticsPage />} />
+          <Route path="cloud" element={<CloudPage />} />
           <Route path="work-tickets" element={<Navigate replace to="/tasks" />} />
           <Route path="evaluations" element={<EvaluationsPage />} />
           <Route path="personnel" element={<Navigate replace to="/personnel/profile" />} />
@@ -53,7 +56,8 @@ export function AppRoutes() {
           <Route path="personnel/resume/:id" element={<PersonnelProfilePage />} />
           <Route path="personnel/create" element={<CreatePersonnelPage />} />
           <Route path="personnel/edit/:id" element={<CreatePersonnelPage />} />
-          <Route path="calendar" element={<CalendarNotificationsPage />} />
+          <Route path="calendar" element={<Navigate replace to="/calendar/week" />} />
+          <Route path="calendar/week" element={<CalendarWeekPage />} />
           <Route path="calendar/notifications" element={<CalendarNotificationsPage />} />
           <Route path="calendar/groups" element={<CalendarGroupsPage />} />
           <Route path="account" element={<AccountProfilePage />} />

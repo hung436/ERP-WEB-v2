@@ -185,6 +185,7 @@ export function EvaluationCriterionRow({
   order,
   readOnly,
   previousStages,
+  currentStage,
   onScoreChange,
   onChildScoreChange,
   onOpenNote,
@@ -194,6 +195,8 @@ export function EvaluationCriterionRow({
   order: number;
   readOnly: boolean;
   previousStages: EvaluationStage[];
+  /** Cấp đang chấm hiện tại, dùng để gắn nhãn đúng cấp cho ghi chú đang nhập (thay vì nhãn chung chung). */
+  currentStage: EvaluationStage;
   onScoreChange: (score: number | null) => void;
   /** Cập nhật điểm cho một ý con của tiêu chí nhiều cấp. */
   onChildScoreChange?: (childId: string, score: number | null) => void;
@@ -205,6 +208,7 @@ export function EvaluationCriterionRow({
   const [pendingLevel, setPendingLevel] = useState<EvaluationLevel | null>(null);
   const [tempScore, setTempScore] = useState<number>(0);
   const [isScoreModalOpen, setIsScoreModalOpen] = useState(false);
+  const [viewingStageNote, setViewingStageNote] = useState<{ label: string; text: string } | null>(null);
 
   const titleRef = useRef<HTMLHeadingElement>(null);
   const [isSingleLine, setIsSingleLine] = useState(true);
@@ -279,7 +283,7 @@ export function EvaluationCriterionRow({
           </div>
         </div>
 
-        {/* Top-Right Toolbar: Hide all input controls & note buttons in readOnly/published mode */}
+        {/* Top-Right Toolbar: ô nhập điểm & nút ghi chú nằm ở góc trên bên phải (thiết kế cũ) */}
         {!readOnly || isSumMode ? (
           <div className="header-right-toolbar">
             {isSumMode && (
@@ -291,10 +295,10 @@ export function EvaluationCriterionRow({
             )}
 
             {!readOnly && !hasLevels && !isSumMode && (
-              <div className="evaluation-score-inline" id={`evaluation-score-${criterion.id}`}>
-                <label htmlFor={`evaluation-score-${criterion.id}`}>Điểm</label>
+              <div className="evaluation-score-inline">
+                <label htmlFor={`evaluation-score-input-${criterion.id}`}>Điểm</label>
                 <InputNumber
-                  id={`evaluation-score-${criterion.id}`}
+                  id={`evaluation-score-input-${criterion.id}`}
                   aria-label={`Nhập điểm: ${criterion.title}`}
                   min={minimum}
                   max={maximum}
@@ -309,21 +313,109 @@ export function EvaluationCriterionRow({
             )}
 
             {!readOnly && !isSumMode && (
-            <div className="card-note-wrapper">
-              <Tooltip title={criterion.note ? `Ghi chú: ${criterion.note}` : 'Thêm ghi chú/minh chứng'}>
-                <Button
-                  aria-label={criterion.note ? 'Chỉnh sửa ghi chú' : 'Thêm ghi chú'}
-                  className={`evaluation-note-button${criterion.note ? ' has-note' : ''}`}
-                  onClick={onOpenNote}
-                >
-                  <span className="btn-icon" aria-hidden="true">{criterion.note ? '📝' : '💬'}</span>
-                </Button>
-              </Tooltip>
-            </div>
+              <div className="card-note-wrapper">
+                <Tooltip title={criterion.note ? `Ghi chú: ${criterion.note}` : 'Thêm ghi chú/minh chứng'}>
+                  <Button
+                    aria-label={criterion.note ? 'Chỉnh sửa ghi chú' : 'Thêm ghi chú'}
+                    className={`evaluation-note-button${criterion.note ? ' has-note' : ''}`}
+                    onClick={onOpenNote}
+                  >
+                    <span className="btn-icon" aria-hidden="true">{criterion.note ? '📝' : '💬'}</span>
+                  </Button>
+                </Tooltip>
+              </div>
             )}
           </div>
         ) : null}
       </header>
+
+      {/* Lịch sử các cấp: chuỗi chip điểm gọn theo mũi tên, đặt ngay dưới tiêu đề để thấy điểm các cấp trước ngay. */}
+      {previousStages.length > 0 && (
+        <div className="criterion-stage-history-container" aria-label={`Lịch sử điểm chấm: ${criterion.title}`}>
+          <div className="stage-comparison-strip">
+            {previousStages.map((stage, idx) => {
+              const val =
+                stage === 'published'
+                  ? criterion.stageScores?.['published'] ?? criterion.score
+                  : criterion.stageScores?.[stage] ?? (stage === 'self' ? criterion.score : undefined);
+              const noteText = criterion.stageNotes?.[stage] || (stage === 'self' ? criterion.note : undefined);
+
+              if (val === null || val === undefined) return null;
+
+              const matchedOpt = getStageOptionLevel(criterion, val);
+              const optIdx = criterion.levels && matchedOpt ? criterion.levels.findIndex((l) => l.label === matchedOpt.label) : -1;
+              const optLetter = optIdx !== -1 ? String.fromCharCode(65 + optIdx) : null;
+
+              return (
+                <div key={stage} className="stage-chip-item">
+                  {idx > 0 && <span className="stage-chip-arrow">→</span>}
+                  <span className={`stage-score-chip stage-${stage}`}>
+                    <span className="chip-stage-label">{stageLabels[stage]}:</span>
+                    {optLetter && <strong className="chip-stage-letter">{optLetter}.</strong>}
+                    <strong className="chip-stage-score">{val} điểm</strong>
+                    {noteText && (
+                      <button
+                        type="button"
+                        className="stage-note-view-btn"
+                        aria-label={`Xem ghi chú ${stageLabels[stage]}`}
+                        title="Xem ghi chú"
+                        onClick={() => setViewingStageNote({ label: stageLabels[stage], text: noteText })}
+                      >
+                        📝
+                      </button>
+                    )}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Popup xem ghi chú của một cấp trong lịch sử */}
+      <Modal
+        title={viewingStageNote ? `Ghi chú: ${viewingStageNote.label}` : ''}
+        open={Boolean(viewingStageNote)}
+        onCancel={() => setViewingStageNote(null)}
+        footer={null}
+        centered
+        width={420}
+      >
+        <p style={{ margin: 0, whiteSpace: 'pre-wrap', color: '#1e293b', lineHeight: 1.6 }}>
+          {viewingStageNote?.text}
+        </p>
+      </Modal>
+
+      {/* Ghi chú đang nhập của cấp hiện tại (chưa chốt sang lịch sử) */}
+      {criterion.note && (
+        <div
+          className="criterion-personal-note-card"
+          aria-label={`Ghi chú cá nhân: ${criterion.title}`}
+          onClick={!readOnly ? onOpenNote : undefined}
+          style={{ cursor: !readOnly ? 'pointer' : 'default' }}
+        >
+          <div className="note-card-header">
+            <span className="note-card-title">
+              <span className="note-icon" aria-hidden="true">📝</span>
+              <strong>{stageLabels[currentStage]}</strong>
+            </span>
+            {!readOnly && (
+              <button
+                type="button"
+                className="btn-edit-note-inline"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onOpenNote();
+                }}
+                title="Chỉnh sửa ghi chú"
+              >
+                ✏️ Chỉnh sửa
+              </button>
+            )}
+          </div>
+          <p className="note-card-body">{criterion.note}</p>
+        </div>
+      )}
 
       {/* Cây ý con của tiêu chí nhiều cấp (chỉ hiển thị để theo dõi hoặc nhập điểm từng ý) */}
       {isGrouped && (
@@ -390,88 +482,6 @@ export function EvaluationCriterionRow({
               </button>
             );
           })}
-        </div>
-      )}
-
-      {/* Sleek Personal Note Card Display */}
-      {criterion.note && (
-        <div
-          className="criterion-personal-note-card"
-          aria-label={`Ghi chú cá nhân: ${criterion.title}`}
-          onClick={!readOnly ? onOpenNote : undefined}
-          style={{ cursor: !readOnly ? 'pointer' : 'default' }}
-        >
-          <div className="note-card-header">
-            <span className="note-card-title">
-              <span className="note-icon" aria-hidden="true">📝</span>
-              <strong>Ghi chú & minh chứng cá nhân:</strong>
-            </span>
-            {!readOnly && (
-              <button
-                type="button"
-                className="btn-edit-note-inline"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onOpenNote();
-                }}
-                title="Chỉnh sửa ghi chú"
-              >
-                ✏️ Chỉnh sửa
-              </button>
-            )}
-          </div>
-          <p className="note-card-body">{criterion.note}</p>
-        </div>
-      )}
-
-      {/* Sleek Stage Comparison Bar & Notes */}
-      {previousStages.length > 0 && (
-        <div className="criterion-stage-history-container" aria-label={`Lịch sử điểm chấm: ${criterion.title}`}>
-          {/* 1-Line Compact Stage Score Comparison Flow */}
-          <div className="stage-comparison-strip">
-            {previousStages.map((stage, idx) => {
-              const val =
-                stage === 'published'
-                  ? criterion.stageScores?.['published'] ?? criterion.score
-                  : criterion.stageScores?.[stage] ?? (stage === 'self' ? criterion.score : undefined);
-
-              if (val === null || val === undefined) return null;
-
-              const matchedOpt = getStageOptionLevel(criterion, val);
-              const optIdx = criterion.levels && matchedOpt ? criterion.levels.findIndex((l) => l.label === matchedOpt.label) : -1;
-              const optLetter = optIdx !== -1 ? String.fromCharCode(65 + optIdx) : null;
-
-              return (
-                <div key={stage} className="stage-chip-item">
-                  {idx > 0 && <span className="stage-chip-arrow">→</span>}
-                  <span className={`stage-score-chip stage-${stage}`}>
-                    <span className="chip-stage-label">{stageLabels[stage]}:</span>
-                    {optLetter && <strong className="chip-stage-letter">{optLetter}.</strong>}
-                    <strong className="chip-stage-score">{val}đ</strong>
-                  </span>
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Stage Notes / Proof Quotes (Only rendered if notes exist!) */}
-          {previousStages.some((stage) => criterion.stageNotes?.[stage] || (stage === 'self' && criterion.note)) && (
-            <div className="stage-notes-list">
-              {previousStages.map((stage) => {
-                const noteText = criterion.stageNotes?.[stage] || (stage === 'self' ? criterion.note : undefined);
-                if (!noteText) return null;
-
-                return (
-                  <div key={`note-${stage}`} className={`stage-note-bubble stage-${stage}`}>
-                    <div className="note-bubble-header">
-                      <span className="note-bubble-author">📝 Ghi chú {stageLabels[stage].toLowerCase()}:</span>
-                    </div>
-                    <p className="note-bubble-text">“{noteText}”</p>
-                  </div>
-                );
-              })}
-            </div>
-          )}
         </div>
       )}
 

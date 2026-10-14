@@ -21,7 +21,7 @@ export function HeaderDirectorySearch({ onSelect }: { onSelect: (contact: Direct
   return <div className="header-directory-search">
     <span className="header-directory-icon"><ModuleIcon module="directory" size={19} /></span>
     <AutoComplete notFoundContent={state.loading ? 'Đang tải…' : 'Không tìm thấy nhân sự'} onSearch={setQuery} onSelect={(id) => { const contact = state.data?.find((item) => item.id === id); if (contact) { onSelect(contact); setQuery(''); } }} options={options} popupClassName="header-directory-dropdown" popupMatchSelectWidth={560} value={query}>
-      <Input aria-label="Tìm kiếm danh bạ toàn cục" allowClear placeholder="Tìm tên, email, số điện thoại, máy lẻ…" variant="borderless" />
+      <Input name="global_directory_search_query" autoComplete="off" data-lpignore="true" aria-label="Tìm kiếm danh bạ toàn cục" allowClear placeholder="Tìm tên, email, số điện thoại, máy lẻ…" variant="borderless" />
     </AutoComplete>
     <Link aria-label="Mở toàn bộ Danh bạ" to="/directory">Danh bạ <span aria-hidden="true">→</span></Link>
   </div>;

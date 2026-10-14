@@ -5,7 +5,7 @@ import { followerOptions, workTicketSubmissions, workTicketTemplates } from '@/m
 import { evaluationPeriods, evaluationSheets } from '@/mocks/evaluationFixtures';
 import { initialChangeRequests, initialPersonnelList, initialPositionTitles, initialResignedEmployees, initialSpecialties, initialUnitPositionMappings, initialWorkUnits, personalProfile } from '@/mocks/personnelFixtures';
 import { initialCalendarNotifications, initialRecipientGroups } from '@/mocks/calendarNotificationFixtures';
-import type { Announcement, ApiResponse, ApiState, CalendarEvent, ChatAttachment, ChatConversation, ChatMessage, CustomDocumentTemplateItem, DashboardSummary, DirectoryContact, DocumentSubmission, DocumentWorkflowStep, MailComposePayload, MailItem, MailReply, MeetingEvent, Task, User, WorkTicketAttachment, WorkTicketFollower, WorkTicketSubmission } from '@/types/domain';
+import type { Announcement, ApiResponse, ApiState, CalendarAttachmentItem, CalendarEvent, ChatAttachment, ChatConversation, ChatMessage, CustomDocumentTemplateItem, DashboardSummary, DirectoryContact, DocumentSubmission, DocumentWorkflowStep, MailComposePayload, MailItem, MailReply, MeetingEvent, Task, User, WorkTicketAttachment, WorkTicketFollower, WorkTicketSubmission } from '@/types/domain';
 import type { CalendarNotificationItem, CalendarRecipientGroup, CreateCalendarNotificationPayload, CreateRecipientGroupPayload } from '@/types/calendar';
 import type { EvaluationSheet, EvaluationSummary } from '@/types/evaluation';
 import type { PositionTitleItem, PersonnelChangeRequest, PersonnelRecordItem, PermissionAssignmentItem, PermissionGroupItem, PermissionItem, ResignedEmployeeItem, SpecialtyItem, UnitPositionMapping, WorkUnitItem } from '@/types/personnel';
@@ -287,25 +287,40 @@ export async function mockRequest<T>(path: string, options?: { method?: string; 
   else if (pathname === '/api/calendar/events') {
     if (options?.method === 'POST') {
       const body = options.body as Partial<CalendarEvent>;
+      const meetingCode = `${Math.floor(100 + Math.random() * 900)}-${Math.floor(100 + Math.random() * 900)}`;
       const newEvent: CalendarEvent = {
         id: `event-${Date.now()}`,
-        title: body.title ?? 'Cuộc họp mới',
+        title: body.title ?? 'Cuộc họp trực tuyến mới',
         startAt: body.startAt ?? new Date().toISOString(),
         endAt: body.endAt ?? new Date(Date.now() + 3600000).toISOString(),
-        location: body.location ?? 'meeting.tuoitre.vn',
-        meetingUrl: body.meetingUrl ?? 'https://meeting.tuoitre.vn/truc-tuyen',
+        location: body.location ?? 'https://meeting.tuoitre.vn/room-123',
+        meetingUrl: body.meetingUrl ?? `https://meeting.tuoitre.vn/phong-${meetingCode}`,
         type: body.type ?? 'meeting',
+        scope: body.scope ?? 'personal',
         organizer: activeUser.fullName,
+        leader: body.leader ?? activeUser.fullName,
         responseStatus: 'accepted',
-        meetingId: `TT-${Math.floor(100 + Math.random() * 900)}-${Math.floor(100 + Math.random() * 900)}`,
+        meetingId: `TT-${meetingCode}`,
         platform: body.platform ?? 'meeting.tuoitre.vn',
-        agenda: body.agenda ?? 'Trao đổi nội dung công việc',
+        agenda: body.agenda ?? 'Trao đổi nội dung công việc trực tuyến',
+        notes: body.notes,
+        participantText: body.participantText ?? (body.participants?.join(', ') || activeUser.fullName),
         participants: body.participants?.length ? body.participants : [activeUser.fullName],
+        participantCount: body.participantCount ?? (body.participants?.length || 1),
+        isUserParticipant: true,
+        attachments: body.attachments ?? [],
+        comments: body.comments ?? [],
       };
       calendarEventStore = [newEvent, ...calendarEventStore];
       data = newEvent;
     } else {
-      data = calendarEventStore.filter((item) => !url.searchParams.get('type') || item.type === url.searchParams.get('type'));
+      const scopeFilter = url.searchParams.get('scope');
+      const typeFilter = url.searchParams.get('type');
+      data = calendarEventStore.filter((item) => {
+        if (scopeFilter && item.scope !== scopeFilter) return false;
+        if (typeFilter && item.type !== typeFilter) return false;
+        return true;
+      });
     }
   }
   else if (/^\/api\/calendar\/events\/[^/]+\/respond$/.test(pathname) && options?.method === 'POST') {
@@ -316,6 +331,54 @@ export async function mockRequest<T>(path: string, options?: { method?: string; 
     const updated = { ...event, responseStatus: body.responseStatus };
     calendarEventStore = calendarEventStore.map((item) => item.id === eventId ? updated : item);
     data = updated;
+  }
+  else if (/^\/api\/calendar\/events\/[^/]+\/comments$/.test(pathname) && options?.method === 'POST') {
+    const eventId = pathname.split('/')[4];
+    const body = options.body as { content: string };
+    const event = calendarEventStore.find((item) => item.id === eventId);
+    if (!event) throw new Error('Không tìm thấy sự kiện để bình luận.');
+    const newComment = {
+      id: `cmt-${Date.now()}`,
+      author: activeUser.fullName,
+      content: body.content,
+      createdAt: new Date().toISOString(),
+    };
+    const updated: CalendarEvent = {
+      ...event,
+      comments: [...(event.comments || []), newComment],
+    };
+    calendarEventStore = calendarEventStore.map((item) => item.id === eventId ? updated : item);
+    data = updated;
+  }
+  else if (/^\/api\/calendar\/events\/[^/]+\/attachments$/.test(pathname) && options?.method === 'POST') {
+    const eventId = pathname.split('/')[4];
+    const body = options.body as { attachment: CalendarAttachmentItem };
+    const event = calendarEventStore.find((item) => item.id === eventId);
+    if (!event) throw new Error('Không tìm thấy sự kiện để thêm tệp đính kèm.');
+    const updated: CalendarEvent = {
+      ...event,
+      attachments: [...(event.attachments || []), body.attachment],
+    };
+    calendarEventStore = calendarEventStore.map((item) => item.id === eventId ? updated : item);
+    data = updated;
+  }
+  else if (/^\/api\/calendar\/events\/[^/]+$/.test(pathname)) {
+    const id = pathname.split('/')[4];
+    if (options?.method === 'DELETE') {
+      calendarEventStore = calendarEventStore.filter((item) => item.id !== id);
+      data = { success: true };
+    } else if (options?.method === 'PUT' || options?.method === 'PATCH') {
+      const body = options.body as Partial<CalendarEvent>;
+      const existing = calendarEventStore.find((item) => item.id === id);
+      if (!existing) throw new Error('Không tìm thấy sự kiện');
+      const updated = { ...existing, ...body };
+      calendarEventStore = calendarEventStore.map((item) => item.id === id ? updated : item);
+      data = updated;
+    } else {
+      const event = calendarEventStore.find((item) => item.id === id);
+      if (!event) throw new Error('Không tìm thấy sự kiện');
+      data = event;
+    }
   }
   else if (pathname === '/api/calendar/notifications') {
     if (options?.method === 'POST') {
