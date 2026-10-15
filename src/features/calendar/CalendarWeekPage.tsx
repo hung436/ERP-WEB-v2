@@ -1,7 +1,7 @@
 import { Button, DatePicker, Tooltip } from 'antd';
 import dayjs, { type Dayjs } from 'dayjs';
 import isoWeek from 'dayjs/plugin/isoWeek';
-import { Check, ChevronLeft, ChevronRight, Filter, Plus, Search, User, X } from 'lucide-react';
+import { Check, ChevronLeft, ChevronRight, Columns3, Filter, Plus, Rows3, Search, User, X } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { ContentSkeleton, ErrorState } from '@/components/AsyncState';
 import { useAsyncData } from '@/hooks/useAsyncData';
@@ -11,6 +11,7 @@ import { CalendarEventDetailModal } from './components/CalendarEventDetailModal'
 import { CreatePersonalMeetingModal } from './components/CreatePersonalMeetingModal';
 import { DayScheduleDrawer } from './components/DayScheduleDrawer';
 import { WeekTimelineGrid } from './components/WeekTimelineGrid';
+import { WeekVerticalGrid } from './components/WeekVerticalGrid';
 import './calendar-week.css';
 
 dayjs.extend(isoWeek);
@@ -61,6 +62,24 @@ export function CalendarWeekPage() {
   const [selectedDayForSchedule, setSelectedDayForSchedule] = useState<Dayjs | null>(null);
   const [dayScheduleDrawerOpen, setDayScheduleDrawerOpen] = useState(false);
 
+  // Hướng chuyển tuần: 'forward' (tiến tới tuần sau), 'backward' (lùi lại tuần trước), 'fade' (chọn ngày ngẫu nhiên)
+  const [slideDirection, setSlideDirection] = useState<'forward' | 'backward' | 'fade' | null>(null);
+
+  // Layout mode: 'horizontal' (Bố trí ngang) hoặc 'vertical' (Bố trí dọc)
+  const [viewMode, setViewMode] = useState<'horizontal' | 'vertical'>(() => {
+    if (typeof window !== 'undefined') {
+      return (localStorage.getItem('calendar_week_view_layout') as 'horizontal' | 'vertical') || 'vertical';
+    }
+    return 'vertical';
+  });
+
+  const handleViewModeChange = (mode: 'horizontal' | 'vertical') => {
+    setViewMode(mode);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('calendar_week_view_layout', mode);
+    }
+  };
+
   // Fetch calendar events
   const state = useAsyncData(async () => (await calendarApi.list()).data);
   const [localEvents, setLocalEvents] = useState<CalendarEvent[]>([]);
@@ -81,10 +100,12 @@ export function CalendarWeekPage() {
 
   // Navigation handlers
   const handlePrevWeek = () => {
+    setSlideDirection('backward');
     setCurrentWeekStart((prev) => prev.subtract(7, 'day'));
   };
 
   const handleNextWeek = () => {
+    setSlideDirection('forward');
     setCurrentWeekStart((prev) => prev.add(7, 'day'));
   };
 
@@ -93,7 +114,15 @@ export function CalendarWeekPage() {
       // Find Monday of the selected date's week
       const dayOfWeek = date.day(); // 0 is Sunday, 1 is Monday
       const diffToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
-      setCurrentWeekStart(date.add(diffToMonday, 'day').startOf('day'));
+      const targetMonday = date.add(diffToMonday, 'day').startOf('day');
+      if (targetMonday.isAfter(currentWeekStart, 'day')) {
+        setSlideDirection('forward');
+      } else if (targetMonday.isBefore(currentWeekStart, 'day')) {
+        setSlideDirection('backward');
+      } else {
+        setSlideDirection('fade');
+      }
+      setCurrentWeekStart(targetMonday);
     }
   };
 
@@ -183,8 +212,10 @@ export function CalendarWeekPage() {
     }
   };
 
+  const isDrawerOpen = detailModalOpen || dayScheduleDrawerOpen;
+
   return (
-    <div className="calendar-week-page">
+    <div className={`calendar-week-page${isDrawerOpen ? ' has-drawer-open' : ''}`}>
       {/* Toolbar matching mockup */}
       <header className="calendar-week-header">
         {/* Search icon button / expandable search input */}
@@ -326,8 +357,31 @@ export function CalendarWeekPage() {
           </button>
         </div>
 
-        {/* 3. Cụm Phải: Nút Tạo lịch họp */}
+        {/* 3. Cụm Phải: Bộ chuyển đổi bố cục Ngang/Dọc (chỉ dùng icon) + Nút Tạo lịch họp */}
         <div className="header-cluster-right">
+          <div className="calendar-layout-switcher">
+            <Tooltip title="Dạng ngang (Dòng thời gian)">
+              <button
+                aria-label="Xem dạng ngang theo dòng thời gian"
+                className={`layout-switcher-btn ${viewMode === 'horizontal' ? 'is-active' : ''}`}
+                onClick={() => handleViewModeChange('horizontal')}
+                type="button"
+              >
+                <Rows3 size={15} />
+              </button>
+            </Tooltip>
+            <Tooltip title="Dạng dọc (Theo từng cột ngày)">
+              <button
+                aria-label="Xem dạng dọc theo từng cột ngày"
+                className={`layout-switcher-btn ${viewMode === 'vertical' ? 'is-active' : ''}`}
+                onClick={() => handleViewModeChange('vertical')}
+                type="button"
+              >
+                <Columns3 size={15} />
+              </button>
+            </Tooltip>
+          </div>
+
           <Button
             className="btn-create-meeting"
             icon={<Plus size={16} />}
@@ -343,16 +397,35 @@ export function CalendarWeekPage() {
         </div>
       </header>
 
-      {/* Timeline Grid ngang */}
-      <WeekTimelineGrid
-        currentWeekStart={currentWeekStart}
-        events={searchedEvents}
-        filterEditorial={filterEditorial}
-        filterOnlyMyEvents={filterOnlyMyEvents}
-        filterPersonal={filterPersonal}
-        onSelectDay={handleSelectDay}
-        onSelectEvent={handleSelectEvent}
-      />
+      {/* Grid lịch tuần: Dạng ngang hoặc Dạng dọc có hiệu ứng trượt mượt mà phong cách Google Calendar */}
+      <div
+        className={`calendar-grid-transition-wrap ${slideDirection ? `slide-${slideDirection}` : ''}`}
+        key={currentWeekStart.format('YYYY-MM-DD')}
+      >
+        {viewMode === 'horizontal' ? (
+          <WeekTimelineGrid
+            currentWeekStart={currentWeekStart}
+            disabledHover={isDrawerOpen}
+            events={searchedEvents}
+            filterEditorial={filterEditorial}
+            filterOnlyMyEvents={filterOnlyMyEvents}
+            filterPersonal={filterPersonal}
+            onSelectDay={handleSelectDay}
+            onSelectEvent={handleSelectEvent}
+          />
+        ) : (
+          <WeekVerticalGrid
+            currentWeekStart={currentWeekStart}
+            disabledHover={isDrawerOpen}
+            events={searchedEvents}
+            filterEditorial={filterEditorial}
+            filterOnlyMyEvents={filterOnlyMyEvents}
+            filterPersonal={filterPersonal}
+            onSelectDay={handleSelectDay}
+            onSelectEvent={handleSelectEvent}
+          />
+        )}
+      </div>
 
       {/* 4. Event Detail Modal (for participating events & personal meetings) */}
       <CalendarEventDetailModal

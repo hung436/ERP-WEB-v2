@@ -1,5 +1,5 @@
 import dayjs, { type Dayjs } from 'dayjs';
-import { ChevronDown, ChevronRight } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import type { CalendarEvent } from '@/types/domain';
 import { CalendarEventCard } from './CalendarEventCard';
@@ -13,6 +13,7 @@ interface WeekTimelineGridProps {
   filterEditorial: boolean;
   filterPersonal: boolean;
   filterOnlyMyEvents: boolean;
+  disabledHover?: boolean;
 }
 
 const TIMELINE_START_HOUR = 7;
@@ -83,9 +84,9 @@ function computePositionedEvents(events: CalendarEvent[]): PositionedEvent[] {
     prevLeftPct = leftPct;
 
     const rawWidthPct = ((clampedEnd - clampedStart) / TOTAL_MINUTES) * 100;
-    const widthPct = Math.max(4.2, Math.min(rawWidthPct, 100 - leftPct));
-    // Chỉ các sự kiện sát mép phải từ 16:00 trở đi (leftPct >= 72%) mới mở rộng về bên trái; các sự kiện ở giữa (14:00 - 15:30) vẫn mở rộng sang phải
-    const isRightAligned = leftPct >= 72;
+    const widthPct = Math.max(7.5, Math.min(100 - leftPct, rawWidthPct));
+    // Các sự kiện từ 14:00 trở đi (leftPct > 58%) sẽ mở rộng về bên trái để không bị tràn viền phải
+    const isRightAligned = leftPct > 58;
     const rightOffsetPct = Math.max(0.5, 100 - (leftPct + widthPct));
 
     positioned.push({
@@ -108,6 +109,7 @@ export function WeekTimelineGrid({
   filterEditorial,
   filterPersonal,
   filterOnlyMyEvents,
+  disabledHover,
 }: WeekTimelineGridProps) {
   const now = dayjs();
   const [expandedDutyDays, setExpandedDutyDays] = useState<Record<string, boolean>>({});
@@ -231,9 +233,6 @@ export function WeekTimelineGrid({
                         {day.format('DD/MM')}
                       </span>
                     </div>
-                    <span className="timeline-day-event-count">
-                      {dayEvents.length} sự kiện <ChevronRight className="count-arrow" size={12} />
-                    </span>
                   </button>
 
                   {duty && (
@@ -311,6 +310,7 @@ export function WeekTimelineGrid({
                             setActivePopupDayIdx((prev) => (prev === dIdx ? null : prev));
                           }
                         }}
+                        disabledHover={disabledHover}
                         onSelectEvent={onSelectEvent}
                         style={{
                           left: `${leftPct}%`,
