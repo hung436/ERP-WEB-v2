@@ -10,9 +10,10 @@ interface CalendarEventCardProps {
   onHoverChange?: (isHovered: boolean) => void;
   style?: React.CSSProperties;
   className?: string;
+  disabledHover?: boolean;
 }
 
-export function CalendarEventCard({ event, onSelectEvent, onHoverChange, style, className }: CalendarEventCardProps) {
+export function CalendarEventCard({ event, onSelectEvent, onHoverChange, style, className, disabledHover }: CalendarEventCardProps) {
   const start = dayjs(event.startAt);
   const end = dayjs(event.endAt);
 
@@ -36,6 +37,18 @@ export function CalendarEventCard({ event, onSelectEvent, onHoverChange, style, 
     };
   }, []);
 
+  // Khi drawer hoặc modal mở, lập tức tắt popup hover và xóa mọi timer
+  useEffect(() => {
+    if (disabledHover) {
+      resetEnterTimer();
+      if (leaveTimerRef.current) {
+        clearTimeout(leaveTimerRef.current);
+        leaveTimerRef.current = null;
+      }
+      setIsHoverExpanded(false);
+    }
+  }, [disabledHover]);
+
   const resetEnterTimer = () => {
     if (enterTimerRef.current) {
       clearTimeout(enterTimerRef.current);
@@ -44,34 +57,39 @@ export function CalendarEventCard({ event, onSelectEvent, onHoverChange, style, 
   };
 
   const startEnterTimer = () => {
+    if (disabledHover) return;
     if (leaveTimerRef.current) {
       clearTimeout(leaveTimerRef.current);
       leaveTimerRef.current = null;
     }
     resetEnterTimer();
-    // Độ trễ 400ms (trong khoảng 300ms - 500ms): chuột dừng yên trên card mới kích hoạt popup
+    // Độ trễ 120ms phản hồi nhanh khi hover vào thẻ
     enterTimerRef.current = setTimeout(() => {
-      setIsHoverExpanded(true);
-    }, 400);
+      if (!disabledHover) {
+        setIsHoverExpanded(true);
+      }
+    }, 120);
   };
 
   const handleMouseEnter = () => {
+    if (disabledHover) return;
     startEnterTimer();
   };
 
   const handleMouseMove = () => {
-    // Nếu chưa kích hoạt popup (chuột đang lướt qua), tiếp tục reset timer: chỉ khi chuột dừng yên 400ms mới kích hoạt
-    if (!isHoverExpanded) {
+    if (disabledHover) return;
+    // Chỉ kích hoạt hẹn giờ nếu chưa có popup và chưa có timer đang chạy (tránh reset timer liên tục khi chuột di chuyển trong thẻ)
+    if (!isHoverExpanded && !enterTimerRef.current) {
       startEnterTimer();
     }
   };
 
   const handleMouseLeave = () => {
     resetEnterTimer();
-    // Khi chuột rời đi, giữ thêm khoảng 100ms trước khi đóng
+    // Khi chuột rời đi, giữ thêm khoảng 120ms trước khi đóng
     leaveTimerRef.current = setTimeout(() => {
       setIsHoverExpanded(false);
-    }, 100);
+    }, 120);
   };
 
   const timeLabel = `${start.format('HH:mm')} - ${end.format('HH:mm')}`;
@@ -99,11 +117,17 @@ export function CalendarEventCard({ event, onSelectEvent, onHoverChange, style, 
   } else if (isPersonal) {
     cardClass += ' card-personal';
   }
-  if (isHoverExpanded) {
+  if (isHoverExpanded && !disabledHover) {
     cardClass += ' is-hover-expanded';
   }
 
   const handleClick = () => {
+    resetEnterTimer();
+    if (leaveTimerRef.current) {
+      clearTimeout(leaveTimerRef.current);
+      leaveTimerRef.current = null;
+    }
+    setIsHoverExpanded(false);
     if (!canOpenDrawer) return;
     onSelectEvent?.(event);
   };
@@ -112,7 +136,7 @@ export function CalendarEventCard({ event, onSelectEvent, onHoverChange, style, 
     if (!canOpenDrawer) return;
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
-      onSelectEvent?.(event);
+      handleClick();
     }
   };
 
@@ -165,12 +189,12 @@ export function CalendarEventCard({ event, onSelectEvent, onHoverChange, style, 
           <div className="card-location-row">
             {event.location ? (
               <div className="card-location-info" title={event.location}>
-                <MapPin size={11} style={{ flexShrink: 0 }} />
+                <MapPin size={12} style={{ flexShrink: 0 }} />
                 <span>{event.location}</span>
               </div>
             ) : Boolean(event.leader?.trim()) ? (
               <div className="card-location-info" title={event.leader}>
-                <Users size={11} style={{ flexShrink: 0 }} />
+                <Users size={12} style={{ flexShrink: 0 }} />
                 <span>{event.leader}</span>
               </div>
             ) : null}
@@ -178,8 +202,10 @@ export function CalendarEventCard({ event, onSelectEvent, onHoverChange, style, 
         )}
       </div>
 
-      {/* 2. Popup preview nhanh khi chuột dừng yên (300-500ms delay, đóng sau 100ms khi rời đi) */}
-      <div className="card-hover-rich-view">
+      {/* 2. Popup preview nhanh khi chuột dừng yên (120ms delay, có arrow beak chỉ hướng) */}
+      <div className="card-hover-popover-portal">
+        <div className="card-hover-arrow" />
+        <div className="card-hover-rich-view">
         <div className="card-rich-header">
           <div className="card-rich-title">{event.title}</div>
           <div className="card-rich-badges">
@@ -284,7 +310,13 @@ export function CalendarEventCard({ event, onSelectEvent, onHoverChange, style, 
               )}
             </div>
             {canOpenDrawer && (
-              <span className="card-hover-hint-cta">
+              <span
+                className="card-hover-hint-cta"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleClick();
+                }}
+              >
                 Xem chi tiết <ArrowRight size={12} />
               </span>
             )}
@@ -292,5 +324,6 @@ export function CalendarEventCard({ event, onSelectEvent, onHoverChange, style, 
         )}
       </div>
     </div>
+  </div>
   );
 }
