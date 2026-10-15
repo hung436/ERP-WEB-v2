@@ -65,20 +65,20 @@ export function CalendarWeekPage() {
   // Hướng chuyển tuần: 'forward' (tiến tới tuần sau), 'backward' (lùi lại tuần trước), 'fade' (chọn ngày ngẫu nhiên)
   const [slideDirection, setSlideDirection] = useState<'forward' | 'backward' | 'fade' | null>(null);
 
-  // Layout mode: 'horizontal' (Bố trí ngang) hoặc 'vertical' (Bố trí dọc)
-  const [viewMode, setViewMode] = useState<'horizontal' | 'vertical'>(() => {
-    if (typeof window !== 'undefined') {
-      return (localStorage.getItem('calendar_week_view_layout') as 'horizontal' | 'vertical') || 'vertical';
-    }
-    return 'vertical';
-  });
+  // Layout mode: Mặc định khi mở lịch tuần luôn là dạng dọc ('vertical')
+  const [viewMode, setViewMode] = useState<'horizontal' | 'vertical'>('vertical');
 
   const handleViewModeChange = (mode: 'horizontal' | 'vertical') => {
     setViewMode(mode);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('calendar_week_view_layout', mode);
-    }
   };
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.removeItem('calendar_week_view_layout');
+      } catch {}
+    }
+  }, []);
 
   // Fetch calendar events
   const state = useAsyncData(async () => (await calendarApi.list()).data);
