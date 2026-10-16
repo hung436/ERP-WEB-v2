@@ -646,8 +646,8 @@
 }
 
 .timeline-day-header-cell.is-today {
-  background: #eff6ff;
-  border-left: 2px solid #3b82f6;
+  background: #f0fdf4;
+  border-left: 2px solid #059669;
 }
 
 .timeline-day-title-btn {
@@ -709,8 +709,8 @@
 }
 
 .timeline-day-date-pill.is-today {
-  background: #dbeafe;
-  color: #1d4ed8;
+  background: #dcfce7;
+  color: #15803d;
 }
 
 .timeline-day-event-count {
@@ -3254,9 +3254,9 @@
 
 .vertical-feed-column.is-today {
   background: #ffffff;
-  border-left: 1px solid #93c5fd !important;
-  border-right: 1px solid #93c5fd !important;
-  border-bottom: 1px solid #93c5fd;
+  border-left: 1px solid #a7f3d0 !important;
+  border-right: 1px solid #a7f3d0 !important;
+  border-bottom: 1px solid #a7f3d0;
   position: relative;
   z-index: 2;
 }
@@ -3274,9 +3274,9 @@
 }
 
 .vertical-feed-column.is-today .vertical-feed-column-header {
-  background: #eff6ff;
-  border-top: 2px solid #3b82f6;
-  border-bottom: 1px solid #dbeafe;
+  background: #f0fdf4;
+  border-top: 2px solid #059669;
+  border-bottom: 1px solid #bbf7d0;
   padding: 8px 10px 8px 10px;
 }
 
@@ -3305,11 +3305,11 @@
 }
 
 .vertical-feed-column.is-today .vertical-feed-day-name {
-  color: #2563eb;
+  color: #047857;
 }
 
 .vertical-feed-day-btn:hover .vertical-feed-day-name {
-  color: #2563eb;
+  color: #059669;
 }
 
 .vertical-feed-date-side {
@@ -3331,7 +3331,7 @@
 }
 
 .vertical-feed-date-badge.is-today {
-  background: #2563eb;
+  background: #059669;
   color: #ffffff;
   font-size: 12.5px;
   font-weight: 700;
