@@ -2136,7 +2136,7 @@
 }
 
 .calendar-list-card.is-past-event .card-default-view {
-  opacity: 0.7;
+  opacity: 0.82;
   transition: opacity 0.15s ease;
 }
 
@@ -3468,12 +3468,12 @@
   word-break: break-word;
 }
 
-/* Các ca trực và thông tin trực ban đã qua trong tuần: Giảm opacity xuống 0.7, hover phục hồi 1 */
+/* Các ca trực và thông tin trực ban đã qua trong tuần: Giảm opacity xuống 0.82 (tối thiểu 0.8), hover phục hồi 1 */
 .duty-inline-shift-row.is-past-shift,
 .timeline-duty-shift-row.is-past-shift,
 .duty-inline-leader.is-past-duty,
 .timeline-duty-leader-btn.is-past-duty {
-  opacity: 0.7;
+  opacity: 0.82;
   transition: opacity 0.15s ease;
 }
 
