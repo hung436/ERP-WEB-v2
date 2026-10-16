@@ -2,7 +2,7 @@ import dayjs, { type Dayjs } from 'dayjs';
 import { useMemo, useRef, useState } from 'react';
 import type { CalendarEvent } from '@/types/domain';
 import { CalendarEventCard } from './CalendarEventCard';
-import { getDayDutyInfo } from '../dutySchedule';
+import { getDayDutyInfo, isDayDutyPast, isShiftPast } from '../dutySchedule';
 
 interface WeekVerticalGridProps {
   currentWeekStart: Dayjs;
@@ -63,6 +63,9 @@ export function WeekVerticalGrid({
     });
   }, [events, filterEditorial, filterPersonal, filterOnlyMyEvents]);
 
+  // Kiểm tra tuần hiện tại
+  const isCurrentWeek = useMemo(() => days.some((d) => d.isSame(now, 'day')), [days, now]);
+
   // Tính toán dữ liệu cho 7 cột ngày
   const dayColumns = useMemo(() => {
     return days.map((day, dIdx) => {
@@ -70,6 +73,7 @@ export function WeekVerticalGrid({
       const dayStr = day.format('YYYY-MM-DD');
       const dayNameVi = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'][day.day()];
       const duty = getDayDutyInfo(day);
+      const isLeaderPast = isDayDutyPast(day, now, isCurrentWeek);
 
       const dayEvents = filteredEvents
         .filter((e) => dayjs(e.startAt).format('YYYY-MM-DD') === dayStr)
@@ -82,10 +86,11 @@ export function WeekVerticalGrid({
         isToday,
         dayNameVi,
         duty,
+        isLeaderPast,
         dayEvents,
       };
     });
-  }, [days, filteredEvents, now]);
+  }, [days, filteredEvents, now, isCurrentWeek]);
 
   return (
     <div
@@ -93,7 +98,7 @@ export function WeekVerticalGrid({
       onScroll={handleScroll}
     >
       <div className="week-vertical-feed-grid">
-        {dayColumns.map(({ day, dayStr, dIdx, isToday, dayNameVi, duty, dayEvents }) => {
+        {dayColumns.map(({ day, dayStr, dIdx, isToday, dayNameVi, duty, isLeaderPast, dayEvents }) => {
           return (
             <div
               className={`vertical-feed-column${isToday ? ' is-today' : ''}`}
@@ -123,32 +128,35 @@ export function WeekVerticalGrid({
                 {/* Thông tin trực ban hiển thị trực tiếp, bỏ đóng khung */}
                 {duty && (
                   <div className="vertical-feed-duty-inline">
-                    <div className="duty-inline-leader">
+                    <div className={`duty-inline-leader${isLeaderPast ? ' is-past-duty' : ''}`}>
                       <span className="duty-prefix">Trực:</span>
                       <span className="duty-leader-name" title={duty.leader}>{duty.leader}</span>
                     </div>
 
                     {duty.shifts && duty.shifts.length > 0 && (
                       <div className="duty-inline-shifts">
-                        {duty.shifts.map((shift, sIdx) => (
-                          <div className="duty-inline-shift-row" key={sIdx}>
-                            <span className="shift-badge">{shift.name}:</span>
-                            <div className="shift-roles">
-                              {shift.tkts && (
-                                <div className="role-item">
-                                  <span className="role-lbl">TKTS:</span>
-                                  <span className="role-val">{shift.tkts}</span>
-                                </div>
-                              )}
-                              {shift.btv && (
-                                <div className="role-item">
-                                  <span className="role-lbl">BTV:</span>
-                                  <span className="role-val">{shift.btv}</span>
-                                </div>
-                              )}
+                        {duty.shifts.map((shift, sIdx) => {
+                          const isShiftDone = isShiftPast(day, shift.name, now, isCurrentWeek);
+                          return (
+                            <div className={`duty-inline-shift-row${isShiftDone ? ' is-past-shift' : ''}`} key={sIdx}>
+                              <span className="shift-badge">{shift.name}:</span>
+                              <div className="shift-roles">
+                                {shift.tkts && (
+                                  <div className="role-item">
+                                    <span className="role-lbl">TKTS:</span>
+                                    <span className="role-val">{shift.tkts}</span>
+                                  </div>
+                                )}
+                                {shift.btv && (
+                                  <div className="role-item">
+                                    <span className="role-lbl">BTV:</span>
+                                    <span className="role-val">{shift.btv}</span>
+                                  </div>
+                                )}
+                              </div>
                             </div>
-                          </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     )}
                   </div>

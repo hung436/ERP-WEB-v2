@@ -486,7 +486,7 @@
 }
 
 .timeline-horizontal-container {
-  min-width: 1100px;
+  min-width: 1260px;
   flex: 1;
   min-height: 100%;
   display: flex;
@@ -516,6 +516,42 @@
   box-shadow: 1px 0 2px rgba(0, 0, 0, 0.02);
 }
 
+/* Out-of-hours headers (Trước 7h & Sau 18h) */
+.timeline-out-hours-header {
+  width: 105px;
+  min-width: 105px;
+  max-width: 105px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  font-size: 11.5px;
+  font-weight: 600;
+  user-select: none;
+  box-sizing: border-box;
+  letter-spacing: -0.1px;
+}
+
+.timeline-out-hours-header.early {
+  background: #fffbeb;
+  color: #b45309;
+  border-right: 1px solid #fed7aa;
+}
+
+.timeline-out-hours-header.early .out-hours-icon {
+  color: #d97706;
+}
+
+.timeline-out-hours-header.late {
+  background: #f1f5f9;
+  color: #475569;
+  border-left: 1px solid #e2e8f0;
+}
+
+.timeline-out-hours-header.late .out-hours-icon {
+  color: #64748b;
+}
+
 .timeline-hours-track {
   flex: 1;
   display: flex;
@@ -539,8 +575,8 @@
 }
 
 .timeline-hour-label-cell.is-highlight-hour {
-  background: rgba(254, 242, 242, 0.5);
-  color: #dc2626;
+  color: #ef4444;
+  font-weight: 700;
 }
 
 /* Timeline Body & Day Rows */
@@ -586,7 +622,7 @@
 }
 
 .timeline-day-row.is-today {
-  background: #fbfdff;
+  background: #ffffff;
 }
 
 /* Left Day Header Cell */
@@ -610,8 +646,8 @@
 }
 
 .timeline-day-header-cell.is-today {
-  background: #f0f7ff;
-  border-left: 3px solid #2563eb;
+  background: #f0fdf4;
+  border-left: 2px solid #059669;
 }
 
 .timeline-day-title-btn {
@@ -673,8 +709,8 @@
 }
 
 .timeline-day-date-pill.is-today {
-  background: #dbeafe;
-  color: #1d4ed8;
+  background: #dcfce7;
+  color: #15803d;
 }
 
 .timeline-day-event-count {
@@ -820,15 +856,318 @@
 }
 
 .role-lbl {
-  font-size: 10.5px;
-  font-weight: 600;
-  color: #64748b;
+  font-size: inherit;
+  font-weight: 400;
+  color: inherit;
 }
 
-.role-dot {
-  margin: 0 3px;
-  color: #94a3b8;
+/* Out-of-hours slots (Trước 7h & Sau 18h) */
+.timeline-out-hours-slot {
+  width: 105px;
+  min-width: 105px;
+  max-width: 105px;
+  display: flex;
+  flex-direction: column;
+  padding: 5px 4px;
+  box-sizing: border-box;
+  position: relative;
+  transition: background 0.15s ease;
+  align-self: stretch;
+  z-index: 20;
+}
+
+.timeline-out-hours-slot.early {
+  background: #fffdf5;
+  border-right: 1px solid #fef3c7;
+}
+
+.timeline-out-hours-slot.late {
+  background: #f8fafc;
+  border-left: 1px solid #f1f5f9;
+}
+
+.timeline-out-hours-slot:hover,
+.timeline-out-hours-slot:has(.is-hover-expanded),
+.timeline-out-hours-slot.has-active-popup {
+  z-index: 600 !important;
+}
+
+.timeline-day-row.is-today .timeline-out-hours-slot.early {
+  background: #fefce8;
+}
+
+.timeline-day-row.is-today .timeline-out-hours-slot.late {
+  background: #f1f5f9;
+}
+
+.timeline-out-hours-empty {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #cbd5e1;
+  font-size: 14px;
+  user-select: none;
+}
+
+.timeline-out-hours-empty .empty-dash {
+  font-weight: 500;
+  color: #cbd5e1;
+}
+
+.timeline-out-hours-list {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  width: 100%;
+  min-height: 100%;
+  height: auto;
+  position: relative;
+}
+
+/* Event Card in Out-of-Hours Slot (Thiết kế micro-card nhỏ gọn, không có tag bên ngoài) */
+.timeline-out-hours-card {
+  position: relative !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  height: 32px;
+  min-height: 30px;
+  max-height: 34px;
+  padding: 2px 6px !important;
+  border-radius: 5px !important;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  overflow: visible;
+}
+
+.timeline-out-hours-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.timeline-out-hours-card.is-hover-expanded {
+  z-index: 9999 !important;
+}
+
+/* Thẻ BBT tham gia: Nền hồng siêu nhạt, viền đỏ nhẹ */
+.timeline-out-hours-card.card-editorial-user {
+  background: #fff8f8;
+  border: 1px solid #fca5a5;
+}
+
+.timeline-out-hours-card.card-editorial-user:hover {
+  background: #fff1f2;
+  border-color: #ef4444;
+}
+
+.timeline-out-hours-card.card-editorial-user .card-time-tag {
+  color: #b91c1c;
+}
+
+/* Thẻ Lịch cá nhân: Nền xanh lam nhạt, viền xanh nhẹ */
+.timeline-out-hours-card.card-personal {
+  background: #f0f7ff;
+  border: 1px solid #bae6fd;
+}
+
+.timeline-out-hours-card.card-personal:hover {
+  background: #e0f2fe;
+  border-color: #60a5fa;
+}
+
+.timeline-out-hours-card.card-personal .card-time-tag {
+  color: #1d4ed8;
+}
+
+/* Thẻ BBT chung (chỉ xem): Nền xám ấm nhạt */
+.timeline-out-hours-card.card-editorial-other {
+  background: #fafaf9;
+  border: 1px solid #e2e8f0;
+}
+
+.timeline-out-hours-card.card-editorial-other:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+/* Giữ nguyên nội dung thẻ mặc định trong slot siêu tinh gọn */
+.timeline-out-hours-card .card-default-view {
+  display: flex !important;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.timeline-out-hours-card .card-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0;
+  margin-bottom: 0;
+  min-width: 0;
+}
+
+/* Ẩn hoàn toàn các tag "Cá nhân", "Tham gia" bên ngoài thẻ theo yêu cầu */
+.timeline-out-hours-card .card-header-badges,
+.timeline-out-hours-card .card-star-indicator,
+.timeline-out-hours-card .card-star-btn {
+  display: none !important;
+}
+
+.timeline-out-hours-card .card-time-tag {
+  font-size: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+  letter-spacing: -0.2px;
+  line-height: 1.15;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.timeline-out-hours-card .card-title {
+  font-size: 11px;
   font-weight: 600;
+  color: #0f172a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2;
+  margin: 0;
+  min-height: unset;
+}
+
+.timeline-out-hours-card .card-location-row,
+.timeline-out-hours-card .card-adjusted-tag-row {
+  display: none !important;
+}
+
+/* Container popup preview nổi (portal) */
+.timeline-out-hours-card .card-hover-popover-portal {
+  display: none;
+  position: absolute;
+  z-index: 10000;
+  top: -4px;
+}
+
+.timeline-out-hours-card.is-hover-expanded .card-hover-popover-portal {
+  display: block !important;
+  animation: fadeInRichCard 0.12s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Cột Trước 7h (bên trái): Bung sang bên PHẢI ngoài slot */
+.timeline-out-hours-card.expand-right .card-hover-popover-portal {
+  left: calc(100% + 12px);
+  right: auto;
+  top: -4px;
+}
+
+/* Cột Sau 18h (bên phải): Bung sang bên TRÁI ngoài slot */
+.timeline-out-hours-card.expand-left .card-hover-popover-portal {
+  left: auto;
+  right: calc(100% + 12px);
+  top: -4px;
+}
+
+/* Nửa dưới tuần (dIdx >= 3) -> Căn theo cạnh dưới */
+.timeline-out-hours-card.expand-upward.expand-right .card-hover-popover-portal,
+.timeline-out-hours-card.expand-upward.expand-left .card-hover-popover-portal {
+  top: auto;
+  bottom: -4px;
+}
+
+/* Cầu chuột vô hình giúp rê chuột sang popup không bị mất hover */
+.timeline-out-hours-card.expand-right .card-hover-popover-portal::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -16px;
+  width: 16px;
+}
+
+.timeline-out-hours-card.expand-left .card-hover-popover-portal::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: -16px;
+  width: 16px;
+}
+
+/* Mũi tên chỉ hướng arrow beak */
+.timeline-out-hours-card .card-hover-arrow {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: #ffffff;
+  z-index: 10001;
+  display: block !important;
+}
+
+.timeline-out-hours-card.expand-right .card-hover-arrow {
+  left: -5.5px;
+  top: 16px;
+  border-left: 1px solid #cbd5e1;
+  border-bottom: 1px solid #cbd5e1;
+  transform: rotate(45deg);
+}
+
+.timeline-out-hours-card.expand-left .card-hover-arrow {
+  right: -5.5px;
+  top: 16px;
+  border-right: 1px solid #cbd5e1;
+  border-top: 1px solid #cbd5e1;
+  transform: rotate(45deg);
+}
+
+.timeline-out-hours-card.expand-upward.expand-right .card-hover-arrow {
+  top: auto;
+  bottom: 16px;
+}
+
+.timeline-out-hours-card.expand-upward.expand-left .card-hover-arrow {
+  top: auto;
+  bottom: 16px;
+}
+
+/* Khung nội dung chi tiết popover */
+.timeline-out-hours-card .card-hover-rich-view {
+  position: relative;
+  z-index: 10000;
+  width: 340px;
+  min-width: 320px;
+  max-width: 360px;
+  height: auto;
+  min-height: 100px;
+  max-height: 420px;
+  background: #ffffff !important;
+  border: 1px solid #cbd5e1 !important;
+  box-shadow: 0 16px 38px -4px rgba(15, 23, 42, 0.22), 0 6px 14px -2px rgba(15, 23, 42, 0.12) !important;
+  border-radius: 8px;
+  padding: 12px 14px;
+  cursor: default;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex !important;
+  flex-direction: column;
+}
+
+.timeline-out-hours-card .card-hover-rich-view::-webkit-scrollbar {
+  width: 4px;
+}
+
+.timeline-out-hours-card .card-hover-rich-view::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
 }
 
 /* Right Timeline Canvas */
@@ -857,8 +1196,51 @@
   border-right: none;
 }
 
-.timeline-grid-col.is-highlight-col {
-  background: rgba(254, 242, 242, 0.45);
+/* Thước đo vạch đỏ thời gian thực theo phút (Real-time current time indicator) */
+.timeline-now-indicator {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 150;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform: translateX(-50%);
+}
+
+.timeline-now-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #dc2626;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(220, 38, 38, 0.35);
+  position: absolute;
+  top: -14px;
+  white-space: nowrap;
+  z-index: 152;
+  pointer-events: auto;
+}
+
+.timeline-now-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #ffffff;
+}
+
+.timeline-now-line {
+  position: absolute;
+  top: -6px;
+  bottom: 0;
+  width: 2px;
+  background: #ef4444;
+  box-shadow: 0 0 6px rgba(239, 68, 68, 0.45);
 }
 
 .timeline-events-layer {
@@ -878,6 +1260,7 @@
   border-radius: 8px;
   padding: 6px 9px;
   box-sizing: border-box;
+  background: #ffffff;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -1747,6 +2130,22 @@
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
 }
 
+/* Các sự kiện đã qua trong quá khứ: giữ nền thẻ 100% đặc (opaque) để không bị thấu chữ đè nhau khi xếp chồng, chỉ giảm opacity của nội dung chữ */
+.calendar-list-card.is-past-event {
+  opacity: 1 !important;
+}
+
+.calendar-list-card.is-past-event .card-default-view {
+  opacity: 0.7;
+  transition: opacity 0.15s ease;
+}
+
+.calendar-list-card.is-past-event:hover .card-default-view,
+.calendar-list-card.is-past-event.is-hover-expanded .card-default-view,
+.calendar-list-card.is-past-event:focus-within .card-default-view {
+  opacity: 1 !important;
+}
+
 /* 1. Lịch BBT có bạn tham gia: Nền hồng sữa/đỏ sương mù (#FFF8F8), viền đỏ hairline siêu nhạt (#FECACA) */
 .calendar-list-card.card-editorial-user {
   background: #fff8f8;
@@ -1895,7 +2294,7 @@
 .card-status-badge.personal {
   background: #dbeafe;
   color: #1d4ed8;
-  border: 1px solid #bfdbfe;
+  border: none;
 }
 
 .card-title {
@@ -2871,7 +3270,12 @@
 }
 
 .vertical-feed-column.is-today {
-  background: #fcfdff;
+  background: #ffffff;
+  border-left: 1px solid #a7f3d0 !important;
+  border-right: 1px solid #a7f3d0 !important;
+  border-bottom: 1px solid #a7f3d0;
+  position: relative;
+  z-index: 2;
 }
 
 /* 1. Header Cột Ngày - Chiều cao đồng nhất cho tất cả các ngày */
@@ -2887,8 +3291,9 @@
 }
 
 .vertical-feed-column.is-today .vertical-feed-column-header {
-  background: #fcfdff;
-  border-top: 3px solid #2563eb;
+  background: #f0fdf4;
+  border-top: 2px solid #059669;
+  border-bottom: 1px solid #bbf7d0;
   padding: 8px 10px 8px 10px;
 }
 
@@ -2917,11 +3322,11 @@
 }
 
 .vertical-feed-column.is-today .vertical-feed-day-name {
-  color: #2563eb;
+  color: #047857;
 }
 
 .vertical-feed-day-btn:hover .vertical-feed-day-name {
-  color: #2563eb;
+  color: #059669;
 }
 
 .vertical-feed-date-side {
@@ -2943,7 +3348,7 @@
 }
 
 .vertical-feed-date-badge.is-today {
-  background: #2563eb;
+  background: #059669;
   color: #ffffff;
   font-size: 12.5px;
   font-weight: 700;
@@ -3051,7 +3456,7 @@
 
 .duty-inline-shift-row .role-lbl {
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 400;
   color: #1e293b;
   flex-shrink: 0;
 }
@@ -3062,6 +3467,23 @@
   color: #1e293b;
   word-break: break-word;
 }
+
+/* Các ca trực và thông tin trực ban đã qua trong tuần: Giảm opacity xuống 0.7, hover phục hồi 1 */
+.duty-inline-shift-row.is-past-shift,
+.timeline-duty-shift-row.is-past-shift,
+.duty-inline-leader.is-past-duty,
+.timeline-duty-leader-btn.is-past-duty {
+  opacity: 0.7;
+  transition: opacity 0.15s ease;
+}
+
+.duty-inline-shift-row.is-past-shift:hover,
+.timeline-duty-shift-row.is-past-shift:hover,
+.duty-inline-leader.is-past-duty:hover,
+.timeline-duty-leader-btn.is-past-duty:hover {
+  opacity: 1 !important;
+}
+
 
 /* 2. Danh sách các thẻ sự kiện dọc (Phân cách bằng đường line nhẹ, không đóng khung) */
 .vertical-feed-events-list {
@@ -3127,7 +3549,7 @@
 
 .vertical-feed-column.is-today .vertical-feed-card.card-editorial-other:hover,
 .vertical-feed-column.is-today .vertical-feed-card.card-editorial-other.is-hover-expanded {
-  background: #e2e8f0 !important;
+  background: #f1f5f9 !important;
 }
 
 .vertical-feed-card.card-editorial-other .card-title {
@@ -3253,20 +3675,20 @@
 .vertical-feed-card .card-status-badge.attending {
   background: #fee2e2;
   color: #dc2626;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
   border-radius: 4px;
-  padding: 1px 6px;
+  padding: 1px 5px;
 }
 
 .vertical-feed-card .card-status-badge.personal {
   background: #dbeafe !important;
   color: #1d4ed8 !important;
-  border: 1px solid #bfdbfe !important;
-  font-size: 12px !important;
+  border: none !important;
+  font-size: 11px !important;
   font-weight: 600 !important;
   border-radius: 4px !important;
-  padding: 1px 6px !important;
+  padding: 1px 5px !important;
 }
 
 .vertical-feed-card .card-location-row {

@@ -155,3 +155,20 @@ export function getDayDutyInfo(date: Dayjs): DayDutyInfo {
   const dayOfWeek = date.day();
   return WEEKLY_DUTY_SCHEDULE[dayOfWeek];
 }
+
+/**
+ * Kiểm tra xem ca trực đã kết thúc hay chưa.
+ * Chỉ áp dụng theo ngày đã qua (day.isBefore(now, 'day')), không giảm riêng lẻ từng ca trong ngày.
+ */
+export function isShiftPast(day: Dayjs, _shiftName: string, now: Dayjs, isCurrentWeek: boolean): boolean {
+  if (!isCurrentWeek) return false;
+  return day.isBefore(now, 'day');
+}
+
+/**
+ * Kiểm tra xem ngày trực lãnh đạo đã kết thúc hay chưa (chỉ áp dụng trong tuần hiện tại)
+ */
+export function isDayDutyPast(day: Dayjs, now: Dayjs, isCurrentWeek: boolean): boolean {
+  if (!isCurrentWeek) return false;
+  return day.isBefore(now, 'day');
+}

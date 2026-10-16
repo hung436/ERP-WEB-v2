@@ -1046,6 +1046,25 @@ export const calendarEvents: CalendarEvent[] = [
     participantText: 'Anh Xuân Toàn, Hùng Thuật, Bảo Kỳ, Ngọc Hiển, TTTTS',
     isUserParticipant: false
   },
+  {
+    id: 'pers-w42-late',
+    title: 'Giao lưu trực tuyến Chi hội Nhà báo Tuổi Trẻ & Chuyển đổi số',
+    startAt: '2026-10-13T18:30:00+07:00',
+    endAt: '2026-10-13T20:00:00+07:00',
+    location: 'Trực tuyến / P.Hội thảo 2',
+    meetingUrl: 'https://meeting.tuoitre.vn/chi-hoi-nha-bao',
+    platform: 'meeting.tuoitre.vn',
+    meetingId: 'TT-921-504',
+    type: 'meeting',
+    scope: 'personal',
+    organizer: 'Nguyễn Minh Anh',
+    leader: 'Nguyễn Minh Anh',
+    participantText: 'Nguyễn Minh Anh, Lê Thanh Vân, Trần Thu Hà',
+    participants: ['Nguyễn Minh Anh', 'Lê Thanh Vân', 'Trần Thu Hà'],
+    isUserParticipant: true,
+    responseStatus: 'accepted',
+    agenda: 'Trao đổi nghiệp vụ báo chí đa phương tiện và ứng dụng AI an toàn trong quy trình làm tin.'
+  },
 
   // --- THỨ TƯ: 14-10-2026 ---
   {
@@ -1226,6 +1245,22 @@ export const calendarEvents: CalendarEvent[] = [
 
   // --- THỨ NĂM: 15-10-2026 ---
   {
+    id: 'w42-early-01',
+    title: 'Điểm tin sớm & Họp giao ban báo chí quốc tế',
+    startAt: '2026-10-15T06:00:00+07:00',
+    endAt: '2026-10-15T06:45:00+07:00',
+    location: 'Trực tuyến / HTT2',
+    type: 'meeting',
+    scope: 'editorial',
+    organizer: 'Ban Quốc tế',
+    leader: 'Anh Lê Cường',
+    participantText: 'Anh Lê Cường, Ban Quốc tế, TKTS trực, Nguyễn Minh Anh',
+    participants: ['Anh Lê Cường', 'Nguyễn Minh Anh'],
+    isUserParticipant: true,
+    responseStatus: 'accepted',
+    agenda: 'Điểm các tin nóng quốc tế đêm qua và phân bổ tuyến bài xuất bản sáng sớm trên Tuổi Trẻ Online.'
+  },
+  {
     id: 'w42-29',
     title: 'Họp giao ban tin ca 1',
     startAt: '2026-10-15T08:30:00+07:00',
@@ -1365,6 +1400,23 @@ export const calendarEvents: CalendarEvent[] = [
     leader: 'Chị Ng.T.Hương',
     participantText: 'Chị Ng.T.Hương, Lãnh đạo Tòa soạn trực ca 1, ca 2',
     isUserParticipant: false
+  },
+  {
+    id: 'w42-late-01',
+    title: 'Trực ban xuất bản tin tối & Duyệt trang 1 số báo ngày mai',
+    startAt: '2026-10-15T19:00:00+07:00',
+    endAt: '2026-10-15T21:00:00+07:00',
+    location: 'Phòng Thư ký Tòa soạn PHT5',
+    type: 'meeting',
+    scope: 'editorial',
+    organizer: 'Tòa soạn',
+    leader: 'Anh Đức Thọ',
+    participantText: 'Anh Đức Thọ, Lãnh đạo TS trực ca 2, BTV in ấn, Nguyễn Minh Anh',
+    participants: ['Anh Đức Thọ', 'Nguyễn Minh Anh'],
+    isUserParticipant: true,
+    responseStatus: 'accepted',
+    dutyInfo: 'Ca 2: TKTS: N.V.Hải; BTV: Lan Anh',
+    agenda: 'Duyệt market trang bìa và rà soát các bài đinh số báo in sáng mai.'
   },
 
   // --- THỨ SÁU: 16-10-2026 ---
