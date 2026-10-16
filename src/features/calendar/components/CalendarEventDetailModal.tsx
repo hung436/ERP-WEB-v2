@@ -184,7 +184,7 @@ export function CalendarEventDetailModal({
                 </Button>
               </Popconfirm>
             </div>
-          ) : isEditorial && !isUserAttending ? (
+          ) : isEditorial && !isUserAttending && !dayjs(event.endAt).isBefore(dayjs()) ? (
             <Button
               aria-label={event.isInterested ? 'Bỏ quan tâm' : 'Quan tâm lịch họp'}
               icon={<Star color={event.isInterested ? '#d97706' : '#64748b'} fill={event.isInterested ? '#f59e0b' : 'none'} size={14} />}

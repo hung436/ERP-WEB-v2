@@ -3,7 +3,7 @@ import { ChevronDown, Moon, Sunrise } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import type { CalendarEvent } from '@/types/domain';
 import { CalendarEventCard } from './CalendarEventCard';
-import { getDayDutyInfo } from '../dutySchedule';
+import { getDayDutyInfo, isDayDutyPast, isShiftPast } from '../dutySchedule';
 
 interface WeekTimelineGridProps {
   currentWeekStart: Dayjs;
@@ -150,6 +150,7 @@ export function WeekTimelineGrid({
 
   // 7 days from Monday to Sunday
   const days = Array.from({ length: 7 }, (_, i) => currentWeekStart.add(i, 'day'));
+  const isCurrentWeek = days.some((d) => d.isSame(now, 'day'));
 
   // Filter events based on active toggles
   const filteredEvents = events.filter((ev) => {
@@ -205,8 +206,7 @@ export function WeekTimelineGrid({
 
   const [activePopupDayIdx, setActivePopupDayIdx] = useState<number | null>(null);
 
-  // Check if current week is displayed and calculate exact current time
-  const isCurrentWeek = days.some((d) => d.isSame(now, 'day'));
+  // Calculate exact current time
   const currentTotalMinutes = now.hour() * 60 + now.minute();
   const startLimitM = TIMELINE_START_HOUR * 60; // 420
   const endLimitM = TIMELINE_END_HOUR * 60; // 1080
@@ -285,47 +285,53 @@ export function WeekTimelineGrid({
                     </div>
                   </button>
 
-                  {duty && (
-                    <div className="timeline-day-duty-box">
-                      <button
-                        aria-expanded={isDayExpanded}
-                        aria-label={isDayExpanded ? 'Thu gọn các ca trực' : 'Mở rộng các ca trực'}
-                        className="timeline-duty-leader-btn"
-                        onClick={() => toggleDayDuty(dayStr)}
-                        type="button"
-                      >
-                        <span className="timeline-duty-label">Trực:</span>
-                        <span className="timeline-duty-name" title={duty.leader}>{duty.leader}</span>
-                        <ChevronDown
-                          className={`timeline-duty-chevron ${isDayExpanded ? 'is-open' : ''}`}
-                          size={13}
-                        />
-                      </button>
+                  {duty && (() => {
+                    const isLeaderPast = isDayDutyPast(day, now, isCurrentWeek);
+                    return (
+                      <div className="timeline-day-duty-box">
+                        <button
+                          aria-expanded={isDayExpanded}
+                          aria-label={isDayExpanded ? 'Thu gọn các ca trực' : 'Mở rộng các ca trực'}
+                          className={`timeline-duty-leader-btn${isLeaderPast ? ' is-past-duty' : ''}`}
+                          onClick={() => toggleDayDuty(dayStr)}
+                          type="button"
+                        >
+                          <span className="timeline-duty-label">Trực:</span>
+                          <span className="timeline-duty-name" title={duty.leader}>{duty.leader}</span>
+                          <ChevronDown
+                            className={`timeline-duty-chevron ${isDayExpanded ? 'is-open' : ''}`}
+                            size={13}
+                          />
+                        </button>
 
-                      {isDayExpanded && (
-                        <div className={`timeline-duty-shifts-list ${dIdx >= 5 ? 'is-upward' : ''}`}>
-                          {duty.shifts.map((shift, sIdx) => (
-                            <div className="timeline-duty-shift-row" key={sIdx}>
-                              <span className="timeline-shift-badge">{shift.name}:</span>
-                              <div className="timeline-shift-content">
-                                {shift.tkts && (
-                                  <span className="timeline-role-item">
-                                    <span className="role-lbl">TKTS:</span> {shift.tkts}
-                                  </span>
-                                )}
-                                {shift.tkts && shift.btv && <span className="role-dot">·</span>}
-                                {shift.btv && (
-                                  <span className="timeline-role-item">
-                                    <span className="role-lbl">BTV:</span> {shift.btv}
-                                  </span>
-                                )}
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  )}
+                        {isDayExpanded && (
+                          <div className={`timeline-duty-shifts-list ${dIdx >= 5 ? 'is-upward' : ''}`}>
+                            {duty.shifts.map((shift, sIdx) => {
+                              const isShiftDone = isShiftPast(day, shift.name, now, isCurrentWeek);
+                              return (
+                                <div className={`timeline-duty-shift-row${isShiftDone ? ' is-past-shift' : ''}`} key={sIdx}>
+                                  <span className="timeline-shift-badge">{shift.name}:</span>
+                                  <div className="timeline-shift-content">
+                                    {shift.tkts && (
+                                      <span className="timeline-role-item">
+                                        <span className="role-lbl">TKTS:</span> {shift.tkts}
+                                      </span>
+                                    )}
+                                    {shift.tkts && shift.btv && <span className="role-dot">·</span>}
+                                    {shift.btv && (
+                                      <span className="timeline-role-item">
+                                        <span className="role-lbl">BTV:</span> {shift.btv}
+                                      </span>
+                                    )}
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })()}
                 </div>
 
                 {/* 2. Slot Ngoài giờ sáng (Trước 7h) */}

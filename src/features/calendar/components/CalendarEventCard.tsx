@@ -1,8 +1,11 @@
 import { Tooltip, message } from 'antd';
 import dayjs from 'dayjs';
+import isoWeek from 'dayjs/plugin/isoWeek';
 import { ArrowRight, Calendar, Clock, MapPin, MessageSquare, Paperclip, Star, Users } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import type { CalendarEvent } from '@/types/domain';
+
+dayjs.extend(isoWeek);
 
 interface CalendarEventCardProps {
   event: CalendarEvent;
@@ -111,7 +114,14 @@ export function CalendarEventCard({ event, onSelectEvent, onHoverChange, style, 
 
   const canOpenDrawer = isPersonal || isUserAttending;
 
+  const now = dayjs();
+  const isCurrentWeek = start.isSame(now, 'isoWeek') || end.isSame(now, 'isoWeek');
+  const isPast = isCurrentWeek && end.isBefore(now);
+
   let cardClass = `calendar-list-card ${className || ''}`;
+  if (isPast) {
+    cardClass += ' is-past-event';
+  }
   if (isEditorial) {
     cardClass += isUserAttending ? ' card-editorial-user' : ' card-editorial-other';
   } else if (isPersonal) {
@@ -167,7 +177,7 @@ export function CalendarEventCard({ event, onSelectEvent, onHoverChange, style, 
             {isPersonal && (
               <span className="card-status-badge personal">Cá nhân</span>
             )}
-            {isEditorial && !isUserAttending && isInterested && (
+            {isEditorial && !isUserAttending && isInterested && !end.isBefore(now) && (
               <span className="card-star-indicator" title="Đang quan tâm">
                 <Star color="#d97706" fill="#f59e0b" size={12} />
               </span>
@@ -272,7 +282,7 @@ export function CalendarEventCard({ event, onSelectEvent, onHoverChange, style, 
           </div>
         )}
 
-        {isEditorial && !isUserAttending && (
+        {isEditorial && !isUserAttending && !end.isBefore(now) && (
           <div className="card-rich-interest-row">
             <button
               aria-label={isInterested ? 'Bỏ quan tâm' : 'Quan tâm lịch họp'}
