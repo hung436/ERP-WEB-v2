@@ -1,8 +1,9 @@
-import { Tooltip, message } from 'antd';
+import { message } from 'antd';
 import dayjs from 'dayjs';
 import isoWeek from 'dayjs/plugin/isoWeek';
 import { ArrowRight, Calendar, Clock, MapPin, MessageSquare, Paperclip, Star, Users } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+
 import type { CalendarEvent } from '@/types/domain';
 
 dayjs.extend(isoWeek);
@@ -22,7 +23,8 @@ export function CalendarEventCard({ event, onSelectEvent, onHoverChange, style, 
 
   const isEditorial = event.scope === 'editorial';
   const isPersonal = event.scope === 'personal';
-  const isUserAttending = Boolean(event.isUserParticipant);
+  const isTask = event.ticketType === 'TASK';
+  const isUserAttending = Boolean(event.isUserParticipant || event.isUserWatcher);
   const [isInterested, setIsInterested] = useState(Boolean(event.isInterested));
   const [isHoverExpanded, setIsHoverExpanded] = useState(false);
 
@@ -95,7 +97,9 @@ export function CalendarEventCard({ event, onSelectEvent, onHoverChange, style, 
     }, 120);
   };
 
-  const timeLabel = `${start.format('HH:mm')} - ${end.format('HH:mm')}`;
+  const timeLabel = isTask
+    ? `Hạn: ${dayjs(event.deadline || event.endAt || event.startAt).format('HH:mm')}`
+    : `${start.format('HH:mm')} - ${end.format('HH:mm')}`;
 
   const handleToggleInterest = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -171,16 +175,25 @@ export function CalendarEventCard({ event, onSelectEvent, onHoverChange, style, 
           </span>
 
           <div className="card-header-badges">
+            {event.ticketType === 'TASK' && <span className="card-status-badge task">Task</span>}
+            {event.ticketType === 'EVENT' && <span className="card-status-badge event">Sự kiện</span>}
+            {event.ticketType === 'MEETING' && <span className="card-status-badge meeting">Lịch họp</span>}
             {isEditorial && isUserAttending && (
               <span className="card-status-badge attending">Tham gia</span>
             )}
             {isPersonal && (
               <span className="card-status-badge personal">Cá nhân</span>
             )}
-            {isEditorial && !isUserAttending && isInterested && !end.isBefore(now) && (
-              <span className="card-star-indicator" title="Đang quan tâm">
-                <Star color="#d97706" fill="#f59e0b" size={12} />
-              </span>
+            {isEditorial && !isUserAttending && !isPast && (
+              <button
+                type="button"
+                className={`calendar-star-btn ${isInterested ? 'active' : ''}`}
+                onClick={handleToggleInterest}
+                title={isInterested ? 'Bỏ quan tâm' : 'Quan tâm lịch họp'}
+                aria-label={isInterested ? 'Bỏ quan tâm lịch họp' : 'Quan tâm lịch họp'}
+              >
+                <Star size={13} fill={isInterested ? '#f59e0b' : 'none'} color={isInterested ? '#f59e0b' : '#94a3b8'} />
+              </button>
             )}
           </div>
         </div>
@@ -202,7 +215,7 @@ export function CalendarEventCard({ event, onSelectEvent, onHoverChange, style, 
                 <MapPin size={12} style={{ flexShrink: 0 }} />
                 <span>{event.location}</span>
               </div>
-            ) : Boolean(event.leader?.trim()) ? (
+            ) : event.leader?.trim() ? (
               <div className="card-location-info" title={event.leader}>
                 <Users size={12} style={{ flexShrink: 0 }} />
                 <span>{event.leader}</span>
@@ -219,6 +232,9 @@ export function CalendarEventCard({ event, onSelectEvent, onHoverChange, style, 
         <div className="card-rich-header">
           <div className="card-rich-title">{event.title}</div>
           <div className="card-rich-badges">
+            {event.ticketType === 'TASK' && <span className="card-status-badge task">Task</span>}
+            {event.ticketType === 'EVENT' && <span className="card-status-badge event">Sự kiện</span>}
+            {event.ticketType === 'MEETING' && <span className="card-status-badge meeting">Lịch họp</span>}
             {isEditorial && isUserAttending && (
               <span className="card-status-badge attending">Tham gia</span>
             )}
@@ -264,11 +280,20 @@ export function CalendarEventCard({ event, onSelectEvent, onHoverChange, style, 
           </div>
         )}
 
-        {event.participantText && (
+        {!isTask && event.participantText && (
           <div className="card-rich-row">
             <Users size={13} />
             <span>
               <strong>Thành phần:</strong> {event.participantText}
+            </span>
+          </div>
+        )}
+
+        {Boolean(event.executors?.length) && (
+          <div className="card-rich-row">
+            <Users size={13} />
+            <span>
+              <strong>Thực hiện:</strong> {event.executors!.map((u) => u.name).join(', ')}
             </span>
           </div>
         )}
@@ -282,10 +307,10 @@ export function CalendarEventCard({ event, onSelectEvent, onHoverChange, style, 
           </div>
         )}
 
-        {isEditorial && !isUserAttending && !end.isBefore(now) && (
+        {isEditorial && !isUserAttending && !isPast && (
           <div className="card-rich-interest-row">
             <button
-              aria-label={isInterested ? 'Bỏ quan tâm' : 'Quan tâm lịch họp'}
+              aria-label={isInterested ? 'Bỏ quan tâm lịch họp' : 'Quan tâm lịch họp'}
               className={`card-rich-star-btn ${isInterested ? 'active' : ''}`}
               onClick={handleToggleInterest}
               type="button"
@@ -320,7 +345,8 @@ export function CalendarEventCard({ event, onSelectEvent, onHoverChange, style, 
               )}
             </div>
             {canOpenDrawer && (
-              <span
+              <button
+                type="button"
                 className="card-hover-hint-cta"
                 onClick={(e) => {
                   e.stopPropagation();
@@ -328,7 +354,7 @@ export function CalendarEventCard({ event, onSelectEvent, onHoverChange, style, 
                 }}
               >
                 Xem chi tiết <ArrowRight size={12} />
-              </span>
+              </button>
             )}
           </div>
         )}

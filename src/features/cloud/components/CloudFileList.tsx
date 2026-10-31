@@ -17,10 +17,12 @@ import {
 import { Dropdown, MenuProps, Tooltip } from 'antd';
 import { CloudItem, CloudViewMode, CloudSortField, CloudSortOrder } from '../types';
 import { CloudFileIcon } from './CloudFileIcon';
+import { CloudTableSkeleton, CloudGridSkeleton } from './loading';
 
 interface CloudFileListProps {
   items: CloudItem[];
   selectedItems: CloudItem[];
+  loading?: boolean;
   onSelectItem: (item: CloudItem, e: React.MouseEvent) => void;
   onOpenFolder: (folderId: string) => void;
   onPreviewFile: (item: CloudItem) => void;
@@ -41,6 +43,7 @@ interface CloudFileListProps {
 export const CloudFileList: React.FC<CloudFileListProps> = ({
   items,
   selectedItems,
+  loading = false,
   onSelectItem,
   onOpenFolder,
   onPreviewFile,
@@ -160,6 +163,14 @@ export const CloudFileList: React.FC<CloudFileListProps> = ({
   // Chia tách folders và files để nhóm hiển thị chuyên nghiệp
   const folders = items.filter((i) => i.type === 'folder');
   const files = items.filter((i) => i.type !== 'folder');
+
+  if (loading) {
+    return (
+      <div className="flex-1 overflow-y-auto p-0 select-none bg-white">
+        {viewMode === 'details' ? <CloudTableSkeleton /> : <CloudGridSkeleton />}
+      </div>
+    );
+  }
 
   if (items.length === 0) {
     return (

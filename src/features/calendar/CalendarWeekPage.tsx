@@ -1,463 +1,597 @@
-import { Button, DatePicker, Tooltip } from 'antd';
-import dayjs, { type Dayjs } from 'dayjs';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import dayjs, { extend, type Dayjs } from 'dayjs';
 import isoWeek from 'dayjs/plugin/isoWeek';
-import { Check, ChevronLeft, ChevronRight, Columns3, Filter, Plus, Rows3, Search, User, X } from 'lucide-react';
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { ContentSkeleton, ErrorState } from '@/components/AsyncState';
+import { Alert, Button, ConfigProvider, DatePicker, Input, message } from 'antd';
+import {
+  CheckOutlined,
+  CloseOutlined,
+  FilterOutlined,
+  LeftOutlined,
+  PlusOutlined,
+  ReloadOutlined,
+  RightOutlined,
+  SearchOutlined,
+  UserOutlined,
+} from '@ant-design/icons';
+import locale from 'antd/es/locale/vi_VN';
+
 import { useAsyncData } from '@/hooks/useAsyncData';
 import { calendarApi } from '@/services/api';
 import type { CalendarEvent } from '@/types/domain';
+
+import {
+  collectDuty,
+  normalizeMeeting,
+  searchText,
+  vietnamNow,
+  type NormalizedMeetingEvent,
+} from './calendarWeekUtils';
+import { getEventsForWeek } from './mockCalendarData';
+import { WeekColumns } from './components/WeekColumns';
+import { WeekTimeline } from './components/WeekTimeline';
 import { CalendarEventDetailModal } from './components/CalendarEventDetailModal';
 import { CreatePersonalMeetingModal } from './components/CreatePersonalMeetingModal';
 import { DayScheduleDrawer } from './components/DayScheduleDrawer';
-import { WeekTimelineGrid } from './components/WeekTimelineGrid';
-import { WeekVerticalGrid } from './components/WeekVerticalGrid';
 import './calendar-week.css';
 
-dayjs.extend(isoWeek);
+extend(isoWeek);
+
+const EVENTS_STORAGE_KEY = 'jt_calendar_events_store';
+
+function FilterButton({
+  type,
+  active,
+  count,
+  children,
+  onClick,
+  loading = false,
+}: {
+  type: string;
+  active: boolean;
+  count: number;
+  children: React.ReactNode;
+  onClick: () => void;
+  loading?: boolean;
+}) {
+  const ariaLabel = typeof children === 'string' ? children : undefined;
+  return (
+    <button
+      type="button"
+      className={`booking-week-filter booking-week-${type} ${active ? 'booking-week-active' : ''}`}
+      aria-pressed={active}
+      aria-label={ariaLabel}
+      onClick={onClick}
+    >
+      <span aria-hidden="true">
+        {active ? (
+          <CheckOutlined />
+        ) : type === 'attending' ? (
+          <UserOutlined />
+        ) : (
+          <span className="booking-week-filter-dot" />
+        )}
+      </span>
+      <span>{children}</span>
+      <span className={`booking-week-filter-count ${loading ? 'booking-week-count-loading' : ''}`}>
+        {loading ? '' : count}
+      </span>
+    </button>
+  );
+}
+
+function ViewIcon({ vertical = false }: { vertical?: boolean }) {
+  return (
+    <svg
+      className="booking-week-view-icon"
+      aria-hidden="true"
+      width="15"
+      height="15"
+      viewBox="0 0 16 16"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.2"
+    >
+      <rect x="2.5" y="2.5" width="11" height="11" rx="1.5" />
+      <path d={vertical ? 'M6 3v10M10 3v10' : 'M3 6h10M3 10h10'} />
+    </svg>
+  );
+}
 
 export function CalendarWeekPage() {
-  // Tuần đang hiện hành (Mặc định Thứ Hai của tuần hiện tại)
-  const [currentWeekStart, setCurrentWeekStart] = useState<Dayjs>(() => {
-    if (typeof window !== 'undefined') {
-      const params = new URLSearchParams(window.location.search);
-      const dateParam = params.get('date');
-      if (dateParam && dayjs(dateParam).isValid()) {
-        return dayjs(dateParam).startOf('isoWeek').startOf('day');
-      }
+  const [now, setNow] = useState<Dayjs>(vietnamNow);
+  useEffect(() => {
+    const timer = setInterval(() => setNow(vietnamNow()), 30000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const requestedDate = new URLSearchParams(location.search).get('date');
+  const selectedDate = useMemo(() => {
+    if (requestedDate && /^\d{4}-\d{2}-\d{2}$/.test(requestedDate)) {
+      const parsed = dayjs(requestedDate);
+      return parsed.isValid() ? parsed : vietnamNow();
     }
-    return dayjs().startOf('isoWeek').startOf('day');
+    return vietnamNow();
+  }, [requestedDate]);
+
+  const week = useMemo(() => selectedDate.startOf('isoWeek'), [selectedDate]);
+  const end = useMemo(() => week.add(6, 'day'), [week]);
+  const fromDate = week.format('YYYY-MM-DD');
+
+  // Fetch dữ liệu từ API
+  const state = useAsyncData(async () => (await calendarApi.list()).data);
+  const [userCreatedEvents, setUserCreatedEvents] = useState<CalendarEvent[]>(() => {
+    try {
+      const saved = localStorage.getItem(EVENTS_STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) return parsed;
+      }
+    } catch {
+      // ignore
+    }
+    return [];
   });
 
-  // Search
-  const [searchQuery, setSearchQuery] = useState('');
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const searchInputRef = useRef<HTMLInputElement>(null);
-  const searchWrapRef = useRef<HTMLDivElement>(null);
-
-  // Đóng ô tìm kiếm khi click chuột ra ngoài (nếu chưa nhập từ khóa)
-  useEffect(() => {
-    if (!isSearchOpen || searchQuery) return;
-    const handleOutside = (e: MouseEvent) => {
-      if (!searchWrapRef.current?.contains(e.target as Node)) {
-        setIsSearchOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleOutside);
-    return () => document.removeEventListener('mousedown', handleOutside);
-  }, [isSearchOpen, searchQuery]);
-
-  // Filters
-  const [filterEditorial, setFilterEditorial] = useState(true);
-  const [filterPersonal, setFilterPersonal] = useState(true);
-  const [filterOnlyMyEvents, setFilterOnlyMyEvents] = useState(false);
-
-  // Modals state
-  const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
-  const [detailModalOpen, setDetailModalOpen] = useState(false);
-  const [createModalOpen, setCreateModalOpen] = useState(false);
-  const [createMeetingInitialDate, setCreateMeetingInitialDate] = useState<Dayjs | null>(null);
-
-  // Day Schedule Drawer (Xem lịch trong ngày)
-  const [selectedDayForSchedule, setSelectedDayForSchedule] = useState<Dayjs | null>(null);
-  const [dayScheduleDrawerOpen, setDayScheduleDrawerOpen] = useState(false);
-
-  // Hướng chuyển tuần: 'forward' (tiến tới tuần sau), 'backward' (lùi lại tuần trước), 'fade' (chọn ngày ngẫu nhiên)
-  const [slideDirection, setSlideDirection] = useState<'forward' | 'backward' | 'fade' | null>(null);
-
-  // Layout mode: Mặc định khi mở lịch tuần luôn là dạng dọc ('vertical')
-  const [viewMode, setViewMode] = useState<'horizontal' | 'vertical'>('vertical');
-
-  const handleViewModeChange = (mode: 'horizontal' | 'vertical') => {
-    setViewMode(mode);
-  };
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        localStorage.removeItem('calendar_week_view_layout');
-      } catch {}
+  const saveUserEvents = useCallback((events: CalendarEvent[]) => {
+    setUserCreatedEvents(events);
+    try {
+      localStorage.setItem(EVENTS_STORAGE_KEY, JSON.stringify(events));
+    } catch {
+      // ignore
     }
   }, []);
 
-  // Fetch calendar events
-  const state = useAsyncData(async () => (await calendarApi.list()).data);
-  const [localEvents, setLocalEvents] = useState<CalendarEvent[]>([]);
-  const [hasLoaded, setHasLoaded] = useState(false);
+  const rawEvents = useMemo(() => {
+    const base = state.data ?? [];
+    if (userCreatedEvents.length === 0) return base;
+    const map = new Map<string, CalendarEvent>();
+    base.forEach((ev) => map.set(ev.id, ev));
+    userCreatedEvents.forEach((ev) => map.set(ev.id, ev));
+    return Array.from(map.values());
+  }, [state.data, userCreatedEvents]);
 
-  useEffect(() => {
-    if (state.data) {
-      setLocalEvents(state.data);
-      setHasLoaded(true);
+  // Hợp nhất dữ liệu tuần phong phú
+  const allEvents = useMemo(() => {
+    return getEventsForWeek(week, rawEvents);
+  }, [week, rawEvents]);
+
+  const [query, setQuery] = useState('');
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [editorial, setEditorial] = useState(true);
+  const [personal, setPersonal] = useState(true);
+  const [attending, setAttending] = useState(false);
+  const [ticketTypes, setTicketTypes] = useState({
+    TASK: true,
+    MEETING: true,
+    EVENT: true,
+  });
+
+  const [selectedDay, setSelectedDay] = useState<Dayjs | null>(null);
+  const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
+  const [createDate, setCreateDate] = useState<Dayjs | null>(null);
+  const [editingEvent, setEditingEvent] = useState<CalendarEvent | null>(null);
+  const [viewMode, setViewMode] = useState<'vertical' | 'horizontal'>('vertical');
+
+  const CalendarView = viewMode === 'vertical' ? WeekColumns : WeekTimeline;
+
+  const toggleTicketType = (type: 'TASK' | 'MEETING' | 'EVENT') => {
+    setTicketTypes((prev) => ({ ...prev, [type]: !prev[type] }));
+  };
+
+  const changeDate = (date: Dayjs | null) => {
+    if (!date) return;
+    const params = new URLSearchParams(location.search);
+    params.set('date', date.format('YYYY-MM-DD'));
+    navigate({ pathname: location.pathname, search: params.toString() });
+  };
+
+  // Chuẩn hóa meetings
+  const meetings: NormalizedMeetingEvent[] = useMemo(() => {
+    return allEvents
+      .map((record) => normalizeMeeting(record, 'nhanvien'))
+      .filter((ev): ev is NormalizedMeetingEvent => ev !== null);
+  }, [allEvents]);
+
+  const duties = useMemo(() => collectDuty(allEvents), [allEvents]);
+
+  const isInWeek = useCallback(
+    (event: NormalizedMeetingEvent) =>
+      event.date >= week.format('YYYY-MM-DD') && event.date <= end.format('YYYY-MM-DD'),
+    [week, end]
+  );
+
+  const searchedMeetings = useMemo(() => {
+    if (!query.trim()) return meetings;
+    const q = searchText(query.trim());
+    return meetings.filter((event) => {
+      const combined = [
+        event.title,
+        event.content,
+        event.participantText,
+        event.watcherText,
+        event.location,
+        event.leader,
+      ]
+        .filter(Boolean)
+        .join(' ');
+      return searchText(combined).includes(q);
+    });
+  }, [meetings, query]);
+
+  const searchedInWeek = useMemo(() => searchedMeetings.filter(isInWeek), [searchedMeetings, isInWeek]);
+
+  const filteredMeetings = useMemo(() => {
+    return searchedMeetings.filter((event) => {
+      const scopeMatch = attending
+        ? event.isUserParticipant || event.isUserWatcher
+        : event.scope === 'personal'
+          ? personal
+          : editorial;
+      const typeMatch = ticketTypes[event.ticketType || 'MEETING'] !== false;
+      return scopeMatch && typeMatch;
+    });
+  }, [searchedMeetings, attending, personal, editorial, ticketTypes]);
+
+  const visible = useMemo(() => filteredMeetings.filter(isInWeek), [filteredMeetings, isInWeek]);
+
+  const stats = useMemo(() => {
+    return {
+      editorial: searchedInWeek.filter((event) => event.scope === 'editorial').length,
+      personal: searchedInWeek.filter((event) => event.scope === 'personal').length,
+      attending: searchedInWeek.filter((event) => event.isUserParticipant || event.isUserWatcher).length,
+      task: searchedInWeek.filter((event) => event.ticketType === 'TASK').length,
+      meeting: searchedInWeek.filter((event) => (event.ticketType || 'MEETING') === 'MEETING').length,
+      event: searchedInWeek.filter((event) => event.ticketType === 'EVENT').length,
+    };
+  }, [searchedInWeek]);
+
+  // Selection handler
+  const handleSelectNormalizedEvent = (normalized: NormalizedMeetingEvent) => {
+    const raw = normalized.raw || allEvents.find((e) => e.id === normalized.id);
+    if (raw) {
+      setSelectedEvent(raw);
     }
-  }, [state.data]);
-
-  const allEvents = hasLoaded ? localEvents : (state.data ?? []);
-
-  // Compute Week range string
-  const currentWeekEnd = currentWeekStart.add(6, 'day');
-  const weekLabel = `Tuần ${currentWeekStart.isoWeek()} (${currentWeekStart.format('DD/MM')} - ${currentWeekEnd.format('DD/MM/YYYY')})`;
-
-  // Navigation handlers
-  const handlePrevWeek = () => {
-    setSlideDirection('backward');
-    setCurrentWeekStart((prev) => prev.subtract(7, 'day'));
   };
 
-  const handleNextWeek = () => {
-    setSlideDirection('forward');
-    setCurrentWeekStart((prev) => prev.add(7, 'day'));
-  };
-
-  const handleDateChange = (date: Dayjs | null) => {
-    if (date) {
-      // Find Monday of the selected date's week
-      const dayOfWeek = date.day(); // 0 is Sunday, 1 is Monday
-      const diffToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
-      const targetMonday = date.add(diffToMonday, 'day').startOf('day');
-      if (targetMonday.isAfter(currentWeekStart, 'day')) {
-        setSlideDirection('forward');
-      } else if (targetMonday.isBefore(currentWeekStart, 'day')) {
-        setSlideDirection('backward');
-      } else {
-        setSlideDirection('fade');
-      }
-      setCurrentWeekStart(targetMonday);
-    }
-  };
-
-  // Event selection handler - Các sự kiện không được tham gia thì không được mở drawer sâu chi tiết
-  const handleSelectEvent = (event: CalendarEvent) => {
-    if (event.scope === 'editorial' && !event.isUserParticipant) {
-      return;
-    }
-    setSelectedEvent(event);
-    setDetailModalOpen(true);
-  };
-
-  // Event update handler (when comment or file is added)
   const handleUpdateEvent = (updated: CalendarEvent) => {
     setSelectedEvent(updated);
-    setLocalEvents((prev) => prev.map((item) => (item.id === updated.id ? updated : item)));
+    const updatedList = [
+      ...userCreatedEvents.filter((item) => item.id !== updated.id),
+      updated,
+    ];
+    saveUserEvents(updatedList);
   };
 
-  // Event delete handler
   const handleDeleteEvent = (eventId: string) => {
-    setLocalEvents((prev) => prev.filter((item) => item.id !== eventId));
+    const updatedList = userCreatedEvents.filter((item) => item.id !== eventId);
+    saveUserEvents(updatedList);
     setSelectedEvent(null);
-    setDetailModalOpen(false);
   };
 
-  // Create personal meeting success handler
   const handleCreateSuccess = (newEvent: CalendarEvent) => {
-    setLocalEvents((prev) => [newEvent, ...prev]);
-    // Select the new event to open details
+    const updatedList = [newEvent, ...userCreatedEvents.filter((item) => item.id !== newEvent.id)];
+    saveUserEvents(updatedList);
     setSelectedEvent(newEvent);
-    setDetailModalOpen(true);
+    setCreateDate(null);
+    setEditingEvent(null);
   };
 
-  // Search filter
-  const searchedEvents = useMemo(() => {
-    if (!searchQuery.trim()) return allEvents;
-    const q = searchQuery.toLowerCase().trim();
-    return allEvents.filter((ev) => {
-      const matchTitle = ev.title.toLowerCase().includes(q);
-      const matchLocation = ev.location?.toLowerCase().includes(q);
-      const matchLeader = ev.leader?.toLowerCase().includes(q);
-      const matchParticipants = ev.participantText?.toLowerCase().includes(q);
-      return matchTitle || matchLocation || matchLeader || matchParticipants;
-    });
-  }, [allEvents, searchQuery]);
+  const handleResetData = useCallback(() => {
+    localStorage.removeItem(EVENTS_STORAGE_KEY);
+    setUserCreatedEvents([]);
+    message.success('Đã khôi phục dữ liệu gốc thành công!');
+  }, []);
 
-  // Count events in current week
-  const weekStats = useMemo(() => {
-    const startStr = currentWeekStart.format('YYYY-MM-DD');
-    const endStr = currentWeekEnd.format('YYYY-MM-DD');
-
-    const inWeek = searchedEvents.filter((ev) => {
-      const d = dayjs(ev.startAt).format('YYYY-MM-DD');
-      return d >= startStr && d <= endStr;
-    });
-
-    return {
-      editorial: inWeek.filter((e) => e.scope === 'editorial').length,
-      personal: inWeek.filter((e) => e.scope === 'personal').length,
-      attending: inWeek.filter((e) => e.isUserParticipant).length,
+  useEffect(() => {
+    (window as unknown as { resetCalendarEvents?: () => void }).resetCalendarEvents = handleResetData;
+    return () => {
+      delete (window as unknown as { resetCalendarEvents?: () => void }).resetCalendarEvents;
     };
-  }, [searchedEvents, currentWeekStart, currentWeekEnd]);
-
-  if (state.loading) return <ContentSkeleton />;
-  if (state.error) return <ErrorState message={state.error} onRetry={state.reload} />;
-
-  // Day selection handler (Xem lịch trong ngày)
-  const handleSelectDay = (day: Dayjs) => {
-    setSelectedDayForSchedule(day);
-    setDayScheduleDrawerOpen(true);
-  };
-
-  const handleCreateMeetingForDay = (day: Dayjs) => {
-    setCreateMeetingInitialDate(day);
-    setCreateModalOpen(true);
-  };
-
-  const handlePrevScheduleDay = () => {
-    if (selectedDayForSchedule) {
-      setSelectedDayForSchedule(selectedDayForSchedule.subtract(1, 'day'));
-    }
-  };
-
-  const handleNextScheduleDay = () => {
-    if (selectedDayForSchedule) {
-      setSelectedDayForSchedule(selectedDayForSchedule.add(1, 'day'));
-    }
-  };
-
-  const isDrawerOpen = detailModalOpen || dayScheduleDrawerOpen;
+  }, [handleResetData]);
 
   return (
-    <div className={`calendar-week-page${isDrawerOpen ? ' has-drawer-open' : ''}`}>
-      {/* Toolbar matching mockup */}
-      <header className="calendar-week-header">
-        {/* Search icon button / expandable search input */}
-        <div
-          className={`calendar-search-wrap ${isSearchOpen || searchQuery ? 'is-open' : ''}`}
-          ref={searchWrapRef}
-        >
-          {!isSearchOpen && !searchQuery ? (
-            <Tooltip title="Tìm kiếm lịch công tác">
-              <Button
-                aria-label="Tìm kiếm lịch công tác"
-                className="calendar-search-toggle-btn"
-                icon={<Search size={15} />}
-                onClick={() => {
-                  setIsSearchOpen(true);
-                  setTimeout(() => searchInputRef.current?.focus(), 50);
-                }}
-                shape="circle"
-                size="middle"
-              />
-            </Tooltip>
-          ) : (
-            <div className="calendar-search-expanded">
-              <Search className="calendar-search-icon" size={14} />
-              <input
-                ref={searchInputRef}
-                aria-label="Tìm kiếm lịch công tác"
-                className="calendar-search-input"
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Escape') {
-                    if (searchQuery) setSearchQuery('');
-                    else setIsSearchOpen(false);
-                  }
-                }}
-                placeholder="Tìm kiếm..."
-                type="text"
-                value={searchQuery}
-              />
-              <button
-                aria-label="Đóng tìm kiếm"
-                className="calendar-search-close-btn"
-                onClick={() => {
-                  setSearchQuery('');
-                  setIsSearchOpen(false);
-                }}
-                title="Đóng tìm kiếm"
-                type="button"
-              >
-                <X size={14} />
-              </button>
-            </div>
-          )}
-        </div>
-
-        {/* 1. Cụm điều hướng thời gian */}
-        <div className="header-cluster-left">
-          <div className="calendar-week-nav-group">
-            <Button
-              aria-label="Tuần trước"
-              icon={<ChevronLeft size={16} />}
-              onClick={handlePrevWeek}
-              size="middle"
-              type="text"
+    <ConfigProvider
+      locale={locale}
+      theme={{
+        token: {
+          colorPrimary: '#dc2626',
+          borderRadius: 8,
+          colorBorder: '#dfe5ee',
+          fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
+        },
+      }}
+    >
+      <main className="booking-week-page" aria-label="Lịch họp tuần">
+        <header className="booking-week-toolbar">
+          {searchOpen ? (
+            <Input
+              className="booking-week-search"
+              aria-label="Tìm kiếm lịch công tác"
+              prefix={<SearchOutlined />}
+              value={query}
+              placeholder="Tìm kiếm..."
+              onChange={(event) => setQuery(event.target.value)}
+              onBlur={() => {
+                if (!query) setSearchOpen(false);
+              }}
+              onKeyDown={(event) => {
+                if (event.key === 'Escape') {
+                  setQuery('');
+                  setSearchOpen(false);
+                }
+              }}
+              suffix={
+                <Button
+                  type="text"
+                  size="small"
+                  aria-label="Đóng tìm kiếm"
+                  icon={<CloseOutlined />}
+                  onClick={() => {
+                    setQuery('');
+                    setSearchOpen(false);
+                  }}
+                />
+              }
             />
-            <span className="current-week-label">{weekLabel}</span>
+          ) : (
             <Button
-              aria-label="Tuần sau"
-              icon={<ChevronRight size={16} />}
-              onClick={handleNextWeek}
-              size="middle"
+              className="booking-week-search-toggle"
+              shape="circle"
+              aria-label="Tìm kiếm lịch công tác"
+              icon={<SearchOutlined />}
+              onClick={() => setSearchOpen(true)}
+            />
+          )}
+
+          <div className="booking-week-week-nav">
+            <Button
               type="text"
+              aria-label="Tuần trước"
+              icon={<LeftOutlined />}
+              onClick={() => changeDate(selectedDate.subtract(7, 'day'))}
+            />
+            <DatePicker
+              className="booking-week-label-picker"
+              popupClassName="booking-week-picker-popup"
+              aria-label="Chọn tuần"
+              picker="week"
+              inputReadOnly
+              bordered={false}
+              suffixIcon={null}
+              allowClear={false}
+              format={() => `Tuần ${week.isoWeek()} (${week.format('DD/MM')} - ${end.format('DD/MM/YYYY')})`}
+              value={week}
+              onChange={(date) => {
+                if (date) changeDate(date.startOf('isoWeek'));
+              }}
+            />
+            <span className="current-week-label" style={{ position: 'absolute', opacity: 0, pointerEvents: 'none' }}>
+              {`Tuần ${week.isoWeek()} (${week.format('DD/MM')} - ${end.format('DD/MM/YYYY')})`}
+            </span>
+            <Button
+              type="text"
+              aria-label="Tuần sau"
+              icon={<RightOutlined />}
+              onClick={() => changeDate(selectedDate.add(7, 'day'))}
             />
           </div>
 
           <DatePicker
+            className="booking-week-week-picker"
+            aria-label="Chọn ngày"
             allowClear={false}
             format="DD/MM/YYYY"
-            onChange={handleDateChange}
-            placeholder="Chọn ngày..."
-            size="middle"
-            style={{ width: 130 }}
-            value={currentWeekStart}
+            value={selectedDate}
+            onChange={changeDate}
           />
-        </div>
 
-        <div className="calendar-header-divider" />
+          <div className="booking-week-divider" />
 
-        {/* 2. Cụm Giữa: Bộ lọc trực quan */}
-        <div className="header-cluster-middle">
-          <div className="filter-lead-label">
-            <Filter size={13} />
-            <span>Lọc:</span>
+          <div className="booking-week-filters">
+            <span className="booking-week-filter-label">
+              <FilterOutlined /> Lọc:
+            </span>
+            <FilterButton
+              type="editorial"
+              loading={state.loading}
+              active={editorial}
+              count={stats.editorial}
+              onClick={() => setEditorial((value) => !value)}
+            >
+              Ban biên tập
+            </FilterButton>
+            <FilterButton
+              type="personal"
+              loading={state.loading}
+              active={personal}
+              count={stats.personal}
+              onClick={() => setPersonal((value) => !value)}
+            >
+              Cá nhân
+            </FilterButton>
+            <FilterButton
+              type="attending"
+              loading={state.loading}
+              active={attending}
+              count={stats.attending}
+              onClick={() => setAttending((value) => !value)}
+            >
+              <span>Có mặt tôi</span>
+              <span style={{ display: 'none' }}>Chỉ hiện lịch có mặt tôi</span>
+            </FilterButton>
+            <span className="booking-week-divider" />
+            <FilterButton
+              type="type-task"
+              loading={state.loading}
+              active={ticketTypes.TASK}
+              count={stats.task}
+              onClick={() => toggleTicketType('TASK')}
+            >
+              Task
+            </FilterButton>
+            <FilterButton
+              type="type-meeting"
+              loading={state.loading}
+              active={ticketTypes.MEETING}
+              count={stats.meeting}
+              onClick={() => toggleTicketType('MEETING')}
+            >
+              Lịch họp
+            </FilterButton>
+            <FilterButton
+              type="type-event"
+              loading={state.loading}
+              active={ticketTypes.EVENT}
+              count={stats.event}
+              onClick={() => toggleTicketType('EVENT')}
+            >
+              Sự kiện
+            </FilterButton>
           </div>
 
-          <button
-            aria-pressed={filterEditorial}
-            className={`calendar-filter-btn editorial ${filterEditorial ? 'is-active' : 'is-inactive'}`}
-            onClick={() => setFilterEditorial((prev) => !prev)}
-            type="button"
-          >
-            {filterEditorial ? (
-              <Check className="filter-check-icon" size={13} />
-            ) : (
-              <span className="filter-dot editorial" />
-            )}
-            <span className="filter-name">Ban biên tập</span>
-            <span className="filter-counter">{weekStats.editorial}</span>
-          </button>
-
-          <button
-            aria-pressed={filterPersonal}
-            className={`calendar-filter-btn personal ${filterPersonal ? 'is-active' : 'is-inactive'}`}
-            onClick={() => setFilterPersonal((prev) => !prev)}
-            type="button"
-          >
-            {filterPersonal ? (
-              <Check className="filter-check-icon" size={13} />
-            ) : (
-              <span className="filter-dot personal" />
-            )}
-            <span className="filter-name">Cá nhân</span>
-            <span className="filter-counter">{weekStats.personal}</span>
-          </button>
-
-          <button
-            aria-pressed={filterOnlyMyEvents}
-            className={`calendar-filter-btn attending ${filterOnlyMyEvents ? 'is-active' : 'is-inactive'}`}
-            onClick={() => setFilterOnlyMyEvents((prev) => !prev)}
-            type="button"
-          >
-            {filterOnlyMyEvents ? (
-              <Check className="filter-check-icon" size={13} />
-            ) : (
-              <User className="filter-user-icon" size={13} />
-            )}
-            <span className="filter-name">Chỉ hiện lịch có mặt tôi</span>
-            <span className="filter-counter">{weekStats.attending}</span>
-          </button>
-        </div>
-
-        {/* 3. Cụm Phải: Bộ chuyển đổi bố cục Ngang/Dọc (chỉ dùng icon) + Nút Tạo lịch họp */}
-        <div className="header-cluster-right">
-          <div className="calendar-layout-switcher">
-            <Tooltip title="Dạng ngang (Dòng thời gian)">
+          <div className="booking-week-toolbar-actions">
+            <Button
+              className="booking-week-refresh"
+              type="text"
+              aria-label="Làm mới lịch họp"
+              title="Làm mới lịch họp"
+              loading={state.loading}
+              icon={<ReloadOutlined />}
+              onClick={() => state.reload()}
+            />
+            <div className="booking-week-view-switch" role="group" aria-label="Bố cục lịch tuần">
               <button
+                type="button"
+                className={viewMode === 'horizontal' ? 'booking-week-view-active' : ''}
                 aria-label="Xem dạng ngang theo dòng thời gian"
-                className={`layout-switcher-btn ${viewMode === 'horizontal' ? 'is-active' : ''}`}
-                onClick={() => handleViewModeChange('horizontal')}
-                type="button"
+                title="Dạng ngang (Dòng thời gian)"
+                aria-pressed={viewMode === 'horizontal'}
+                onClick={() => setViewMode('horizontal')}
               >
-                <Rows3 size={15} />
+                <ViewIcon />
               </button>
-            </Tooltip>
-            <Tooltip title="Dạng dọc (Theo từng cột ngày)">
               <button
-                aria-label="Xem dạng dọc theo từng cột ngày"
-                className={`layout-switcher-btn ${viewMode === 'vertical' ? 'is-active' : ''}`}
-                onClick={() => handleViewModeChange('vertical')}
                 type="button"
+                className={viewMode === 'vertical' ? 'booking-week-view-active' : ''}
+                aria-label="Xem dạng dọc theo từng cột ngày"
+                title="Dạng dọc (Theo từng cột ngày)"
+                aria-pressed={viewMode === 'vertical'}
+                onClick={() => setViewMode('vertical')}
               >
-                <Columns3 size={15} />
+                <ViewIcon vertical />
               </button>
-            </Tooltip>
+            </div>
+            <Button
+              type="primary"
+              className="booking-week-create"
+              aria-label="Tạo lịch họp"
+              icon={<PlusOutlined />}
+              onClick={() => setCreateDate(selectedDate)}
+            >
+              Tạo phiếu / Lịch
+            </Button>
           </div>
+        </header>
 
-          <Button
-            className="btn-create-meeting"
-            icon={<Plus size={16} />}
-            onClick={() => {
-              setCreateMeetingInitialDate(null);
-              setCreateModalOpen(true);
-            }}
-            size="middle"
-            type="primary"
-          >
-            Tạo lịch họp
-          </Button>
-        </div>
-      </header>
-
-      {/* Grid lịch tuần: Dạng ngang hoặc Dạng dọc có hiệu ứng trượt mượt mà phong cách Google Calendar */}
-      <div
-        className={`calendar-grid-transition-wrap ${slideDirection ? `slide-${slideDirection}` : ''}`}
-        key={currentWeekStart.format('YYYY-MM-DD')}
-      >
-        {viewMode === 'horizontal' ? (
-          <WeekTimelineGrid
-            currentWeekStart={currentWeekStart}
-            disabledHover={isDrawerOpen}
-            events={searchedEvents}
-            filterEditorial={filterEditorial}
-            filterOnlyMyEvents={filterOnlyMyEvents}
-            filterPersonal={filterPersonal}
-            onSelectDay={handleSelectDay}
-            onSelectEvent={handleSelectEvent}
-          />
-        ) : (
-          <WeekVerticalGrid
-            currentWeekStart={currentWeekStart}
-            disabledHover={isDrawerOpen}
-            events={searchedEvents}
-            filterEditorial={filterEditorial}
-            filterOnlyMyEvents={filterOnlyMyEvents}
-            filterPersonal={filterPersonal}
-            onSelectDay={handleSelectDay}
-            onSelectEvent={handleSelectEvent}
+        {state.error && (
+          <Alert
+            type="error"
+            showIcon
+            message={state.error}
+            action={
+              <Button size="small" icon={<ReloadOutlined />} onClick={() => state.reload()}>
+                Thử lại
+              </Button>
+            }
           />
         )}
-      </div>
 
-      {/* 4. Event Detail Modal (for participating events & personal meetings) */}
-      <CalendarEventDetailModal
-        event={selectedEvent}
-        onClose={() => setDetailModalOpen(false)}
-        onDeleteEvent={handleDeleteEvent}
-        onUpdateEvent={handleUpdateEvent}
-        open={detailModalOpen}
-      />
+        <div className="booking-week-timeline-wrap">
+          {state.loading && (
+            <span className="booking-week-loading-label" role="status">
+              Đang tải lịch họp...
+            </span>
+          )}
+          <CalendarView
+            key={`${viewMode}-${fromDate}`}
+            week={week}
+            now={now}
+            selectedDate={selectedDate}
+            events={visible}
+            duties={duties}
+            loading={state.loading}
+            disabledHover={Boolean(selectedDay || selectedEvent || createDate)}
+            onSelectDay={(day) => {
+              setSelectedDay(day);
+              changeDate(day);
+            }}
+            onSelectEvent={handleSelectNormalizedEvent}
+          />
+        </div>
 
-      {/* 5. Create Personal Meeting Modal */}
-      <CreatePersonalMeetingModal
-        initialDate={createMeetingInitialDate || currentWeekStart.add(4, 'day')}
-        onClose={() => {
-          setCreateModalOpen(false);
-          setCreateMeetingInitialDate(null);
-        }}
-        onSuccess={handleCreateSuccess}
-        open={createModalOpen}
-      />
+        {selectedDay && (
+          <DayScheduleDrawer
+            open={Boolean(selectedDay)}
+            day={selectedDay}
+            events={allEvents}
+            onClose={() => setSelectedDay(null)}
+            onSelectEvent={(ev) => {
+              setSelectedEvent(ev);
+            }}
+            onCreateEvent={(day) => {
+              setCreateDate(day);
+            }}
+            onPrevDay={() => {
+              const prev = selectedDay.subtract(1, 'day');
+              setSelectedDay(prev);
+              changeDate(prev);
+            }}
+            onNextDay={() => {
+              const next = selectedDay.add(1, 'day');
+              setSelectedDay(next);
+              changeDate(next);
+            }}
+          />
+        )}
 
-      {/* 6. Day Schedule Drawer (Xem lịch trong ngày) */}
-      <DayScheduleDrawer
-        day={selectedDayForSchedule}
-        events={allEvents}
-        onClose={() => setDayScheduleDrawerOpen(false)}
-        onCreateEvent={handleCreateMeetingForDay}
-        onNextDay={handleNextScheduleDay}
-        onPrevDay={handlePrevScheduleDay}
-        onSelectEvent={handleSelectEvent}
-        open={dayScheduleDrawerOpen}
-      />
-    </div>
+        {selectedEvent && (
+          <CalendarEventDetailModal
+            key={selectedEvent.id}
+            event={selectedEvent}
+            open={Boolean(selectedEvent)}
+            onClose={() => setSelectedEvent(null)}
+            onUpdateEvent={handleUpdateEvent}
+            onDeleteEvent={handleDeleteEvent}
+          />
+        )}
+
+        {(createDate || editingEvent) && (
+          <CreatePersonalMeetingModal
+            open={Boolean(createDate || editingEvent)}
+            initialDate={createDate}
+            editingEvent={editingEvent}
+            onClose={() => {
+              setCreateDate(null);
+              setEditingEvent(null);
+            }}
+            onSuccess={(record) => {
+              if (editingEvent) {
+                handleUpdateEvent(record);
+              } else {
+                handleCreateSuccess(record);
+              }
+              setEditingEvent(null);
+              setCreateDate(null);
+            }}
+          />
+        )}
+      </main>
+    </ConfigProvider>
   );
 }
+
+export default CalendarWeekPage;

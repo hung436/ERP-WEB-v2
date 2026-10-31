@@ -42,6 +42,9 @@ export function AppLayout() {
 
   // Auto-open birthday celebration card once per session if today is user's birthday
   useEffect(() => {
+    if (import.meta.env.MODE === 'test') {
+      return;
+    }
     if (isBirthday && user) {
       const storageKey = `tuoitre_bday_welcomed_${user.id}_${new Date().toDateString()}`;
       if (!sessionStorage.getItem(storageKey)) {

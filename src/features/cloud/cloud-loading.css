@@ -1,0 +1,286 @@
+/* ========================================================
+   TUOI TRE CLOUD LOADING & SKELETON ANIMATIONS
+   Brand Color: #D92D20 (Tuoi Tre Brand Red)
+   Accent: #FF6B5B, Soft Red: #FEF3F2
+   ======================================================== */
+
+/* 1. Animation viền đám mây chạy liên tục - êm ái, thanh thoát */
+@keyframes cloudStrokeDash {
+  0% {
+    stroke-dashoffset: 0;
+  }
+  100% {
+    stroke-dashoffset: -200;
+  }
+}
+
+/* 2. Animation nhịp thở tâm thương hiệu (Breathing scale) - thư thái */
+@keyframes cloudCenterBreathe {
+  0%, 100% {
+    transform: scale(0.96);
+    opacity: 0.92;
+    filter: drop-shadow(0 2px 8px rgba(217, 45, 32, 0.2));
+  }
+  50% {
+    transform: scale(1.04);
+    opacity: 1;
+    filter: drop-shadow(0 4px 14px rgba(217, 45, 32, 0.4));
+  }
+}
+
+/* 3. Animation dải sáng lướt qua Skeleton (Shimmer Wave) - chuyển động chậm, mượt mà */
+@keyframes shimmerWave {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* 4. Animation nhẹ cho text thông điệp */
+@keyframes textPulseFade {
+  0%, 100% {
+    opacity: 0.75;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* ========================================================
+   TUOI TRE CLOUD LOADING COMPONENT
+   ======================================================== */
+.tuoitre-cloud-loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 16px;
+  user-select: none;
+}
+
+.tuoitre-cloud-loading-container.is-fullscreen {
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  background-color: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(4px);
+}
+
+.tuoitre-cloud-loading-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Kích thước */
+.tuoitre-cloud-loading-container.size-sm .tuoitre-cloud-svg {
+  width: 52px;
+  height: 38px;
+}
+.tuoitre-cloud-loading-container.size-md .tuoitre-cloud-svg {
+  width: 80px;
+  height: 58px;
+}
+.tuoitre-cloud-loading-container.size-lg .tuoitre-cloud-svg {
+  width: 110px;
+  height: 78px;
+}
+.tuoitre-cloud-loading-container.size-xl .tuoitre-cloud-svg {
+  width: 140px;
+  height: 98px;
+}
+
+.tuoitre-cloud-svg {
+  overflow: visible;
+}
+
+/* Đường ray dẫn hướng tĩnh */
+.tuoitre-cloud-svg .cloud-track {
+  fill: #f8fafc;
+  stroke: #e2e8f0;
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+}
+
+/* Đường viền đỏ chạy liên tục */
+.tuoitre-cloud-svg .cloud-running-stroke {
+  fill: none;
+  stroke: url(#ttCloudGradient);
+  stroke-width: 3.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 45 155;
+  animation: cloudStrokeDash 2s linear infinite;
+}
+
+/* Tâm thương hiệu Tuổi Trẻ (Chữ T đỏ hoặc biểu tượng) */
+.tuoitre-cloud-svg .cloud-center-brand {
+  transform-origin: 50px 38px;
+  animation: cloudCenterBreathe 2.4s ease-in-out infinite;
+}
+
+.tuoitre-cloud-svg .cloud-brand-text {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-weight: 900;
+  font-size: 20px;
+  fill: #d92d20;
+  letter-spacing: -0.5px;
+}
+
+.tuoitre-cloud-loading-text {
+  margin-top: 14px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #475467;
+  text-align: center;
+  animation: textPulseFade 2.4s ease-in-out infinite;
+}
+
+.tuoitre-cloud-loading-subtext {
+  margin-top: 4px;
+  font-size: 11.5px;
+  color: #94a3b8;
+  text-align: center;
+}
+
+/* ========================================================
+   SKELETON BASE & SHIMMER EFFECT
+   Tốc độ chuyển động chậm dịu (2.4s), ánh sáng lướt tự nhiên
+   ======================================================== */
+.cloud-skeleton-box {
+  background: linear-gradient(
+    90deg,
+    #f1f5f9 0%,
+    #f8fafc 40%,
+    rgba(255, 255, 255, 0.9) 50%,
+    #f8fafc 60%,
+    #f1f5f9 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmerWave 2.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  border-radius: 4px;
+}
+
+.cloud-skeleton-circle {
+  border-radius: 9999px;
+}
+
+/* ========================================================
+   CLOUD TABLE SKELETON
+   ======================================================== */
+.cloud-table-skeleton-row {
+  height: 44px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.cloud-table-skeleton-row td {
+  padding: 8px 12px;
+  vertical-align: middle;
+}
+
+.cloud-table-skeleton-file {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cloud-table-skeleton-icon {
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+
+.cloud-table-skeleton-name {
+  height: 14px;
+  border-radius: 4px;
+}
+
+.cloud-table-skeleton-owner {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.cloud-table-skeleton-avatar {
+  width: 22px;
+  height: 22px;
+  border-radius: 9999px;
+  flex-shrink: 0;
+}
+
+/* ========================================================
+   CLOUD GRID SKELETON
+   ======================================================== */
+.cloud-grid-skeleton-section {
+  padding: 16px 20px 8px 20px;
+}
+
+.cloud-grid-skeleton-title {
+  width: 80px;
+  height: 16px;
+  margin-bottom: 12px;
+  border-radius: 4px;
+}
+
+/* Folder grid skeleton */
+.cloud-grid-skeleton-folders {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.cloud-grid-skeleton-folder-card {
+  height: 44px;
+  border-radius: 8px;
+  border: 1px solid #f1f5f9;
+  background-color: #fafbfc;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* File grid skeleton */
+.cloud-grid-skeleton-files {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 14px;
+}
+
+.cloud-grid-skeleton-file-card {
+  border-radius: 10px;
+  border: 1px solid #f1f5f9;
+  background-color: #ffffff;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cloud-grid-skeleton-thumb {
+  width: 100%;
+  height: 120px;
+  border-radius: 6px;
+}
+
+/* ========================================================
+   CLOUD TREE SKELETON (Sidebar)
+   ======================================================== */
+.cloud-tree-skeleton-wrapper {
+  padding: 4px 8px 8px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cloud-tree-skeleton-item {
+  height: 26px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}

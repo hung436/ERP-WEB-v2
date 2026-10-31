@@ -10,6 +10,7 @@ import { CloudDetailsPane } from './components/CloudDetailsPane';
 import { CloudContextMenu } from './components/CloudContextMenu';
 import { CloudShareModal } from './components/CloudShareModal';
 import { NewFolderModal, RenameModal, PreviewModal } from './components/CloudModals';
+import './cloud-loading.css';
 
 export const CloudPage: React.FC = () => {
   // 1. Data State
@@ -144,8 +145,10 @@ export const CloudPage: React.FC = () => {
       } else if (currentTab === 'shared-drives') {
         filtered = filtered.filter((i) => i.generalAccess === 'domain');
       } else if (currentTab === 'my-cloud') {
-        // Trong My Cloud: chỉ hiển thị mục có parentId khớp
-        filtered = filtered.filter((i) => i.parentId === currentFolderId);
+        // Trong My Cloud: nếu đang tìm kiếm, hiển thị kết quả từ toàn bộ thư mục; nếu không tìm kiếm, lọc theo parentId
+        if (!searchQuery.trim()) {
+          filtered = filtered.filter((i) => i.parentId === currentFolderId);
+        }
       }
     }
 

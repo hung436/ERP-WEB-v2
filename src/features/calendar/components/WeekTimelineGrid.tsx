@@ -13,6 +13,7 @@ interface WeekTimelineGridProps {
   filterEditorial: boolean;
   filterPersonal: boolean;
   filterOnlyMyEvents: boolean;
+  filterTypes?: { TASK: boolean; MEETING: boolean; EVENT: boolean };
   disabledHover?: boolean;
 }
 
@@ -108,6 +109,7 @@ export function WeekTimelineGrid({
   filterEditorial,
   filterPersonal,
   filterOnlyMyEvents,
+  filterTypes,
   disabledHover,
 }: WeekTimelineGridProps) {
   const now = dayjs();
@@ -156,7 +158,11 @@ export function WeekTimelineGrid({
   const filteredEvents = events.filter((ev) => {
     if (ev.scope === 'editorial' && !filterEditorial) return false;
     if (ev.scope === 'personal' && !filterPersonal) return false;
-    if (filterOnlyMyEvents && !ev.isUserParticipant) return false;
+    if (filterOnlyMyEvents && !ev.isUserParticipant && !ev.isUserWatcher) return false;
+    if (filterTypes) {
+      const typeKey = (ev.ticketType || (ev.type === 'meeting' ? 'MEETING' : 'TASK')) as keyof typeof filterTypes;
+      if (filterTypes[typeKey] === false) return false;
+    }
     return true;
   });
 

@@ -2848,3 +2848,42 @@ body.cloud-page-open #root > .ant-layout {
 .workflow-step-note:before,.workflow-step-note:after,.workflow-consult-note:before,.workflow-consult-note:after { color:#98a2b3; }
 .workflow-step-note:before,.workflow-consult-note:before { content:'\201C'; }
 .workflow-step-note:after,.workflow-consult-note:after { content:'\201D'; }
+
+/* ==========================================================================
+   Public Link & Cloud Modals Radio / Form Styling (Tuổi Trẻ ERPv2 standard)
+   ========================================================================== */
+.ant-modal .ant-radio-wrapper:hover .ant-radio .ant-radio-inner,
+.cloud-share-modal .ant-radio-wrapper:hover .ant-radio .ant-radio-inner {
+  border-color: #d92d20 !important;
+}
+
+.ant-modal .ant-radio-checked .ant-radio-inner,
+.cloud-share-modal .ant-radio-checked .ant-radio-inner {
+  border-color: #d92d20 !important;
+  background-color: #ffffff !important;
+}
+
+.ant-modal .ant-radio-checked .ant-radio-inner::after,
+.cloud-share-modal .ant-radio-checked .ant-radio-inner::after {
+  background-color: #d92d20 !important;
+  transform: scale(0.5) !important;
+  opacity: 1 !important;
+}
+
+.ant-modal .ant-radio-input:focus + .ant-radio-inner,
+.cloud-share-modal .ant-radio-input:focus + .ant-radio-inner {
+  box-shadow: 0 0 0 3px rgba(217, 45, 32, 0.12) !important;
+}
+
+/* Reset triệt để input bên trong affix-wrapper (Input.Password, Search) để không bị viền kép / lệch khung */
+.ant-modal .ant-input-affix-wrapper input.ant-input,
+.ant-modal .ant-input-affix-wrapper input {
+  border: none !important;
+  border-radius: 0 !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  outline: none !important;
+}

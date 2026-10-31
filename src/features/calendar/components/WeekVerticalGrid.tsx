@@ -12,6 +12,7 @@ interface WeekVerticalGridProps {
   filterEditorial: boolean;
   filterPersonal: boolean;
   filterOnlyMyEvents: boolean;
+  filterTypes?: { TASK: boolean; MEETING: boolean; EVENT: boolean };
   disabledHover?: boolean;
 }
 
@@ -23,6 +24,7 @@ export function WeekVerticalGrid({
   filterEditorial,
   filterPersonal,
   filterOnlyMyEvents,
+  filterTypes,
   disabledHover,
 }: WeekVerticalGridProps) {
   const now = dayjs();
@@ -58,10 +60,14 @@ export function WeekVerticalGrid({
     return events.filter((ev) => {
       if (ev.scope === 'editorial' && !filterEditorial) return false;
       if (ev.scope === 'personal' && !filterPersonal) return false;
-      if (filterOnlyMyEvents && !ev.isUserParticipant) return false;
+      if (filterOnlyMyEvents && !ev.isUserParticipant && !ev.isUserWatcher) return false;
+      if (filterTypes) {
+        const typeKey = (ev.ticketType || (ev.type === 'meeting' ? 'MEETING' : 'TASK')) as keyof typeof filterTypes;
+        if (filterTypes[typeKey] === false) return false;
+      }
       return true;
     });
-  }, [events, filterEditorial, filterPersonal, filterOnlyMyEvents]);
+  }, [events, filterEditorial, filterPersonal, filterOnlyMyEvents, filterTypes]);
 
   // Kiểm tra tuần hiện tại
   const isCurrentWeek = useMemo(() => days.some((d) => d.isSame(now, 'day')), [days, now]);
@@ -113,7 +119,7 @@ export function WeekVerticalGrid({
                   title={`Bấm để xem danh sách các sự kiện ${dayNameVi} (${day.format('DD/MM')})`}
                   type="button"
                 >
-                  <span className="vertical-feed-day-name">{dayNameVi.toUpperCase()}</span>
+                  <span className="vertical-feed-day-name">{dayNameVi}</span>
 
                   <div className="vertical-feed-date-side">
                     <span

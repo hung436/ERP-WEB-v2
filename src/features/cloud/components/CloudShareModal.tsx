@@ -133,6 +133,39 @@ export const CloudShareModal: React.FC<CloudShareModalProps> = ({
   const [newLinkPassword, setNewLinkPassword] = useState('');
   const [newLinkExpiration, setNewLinkExpiration] = useState<string | null>(null);
 
+  const isFolder = item?.type === 'folder';
+
+  const permissionOptions = isFolder
+    ? [
+        {
+          value: 'download_view' as CloudPublicLinkPermission,
+          title: 'Tải về / Xem',
+          description: 'Người nhận có thể duyệt xem thư mục và tải về nội dung.',
+        },
+        {
+          value: 'download_view_upload' as CloudPublicLinkPermission,
+          title: 'Tải về / Xem / Tải lên',
+          description: 'Người nhận có thể xem, tải về và đóng góp thêm tệp mới vào thư mục.',
+        },
+        {
+          value: 'download_view_upload_edit' as CloudPublicLinkPermission,
+          title: 'Toàn quyền (Xem / Tải về / Tải lên / Chỉnh sửa)',
+          description: 'Người nhận có thể quản lý, đổi tên, xóa và tải tệp lên thư mục.',
+        },
+        {
+          value: 'upload_only' as CloudPublicLinkPermission,
+          title: 'Chỉ tải lên (Hộp thả tệp / File Drop)',
+          description: 'Nhận tệp nộp từ cộng tác viên, người ngoài mà KHÔNG làm lộ danh sách tệp khác trong thư mục.',
+        },
+      ]
+    : [
+        {
+          value: 'download_view' as CloudPublicLinkPermission,
+          title: 'Chỉ xem & Tải về',
+          description: 'Người nhận liên kết có thể xem trước nội dung tệp trực tuyến và tải tệp về máy tính / điện thoại.',
+        },
+      ];
+
   // Trạng thái hiển thị popup QR Code
   const [activeQrLink, setActiveQrLink] = useState<CloudPublicLink | null>(null);
 
@@ -320,7 +353,7 @@ export const CloudShareModal: React.FC<CloudShareModalProps> = ({
           content: { padding: 0, borderRadius: 12, overflow: 'hidden' },
         }}
       >
-        {/* 1. Header phong cách Nextcloud / OwnCloud chuẩn hình mẫu */}
+        {/* 1. Header phong cách Nextcloud / Cloud chuẩn hình mẫu */}
         <div className="p-4 border-b border-slate-200/90 flex items-start gap-3 bg-white">
           <div className="w-12 h-12 rounded-lg bg-slate-600 text-white flex items-center justify-center shrink-0 shadow-sm relative">
             {item.type === 'folder' ? (
@@ -740,7 +773,7 @@ export const CloudShareModal: React.FC<CloudShareModalProps> = ({
         )}
       </Modal>
 
-      {/* 4. Modal tạo Public Link với đầy đủ các quyền bằng tiếng Việt */}
+      {/* 4. Modal tạo Public Link chuẩn ERPv2 */}
       <Modal
         open={isCreateLinkModalOpen}
         onCancel={() => setIsCreateLinkModalOpen(false)}
@@ -748,10 +781,12 @@ export const CloudShareModal: React.FC<CloudShareModalProps> = ({
         width={480}
         centered
         destroyOnClose
-        closeIcon={<X size={16} className="text-slate-500 hover:text-slate-800" />}
+        closeIcon={<X size={16} className="text-slate-400 hover:text-slate-700" />}
         title={
-          <div className="text-[15px] font-semibold text-slate-900 pb-1">
-            {editingLinkId ? `Chỉnh sửa liên kết: /${item.name}` : `Tạo liên kết chia sẻ: /${item.name}`}
+          <div className="text-[15px] font-semibold text-slate-900 pb-1 pr-6">
+            {editingLinkId
+              ? `Chỉnh sửa liên kết: /${item.name}`
+              : `Tạo liên kết chia sẻ: /${item.name}`}
           </div>
         }
       >
@@ -772,7 +807,7 @@ export const CloudShareModal: React.FC<CloudShareModalProps> = ({
               value={newLinkName}
               onChange={(e) => setNewLinkName(e.target.value)}
               placeholder="Liên kết công khai"
-              className="text-[13px]"
+              className="text-[13px] rounded-lg h-9"
             />
           </div>
 
@@ -781,67 +816,26 @@ export const CloudShareModal: React.FC<CloudShareModalProps> = ({
             <Radio.Group
               value={newLinkPermission}
               onChange={(e) => setNewLinkPermission(e.target.value)}
-              className="w-full space-y-3"
+              className="w-full space-y-2.5"
             >
-              {/* Option 1: Tải về / Xem */}
-              <div
-                onClick={() => setNewLinkPermission('download_view')}
-                className={`p-2 rounded-lg cursor-pointer transition-colors ${
-                  newLinkPermission === 'download_view' ? 'bg-slate-50 border border-slate-200' : ''
-                }`}
-              >
-                <Radio value="download_view" className="font-semibold text-slate-800 text-[13px]">
-                  Tải về / Xem
-                </Radio>
-                <div className="text-xs text-slate-500 pl-6">
-                  Người nhận có thể xem hoặc tải về nội dung.
+              {permissionOptions.map((opt) => (
+                <div
+                  key={opt.value}
+                  onClick={() => setNewLinkPermission(opt.value)}
+                  className={`p-2.5 rounded-xl cursor-pointer transition-colors ${
+                    newLinkPermission === opt.value
+                      ? 'bg-slate-50 border border-slate-200'
+                      : 'hover:bg-slate-50/50'
+                  }`}
+                >
+                  <Radio value={opt.value} className="font-semibold text-slate-800 text-[13px]">
+                    {opt.title}
+                  </Radio>
+                  <div className="text-xs text-slate-500 pl-6 mt-0.5">
+                    {opt.description}
+                  </div>
                 </div>
-              </div>
-
-              {/* Option 2: Tải về / Xem / Tải lên */}
-              <div
-                onClick={() => setNewLinkPermission('download_view_upload')}
-                className={`p-2 rounded-lg cursor-pointer transition-colors ${
-                  newLinkPermission === 'download_view_upload' ? 'bg-slate-50 border border-slate-200' : ''
-                }`}
-              >
-                <Radio value="download_view_upload" className="font-semibold text-slate-800 text-[13px]">
-                  Tải về / Xem / Tải lên
-                </Radio>
-                <div className="text-xs text-slate-500 pl-6">
-                  Người nhận có thể xem, tải về và tải tệp lên.
-                </div>
-              </div>
-
-              {/* Option 3: Tải về / Xem / Tải lên / Chỉnh sửa */}
-              <div
-                onClick={() => setNewLinkPermission('download_view_upload_edit')}
-                className={`p-2 rounded-lg cursor-pointer transition-colors ${
-                  newLinkPermission === 'download_view_upload_edit' ? 'bg-slate-50 border border-slate-200' : ''
-                }`}
-              >
-                <Radio value="download_view_upload_edit" className="font-semibold text-slate-800 text-[13px]">
-                  Tải về / Xem / Tải lên / Chỉnh sửa
-                </Radio>
-                <div className="text-xs text-slate-500 pl-6">
-                  Người nhận có thể xem, tải về, chỉnh sửa, xóa và tải tệp lên.
-                </div>
-              </div>
-
-              {/* Option 4: Chỉ tải lên (Thả tệp) */}
-              <div
-                onClick={() => setNewLinkPermission('upload_only')}
-                className={`p-2 rounded-lg cursor-pointer transition-colors ${
-                  newLinkPermission === 'upload_only' ? 'bg-slate-50 border border-slate-200' : ''
-                }`}
-              >
-                <Radio value="upload_only" className="font-semibold text-slate-800 text-[13px]">
-                  Chỉ tải lên (Thả tệp)
-                </Radio>
-                <div className="text-xs text-slate-500 pl-6">
-                  Nhận tệp từ nhiều người gửi mà không làm lộ nội dung bên trong thư mục.
-                </div>
-              </div>
+              ))}
             </Radio.Group>
           </div>
 
@@ -855,7 +849,7 @@ export const CloudShareModal: React.FC<CloudShareModalProps> = ({
               value={newLinkPassword}
               onChange={(e) => setNewLinkPassword(e.target.value)}
               placeholder="Đặt mật khẩu truy cập (tùy chọn)"
-              className="text-[13px]"
+              className="text-[13px] rounded-lg h-9"
             />
           </div>
 
@@ -866,18 +860,23 @@ export const CloudShareModal: React.FC<CloudShareModalProps> = ({
               placeholder="Chọn ngày hết hạn"
               value={newLinkExpiration ? dayjs(newLinkExpiration) : null}
               onChange={(d) => setNewLinkExpiration(d ? d.format('YYYY-MM-DD') : null)}
-              className="w-full text-xs [&_input]:!text-xs [&_input]:!placeholder:text-xs"
+              className="w-full text-xs rounded-lg h-9"
               allowClear
             />
           </div>
 
           {/* Bottom Buttons: Hủy & Chia sẻ */}
-          <div className="flex items-center justify-between pt-2 border-t border-slate-100">
-            <Button onClick={() => setIsCreateLinkModalOpen(false)}>Hủy</Button>
+          <div className="flex items-center justify-between pt-3 border-t border-slate-100">
+            <Button
+              onClick={() => setIsCreateLinkModalOpen(false)}
+              className="h-9 px-5 rounded-lg font-medium text-slate-700 border-slate-200 hover:bg-slate-50"
+            >
+              Hủy
+            </Button>
             <Button
               type="primary"
               htmlType="submit"
-              className="bg-[#1e293b] hover:bg-[#0f172a] text-white px-5"
+              className="h-9 px-6 rounded-lg font-medium text-white !bg-[#1e293b] hover:!bg-[#0f172a] !border-[#1e293b]"
             >
               {editingLinkId ? 'Lưu thay đổi' : 'Chia sẻ'}
             </Button>

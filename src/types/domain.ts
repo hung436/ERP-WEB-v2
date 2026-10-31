@@ -73,7 +73,7 @@ export interface MeetingEvent {
   recordingAvailable?: boolean;
 }
 
-export type CalendarEventType = 'meeting' | 'work' | 'deadline' | 'personal';
+export type CalendarEventType = 'meeting' | 'work' | 'deadline' | 'personal' | 'task' | 'event';
 export type CalendarScope = 'editorial' | 'personal';
 
 export interface CalendarComment {
@@ -113,6 +113,7 @@ export interface CalendarEvent {
   platform?: string;
   agenda?: string;
   notes?: string;
+  description?: string;
   dutyInfo?: string;
   participants?: string[];
   attachments?: CalendarAttachmentItem[];
@@ -122,6 +123,31 @@ export interface CalendarEvent {
   reminderMinutes?: number;
   isAdjusted?: boolean;
   adjustedNote?: string;
+  ticketType?: 'TASK' | 'MEETING' | 'EVENT';
+  mode?: 'offline' | 'online' | 'hybrid';
+  deadline?: string;
+  executors?: Array<{ id: string | number; name: string; role?: string }>;
+  watchers?: Array<{ id: string | number; name: string }>;
+  approver?: { id: string | number; name: string; note?: string };
+  approvalStatus?: 'APPROVED' | 'PENDING' | 'ACTIVE' | 'CONSULTING' | 'COMPLETED' | 'REJECTED' | 'CANCELLED';
+  consultQuestion?: string;
+  consultantName?: string;
+  consultReply?: string;
+  signedAt?: string;
+  signedBy?: string;
+  signedOtp?: string;
+  steps?: Array<{
+    id: string;
+    step_order: number;
+    name: string;
+    status: string;
+    completed_at?: string;
+    actor_id?: string | number;
+    actor_name?: string;
+    role?: string;
+    note?: string;
+  }>;
+  isUserWatcher?: boolean;
 }
 
 export interface ChatMember {

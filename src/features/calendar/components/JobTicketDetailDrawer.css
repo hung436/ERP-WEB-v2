@@ -1,0 +1,2302 @@
+/* ==========================================================================
+   JobTicketDetailDrawer.css
+   Style chuẩn đồng bộ 100% với giao diện JobTicket (DocsDetailDrawer)
+   Dùng cho Drawer Chi tiết phiếu trong Lịch làm việc Booking
+   ========================================================================== */
+
+:root,
+.jt-document-drawer,
+.jt-doc-detail,
+.job-ticket-drawer {
+  --jt-color-primary: rgb(227, 14, 22);
+  --jt-color-primary-light: rgba(227, 14, 22, 0.08);
+  --jt-color-primary-hover: rgba(227, 14, 22, 0.12);
+  --jt-color-success: rgb(95, 159, 114);
+  --jt-color-success-light: rgba(95, 159, 114, 0.1);
+  --jt-color-success-hover: rgba(95, 159, 114, 0.18);
+  --jt-color-bg: #f5f5f7;
+  --jt-color-surface: #ffffff;
+  --jt-color-surface-secondary: #f7f7f8;
+  --jt-color-input-bg: #f5f5f7;
+  --jt-color-border: #e8e8e8;
+  --jt-color-border-light: #f0f0f0;
+  --jt-color-text-primary: #1a1a1a;
+  --jt-color-text-secondary: #666666;
+  --jt-color-text-muted: #999999;
+  --jt-radius-sm: 6px;
+  --jt-radius-md: 8px;
+  --jt-radius-lg: 12px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* --- DRAWER CONTAINER & HEADER --- */
+.jt-document-drawer .job-ticket-drawer-content-wrapper,
+.jt-document-drawer .ant-drawer-content-wrapper {
+  height: 100% !important;
+}
+
+.jt-document-drawer .job-ticket-drawer-content,
+.jt-document-drawer .ant-drawer-content {
+  height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+}
+
+.jt-document-drawer .job-ticket-drawer-header,
+.jt-document-drawer .ant-drawer-header {
+  flex: 0 0 auto !important;
+  padding: 0 !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+  background: #ffffff !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.03) !important;
+}
+
+.jt-document-drawer .job-ticket-drawer-title,
+.jt-document-drawer .ant-drawer-title {
+  width: 100% !important;
+}
+
+.jt-document-drawer .job-ticket-drawer-body,
+.jt-document-drawer .ant-drawer-body {
+  padding: 0 !important;
+  background: #f1f5f9 !important;
+  overflow: hidden !important;
+  flex: 1 1 0% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.jt-document-drawer__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 58px;
+  min-height: 56px;
+  padding: 0 20px;
+  box-sizing: border-box;
+}
+
+.jt-document-drawer__title-wrap {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1 1 auto;
+  margin-right: 16px;
+}
+
+.jt-document-drawer__title-wrap h2 {
+  margin: 0;
+  color: #0f172a !important;
+  font-size: 16px !important;
+  font-weight: 650 !important;
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.jt-document-drawer__header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* Action pills trên header: Nút viền xám nhẹ (Outlined neutral) chuẩn Ant Design hiện đại */
+.jt-drawer-action-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  height: 32px !important;
+  padding: 0 12px !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  border-radius: 6px !important;
+  border: 1px solid #e2e8f0 !important;
+  background: #ffffff !important;
+  color: #334155 !important;
+  cursor: pointer;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.jt-drawer-action-btn:hover {
+  background: #f8fafc !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+}
+
+.jt-drawer-action-btn:active {
+  background: #f1f5f9 !important;
+}
+
+.jt-drawer-action-btn .anticon,
+.jt-drawer-action-btn .job-ticket-icon {
+  font-size: 14px;
+  color: #64748b;
+  transition: color 0.2s ease;
+}
+
+.jt-drawer-action-btn:hover .anticon,
+.jt-drawer-action-btn:hover .job-ticket-icon {
+  color: #0f172a;
+}
+
+.jt-drawer-action-btn--muted {
+  background: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+  color: #64748b !important;
+}
+
+.jt-drawer-action-btn--muted .anticon,
+.jt-drawer-action-btn--muted .job-ticket-icon {
+  color: #94a3b8 !important;
+}
+
+.jt-drawer-action-btn--muted:hover {
+  background: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+  color: #334155 !important;
+}
+
+.jt-drawer-action-btn--leave {
+  background: #fff5f5 !important;
+  border-color: #fecaca !important;
+  color: #dc2626 !important;
+}
+
+.jt-drawer-action-btn--leave .anticon,
+.jt-drawer-action-btn--leave .job-ticket-icon {
+  color: #dc2626 !important;
+}
+
+.jt-drawer-action-btn--leave:hover {
+  background: #fee2e2 !important;
+  border-color: #fca5a5 !important;
+  color: #b91c1c !important;
+}
+
+/* Nút Back */
+.jt-document-drawer__icon-button {
+  width: 32px !important;
+  height: 32px !important;
+  min-width: 32px !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: 1px solid #e2e8f0 !important;
+  color: #64748b !important;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px !important;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.jt-document-drawer__icon-button:hover,
+.jt-document-drawer__icon-button:focus {
+  border-color: #cbd5e1 !important;
+  background: #f8fafc !important;
+  color: #0f172a !important;
+}
+
+/* Nút 'X' độc lập góc phải theo phong cách Native Drawer Close */
+.jt-document-drawer__close-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 32px !important;
+  height: 32px !important;
+  min-width: 32px !important;
+  padding: 0 !important;
+  margin-left: 8px !important;
+  border: none !important;
+  background: transparent !important;
+  color: #64748b !important;
+  border-radius: 6px !important;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 15px !important;
+}
+
+.jt-document-drawer__close-btn:hover,
+.jt-document-drawer__close-btn:focus {
+  background: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+
+.jt-document-drawer__close-btn:active {
+  background: #e2e8f0 !important;
+}
+
+/* --- GRID LAYOUT 2 CỘT 7fr 5fr --- */
+.jt-doc-detail {
+  padding: 14px 16px !important;
+  height: 100% !important;
+  max-height: 100% !important;
+  min-height: 0 !important;
+  flex: 1 1 0% !important;
+  background: #f1f5f9 !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.jt-doc-detail__grid {
+  display: grid !important;
+  grid-template-columns: 7fr 5fr !important;
+  gap: 14px !important;
+  flex: 1 1 0% !important;
+  height: 100% !important;
+  max-height: 100% !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+  align-items: stretch !important;
+}
+
+/* --- CARD PANE DÙNG CHUNG --- */
+.jt-doc-detail-pane {
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 8px !important;
+  background: #ffffff !important;
+  overflow: hidden !important;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+  display: flex;
+  flex-direction: column;
+}
+
+.jt-doc-detail-pane__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 58px;
+  padding: 12px 16px;
+  border-bottom: 1px solid #f1f5f9;
+  background: #ffffff;
+  flex-shrink: 0;
+}
+
+.jt-doc-detail-pane__header h3 {
+  margin: 2px 0 0;
+  color: #0f172a;
+  font-size: 15px;
+  font-weight: 650;
+}
+
+.jt-doc-detail-pane__eyebrow {
+  display: block;
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* --- CỘT TRÁI: KHUNG THẢO LUẬN & CHAT STREAM --- */
+.jt-doc-chat-pane {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.jt-doc-chat-pane__header-tools {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.jt-doc-chat-stream {
+  flex: 1 1 0%;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  background: #f8fafc;
+}
+
+.jt-doc-chat-msg {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  max-width: 88%;
+}
+
+.jt-doc-chat-msg--mine {
+  margin-left: auto;
+  flex-direction: row-reverse;
+}
+
+.jt-doc-chat-msg__avatar {
+  flex-shrink: 0;
+}
+
+.jt-doc-chat-msg__body {
+  min-width: 0;
+}
+
+.jt-doc-chat-msg__meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.jt-doc-chat-msg--mine .jt-doc-chat-msg__meta {
+  justify-content: flex-end;
+}
+
+.jt-doc-chat-msg__author {
+  font-size: 12px;
+  font-weight: 650;
+  color: #1e293b;
+}
+
+.jt-doc-chat-msg__role {
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: #e2e8f0;
+  color: #475569;
+}
+
+.jt-doc-chat-msg__time {
+  font-size: 11px;
+  color: #94a3b8;
+}
+
+.jt-doc-chat-msg__bubble {
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  line-height: 1.5;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  color: #1e293b;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.jt-doc-chat-msg--mine .jt-doc-chat-msg__bubble {
+  background: #fff5f5;
+  border-color: #fecdd3;
+  color: #991b1b;
+}
+
+.jt-doc-chat-input-area {
+  padding: 12px 16px;
+  background: #ffffff;
+  border-top: 1px solid #f1f5f9;
+  flex-shrink: 0;
+}
+
+.jt-doc-chat-input-row {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+}
+
+.jt-doc-chat-input-row textarea {
+  flex: 1;
+  resize: none;
+  border-radius: 6px;
+  border-color: #cbd5e1;
+}
+
+/* Action bar ở dưới cùng cột trái */
+.jt-doc-action-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  background: #ffffff;
+  border-top: 1px solid #e2e8f0;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* --- CỘT PHẢI: STACK THÔNG TIN + QUY TRÌNH --- */
+.jt-doc-detail-sidebar-stack {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 14px !important;
+  min-height: 0 !important;
+  height: 100% !important;
+  overflow-y: auto !important;
+}
+
+/* Panel Thông tin của phiếu */
+.jt-doc-detail-pane--info {
+  flex-shrink: 0;
+}
+
+.jt-doc-info-list {
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.jt-doc-info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 13px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #f8fafc;
+}
+
+.jt-doc-info-item:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.jt-doc-info-item--block {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.jt-doc-info-item__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 550;
+  flex-shrink: 0;
+}
+
+.jt-doc-info-icon {
+  color: #94a3b8;
+}
+
+.jt-doc-info-item__value {
+  color: #0f172a;
+  font-weight: 550;
+  text-align: right;
+  word-break: break-word;
+}
+
+.jt-doc-info-item--block .jt-doc-info-item__value {
+  text-align: left;
+  width: 100%;
+}
+
+.jt-doc-info-item__sub {
+  color: #94a3b8;
+  font-weight: 400;
+  font-size: 12px;
+}
+
+.jt-doc-info-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.jt-doc-info-user-tag {
+  margin: 0 !important;
+  border-radius: 4px !important;
+  font-size: 12px !important;
+  background: #f1f5f9 !important;
+  border-color: #e2e8f0 !important;
+  color: #334155 !important;
+}
+
+.jt-doc-info-room {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 8px 12px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  gap: 8px;
+}
+
+.jt-doc-info-room__link {
+  color: rgb(227, 14, 22) !important;
+  font-size: 12px;
+  text-decoration: underline;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.jt-doc-info-room__actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+/* Panel Quy trình xử lý */
+.jt-doc-detail-pane--steps {
+  flex: 1 1 auto;
+  min-height: 220px;
+}
+
+.jt-doc-steps {
+  padding: 14px 16px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.jt-doc-step {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr);
+  gap: 12px;
+}
+
+.jt-doc-step__rail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.jt-doc-step__rail span {
+  width: 18px;
+  height: 18px;
+  border: 2px solid #cbd5e1;
+  border-radius: 999px;
+  background: #ffffff;
+}
+
+.jt-doc-step__rail span.is-done {
+  border-color: rgb(227, 14, 22);
+  background: rgb(227, 14, 22);
+  box-shadow: inset 0 0 0 3px #ffffff;
+}
+
+.jt-doc-step__rail i {
+  width: 2px;
+  flex: 1;
+  min-height: 24px;
+  margin: 4px 0;
+  background: #e2e8f0;
+}
+
+.jt-doc-step__card {
+  margin-bottom: 12px;
+  padding: 12px 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.jt-doc-step__top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.jt-doc-step__order {
+  color: #94a3b8;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.jt-doc-step__top h4 {
+  margin: 2px 0 0;
+  color: #0f172a;
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.jt-doc-step__actor {
+  margin-top: 8px;
+  font-size: 12px;
+  color: #475467;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.jt-doc-step__actor-name {
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.jt-doc-step__time {
+  font-size: 11px;
+  color: #94a3b8;
+  margin-left: auto;
+}
+
+.jt-doc-step__note {
+  margin-top: 8px;
+  padding: 6px 10px;
+  background: #f8fafc;
+  border-left: 3px solid #cbd5e1;
+  border-radius: 4px;
+  font-size: 12px;
+  color: #334155;
+  line-height: 1.45;
+  word-break: break-word;
+}
+
+.jt-doc-step__note--success {
+  background: #f0fdf4;
+  border-left-color: #22c55e;
+  color: #166534;
+}
+
+.jt-doc-step__note--danger {
+  background: #fef2f2;
+  border-left-color: #ef4444;
+  color: #991b1b;
+}
+
+.jt-doc-step__note--purple {
+  background: #faf5ff;
+  border-left-color: #a855f7;
+  color: #6b21a8;
+}
+
+/* Status tags */
+.jt-doc-status {
+  display: inline-flex;
+  align-items: center;
+  margin: 0 !important;
+  border-radius: 999px !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  padding: 1px 8px !important;
+}
+
+.jt-doc-status--success {
+  border-color: #bbf7d0 !important;
+  background: #f0fdf4 !important;
+  color: #166534 !important;
+}
+
+.jt-doc-status--warning {
+  border-color: #fde68a !important;
+  background: #fffbeb !important;
+  color: #92400e !important;
+}
+
+.jt-doc-status--danger {
+  border-color: #fecaca !important;
+  background: #fef2f2 !important;
+  color: #991b1b !important;
+}
+
+
+/* ==========================================================================
+   BỔ SUNG TỪ TEMPLATEMODALS.CSS (JOB-TICKET-FE)
+   Hỗ trợ Pinned Hero Card, Combined Stream (System Events + Chat), và Chat Bar
+   ========================================================================== */
+
+/* Thẻ loại phiếu (Ticket Type Badges) */
+.jt-ticket-type-badge,
+.jt-ticket-type-badge.ant-tag,
+.jt-ticket-type-badge.job-ticket-tag {
+  margin: 0 !important;
+  border-radius: 999px !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  padding: 1px 8px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+}
+
+.jt-ticket-type-badge--task,
+.jt-ticket-type-badge--task.ant-tag {
+  background: #eff6ff !important;
+  border-color: #bfdbfe !important;
+  color: #1d4ed8 !important;
+}
+
+.jt-ticket-type-badge--meeting,
+.jt-ticket-type-badge--meeting.ant-tag {
+  background: #fef2f2 !important;
+  border-color: #fecaca !important;
+  color: #b91c1c !important;
+}
+
+.jt-ticket-type-badge--event,
+.jt-ticket-type-badge--event.ant-tag {
+  background: #f5f3ff !important;
+  border-color: #ddd6fe !important;
+  color: #6d28d9 !important;
+}
+
+/* 1. Pinned Hero Card ở đỉnh cột trái */
+.jt-pinned-hero-card {
+  flex-shrink: 0;
+  background: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+  padding: 14px 18px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+  transition: all 0.2s ease-in-out;
+  z-index: 10;
+}
+
+.jt-pinned-hero-card--collapsed {
+  padding: 10px 16px;
+  background: #f8fafc;
+}
+
+.jt-pinned-hero-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.jt-pinned-hero-card__header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  flex: 1;
+}
+
+.jt-pinned-hero-card__title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: #0f172a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+}
+
+.jt-pinned-hero-card__toggle-btn {
+  font-size: 12px !important;
+  color: #64748b !important;
+  font-weight: 500 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  padding: 2px 8px !important;
+}
+
+.jt-pinned-hero-card__toggle-btn:hover {
+  color: #e30e16 !important;
+  background: #fee2e2 !important;
+}
+
+.jt-pinned-hero-card__content {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.jt-pinned-hero-card__meta-bar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.jt-pinned-meta-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  padding: 3px 10px;
+  background: #f1f5f9;
+  border-radius: 6px;
+  color: #475569;
+  font-weight: 500;
+}
+
+.jt-pinned-meta-chip--link {
+  color: #2563eb !important;
+  background: #eff6ff !important;
+  border: 1px solid #bfdbfe !important;
+  text-decoration: none !important;
+  transition: all 0.15s ease;
+}
+
+.jt-pinned-meta-chip--link:hover {
+  text-decoration: underline !important;
+  background: #dbeafe !important;
+}
+
+.jt-pinned-hero-card__desc {
+  font-size: 13px;
+  line-height: 1.6;
+  color: #334155;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  padding: 10px 14px;
+  border-radius: 8px;
+  white-space: pre-wrap;
+  max-height: 120px;
+  overflow-y: auto;
+}
+
+.jt-pinned-hero-card__attachments {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.jt-pinned-attachments-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.jt-pinned-attachments-list {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.jt-pinned-attachment-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  padding: 3px 10px;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  color: #1e293b;
+  text-decoration: none;
+  transition: border-color 0.16s ease;
+}
+
+.jt-pinned-attachment-chip:hover {
+  border-color: #e30e16;
+  color: #e30e16;
+}
+
+.jt-pinned-attachment-chip__name {
+  max-width: 220px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 2. Container cho Chat & Combined Stream */
+.jt-chat-stream-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  position: relative;
+}
+
+.jt-chat-stream__timeline {
+  flex: 1 1 0% !important;
+  min-height: 0 !important;
+  height: 100% !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain !important;
+  padding: 16px 18px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 14px !important;
+  background: #f8fafc !important;
+}
+
+.jt-chat-stream__timeline::-webkit-scrollbar {
+  width: 6px;
+}
+
+.jt-chat-stream__timeline::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+.jt-chat-stream__timeline::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Mốc sự kiện hệ thống (System Event Item) */
+.jt-chat-system-event {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 6px 0;
+}
+
+.jt-chat-system-event__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 14px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  font-size: 12px;
+  color: #475569;
+}
+
+.jt-chat-system-event__text {
+  font-weight: 500;
+}
+
+.jt-chat-system-event__time {
+  font-size: 11px;
+  color: #94a3b8;
+  margin-left: 4px;
+}
+
+/* Bong bóng tin nhắn (Chat Messages) */
+.jt-chat-message {
+  display: flex;
+  gap: 10px;
+  max-width: 85%;
+}
+
+.jt-chat-message--incoming {
+  align-self: flex-start;
+}
+
+.jt-chat-message--outgoing {
+  align-self: flex-end;
+  flex-direction: row-reverse;
+}
+
+.jt-chat-message__avatar {
+  background: #e2e8f0;
+  color: #475569;
+  flex-shrink: 0;
+}
+
+.jt-chat-message__wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.jt-chat-message--outgoing .jt-chat-message__wrap {
+  align-items: flex-end;
+}
+
+.jt-chat-message__sender-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+}
+
+.jt-chat-message__sender-name {
+  font-weight: 650;
+  color: #1e293b;
+}
+
+.jt-chat-message__role-tag {
+  font-size: 10px;
+  line-height: 16px;
+  padding: 0 6px;
+  border-radius: 4px;
+  margin: 0;
+}
+
+.jt-chat-message__time {
+  font-size: 11px;
+  color: #94a3b8;
+}
+
+.jt-chat-message__bubble {
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-size: 13px;
+  line-height: 1.5;
+  word-break: break-word;
+  white-space: pre-wrap;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.jt-chat-message__bubble--incoming {
+  background: #ffffff;
+  color: #0f172a;
+  border: 1px solid #e2e8f0;
+  border-top-left-radius: 2px;
+}
+
+.jt-chat-message__bubble--outgoing {
+  background: #e30e16;
+  color: #ffffff;
+  border-top-right-radius: 2px;
+}
+
+.jt-chat-message__attachment {
+  margin-top: 6px;
+  padding: 6px 10px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.jt-chat-message__bubble--incoming .jt-chat-message__attachment {
+  background: #f1f5f9;
+  color: #0f172a;
+  border: 1px solid #cbd5e1;
+}
+
+/* 3. Sticky Bottom Input Bar */
+.jt-chat-stream__sticky-input-bar {
+  flex-shrink: 0;
+  background: #ffffff;
+  border-top: 1px solid #e2e8f0;
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.02);
+}
+
+.jt-chat-file-preview-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 12px;
+  color: #334155;
+  width: fit-content;
+}
+
+.jt-chat-file-preview-chip__name {
+  font-weight: 600;
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.jt-chat-file-preview-chip__size {
+  color: #64748b;
+  font-size: 11px;
+}
+
+.jt-chat-file-preview-chip__remove {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: #94a3b8;
+  padding: 0 2px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.jt-chat-file-preview-chip__remove:hover {
+  color: #ef4444;
+}
+
+.jt-chat-input-controls {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.jt-chat-attach-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+  color: #64748b;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.16s ease;
+  flex-shrink: 0;
+}
+
+.jt-chat-attach-btn:hover {
+  color: #e30e16;
+  border-color: #e30e16;
+  background: #fff;
+}
+
+.jt-chat-textarea {
+  flex: 1;
+  border-radius: 8px !important;
+  border: 1px solid #cbd5e1 !important;
+  padding: 7px 12px !important;
+  font-size: 13px !important;
+  line-height: 1.5 !important;
+  resize: none !important;
+}
+
+.jt-chat-textarea:focus {
+  border-color: #e30e16 !important;
+  box-shadow: 0 0 0 2px rgba(227, 14, 22, 0.1) !important;
+}
+
+.jt-chat-send-btn {
+  height: 36px !important;
+  border-radius: 8px !important;
+  background: #e30e16 !important;
+  border-color: #e30e16 !important;
+  font-weight: 600 !important;
+  color: #ffffff !important;
+  flex-shrink: 0;
+}
+
+.jt-chat-send-btn:hover,
+.jt-chat-send-btn:focus {
+  background: #c90c13 !important;
+  border-color: #c90c13 !important;
+}
+
+/* ==========================================================================
+   TICKET CREATION MODAL STYLES (IMAGES 1, 2, 3, 4)
+   ========================================================================== */
+
+/* Picker Modal Step 0 */
+.jt-user-template-modal .ant-modal-content {
+  border-radius: 14px !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+}
+
+.jt-user-template-modal .ant-modal-header {
+  padding: 20px 24px 14px !important;
+  border-bottom: 1px solid #f1f5f9 !important;
+  margin-bottom: 0 !important;
+}
+
+.jt-user-template-modal .ant-modal-title {
+  color: #0f172a !important;
+  font-size: 17px !important;
+  font-weight: 700 !important;
+}
+
+.jt-user-template-modal .ant-modal-body {
+  padding: 20px 24px 24px !important;
+}
+
+.jt-template-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.jt-template-picker__grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.jt-template-option {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  padding: 16px 20px;
+  text-align: left;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.jt-template-option:hover,
+.jt-template-option:focus {
+  border-color: #fca5a5;
+  box-shadow: 0 4px 14px rgba(220, 38, 38, 0.08);
+  outline: none;
+  transform: translateY(-1px);
+}
+
+.jt-template-option__icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: #fef2f2;
+  border: 1px solid #fee2e2;
+  color: #dc2626;
+  font-size: 20px;
+}
+
+.jt-template-option__body {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.jt-template-option__name {
+  color: #111827;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.jt-template-option__desc {
+  color: #6b7280;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+/* Modal Step 1 */
+.jt-create-template-modal .ant-modal-content {
+  border-radius: 14px !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+}
+
+.jt-create-template-modal .ant-modal-header {
+  padding: 14px 20px !important;
+  border-bottom: 1px solid #f1f5f9 !important;
+  background: #ffffff !important;
+  margin-bottom: 0 !important;
+}
+
+.jt-create-template-modal .ant-modal-body {
+  max-height: calc(90vh - 130px);
+  overflow-y: auto;
+  padding: 18px 24px !important;
+  background: #ffffff !important;
+}
+
+.jt-modal-clean-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.jt-modal-clean-header__left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.jt-modal-clean-header__back {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.jt-modal-clean-header__back:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+  border-color: #cbd5e1;
+}
+
+.jt-modal-clean-header__titles {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  min-width: 0;
+}
+
+.jt-modal-clean-header__title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #0f172a;
+  letter-spacing: -0.01em;
+}
+
+.jt-modal-clean-header__steps-badge {
+  font-size: 12px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.jt-modal-clean-header__close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border-radius: 8px;
+  border: 0;
+  background: transparent;
+  color: #94a3b8;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-size: 15px;
+}
+
+.jt-modal-clean-header__close:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.jt-create-ticket-modal__footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 14px 24px;
+  border-top: 1px solid #f1f5f9;
+  background: #ffffff;
+}
+
+.jt-form-section {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 12px;
+}
+
+.jt-form-section--divider {
+  border-top: 1px solid #eef2f6;
+  padding-top: 14px;
+  margin-top: 6px;
+}
+
+.jt-form-section-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #475569;
+  margin-bottom: 12px;
+}
+
+.jt-form-section-header .anticon {
+  font-size: 13px;
+  color: #64748b;
+}
+
+.jt-field-label {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.jt-field-label__sub {
+  font-size: 12px;
+  font-weight: 400;
+  color: #64748b;
+  margin-left: 4px;
+}
+
+.jt-form-grid-1col {
+  width: 100%;
+}
+
+.jt-form-grid-2col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  width: 100%;
+}
+
+@media (max-width: 640px) {
+  .jt-form-grid-2col {
+    grid-template-columns: 1fr;
+  }
+}
+
+.jt-upload-dropzone {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 16px;
+  background: #f8fafc;
+  border: 1.5px dashed #cbd5e1;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.jt-upload-dropzone:hover {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+}
+
+.jt-upload-dropzone__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  color: #64748b;
+  font-size: 16px;
+  flex-shrink: 0;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.jt-upload-dropzone__content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.jt-upload-dropzone__primary {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.jt-upload-dropzone__secondary {
+  font-size: 11.5px;
+  color: #64748b;
+}
+
+.jt-upload-dropzone__btn {
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  border-color: #cbd5e1;
+  height: 30px !important;
+  padding: 0 12px !important;
+}
+
+.jt-segmented-radio {
+  display: flex !important;
+  width: 100% !important;
+}
+
+.jt-segmented-radio .ant-radio-button-wrapper {
+  flex: 1 !important;
+  text-align: center !important;
+  height: 36px !important;
+  line-height: 34px !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  border-color: #cbd5e1 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.jt-segmented-radio .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled) {
+  background: #dc2626 !important;
+  border-color: #dc2626 !important;
+  color: #ffffff !important;
+}
+
+/* ==========================================================================
+   MULTI-ROLE ACTION BAR & CONSULTATION DOCK (ĐẶC TẢ 4 VAI TRÒ V2.3)
+   ========================================================================== */
+
+/* Thanh tác vụ đa vai trò nổi trên Chat stream */
+.jt-role-action-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 10px 16px;
+  background: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+  flex-shrink: 0;
+  z-index: 5;
+}
+
+.jt-role-action-bar__info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #334155;
+}
+
+.jt-role-action-bar__title {
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.jt-role-action-bar__buttons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.jt-action-btn-approve {
+  background-color: #16a34a !important;
+  border-color: #16a34a !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  border-radius: 6px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+}
+
+.jt-action-btn-approve:hover {
+  background-color: #15803d !important;
+  border-color: #15803d !important;
+}
+
+.jt-action-btn-reject {
+  background-color: #dc2626 !important;
+  border-color: #dc2626 !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  border-radius: 6px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+}
+
+.jt-action-btn-reject:hover {
+  background-color: #b91c1c !important;
+  border-color: #b91c1c !important;
+}
+
+.jt-action-btn-consult {
+  border-color: #7c3aed !important;
+  color: #7c3aed !important;
+  background-color: #f5f3ff !important;
+  font-weight: 600 !important;
+  border-radius: 6px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+}
+
+.jt-action-btn-consult:hover {
+  background-color: #ede9fe !important;
+  border-color: #6d28d9 !important;
+  color: #6d28d9 !important;
+}
+
+.jt-action-btn-complete {
+  background-color: #16a34a !important;
+  border-color: #16a34a !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  border-radius: 6px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+}
+
+/* Dock phản hồi ý kiến chuyên biệt (jt-doc-consult-dock) */
+.jt-doc-consult-dock {
+  background: #faf5ff;
+  border: 1px solid #e9d5ff;
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: 0 1px 3px rgba(124, 58, 237, 0.08);
+}
+
+.jt-doc-consult-dock__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.jt-doc-consult-dock__title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #6b21a8;
+}
+
+.jt-doc-consult-dock__question {
+  background: #ffffff;
+  border: 1px dashed #d8b4fe;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 13px;
+  color: #4c1d95;
+  line-height: 1.5;
+}
+
+.jt-doc-consult-dock__input-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.jt-doc-consult-dock__textarea {
+  border-radius: 6px !important;
+  border-color: #d8b4fe !important;
+  font-size: 13px !important;
+}
+
+.jt-doc-consult-dock__textarea:focus {
+  border-color: #9333ea !important;
+  box-shadow: 0 0 0 2px rgba(147, 51, 234, 0.2) !important;
+}
+
+.jt-doc-consult-dock__actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.jt-doc-consult-dock__submit-btn {
+  background-color: #7c3aed !important;
+  border-color: #7c3aed !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  border-radius: 6px !important;
+}
+
+.jt-doc-consult-dock__submit-btn:hover {
+  background-color: #6d28d9 !important;
+  border-color: #6d28d9 !important;
+}
+
+/* ==========================================================================
+   REVIEW & CONFIRM MODAL STYLES (CLEAN ENTERPRISE)
+   ========================================================================== */
+.jt-review-confirm-modal .ant-modal-content {
+  border-radius: 8px !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+  background: #ffffff !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12) !important;
+}
+
+.jt-review-confirm-modal .ant-modal-header {
+  padding: 14px 20px !important;
+  border-bottom: 1px solid #f1f5f9 !important;
+  background: #ffffff !important;
+  margin: 0 !important;
+}
+
+.jt-review-confirm-modal .ant-modal-title {
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  color: #1e293b !important;
+}
+
+.jt-review-confirm-modal .ant-modal-body {
+  padding: 16px 20px !important;
+  background: #ffffff !important;
+  max-height: calc(85vh - 120px) !important;
+  overflow-y: auto !important;
+}
+
+.jt-review-confirm-modal .ant-modal-footer {
+  padding: 12px 20px !important;
+  border-top: 1px solid #f1f5f9 !important;
+  background: #f8fafc !important;
+  margin: 0 !important;
+}
+
+.jt-review-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.jt-review-title-section {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 10px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.jt-review-type-tag {
+  margin: 0 !important;
+  font-size: 11.5px !important;
+  font-weight: 500 !important;
+  border-radius: 4px !important;
+  padding: 1px 7px !important;
+  color: #475569 !important;
+  background: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+  line-height: 18px !important;
+  flex-shrink: 0 !important;
+}
+
+.jt-review-ticket-title {
+  margin: 0 !important;
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  color: #0f172a !important;
+  line-height: 1.35 !important;
+  word-break: break-word !important;
+  flex: 1 !important;
+  min-width: 0 !important;
+}
+
+.jt-review-kv-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.jt-review-kv-row {
+  display: flex;
+  align-items: baseline;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.jt-review-kv-label {
+  width: 140px;
+  flex-shrink: 0;
+  color: #64748b;
+  font-size: 12.5px;
+  font-weight: 500;
+}
+
+.jt-review-kv-value {
+  flex: 1;
+  min-width: 0;
+  color: #1e293b;
+  font-weight: 450;
+  word-break: break-word;
+}
+
+.jt-review-kv-value--bold {
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.jt-review-neutral-text {
+  color: #64748b;
+  font-style: italic;
+}
+
+.jt-review-files-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.jt-review-file-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 7px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  font-size: 11.5px;
+  color: #334155;
+}
+
+.jt-review-desc-section {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #f1f5f9;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.jt-review-desc-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.jt-review-desc-box {
+  width: 100%;
+  box-sizing: border-box;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #1e293b;
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 120px;
+  overflow-y: auto;
+}
+
+.jt-review-modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+/* ==========================================================================
+   OTP DIGITAL SIGNATURE MODAL STYLES
+   ========================================================================== */
+.jt-otp-confirm-modal .ant-modal-content {
+  border-radius: 10px !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+}
+
+.jt-otp-confirm-modal .ant-modal-header {
+  padding: 16px 20px !important;
+  border-bottom: 1px solid #f1f5f9 !important;
+  margin: 0 !important;
+}
+
+.jt-otp-confirm-modal .ant-modal-title {
+  font-size: 16px !important;
+  font-weight: 650 !important;
+  color: #0f172a !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+.jt-otp-confirm-modal .ant-modal-body {
+  padding: 20px !important;
+}
+
+.jt-otp-confirm-modal .ant-modal-footer {
+  padding: 12px 20px !important;
+  border-top: 1px solid #f1f5f9 !important;
+  background: #f8fafc !important;
+  margin: 0 !important;
+}
+
+.jt-otp-confirm-modal__content {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.jt-otp-confirm-modal__hint {
+  color: #475569;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.jt-otp-confirm-modal__service-pill {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 12.5px;
+  color: #166534;
+}
+
+.jt-otp-confirm-modal__input {
+  display: flex;
+  justify-content: center;
+  margin: 8px 0;
+}
+
+.jt-otp-confirm-modal__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/* ==========================================================================
+   DRAWER FOOTER (BOTTOM-RIGHT ACTION BAR)
+   Đưa toàn bộ thao tác duyệt/hoàn thành xuống góc dưới cùng bên phải của Drawer
+   ========================================================================== */
+.jt-document-drawer .ant-drawer-footer,
+.jt-document-drawer .job-ticket-drawer-footer {
+  padding: 0 !important;
+  border-top: 1px solid #e2e8f0 !important;
+  background: #ffffff !important;
+  flex: 0 0 auto !important;
+  box-shadow: 0 -2px 8px rgba(15, 23, 42, 0.04) !important;
+}
+
+.jt-drawer-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 12px 24px;
+  background: #ffffff;
+  box-sizing: border-box;
+}
+
+.jt-drawer-footer__left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.jt-drawer-footer__hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #334155;
+}
+
+.jt-drawer-footer__right {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-left: auto;
+}
+
+/* Thanh tác vụ nghiệp vụ nằm ngay dưới hero card (vị trí chuẩn) */
+.jt-role-action-bar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 10px 14px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 9px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+.jt-role-action-bar__info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #475467;
+}
+
+.jt-role-action-bar__title {
+  color: #0f172a;
+  font-weight: 600;
+}
+
+.jt-role-action-bar__buttons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Các nút tác vụ chuyên biệt chuẩn ERP */
+.jt-action-btn {
+  height: 38px !important;
+  padding: 0 16px !important;
+  font-weight: 600 !important;
+  font-size: 13.5px !important;
+  border-radius: 8px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  transition: all 0.15s ease !important;
+}
+
+.jt-action-btn--approve {
+  background-color: #16a34a !important;
+  border-color: #16a34a !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 6px rgba(22, 163, 74, 0.25) !important;
+}
+
+.jt-action-btn--approve:hover {
+  background-color: #15803d !important;
+  border-color: #15803d !important;
+}
+
+.jt-action-btn--reject {
+  background-color: #ffffff !important;
+  border-color: #fca5a5 !important;
+  color: #dc2626 !important;
+}
+
+.jt-action-btn--reject:hover {
+  background-color: #fef2f2 !important;
+  border-color: #ef4444 !important;
+}
+
+.jt-action-btn--consult {
+  background-color: #ffffff !important;
+  border-color: #c7d2fe !important;
+  color: #4f46e5 !important;
+}
+
+.jt-action-btn--consult:hover {
+  background-color: #eef2ff !important;
+  border-color: #6366f1 !important;
+}
+
+.jt-action-btn--complete {
+  background-color: #16a34a !important;
+  border-color: #16a34a !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 6px rgba(22, 163, 74, 0.25) !important;
+}
+
+.jt-action-btn--complete:hover {
+  background-color: #15803d !important;
+  border-color: #15803d !important;
+}
+
+.jt-action-btn--consult-reply {
+  background-color: #7c3aed !important;
+  border-color: #7c3aed !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 6px rgba(124, 58, 237, 0.25) !important;
+}
+
+.jt-action-btn--consult-reply:hover {
+  background-color: #6d28d9 !important;
+  border-color: #6d28d9 !important;
+}
+
+/* ==========================================================================
+   MODAL TÁC VỤ HIỆN ĐẠI (JT-MODERN-ACTION-MODAL)
+   Khắc phục toàn bộ khuyết điểm layout cũ, đẹp và chuyên nghiệp chuẩn ERP
+   ========================================================================== */
+
+.jt-modern-action-modal .ant-modal-content {
+  border-radius: 14px !important;
+  padding: 24px !important;
+  box-shadow: 0 20px 25px -5px rgba(15, 23, 42, 0.1), 0 8px 10px -6px rgba(15, 23, 42, 0.06) !important;
+  border: 1px solid #e2e8f0 !important;
+  overflow: hidden !important;
+}
+
+.jt-modern-modal-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.jt-modern-modal-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.jt-modern-modal-icon--success {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #16a34a;
+}
+
+.jt-modern-modal-icon--gold {
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  color: #d97706;
+}
+
+.jt-modern-modal-icon--danger {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+}
+
+.jt-modern-modal-icon--purple {
+  background: #faf5ff;
+  border: 1px solid #e9d5ff;
+  color: #7c3aed;
+}
+
+.jt-modern-modal-title-group {
+  min-width: 0;
+  flex: 1;
+}
+
+.jt-modern-modal-title {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1.35;
+}
+
+.jt-modern-modal-subtitle {
+  margin: 3px 0 0 0;
+  font-size: 13px;
+  color: #64748b;
+  line-height: 1.4;
+}
+
+.jt-modern-modal-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 9px;
+  padding: 12px 14px;
+  margin-bottom: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.jt-modern-modal-card-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 13px;
+}
+
+.jt-modern-modal-card-label {
+  color: #64748b;
+  font-size: 12.5px;
+  flex-shrink: 0;
+}
+
+.jt-modern-modal-card-value {
+  color: #0f172a;
+  font-weight: 600;
+  text-align: right;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.jt-modern-modal-form {
+  margin-bottom: 22px;
+}
+
+.jt-modern-field-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 8px;
+}
+
+.jt-modern-field-label--required::after {
+  content: " *";
+  color: #dc2626;
+}
+
+.jt-modern-optional-tag {
+  font-size: 12px;
+  font-weight: 400;
+  color: #94a3b8;
+  margin-left: 4px;
+}
+
+.jt-modern-textarea {
+  border-radius: 8px !important;
+  border: 1px solid #cbd5e1 !important;
+  padding: 10px 12px !important;
+  font-size: 13.5px !important;
+  line-height: 1.5 !important;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04) !important;
+  transition: all 0.15s ease !important;
+}
+
+.jt-modern-textarea:focus {
+  border-color: #2563eb !important;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12) !important;
+}
+
+.jt-modern-modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-top: 16px;
+  border-top: 1px solid #f1f5f9;
+}
+
+.jt-modern-modal-btn {
+  height: 38px !important;
+  padding: 0 18px !important;
+  border-radius: 8px !important;
+  font-weight: 600 !important;
+  font-size: 13.5px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+}
+
+.jt-modern-modal-btn--cancel {
+  border: 1px solid #cbd5e1 !important;
+  color: #475467 !important;
+  background: #ffffff !important;
+}
+
+.jt-modern-modal-btn--cancel:hover {
+  background: #f8fafc !important;
+  border-color: #94a3b8 !important;
+}
+
+.jt-modern-modal-btn--success {
+  background: #16a34a !important;
+  border-color: #16a34a !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 6px rgba(22, 163, 74, 0.25) !important;
+}
+
+.jt-modern-modal-btn--success:hover {
+  background: #15803d !important;
+  border-color: #15803d !important;
+}
+
+.jt-modern-modal-btn--danger {
+  background: #dc2626 !important;
+  border-color: #dc2626 !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 6px rgba(220, 38, 38, 0.25) !important;
+}
+
+.jt-modern-modal-btn--danger:hover {
+  background: #b91c1c !important;
+  border-color: #b91c1c !important;
+}
+
+.jt-modern-modal-btn--purple {
+  background: #7c3aed !important;
+  border-color: #7c3aed !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 6px rgba(124, 58, 237, 0.25) !important;
+}
+
+.jt-modern-modal-btn--purple:hover {
+  background: #6d28d9 !important;
+  border-color: #6d28d9 !important;
+}
+
+
+
