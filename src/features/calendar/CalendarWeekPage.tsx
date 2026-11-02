@@ -402,9 +402,11 @@ export function CalendarWeekPage() {
               aria-pressed={attending}
               onClick={() => setAttending((value) => !value)}
             >
-              <span className="booking-week-modifier-dot" aria-hidden="true" />
+              <span className="booking-week-modifier-check" aria-hidden="true">
+                {attending && <CheckOutlined />}
+              </span>
               <span>Chỉ có mặt tôi</span>
-              <span className="booking-week-modifier-count">({state.loading ? '...' : stats.attending})</span>
+              <span className="booking-week-modifier-count">{state.loading ? '' : stats.attending}</span>
               <span style={{ display: 'none' }}>Chỉ hiện lịch có mặt tôi</span>
             </button>
 

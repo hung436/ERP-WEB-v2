@@ -40,7 +40,7 @@ export const APPROVAL_STATUS_META = {
     label: 'Đang lấy ý kiến',
     color: 'processing',
   },
-  APPROVED: { value: 'APPROVED', label: 'Đã duyệt', color: 'success' },
+  APPROVED: { value: 'APPROVED', label: 'Đang triển khai', color: 'success' },
   REJECTED: { value: 'REJECTED', label: 'Không duyệt', color: 'error' },
 } as const;
 

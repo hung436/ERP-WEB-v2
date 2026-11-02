@@ -61,6 +61,7 @@ export interface MeetingEvent {
   title: string;
   startAt: string;
   endAt: string;
+  createdAt?: string;
   location?: string;
   meetingUrl?: string;
   type: MeetingEventType | string;
@@ -99,6 +100,7 @@ export interface CalendarEvent {
   title: string;
   startAt: string;
   endAt: string;
+  createdAt?: string;
   location?: string;
   meetingUrl?: string;
   type: CalendarEventType;

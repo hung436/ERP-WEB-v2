@@ -289,7 +289,8 @@ export async function mockRequest<T>(path: string, options?: { method?: string; 
       const body = options.body as Partial<CalendarEvent>;
       const meetingCode = `${Math.floor(100 + Math.random() * 900)}-${Math.floor(100 + Math.random() * 900)}`;
       const newEvent: CalendarEvent = {
-        id: `event-${Date.now()}`,
+        ...body,
+        id: body.id || `event-${Date.now()}`,
         title: body.title ?? 'Cuộc họp trực tuyến mới',
         startAt: body.startAt ?? new Date().toISOString(),
         endAt: body.endAt ?? new Date(Date.now() + 3600000).toISOString(),

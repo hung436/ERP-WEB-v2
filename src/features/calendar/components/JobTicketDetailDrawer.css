@@ -233,7 +233,7 @@
   background: #e2e8f0 !important;
 }
 
-/* --- GRID LAYOUT 2 CỘT 7fr 5fr (KHÔNG ĐÓNG KHUNG CARD) --- */
+/* --- GRID LAYOUT 2 CỘT TỶ LỆ 2:1 (KHÔNG ĐÓNG KHUNG CARD, CỘT PHẢI THU GỌN) --- */
 .jt-doc-detail {
   padding: 0 !important;
   height: 100% !important;
@@ -249,7 +249,7 @@
 
 .jt-doc-detail__grid {
   display: grid !important;
-  grid-template-columns: 7fr 5fr !important;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) !important;
   gap: 0 !important;
   flex: 1 1 0% !important;
   height: 100% !important;
@@ -789,6 +789,24 @@
   gap: 10px;
   min-width: 0;
   flex: 1;
+}
+
+.jt-pinned-hero-card__label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #475569;
+  letter-spacing: 0.02em;
+}
+
+.jt-chat-empty-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 36px 16px;
+  color: #94a3b8;
+  font-size: 13px;
+  text-align: center;
+  background: transparent;
 }
 
 .jt-pinned-hero-card__title {
@@ -2397,6 +2415,71 @@
 }
 
 /* ==========================================================================
+   HIGHLIGHT TRƯỜNG NGƯỜI DUYỆT PHIẾU (PHẲNG, KHÔNG ĐÓNG KHUNG)
+   ========================================================================== */
+.jt-approver-highlight-row .ant-form-item-label > label {
+  width: 100%;
+}
+
+.jt-approver-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+}
+
+.jt-field-label--approver {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #0f172a;
+  font-weight: 700;
+}
+
+.jt-approver-icon {
+  color: #d97706;
+  font-size: 14px;
+}
+
+.jt-approver-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 22px;
+  padding: 0 9px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 600;
+  border: 0;
+}
+
+.jt-approver-status-pill__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.jt-approver-status-pill.is-required {
+  background: #fffbeb;
+  color: #b45309;
+}
+
+.jt-approver-status-pill.is-required .jt-approver-status-pill__dot {
+  background: #d97706;
+}
+
+.jt-approver-status-pill.is-auto {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+.jt-approver-status-pill.is-auto .jt-approver-status-pill__dot {
+  background: #94a3b8;
+}
+
+/* ==========================================================================
    QUICK STATUS LOG BAR (TRONG DRAWER CHI TIẾT 2 CỘT)
    ========================================================================== */
 .jt-quick-log-bar {
@@ -2474,6 +2557,7 @@
   background: #fee2e2;
   color: #b91c1c;
 }
+
 
 
 

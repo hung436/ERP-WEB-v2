@@ -262,7 +262,7 @@ export function getMockPersonalEvents(weekStart: Dayjs): CalendarEvent[] {
       approver: { id: 'user-107', name: 'Đ/c Nguyễn Tấn Đạt (Phó Tổng Biên tập)' },
       approvalStatus: 'PENDING',
       steps: [
-        { id: 'step-1', step_order: 1, name: 'Khởi tạo', status: 'DONE', completed_at: mon.toISOString(), actor_name: 'Bùi Lê Thế Kiệt', role: 'CREATOR', note: 'Đã hoàn tất lập đề xuất và đính kèm tài liệu kiến trúc.' },
+        { id: 'step-1', step_order: 1, name: 'Khởi tạo', status: 'DONE', completed_at: mon.toISOString(), actor_name: 'Nguyễn Minh Anh', role: 'CREATOR', note: 'Đã hoàn tất lập đề xuất và đính kèm tài liệu kiến trúc.' },
         { id: 'step-2', step_order: 2, name: 'Phê duyệt', status: 'ACTIVE', actor_name: 'Đ/c Nguyễn Tấn Đạt (Phó Tổng Biên tập)', role: 'APPROVER' },
         { id: 'step-3', step_order: 3, name: 'Triển khai', status: 'PENDING', actor_name: 'Nguyễn Minh Anh', role: 'EXECUTOR' },
       ],

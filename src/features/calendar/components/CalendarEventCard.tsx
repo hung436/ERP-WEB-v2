@@ -293,7 +293,7 @@ export function CalendarEventCard({ event, onSelectEvent, onHoverChange, style, 
           <div className="card-rich-row">
             <Users size={13} />
             <span>
-              <strong>Thực hiện:</strong> {event.executors!.map((u) => u.name).join(', ')}
+              <strong>Triển khai:</strong> {event.executors!.map((u) => u.name).join(', ')}
             </span>
           </div>
         )}

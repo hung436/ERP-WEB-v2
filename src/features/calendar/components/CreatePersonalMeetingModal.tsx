@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
-import dayjs, { type Dayjs } from 'dayjs';
+import { useEffect, useRef, useState } from "react";
+import dayjs, { type Dayjs } from "dayjs";
 import {
   Alert,
   Button,
@@ -10,71 +10,91 @@ import {
   Radio,
   Select,
   message,
-} from 'antd';
-import type { UploadFile } from 'antd/es/upload/interface';
+} from "antd";
+import type { UploadFile } from "antd/es/upload/interface";
 import {
   CheckOutlined,
   CheckSquareOutlined,
-  ClockCircleOutlined,
   CloseOutlined,
   EnvironmentOutlined,
+  LinkOutlined,
   NotificationOutlined,
   PaperClipOutlined,
   TeamOutlined,
   UploadOutlined,
   VideoCameraOutlined,
-} from '@ant-design/icons';
+} from "@ant-design/icons";
 
-import { calendarApi } from '@/services/api';
-import type { CalendarAttachmentItem, CalendarEvent } from '@/types/domain';
+import { useAuth } from "@/features/auth/AuthContext";
+import { calendarApi } from "@/services/api";
+import type { CalendarAttachmentItem, CalendarEvent } from "@/types/domain";
 
-import './JobTicketDetailDrawer.css';
+import "./JobTicketDetailDrawer.css";
 
 const TICKET_TYPE_ITEMS = [
   {
-    value: 'TASK' as const,
-    name: 'Phiếu công việc',
+    value: "TASK" as const,
+    name: "Phiếu công việc",
     icon: <CheckSquareOutlined />,
-    contentPlaceholder: 'Nhập nội dung công việc, mục tiêu hoặc yêu cầu phối hợp...',
-    createButtonText: 'Tạo phiếu công việc',
+    contentPlaceholder:
+      "Nhập nội dung công việc, mục tiêu hoặc yêu cầu phối hợp...",
+    createButtonText: "Tạo phiếu công việc",
   },
   {
-    value: 'MEETING' as const,
-    name: 'Lịch họp',
+    value: "MEETING" as const,
+    name: "Lịch họp",
     icon: <VideoCameraOutlined />,
-    contentPlaceholder: 'Nhập nội dung cuộc họp, chương trình nghị sự...',
-    createButtonText: 'Tạo lịch họp',
+    contentPlaceholder: "Nhập nội dung cuộc họp, chương trình nghị sự...",
+    createButtonText: "Tạo lịch họp",
   },
   {
-    value: 'EVENT' as const,
-    name: 'Sự kiện',
+    value: "EVENT" as const,
+    name: "Sự kiện",
     icon: <NotificationOutlined />,
-    contentPlaceholder: 'Nhập nội dung sự kiện, kế hoạch tổ chức...',
-    createButtonText: 'Tạo sự kiện',
+    contentPlaceholder: "Nhập nội dung sự kiện, kế hoạch tổ chức...",
+    createButtonText: "Tạo sự kiện",
   },
 ];
 
 export const SUGGESTED_MEMBERS = [
-  { value: 'Nguyễn Minh Anh (Phóng viên)', label: 'Nguyễn Minh Anh (Phóng viên)' },
-  { value: 'Trần Thu Hà (Ban Nội dung)', label: 'Trần Thu Hà (Ban Nội dung)' },
-  { value: 'Lê Thanh Vân (Văn phòng)', label: 'Lê Thanh Vân (Văn phòng)' },
-  { value: 'Nguyễn Hoài Nam (Ban Bạn đọc)', label: 'Nguyễn Hoài Nam (Ban Bạn đọc)' },
-  { value: 'Đỗ Quang Huy (Ban Khoa giáo)', label: 'Đỗ Quang Huy (Ban Khoa giáo)' },
-  { value: 'Mai Phương Thảo (Phòng Lưu trữ)', label: 'Mai Phương Thảo (Phòng Lưu trữ)' },
-  { value: 'Hoàng Điệp (BTV Ảnh)', label: 'Hoàng Điệp (BTV Ảnh)' },
-  { value: 'TS. Trần Quốc Hùng (Chuyên gia khách mời)', label: 'TS. Trần Quốc Hùng (Chuyên gia khách mời)' },
-  { value: 'PHAN NGHỆ ĐÔ', label: 'PHAN NGHỆ ĐÔ' },
-  { value: 'Bùi Lê Thế Kiệt', label: 'Bùi Lê Thế Kiệt' },
-  { value: 'Nguyễn Văn An', label: 'Nguyễn Văn An' },
-  { value: 'Lê Văn Tuấn', label: 'Lê Văn Tuấn' },
-  { value: 'Nguyễn Tấn Đạt (Phó Tổng Biên tập)', label: 'Nguyễn Tấn Đạt (Phó Tổng Biên tập)' },
+  {
+    value: "Nguyễn Minh Anh (Phóng viên)",
+    label: "Nguyễn Minh Anh (Phóng viên)",
+  },
+  { value: "Trần Thu Hà (Ban Nội dung)", label: "Trần Thu Hà (Ban Nội dung)" },
+  { value: "Lê Thanh Vân (Văn phòng)", label: "Lê Thanh Vân (Văn phòng)" },
+  {
+    value: "Nguyễn Hoài Nam (Ban Bạn đọc)",
+    label: "Nguyễn Hoài Nam (Ban Bạn đọc)",
+  },
+  {
+    value: "Đỗ Quang Huy (Ban Khoa giáo)",
+    label: "Đỗ Quang Huy (Ban Khoa giáo)",
+  },
+  {
+    value: "Mai Phương Thảo (Phòng Lưu trữ)",
+    label: "Mai Phương Thảo (Phòng Lưu trữ)",
+  },
+  { value: "Hoàng Điệp (BTV Ảnh)", label: "Hoàng Điệp (BTV Ảnh)" },
+  {
+    value: "TS. Trần Quốc Hùng (Chuyên gia khách mời)",
+    label: "TS. Trần Quốc Hùng (Chuyên gia khách mời)",
+  },
+  { value: "PHAN NGHỆ ĐÔ", label: "PHAN NGHỆ ĐÔ" },
+  { value: "Bùi Lê Thế Kiệt", label: "Bùi Lê Thế Kiệt" },
+  { value: "Nguyễn Văn An", label: "Nguyễn Văn An" },
+  { value: "Lê Văn Tuấn", label: "Lê Văn Tuấn" },
+  {
+    value: "Nguyễn Tấn Đạt (Phó Tổng Biên tập)",
+    label: "Nguyễn Tấn Đạt (Phó Tổng Biên tập)",
+  },
 ];
 
 export interface CreatePersonalMeetingModalProps {
   open: boolean;
   initialDate?: Dayjs | null;
   editingEvent?: CalendarEvent | null;
-  initialTicketType?: 'TASK' | 'MEETING' | 'EVENT';
+  initialTicketType?: "TASK" | "MEETING" | "EVENT";
   onClose: () => void;
   onSuccess: (record: CalendarEvent) => void;
 }
@@ -86,65 +106,90 @@ interface TicketFormValues {
   deadline?: Dayjs;
   dateTimeRange?: [Dayjs, Dayjs];
   location?: string;
-  mode?: 'offline' | 'online' | 'hybrid';
+  meetingLink?: string;
+  mode?: "offline" | "online" | "hybrid";
   participants?: string[] | string;
   executors?: string[];
   watchers?: string[];
-  approver?: string;
+  approver?: string[] | string;
 }
 
 export function CreatePersonalMeetingModal({
   open,
   initialDate,
   editingEvent,
-  initialTicketType = 'TASK',
+  initialTicketType = "TASK",
   onClose,
   onSuccess,
 }: CreatePersonalMeetingModalProps) {
+  const { user } = useAuth();
+  const currentUserName = user?.fullName || "Nguyễn Minh Anh";
   const [form] = Form.useForm<TicketFormValues>();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const isEdit = Boolean(editingEvent);
 
-  const [ticketType, setTicketType] = useState<'TASK' | 'MEETING' | 'EVENT'>(
-    (editingEvent?.ticketType as 'TASK' | 'MEETING' | 'EVENT' | undefined) || initialTicketType
+  const [ticketType, setTicketType] = useState<"TASK" | "MEETING" | "EVENT">(
+    (editingEvent?.ticketType as "TASK" | "MEETING" | "EVENT" | undefined) ||
+      initialTicketType,
   );
   const [files, setFiles] = useState<UploadFile[]>([]);
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
-  const selectedApprover = Form.useWatch('approver', form);
+  const selectedApprover = Form.useWatch("approver", form);
+  const selectedMode = Form.useWatch("mode", form) || "offline";
   const hasApprover =
-    ticketType !== 'MEETING' &&
+    ticketType !== "MEETING" &&
     Boolean(
       selectedApprover &&
-        (Array.isArray(selectedApprover) ? selectedApprover.length > 0 : String(selectedApprover).trim() !== '')
+      (Array.isArray(selectedApprover)
+        ? selectedApprover.length > 0
+        : String(selectedApprover).trim() !== ""),
     );
 
   useEffect(() => {
     if (open) {
-      setError('');
+      setError("");
       setSaving(false);
 
       if (editingEvent) {
         const tType =
-          (editingEvent.ticketType as 'TASK' | 'MEETING' | 'EVENT' | undefined) ||
-          (editingEvent.type === 'meeting' ? 'MEETING' : 'TASK');
+          (editingEvent.ticketType as
+            | "TASK"
+            | "MEETING"
+            | "EVENT"
+            | undefined) ||
+          (editingEvent.type === "meeting" ? "MEETING" : "TASK");
         setTicketType(tType);
 
-        const start = editingEvent.startAt ? dayjs(editingEvent.startAt) : dayjs().hour(9).minute(0).second(0);
-        const end = editingEvent.endAt ? dayjs(editingEvent.endAt) : start.add(1, 'hour');
+        const start = editingEvent.startAt
+          ? dayjs(editingEvent.startAt)
+          : dayjs().hour(9).minute(0).second(0);
+        const end = editingEvent.endAt
+          ? dayjs(editingEvent.endAt)
+          : start.add(1, "hour");
 
         form.setFieldsValue({
-          content: editingEvent.notes || editingEvent.description || editingEvent.title || '',
+          content:
+            editingEvent.notes ||
+            editingEvent.description ||
+            editingEvent.title ||
+            "",
           startAt: start,
           deadline: editingEvent.deadline ? dayjs(editingEvent.deadline) : end,
           location: editingEvent.location,
-          mode: editingEvent.mode || 'offline',
-          participants: editingEvent.participants || ['PHAN NGHỆ ĐÔ'],
-          executors: editingEvent.executors?.map((e) => e.name) || ['Bùi Lê Thế Kiệt'],
-          watchers: editingEvent.watchers?.map((w) => w.name) || ['Lê Văn Tuấn'],
-          approver: editingEvent.approver?.name || 'Nguyễn Tấn Đạt (Phó Tổng Biên tập)',
+          mode: editingEvent.mode || "offline",
+          participants: editingEvent.participants || ["PHAN NGHỆ ĐÔ"],
+          executors: editingEvent.executors?.map((e) => e.name) || [
+            "Bùi Lê Thế Kiệt",
+          ],
+          watchers: editingEvent.watchers?.map((w) => w.name) || [
+            "Lê Văn Tuấn",
+          ],
+          approver: editingEvent.approver?.name
+            ? editingEvent.approver.name.split(", ").filter(Boolean)
+            : ["Nguyễn Tấn Đạt (Phó Tổng Biên tập)"],
         });
 
         if (editingEvent.attachments) {
@@ -154,44 +199,47 @@ export function CreatePersonalMeetingModal({
               name: att.name,
               size: att.size,
               type: att.type,
-              status: 'done',
-            }))
+              status: "done",
+            })),
           );
         }
       } else {
-        setTicketType(initialTicketType || 'TASK');
+        setTicketType(initialTicketType || "TASK");
         form.resetFields();
         setFiles([]);
 
         const baseDate = initialDate || dayjs();
         const start = baseDate.hour(9).minute(0).second(0);
-        const end = start.add(1, 'hour');
+        const end = start.add(1, "hour");
 
         form.setFieldsValue({
-          mode: 'offline',
+          mode: "offline",
           startAt: start,
           deadline: end,
-          participants: ['PHAN NGHỆ ĐÔ'],
-          executors: ['Bùi Lê Thế Kiệt'],
-          watchers: ['Lê Văn Tuấn'],
-          approver: 'Nguyễn Tấn Đạt (Phó Tổng Biên tập)',
+          participants: [],
+          executors: [],
+          watchers: [],
+          approver: [],
         });
       }
     }
   }, [open, editingEvent, initialDate, initialTicketType, form]);
 
   const currentTypeMeta =
-    TICKET_TYPE_ITEMS.find((item) => item.value === ticketType) || TICKET_TYPE_ITEMS[0];
+    TICKET_TYPE_ITEMS.find((item) => item.value === ticketType) ||
+    TICKET_TYPE_ITEMS[0];
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      const newFiles: UploadFile[] = Array.from(e.target.files).map((f, idx) => ({
-        uid: `f-${Date.now()}-${idx}`,
-        name: f.name,
-        size: f.size,
-        type: f.type,
-        status: 'done',
-      }));
+      const newFiles: UploadFile[] = Array.from(e.target.files).map(
+        (f, idx) => ({
+          uid: `f-${Date.now()}-${idx}`,
+          name: f.name,
+          size: f.size,
+          type: f.type,
+          status: "done",
+        }),
+      );
       setFiles((prev) => [...prev, ...newFiles]);
     }
   };
@@ -200,107 +248,146 @@ export function CreatePersonalMeetingModal({
   const handleDirectSubmit = async () => {
     try {
       const data = await form.validateFields();
-      setError('');
+      setError("");
       setSaving(true);
 
       let startAtStr = new Date().toISOString();
       let endAtStr = new Date().toISOString();
 
-      if (ticketType === 'TASK') {
+      if (ticketType === "TASK") {
         const d = data.deadline ? dayjs(data.deadline) : dayjs();
+        startAtStr = d.toISOString();
         endAtStr = d.toISOString();
-        startAtStr = d.subtract(1, 'hour').toISOString();
       } else {
-        const s = data.startAt ? dayjs(data.startAt) : (data.dateTimeRange ? dayjs(data.dateTimeRange[0]) : dayjs());
+        const s = data.startAt
+          ? dayjs(data.startAt)
+          : data.dateTimeRange
+            ? dayjs(data.dateTimeRange[0])
+            : dayjs();
         startAtStr = s.toISOString();
-        endAtStr = s.add(1, 'hour').toISOString();
+        endAtStr = s.add(1, "hour").toISOString();
       }
 
+      const rawLocation = (data.location as string)?.trim() || "";
+      const rawLink = (data.meetingLink as string)?.trim() || "";
       const location =
-        data.mode === 'online'
-          ? 'Trực tuyến'
-          : (data.location as string) || (ticketType === 'TASK' ? 'Task công việc' : 'Phòng họp cơ quan');
+        data.mode === "online"
+          ? rawLink || rawLocation || "Trực tuyến"
+          : data.mode === "hybrid"
+            ? [rawLocation, rawLink].filter(Boolean).join(" • ") || "Phòng họp cơ quan"
+            : rawLocation ||
+              (ticketType === "TASK" ? "Task công việc" : "Phòng họp cơ quan");
 
-      const attachedItems: CalendarAttachmentItem[] = files.map((file, idx) => ({
-        id: `att-${Date.now()}-${idx}`,
-        name: file.name,
-        size: file.size || 1024,
-        type: file.type || 'application/octet-stream',
-        uploadedAt: new Date().toISOString(),
-        uploadedBy: 'Bùi Lê Thế Kiệt',
-      }));
+      const attachedItems: CalendarAttachmentItem[] = files.map(
+        (file, idx) => ({
+          id: `att-${Date.now()}-${idx}`,
+          name: file.name,
+          size: file.size || 1024,
+          type: file.type || "application/octet-stream",
+          uploadedAt: new Date().toISOString(),
+          uploadedBy: currentUserName,
+        }),
+      );
 
-      const approverName = hasApprover ? (data.approver as string) : undefined;
+      const approverName = hasApprover
+        ? Array.isArray(data.approver)
+          ? data.approver.join(", ")
+          : String(data.approver)
+        : undefined;
       const initialApprovalStatus = isEdit
-        ? editingEvent?.approvalStatus || 'APPROVED'
+        ? editingEvent?.approvalStatus || "APPROVED"
         : hasApprover
-          ? 'PENDING'
-          : 'APPROVED';
+          ? "PENDING"
+          : "APPROVED";
 
-      const rawContent = (data.content || '').trim();
+      const rawContent = (data.content || "").trim();
       const firstLine = rawContent.split(/\r?\n/)[0] || currentTypeMeta.name;
-      const derivedTitle = firstLine.length > 120 ? `${firstLine.slice(0, 120)}...` : firstLine;
+      const derivedTitle =
+        firstLine.length > 120 ? `${firstLine.slice(0, 120)}...` : firstLine;
 
       const newRecord: CalendarEvent = {
         id: editingEvent?.id || `event-${Date.now()}`,
         title: derivedTitle,
-        type: ticketType === 'TASK' ? 'task' : ticketType === 'EVENT' ? 'event' : 'meeting',
+        type:
+          ticketType === "TASK"
+            ? "task"
+            : ticketType === "EVENT"
+              ? "event"
+              : "meeting",
         ticketType,
-        scope: 'personal',
+        scope: "personal",
         startAt: startAtStr,
         endAt: endAtStr,
+        createdAt: editingEvent?.createdAt || new Date().toISOString(),
+        deadline: ticketType === "TASK" ? endAtStr : undefined,
         location,
-        mode: data.mode || 'offline',
-        organizer: 'Bùi Lê Thế Kiệt',
-        leader: 'Bùi Lê Thế Kiệt',
+        meetingUrl: rawLink || undefined,
+        mode: data.mode || "offline",
+        organizer: currentUserName,
+        leader: currentUserName,
         participants: Array.isArray(data.participants)
           ? data.participants
-          : typeof data.participants === 'string'
+          : typeof data.participants === "string"
             ? [data.participants]
-            : ['PHAN NGHỆ ĐÔ'],
+            : [],
         participantText: Array.isArray(data.participants)
-          ? data.participants.join(', ')
-          : String(data.participants || 'PHAN NGHỆ ĐÔ'),
-        participantCount: Array.isArray(data.participants) ? data.participants.length : 1,
+          ? data.participants.join(", ")
+          : String(data.participants || ""),
+        participantCount: Array.isArray(data.participants)
+          ? data.participants.length
+          : 0,
         isUserParticipant: true,
         notes: data.content,
         description: data.content,
         agenda: data.content,
         attachments: attachedItems,
-        approver: approverName ? { id: 'appr-1', name: approverName } : undefined,
+        approver: approverName
+          ? { id: "appr-1", name: approverName }
+          : undefined,
         approvalStatus: initialApprovalStatus,
         comments: editingEvent?.comments || [],
-        executors: Array.isArray(data.executors)
-          ? data.executors.map((e: string, i: number) => ({ id: `exec-${i}`, name: e }))
-          : [{ id: 'exec-0', name: 'Bùi Lê Thế Kiệt' }, { id: 'exec-1', name: 'Nguyễn Văn An' }],
-        watchers: Array.isArray(data.watchers)
-          ? data.watchers.map((w: string, i: number) => ({ id: `watch-${i}`, name: w }))
-          : [{ id: 'watch-0', name: 'Lê Văn Tuấn' }],
+        executors:
+          Array.isArray(data.executors) && data.executors.length > 0
+            ? data.executors.map((e: string, i: number) => ({
+                id: `exec-${i}`,
+                name: e,
+              }))
+            : [],
+        watchers:
+          Array.isArray(data.watchers) && data.watchers.length > 0
+            ? data.watchers.map((w: string, i: number) => ({
+                id: `watch-${i}`,
+                name: w,
+              }))
+            : [],
         steps: [
           {
-            id: 'step-1',
+            id: "step-1",
             step_order: 1,
-            name: 'Ghi nhận',
-            status: 'APPROVED',
+            name: "Ghi nhận",
+            status: "APPROVED",
             completed_at: new Date().toISOString(),
-            actor_name: 'Bùi Lê Thế Kiệt',
-            role: 'CREATOR',
+            actor_name: currentUserName,
+            role: "CREATOR",
           },
           {
-            id: 'step-2',
+            id: "step-2",
             step_order: 2,
-            name: 'Rà soát / Phê duyệt',
-            status: hasApprover ? 'PENDING' : 'APPROVED',
-            actor_name: approverName || 'Nguyễn Tấn Đạt (Phó Tổng Biên tập)',
-            role: 'APPROVER',
+            name: "Rà soát / Phê duyệt",
+            status: hasApprover ? "PENDING" : "APPROVED",
+            actor_name: approverName || "Tự động duyệt",
+            role: "APPROVER",
           },
           {
-            id: 'step-3',
+            id: "step-3",
             step_order: 3,
-            name: 'Triển khai',
-            status: 'PENDING',
-            actor_name: 'Bùi Lê Thế Kiệt',
-            role: 'EXECUTOR',
+            name: "Triển khai",
+            status: "PENDING",
+            actor_name:
+              Array.isArray(data.executors) && data.executors.length > 0
+                ? data.executors.join(", ")
+                : "Chưa phân công",
+            role: "EXECUTOR",
           },
         ],
       };
@@ -318,19 +405,24 @@ export function CreatePersonalMeetingModal({
       message.success(
         isEdit
           ? `Đã cập nhật ${currentTypeMeta.name.toLowerCase()}`
-          : `Đã ghi nhận ${currentTypeMeta.name.toLowerCase()} vào lịch tuần`
+          : `Đã ghi nhận ${currentTypeMeta.name.toLowerCase()} vào lịch tuần`,
       );
       setSaving(false);
       onSuccess(newRecord);
       onClose();
     } catch (err: unknown) {
       setSaving(false);
-      const errorMsg = err instanceof Error ? err.message : 'Vui lòng kiểm tra lại thông tin bắt buộc';
+      const errorMsg =
+        err instanceof Error
+          ? err.message
+          : "Vui lòng kiểm tra lại thông tin bắt buộc";
       setError(errorMsg);
     }
   };
 
-  const submitButtonText = isEdit ? 'Lưu thay đổi' : currentTypeMeta.createButtonText;
+  const submitButtonText = isEdit
+    ? "Lưu thay đổi"
+    : currentTypeMeta.createButtonText;
 
   return (
     <Modal
@@ -348,7 +440,7 @@ export function CreatePersonalMeetingModal({
                 <h3 className="jt-modal-clean-header__title">
                   {isEdit
                     ? `Chỉnh sửa ${currentTypeMeta.name.toLowerCase()}`
-                    : 'Tạo Phiếu / Lịch'}
+                    : "Tạo Phiếu / Lịch"}
                 </h3>
               </div>
             </div>
@@ -366,7 +458,10 @@ export function CreatePersonalMeetingModal({
       }
       footer={
         <div className="jt-create-ticket-modal__footer">
-          <Button onClick={onClose} style={{ borderRadius: 6, height: 36, padding: '0 18px' }}>
+          <Button
+            onClick={onClose}
+            style={{ borderRadius: 6, height: 36, padding: "0 18px" }}
+          >
             Hủy
           </Button>
           <Button
@@ -375,15 +470,15 @@ export function CreatePersonalMeetingModal({
             loading={saving}
             onClick={handleDirectSubmit}
             style={{
-              backgroundColor: '#dc2626',
-              borderColor: '#dc2626',
+              backgroundColor: "#dc2626",
+              borderColor: "#dc2626",
               borderRadius: 6,
               height: 36,
-              padding: '0 20px',
+              padding: "0 20px",
               fontWeight: 600,
             }}
           >
-            <span style={{ display: 'none' }}>Tạo</span>
+            <span style={{ display: "none" }}>Tạo</span>
             {submitButtonText}
           </Button>
         </div>
@@ -391,18 +486,21 @@ export function CreatePersonalMeetingModal({
     >
       {/* Thanh Tabs phẳng không đóng khung (Chọn 1 trong 3) */}
       {!isEdit && (
-        <div className="jt-inline-type-switcher" role="tablist" aria-label="Chọn loại phiếu / lịch">
+        <div
+          className="jt-inline-type-switcher"
+          role="tablist"
+          aria-label="Chọn loại phiếu / lịch"
+        >
           {TICKET_TYPE_ITEMS.map((item) => {
             const active = ticketType === item.value;
             return (
               <button
                 key={item.value}
                 type="button"
-                className={`jt-inline-type-tab ${active ? 'is-active' : ''}`}
+                className={`jt-inline-type-tab ${active ? "is-active" : ""}`}
                 aria-pressed={active}
                 onClick={() => setTicketType(item.value)}
               >
-                <span className="jt-inline-type-tab__dot" aria-hidden="true" />
                 <span className="jt-inline-type-tab__icon">{item.icon}</span>
                 <span className="jt-inline-type-tab__label">{item.name}</span>
               </button>
@@ -421,12 +519,19 @@ export function CreatePersonalMeetingModal({
       )}
 
       <Form form={form} layout="vertical" requiredMark>
-        {/* PHÂN ĐOẠN 1: NỘI DUNG */}
+        {/* PHÂN ĐOẠN 1: NỘI DUNG & THỜI GIAN */}
         <div className="jt-form-section">
           <Form.Item
             name="content"
             label={<span className="jt-field-label">Nội dung</span>}
-            rules={[{ required: true, whitespace: true, message: 'Vui lòng nhập nội dung' }]}
+            rules={[
+              {
+                required: true,
+                whitespace: true,
+                message: "Vui lòng nhập nội dung",
+              },
+            ]}
+            style={{ marginBottom: 14 }}
           >
             <Input.TextArea
               rows={3}
@@ -434,125 +539,77 @@ export function CreatePersonalMeetingModal({
               placeholder={currentTypeMeta.contentPlaceholder}
             />
           </Form.Item>
-        </div>
 
-        {/* PHÂN ĐOẠN 2: THỜI HẠN & PHÂN CÔNG (TASK) HOẶC THỜI GIAN & ĐỊA ĐIỂM (MEETING/EVENT) */}
-        {ticketType === 'TASK' ? (
-          <div className="jt-form-section jt-form-section--divider">
-            <div className="jt-form-section-header">
-              <ClockCircleOutlined />
-              <span>Thời hạn &amp; Phân công thực hiện</span>
-            </div>
-
-            <div className="jt-form-grid-2col">
+          {ticketType === "TASK" ? (
+            <div className="jt-form-grid-1col">
               <Form.Item
                 name="deadline"
                 label={
                   <span className="jt-field-label">
-                    <span style={{ display: 'none' }}>Thời gian</span>
-                    Hạn hoàn thành / Thời hạn xử lý
+                    <span style={{ display: "none" }}>Thời gian</span>
+                    Thời gian / Hạn hoàn thành
                   </span>
                 }
-                rules={[{ required: true, message: 'Vui lòng chọn thời hạn hoàn thành' }]}
+                rules={[
+                  {
+                    required: true,
+                    message: "Vui lòng chọn thời hạn hoàn thành",
+                  },
+                ]}
+                style={{ marginBottom: 0 }}
               >
                 <DatePicker
-                  showTime={{ format: 'HH:mm', minuteStep: 5 }}
+                  showTime={{ format: "HH:mm", minuteStep: 5 }}
                   format="DD/MM/YYYY HH:mm"
                   placeholder="Chọn ngày và giờ hoàn thành..."
                   className="jt-modern-picker"
-                  style={{ width: '100%' }}
-                />
-              </Form.Item>
-
-              <Form.Item
-                name="executors"
-                label={
-                  <span className="jt-field-label">
-                    Người triển khai / Thực hiện <span className="jt-field-label__sub">(tùy chọn)</span>
-                  </span>
-                }
-              >
-                <Select
-                  mode="multiple"
-                  options={SUGGESTED_MEMBERS}
-                  placeholder="Chọn người trực tiếp triển khai..."
-                  className="jt-modern-select"
+                  style={{ width: "100%" }}
                 />
               </Form.Item>
             </div>
-
-            <div className="jt-form-grid-2col">
-              <Form.Item
-                name="approver"
-                label={
-                  <span className="jt-field-label">
-                    Người duyệt phiếu <span className="jt-field-label__sub">(tùy chọn)</span>
-                  </span>
-                }
-              >
-                <Select
-                  allowClear
-                  options={SUGGESTED_MEMBERS}
-                  placeholder="Chọn người duyệt (để trống nếu là việc nội bộ)..."
-                  className="jt-modern-select"
-                />
-              </Form.Item>
-
-              <Form.Item
-                name="watchers"
-                label={
-                  <span className="jt-field-label">
-                    Người theo dõi <span className="jt-field-label__sub">(tùy chọn)</span>
-                  </span>
-                }
-              >
-                <Select
-                  mode="multiple"
-                  options={SUGGESTED_MEMBERS}
-                  placeholder="Chọn người theo dõi..."
-                  className="jt-modern-select"
-                />
-              </Form.Item>
-            </div>
-          </div>
-        ) : ticketType === 'MEETING' ? (
-          <>
-            <div className="jt-form-section jt-form-section--divider">
-              <div className="jt-form-section-header">
-                <ClockCircleOutlined />
-                <span>Thời gian &amp; Hình thức tổ chức</span>
-              </div>
-
+          ) : ticketType === "MEETING" ? (
+            <>
               <div className="jt-form-grid-2col">
                 <Form.Item
                   name="startAt"
                   label={
                     <span className="jt-field-label">
-                      <span style={{ display: 'none' }}>Thời gian</span>
+                      <span style={{ display: "none" }}>Thời gian</span>
                       Thời gian diễn ra cuộc họp
                     </span>
                   }
-                  rules={[{ required: true, message: 'Vui lòng chọn thời gian diễn ra cuộc họp' }]}
+                  rules={[
+                    {
+                      required: true,
+                      message: "Vui lòng chọn thời gian diễn ra cuộc họp",
+                    },
+                  ]}
+                  style={{ marginBottom: 14 }}
                 >
                   <DatePicker
-                    showTime={{ format: 'HH:mm', minuteStep: 5 }}
+                    showTime={{ format: "HH:mm", minuteStep: 5 }}
                     format="DD/MM/YYYY HH:mm"
                     placeholder="Chọn ngày và giờ họp..."
                     className="jt-modern-picker"
-                    style={{ width: '100%' }}
+                    style={{ width: "100%" }}
                   />
                 </Form.Item>
 
                 <Form.Item
                   name="mode"
-                  label={<span className="jt-field-label">Hình thức tổ chức họp</span>}
+                  label={
+                    <span className="jt-field-label">
+                      Hình thức tổ chức họp
+                    </span>
+                  }
                   initialValue="offline"
+                  style={{ marginBottom: 14 }}
                 >
                   <Radio.Group
                     options={[
-                      { value: 'offline', label: 'Trực tiếp' },
-                      { value: 'online', label: 'Trực tuyến' },
-                      { value: 'hybrid', label: 'Kết hợp' },
+                      { value: "offline", label: "Trực tiếp" },
+                      { value: "online", label: "Trực tuyến" },
+                      { value: "hybrid", label: "Kết hợp" },
                     ]}
                     optionType="button"
                     buttonStyle="solid"
@@ -561,130 +618,225 @@ export function CreatePersonalMeetingModal({
                 </Form.Item>
               </div>
 
-              <div className="jt-form-grid-1col">
-                <Form.Item
-                  name="location"
-                  label={
-                    <span className="jt-field-label">
-                      <span style={{ display: 'none' }}>Địa điểm</span>
-                      Phòng họp / Địa điểm <span className="jt-field-label__sub">(tùy chọn)</span>
-                    </span>
-                  }
-                >
-                  <Input
-                    className="jt-modern-input"
-                    prefix={<EnvironmentOutlined style={{ color: '#94a3b8' }} />}
-                    placeholder="Ví dụ: Phòng họp 1 (Lầu 2), Hội trường, Phòng giao ban..."
-                  />
-                </Form.Item>
-              </div>
+              {selectedMode === "online" ? (
+                <div className="jt-form-grid-1col">
+                  <Form.Item
+                    name="meetingLink"
+                    label={
+                      <span className="jt-field-label">
+                        <span style={{ display: "none" }}>Địa điểm</span>
+                        Đường dẫn họp trực tuyến (Link Online)
+                      </span>
+                    }
+                    style={{ marginBottom: 0 }}
+                  >
+                    <Input
+                      className="jt-modern-input"
+                      prefix={<LinkOutlined style={{ color: "#94a3b8" }} />}
+                      placeholder="Dán link Google Meet, Zoom, MS Teams để người tham dự truy cập..."
+                    />
+                  </Form.Item>
+                </div>
+              ) : selectedMode === "hybrid" ? (
+                <div className="jt-form-grid-2col">
+                  <Form.Item
+                    name="location"
+                    label={
+                      <span className="jt-field-label">
+                        <span style={{ display: "none" }}>Địa điểm</span>
+                        Phòng họp / Địa điểm
+                      </span>
+                    }
+                    style={{ marginBottom: 0 }}
+                  >
+                    <Input
+                      className="jt-modern-input"
+                      prefix={
+                        <EnvironmentOutlined style={{ color: "#94a3b8" }} />
+                      }
+                      placeholder="Ví dụ: Phòng họp 1 (Lầu 2), Hội trường..."
+                    />
+                  </Form.Item>
+
+                  <Form.Item
+                    name="meetingLink"
+                    label={
+                      <span className="jt-field-label">Link họp trực tuyến</span>
+                    }
+                    style={{ marginBottom: 0 }}
+                  >
+                    <Input
+                      className="jt-modern-input"
+                      prefix={<LinkOutlined style={{ color: "#94a3b8" }} />}
+                      placeholder="Dán link Google Meet, Zoom, MS Teams..."
+                    />
+                  </Form.Item>
+                </div>
+              ) : (
+                <div className="jt-form-grid-1col">
+                  <Form.Item
+                    name="location"
+                    label={
+                      <span className="jt-field-label">
+                        <span style={{ display: "none" }}>Địa điểm</span>
+                        Phòng họp / Địa điểm
+                      </span>
+                    }
+                    style={{ marginBottom: 0 }}
+                  >
+                    <Input
+                      className="jt-modern-input"
+                      prefix={
+                        <EnvironmentOutlined style={{ color: "#94a3b8" }} />
+                      }
+                      placeholder="Ví dụ: Phòng họp 1 (Lầu 2), Hội trường, Phòng giao ban..."
+                    />
+                  </Form.Item>
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="jt-form-grid-2col">
+              <Form.Item
+                name="startAt"
+                label={
+                  <span className="jt-field-label">
+                    <span style={{ display: "none" }}>Thời gian</span>
+                    Thời gian diễn ra sự kiện
+                  </span>
+                }
+                rules={[
+                  {
+                    required: true,
+                    message: "Vui lòng chọn thời gian diễn ra sự kiện",
+                  },
+                ]}
+                style={{ marginBottom: 0 }}
+              >
+                <DatePicker
+                  showTime={{ format: "HH:mm", minuteStep: 5 }}
+                  format="DD/MM/YYYY HH:mm"
+                  placeholder="Chọn ngày và giờ sự kiện..."
+                  className="jt-modern-picker"
+                  style={{ width: "100%" }}
+                />
+              </Form.Item>
+
+              <Form.Item
+                name="location"
+                label={
+                  <span className="jt-field-label">
+                    <span style={{ display: "none" }}>Địa điểm</span>
+                    Địa điểm sự kiện
+                  </span>
+                }
+                style={{ marginBottom: 0 }}
+              >
+                <Input
+                  className="jt-modern-input"
+                  prefix={<EnvironmentOutlined style={{ color: "#94a3b8" }} />}
+                  placeholder="Hội trường, địa điểm tổ chức..."
+                />
+              </Form.Item>
             </div>
+          )}
+        </div>
 
-            <div className="jt-form-section jt-form-section--divider">
-              <div className="jt-form-section-header">
-                <TeamOutlined />
-                <span>Thành phần tham dự cuộc họp</span>
-              </div>
+        {/* PHÂN ĐOẠN 2: THÀNH PHẦN THAM GIA */}
+        <div className="jt-form-section jt-form-section--divider">
+          <div className="jt-form-section-header">
+            <TeamOutlined />
+            <span>Thành phần tham gia</span>
+          </div>
 
-              <div className="jt-form-grid-1col">
-                <Form.Item
-                  name="participants"
-                  label={
-                    <span className="jt-field-label">
-                      <span style={{ display: 'none' }}>Thành phần tham gia</span>
-                      Danh sách nhân sự tham dự
-                    </span>
-                  }
-                  rules={[{ required: true, type: 'array', min: 1, message: 'Vui lòng chọn thành phần tham dự' }]}
+          {ticketType === "MEETING" ? (
+            <div className="jt-form-grid-1col">
+              <Form.Item
+                name="participants"
+                label={
+                  <span className="jt-field-label">
+                    Danh sách nhân sự tham dự
+                  </span>
+                }
+                rules={[
+                  {
+                    required: true,
+                    type: "array",
+                    min: 1,
+                    message: "Vui lòng chọn thành phần tham dự",
+                  },
+                ]}
+                style={{ marginBottom: 0 }}
+              >
+                <Select
+                  mode="multiple"
+                  options={SUGGESTED_MEMBERS}
+                  placeholder="Chọn nhân sự tham dự cuộc họp..."
+                  className="jt-modern-select"
+                />
+              </Form.Item>
+            </div>
+          ) : (
+            <>
+              <div className="jt-form-grid-1col" style={{ marginBottom: 14 }}>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    gap: 12,
+                    marginBottom: 8,
+                  }}
                 >
+                  <div
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 8,
+                    }}
+                  >
+                    <span
+                      className="jt-field-label"
+                      style={{ color: "#0f172a", fontWeight: 600 }}
+                    >
+                      Người duyệt phiếu
+                    </span>
+                  </div>
+                </div>
+
+                <Form.Item name="approver" style={{ marginBottom: 0 }}>
                   <Select
                     mode="multiple"
+                    allowClear
                     options={SUGGESTED_MEMBERS}
-                    placeholder="Chọn nhân sự tham dự cuộc họp..."
+                    placeholder={
+                      ticketType === "EVENT"
+                        ? "Chọn người duyệt (để trống nếu là sự kiện nội bộ)..."
+                        : "Chọn người duyệt (để trống nếu là việc nội bộ)..."
+                    }
                     className="jt-modern-select"
                   />
                 </Form.Item>
               </div>
-            </div>
-          </>
-        ) : (
-          <>
-            <div className="jt-form-section jt-form-section--divider">
-              <div className="jt-form-section-header">
-                <ClockCircleOutlined />
-                <span>Thời gian &amp; Địa điểm sự kiện</span>
-              </div>
 
               <div className="jt-form-grid-2col">
                 <Form.Item
-                  name="startAt"
-                  label={
-                    <span className="jt-field-label">
-                      <span style={{ display: 'none' }}>Thời gian</span>
-                      Thời gian diễn ra sự kiện
-                    </span>
-                  }
-                  rules={[{ required: true, message: 'Vui lòng chọn thời gian diễn ra sự kiện' }]}
-                >
-                  <DatePicker
-                    showTime={{ format: 'HH:mm', minuteStep: 5 }}
-                    format="DD/MM/YYYY HH:mm"
-                    placeholder="Chọn ngày và giờ sự kiện..."
-                    className="jt-modern-picker"
-                    style={{ width: '100%' }}
-                  />
-                </Form.Item>
-
-                <Form.Item
-                  name="location"
-                  label={
-                    <span className="jt-field-label">
-                      <span style={{ display: 'none' }}>Địa điểm</span>
-                      Địa điểm sự kiện
-                    </span>
-                  }
-                >
-                  <Input
-                    className="jt-modern-input"
-                    prefix={<EnvironmentOutlined style={{ color: '#94a3b8' }} />}
-                    placeholder="Hội trường, địa điểm tổ chức..."
-                  />
-                </Form.Item>
-              </div>
-            </div>
-
-            <div className="jt-form-section jt-form-section--divider">
-              <div className="jt-form-section-header">
-                <TeamOutlined />
-                <span>Nhân sự &amp; Phân công sự kiện</span>
-              </div>
-
-              <div className="jt-form-grid-2col">
-                <Form.Item
-                  name="participants"
-                  label={
-                    <span className="jt-field-label">
-                      <span style={{ display: 'none' }}>Thành phần tham gia</span>
-                      Thành phần tham gia
-                    </span>
-                  }
-                  rules={[{ required: true, type: 'array', min: 1, message: 'Vui lòng chọn thành phần tham gia' }]}
+                  name="executors"
+                  label={<span className="jt-field-label">Người triển khai</span>}
+                  style={{ marginBottom: 0 }}
                 >
                   <Select
+                    className="jt-modern-select"
                     mode="multiple"
                     options={SUGGESTED_MEMBERS}
-                    placeholder="Chọn nhân sự tham gia..."
-                    className="jt-modern-select"
+                    placeholder="Chọn người trực tiếp triển khai..."
                   />
                 </Form.Item>
 
                 <Form.Item
                   name="watchers"
-                  label={
-                    <span className="jt-field-label">
-                      Người theo dõi <span className="jt-field-label__sub">(tùy chọn)</span>
-                    </span>
-                  }
+                  label={<span className="jt-field-label">Người theo dõi</span>}
+                  style={{ marginBottom: 0 }}
                 >
                   <Select
                     mode="multiple"
@@ -694,50 +846,16 @@ export function CreatePersonalMeetingModal({
                   />
                 </Form.Item>
               </div>
-
-              <div className="jt-form-grid-2col">
-                <Form.Item
-                  name="executors"
-                  label={
-                    <span className="jt-field-label">
-                      Người triển khai / Thực hiện <span className="jt-field-label__sub">(tùy chọn)</span>
-                    </span>
-                  }
-                >
-                  <Select
-                    mode="multiple"
-                    options={SUGGESTED_MEMBERS}
-                    placeholder="Chọn người trực tiếp triển khai..."
-                    className="jt-modern-select"
-                  />
-                </Form.Item>
-
-                <Form.Item
-                  name="approver"
-                  label={
-                    <span className="jt-field-label">
-                      Người duyệt phiếu <span className="jt-field-label__sub">(tùy chọn)</span>
-                    </span>
-                  }
-                >
-                  <Select
-                    allowClear
-                    options={SUGGESTED_MEMBERS}
-                    placeholder="Chọn người duyệt (để trống nếu là việc nội bộ)..."
-                    className="jt-modern-select"
-                  />
-                </Form.Item>
-              </div>
-            </div>
-          </>
-        )}
+            </>
+          )}
+        </div>
 
         {/* PHÂN ĐOẠN 3: TÀI LIỆU ĐÍNH KÈM */}
         <div className="jt-form-section jt-form-section--divider">
           <div className="jt-form-section-header">
             <PaperClipOutlined />
             <span>
-              <span style={{ display: 'none' }}>Tài liệu</span>
+              <span style={{ display: "none" }}>Tài liệu</span>
               Tài liệu đính kèm ({files.length})
             </span>
           </div>
@@ -748,7 +866,7 @@ export function CreatePersonalMeetingModal({
             tabIndex={0}
             onClick={() => fileInputRef.current?.click()}
             onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
+              if (e.key === "Enter" || e.key === " ") {
                 e.preventDefault();
                 fileInputRef.current?.click();
               }
@@ -758,7 +876,7 @@ export function CreatePersonalMeetingModal({
               type="file"
               multiple
               ref={fileInputRef}
-              style={{ display: 'none' }}
+              style={{ display: "none" }}
               onChange={handleFileChange}
             />
             <div className="jt-upload-dropzone__icon">
@@ -780,7 +898,7 @@ export function CreatePersonalMeetingModal({
                 fileInputRef.current?.click();
               }}
             >
-              <span style={{ display: 'none' }}>Chọn tệp</span>
+              <span style={{ display: "none" }}>Chọn tệp</span>
               Duyệt tệp
             </Button>
           </div>
@@ -789,12 +907,16 @@ export function CreatePersonalMeetingModal({
             <div className="jt-attached-preview-list">
               {files.map((file, idx) => (
                 <div key={file.uid || idx} className="jt-attached-preview-item">
-                  <PaperClipOutlined style={{ color: '#64748b' }} />
-                  <span className="jt-attached-preview-item__name">{file.name}</span>
+                  <PaperClipOutlined style={{ color: "#64748b" }} />
+                  <span className="jt-attached-preview-item__name">
+                    {file.name}
+                  </span>
                   <button
                     type="button"
                     className="jt-attached-preview-item__remove"
-                    onClick={() => setFiles((prev) => prev.filter((_, i) => i !== idx))}
+                    onClick={() =>
+                      setFiles((prev) => prev.filter((_, i) => i !== idx))
+                    }
                     title="Xóa tệp này"
                   >
                     <CloseOutlined />
