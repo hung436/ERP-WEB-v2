@@ -611,10 +611,14 @@ Chỉ dùng shadow nhẹ:
 0 4px 12px rgba(16, 24, 40, 0.08)
 ```
 
-## Điều 30. Những hình thức bị cấm
+## Điều 30. Những hình thức bị cấm & Chuẩn mực "Anti-AI UI" (Bắt buộc toàn hệ thống)
 
-Codex không được:
+> **NGUYÊN TẮC CỐT LÕI**: Tuyệt đối không để người dùng nhận ra hoặc có cảm giác giao diện được sinh ra từ AI.
 
+Codex/AI tuyệt đối không được:
+
+- **Tuyệt đối không dùng style `border-left` trang trí** (ví dụ: `border-left: 3px solid ...` trên thẻ card, dòng danh sách, khối ghi chú, tiêu đề phụ, thông báo...). Đây là dấu hiệu đặc trưng nhất của UI do AI tạo ra. Khi cần phân biệt trạng thái hoặc phân loại, chỉ dùng chấm tròn nhỏ (`6px` dot), chữ màu tinh tế hoặc badge nhẹ.
+- **Hạn chế tối đa đóng khung bố cục (`box-in-box`)**: Không bọc từng mục nhỏ trong khung viền (`border`) + bo góc + đổ bóng lồng bên trong một cột hoặc panel đã có khung. Ưu tiên bố cục danh sách phẳng (flat rows), khoảng trắng (whitespace), phân cấp chữ (typography) và đường kẻ phân cách ngang cực mảnh (`1px solid #f1f5f9`).
 - Dùng hero banner lớn.
 - Dùng gradient sặc sỡ.
 - Dùng glassmorphism phô trương.
@@ -931,7 +935,9 @@ Codex không được tự ý thực hiện.
 
 ## Điều 47. Tiêu chí nghiệm thu giao diện
 
-- Có tính thẩm mỹ cao.
+- Có tính thẩm mỹ cao, tự nhiên như sản phẩm được thiết kế thủ công bởi đội ngũ Product Design chuyên nghiệp (không mang dấu vết UI do AI tạo).
+- Tuyệt đối không sử dụng `border-left` trang trí ở bất kỳ thành phần nào.
+- Hạn chế đóng khung bố cục chồng chéo (`box-in-box`); ưu tiên bề mặt phẳng, thoáng và đường phân cách mảnh.
 - Hiện đại.
 - Nghiêm túc.
 - Không giống trang tin.

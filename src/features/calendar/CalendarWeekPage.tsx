@@ -2,17 +2,16 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import dayjs, { extend, type Dayjs } from 'dayjs';
 import isoWeek from 'dayjs/plugin/isoWeek';
-import { Alert, Button, ConfigProvider, DatePicker, Input, message } from 'antd';
+import { Alert, Button, ConfigProvider, DatePicker, Input, Popover, message } from 'antd';
 import {
   CheckOutlined,
   CloseOutlined,
-  FilterOutlined,
+  DownOutlined,
   LeftOutlined,
   PlusOutlined,
   ReloadOutlined,
   RightOutlined,
   SearchOutlined,
-  UserOutlined,
 } from '@ant-design/icons';
 import locale from 'antd/es/locale/vi_VN';
 
@@ -38,47 +37,6 @@ import './calendar-week.css';
 extend(isoWeek);
 
 const EVENTS_STORAGE_KEY = 'jt_calendar_events_store';
-
-function FilterButton({
-  type,
-  active,
-  count,
-  children,
-  onClick,
-  loading = false,
-}: {
-  type: string;
-  active: boolean;
-  count: number;
-  children: React.ReactNode;
-  onClick: () => void;
-  loading?: boolean;
-}) {
-  const ariaLabel = typeof children === 'string' ? children : undefined;
-  return (
-    <button
-      type="button"
-      className={`booking-week-filter booking-week-${type} ${active ? 'booking-week-active' : ''}`}
-      aria-pressed={active}
-      aria-label={ariaLabel}
-      onClick={onClick}
-    >
-      <span aria-hidden="true">
-        {active ? (
-          <CheckOutlined />
-        ) : type === 'attending' ? (
-          <UserOutlined />
-        ) : (
-          <span className="booking-week-filter-dot" />
-        )}
-      </span>
-      <span>{children}</span>
-      <span className={`booking-week-filter-count ${loading ? 'booking-week-count-loading' : ''}`}>
-        {loading ? '' : count}
-      </span>
-    </button>
-  );
-}
 
 function ViewIcon({ vertical = false }: { vertical?: boolean }) {
   return (
@@ -181,6 +139,17 @@ export function CalendarWeekPage() {
   const toggleTicketType = (type: 'TASK' | 'MEETING' | 'EVENT') => {
     setTicketTypes((prev) => ({ ...prev, [type]: !prev[type] }));
   };
+
+  const selectedTypeLabel = useMemo(() => {
+    const selected: string[] = [];
+    if (ticketTypes.MEETING) selected.push('Lịch họp');
+    if (ticketTypes.EVENT) selected.push('Sự kiện');
+    if (ticketTypes.TASK) selected.push('Phiếu công việc');
+    if (selected.length === 3) return 'Tất cả (3)';
+    if (selected.length === 0) return 'Chưa chọn (0)';
+    if (selected.length === 1) return selected[0];
+    return `${selected.length} loại đã chọn`;
+  }, [ticketTypes]);
 
   const changeDate = (date: Dayjs | null) => {
     if (!date) return;
@@ -313,7 +282,7 @@ export function CalendarWeekPage() {
               aria-label="Tìm kiếm lịch công tác"
               prefix={<SearchOutlined />}
               value={query}
-              placeholder="Tìm kiếm..."
+              placeholder="Tìm công việc, lịch họp, sự kiện..."
               onChange={(event) => setQuery(event.target.value)}
               onBlur={() => {
                 if (!query) setSearchOpen(false);
@@ -380,77 +349,130 @@ export function CalendarWeekPage() {
             />
           </div>
 
-          <DatePicker
-            className="booking-week-week-picker"
-            aria-label="Chọn ngày"
-            allowClear={false}
-            format="DD/MM/YYYY"
-            value={selectedDate}
-            onChange={changeDate}
-          />
+          <Button
+            className="booking-week-today-btn"
+            onClick={() => changeDate(vietnamNow())}
+          >
+            Hôm nay
+          </Button>
 
           <div className="booking-week-divider" />
 
           <div className="booking-week-filters">
-            <span className="booking-week-filter-label">
-              <FilterOutlined /> Lọc:
-            </span>
-            <FilterButton
-              type="editorial"
-              loading={state.loading}
-              active={editorial}
-              count={stats.editorial}
-              onClick={() => setEditorial((value) => !value)}
-            >
-              Ban biên tập
-            </FilterButton>
-            <FilterButton
-              type="personal"
-              loading={state.loading}
-              active={personal}
-              count={stats.personal}
-              onClick={() => setPersonal((value) => !value)}
-            >
-              Cá nhân
-            </FilterButton>
-            <FilterButton
-              type="attending"
-              loading={state.loading}
-              active={attending}
-              count={stats.attending}
+            <div className="booking-week-source-group" role="group" aria-label="Nguồn lịch chính">
+              <button
+                type="button"
+                className={`booking-week-source-btn ${editorial ? 'is-active' : ''}`}
+                aria-pressed={editorial}
+                aria-label="Ban biên tập"
+                onClick={() => setEditorial((value) => !value)}
+              >
+                <span className="booking-week-source-check" aria-hidden="true">
+                  {editorial && <CheckOutlined />}
+                </span>
+                <span className="booking-week-source-label">
+                  <span>Lịch</span> <span>Ban biên tập</span>
+                </span>
+                <span className={`booking-week-source-count ${state.loading ? 'booking-week-count-loading' : ''}`}>
+                  {state.loading ? '' : stats.editorial}
+                </span>
+              </button>
+
+              <button
+                type="button"
+                className={`booking-week-source-btn ${personal ? 'is-active' : ''}`}
+                aria-pressed={personal}
+                aria-label="Cá nhân"
+                onClick={() => setPersonal((value) => !value)}
+              >
+                <span className="booking-week-source-check" aria-hidden="true">
+                  {personal && <CheckOutlined />}
+                </span>
+                <span className="booking-week-source-label">Lịch cá nhân</span>
+                <span style={{ display: 'none' }}>Cá nhân</span>
+                <span className={`booking-week-source-count ${state.loading ? 'booking-week-count-loading' : ''}`}>
+                  {state.loading ? '' : stats.personal}
+                </span>
+              </button>
+            </div>
+
+            <button
+              type="button"
+              className={`booking-week-modifier-btn ${attending ? 'is-active' : ''}`}
+              aria-pressed={attending}
               onClick={() => setAttending((value) => !value)}
             >
-              <span>Có mặt tôi</span>
+              <span className="booking-week-modifier-dot" aria-hidden="true" />
+              <span>Chỉ có mặt tôi</span>
+              <span className="booking-week-modifier-count">({state.loading ? '...' : stats.attending})</span>
               <span style={{ display: 'none' }}>Chỉ hiện lịch có mặt tôi</span>
-            </FilterButton>
-            <span className="booking-week-divider" />
-            <FilterButton
-              type="type-task"
-              loading={state.loading}
-              active={ticketTypes.TASK}
-              count={stats.task}
-              onClick={() => toggleTicketType('TASK')}
+            </button>
+
+            <div className="booking-week-divider" />
+
+            <Popover
+              trigger="click"
+              placement="bottomLeft"
+              overlayClassName="booking-week-type-popover"
+              content={
+                <div className="booking-week-type-menu">
+                  <div className="booking-week-type-menu-head">
+                    <span>Loại mục ghi trên lịch</span>
+                    {(!ticketTypes.MEETING || !ticketTypes.EVENT || !ticketTypes.TASK) && (
+                      <button
+                        type="button"
+                        className="booking-week-type-reset"
+                        onClick={() => setTicketTypes({ TASK: true, MEETING: true, EVENT: true })}
+                      >
+                        Chọn tất cả
+                      </button>
+                    )}
+                  </div>
+                  <button
+                    type="button"
+                    className={`booking-week-type-menu-item ${ticketTypes.MEETING ? 'is-checked' : ''}`}
+                    aria-pressed={ticketTypes.MEETING}
+                    onClick={() => toggleTicketType('MEETING')}
+                  >
+                    <span className="booking-week-type-menu-left">
+                      <span className="booking-week-type-checkbox">{ticketTypes.MEETING && <CheckOutlined />}</span>
+                      <span>Lịch họp</span>
+                    </span>
+                    <span className="booking-week-type-menu-count">{stats.meeting}</span>
+                  </button>
+                  <button
+                    type="button"
+                    className={`booking-week-type-menu-item ${ticketTypes.EVENT ? 'is-checked' : ''}`}
+                    aria-pressed={ticketTypes.EVENT}
+                    onClick={() => toggleTicketType('EVENT')}
+                  >
+                    <span className="booking-week-type-menu-left">
+                      <span className="booking-week-type-checkbox">{ticketTypes.EVENT && <CheckOutlined />}</span>
+                      <span>Sự kiện</span>
+                    </span>
+                    <span className="booking-week-type-menu-count">{stats.event}</span>
+                  </button>
+                  <button
+                    type="button"
+                    className={`booking-week-type-menu-item ${ticketTypes.TASK ? 'is-checked' : ''}`}
+                    aria-pressed={ticketTypes.TASK}
+                    onClick={() => toggleTicketType('TASK')}
+                  >
+                    <span className="booking-week-type-menu-left">
+                      <span className="booking-week-type-checkbox">{ticketTypes.TASK && <CheckOutlined />}</span>
+                      <span>Phiếu công việc</span>
+                    </span>
+                    <span className="booking-week-type-menu-count">{stats.task}</span>
+                  </button>
+                </div>
+              }
             >
-              Task
-            </FilterButton>
-            <FilterButton
-              type="type-meeting"
-              loading={state.loading}
-              active={ticketTypes.MEETING}
-              count={stats.meeting}
-              onClick={() => toggleTicketType('MEETING')}
-            >
-              Lịch họp
-            </FilterButton>
-            <FilterButton
-              type="type-event"
-              loading={state.loading}
-              active={ticketTypes.EVENT}
-              count={stats.event}
-              onClick={() => toggleTicketType('EVENT')}
-            >
-              Sự kiện
-            </FilterButton>
+              <button type="button" className="booking-week-type-dropdown-btn" aria-label="Lọc theo loại mục ghi">
+                <span className="booking-week-type-prefix">Loại:</span>
+                <span className="booking-week-type-value">{selectedTypeLabel}</span>
+                <DownOutlined className="booking-week-type-arrow" />
+              </button>
+            </Popover>
           </div>
 
           <div className="booking-week-toolbar-actions">
@@ -458,7 +480,7 @@ export function CalendarWeekPage() {
               className="booking-week-refresh"
               type="text"
               aria-label="Làm mới lịch họp"
-              title="Làm mới lịch họp"
+              title="Làm mới lịch tuần"
               loading={state.loading}
               icon={<ReloadOutlined />}
               onClick={() => state.reload()}
@@ -466,23 +488,23 @@ export function CalendarWeekPage() {
             <div className="booking-week-view-switch" role="group" aria-label="Bố cục lịch tuần">
               <button
                 type="button"
-                className={viewMode === 'horizontal' ? 'booking-week-view-active' : ''}
-                aria-label="Xem dạng ngang theo dòng thời gian"
-                title="Dạng ngang (Dòng thời gian)"
-                aria-pressed={viewMode === 'horizontal'}
-                onClick={() => setViewMode('horizontal')}
-              >
-                <ViewIcon />
-              </button>
-              <button
-                type="button"
                 className={viewMode === 'vertical' ? 'booking-week-view-active' : ''}
                 aria-label="Xem dạng dọc theo từng cột ngày"
-                title="Dạng dọc (Theo từng cột ngày)"
+                title="Dạng Lưới 7 cột"
                 aria-pressed={viewMode === 'vertical'}
                 onClick={() => setViewMode('vertical')}
               >
                 <ViewIcon vertical />
+              </button>
+              <button
+                type="button"
+                className={viewMode === 'horizontal' ? 'booking-week-view-active' : ''}
+                aria-label="Xem dạng ngang theo dòng thời gian"
+                title="Dạng Dòng thời gian (Timeline)"
+                aria-pressed={viewMode === 'horizontal'}
+                onClick={() => setViewMode('horizontal')}
+              >
+                <ViewIcon />
               </button>
             </div>
             <Button
@@ -523,7 +545,8 @@ export function CalendarWeekPage() {
             selectedDate={selectedDate}
             events={visible}
             duties={duties}
-            loading={state.loading}
+            showDuty={editorial}
+            loading={state.loading && (location.search.includes('state=loading') || visible.length === 0)}
             disabledHover={Boolean(selectedDay || selectedEvent || createDate)}
             onSelectDay={(day) => {
               setSelectedDay(day);

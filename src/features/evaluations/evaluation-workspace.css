@@ -2719,7 +2719,7 @@ input[type='number'] {
   font-style: italic;
   margin: 0;
   padding-left: 6px;
-  border-left: 2px solid #d0d5dd;
+  padding: 4px 8px; background: #f8fafc; border-radius: 6px;
 }
 
 .stage-feed-no-note {
@@ -3199,7 +3199,7 @@ input[type='number'] {
   gap: 8px;
   margin-left: 20px;
   padding-left: 14px;
-  border-left: 2px solid #eaecf0;
+  padding-left: 14px;
 }
 
 /* Bỏ cả viền lẫn nền của từng dòng ý con, chỉ còn khoảng đệm và phân cấp bằng chữ */

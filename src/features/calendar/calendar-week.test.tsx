@@ -78,9 +78,9 @@ describe('Lịch làm việc theo tuần (Google Calendar style)', () => {
       await user.click(meetingTypeBtn);
     }
 
-    // Kiểm tra modal tạo cuộc họp hiển thị
+    // Kiểm tra modal tạo cuộc họp hiển thị (đã bỏ trường Tiêu đề, chỉ giữ Nội dung)
     expect((await screen.findAllByRole('dialog')).length).toBeGreaterThan(0);
-    expect(screen.getByText('Tiêu đề')).toBeInTheDocument();
+    expect(screen.queryByText('Tiêu đề')).not.toBeInTheDocument();
     expect(screen.getByText('Thời gian')).toBeInTheDocument();
     expect(screen.getByText('Thành phần tham gia')).toBeInTheDocument();
     expect(screen.getByText('Địa điểm')).toBeInTheDocument();

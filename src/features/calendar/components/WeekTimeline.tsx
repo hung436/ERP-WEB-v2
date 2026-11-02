@@ -86,6 +86,7 @@ export function EventCard({
   disabledHover = false,
 }: EventCardProps) {
   const [expanded, setExpanded] = useState(false);
+  const [starred, setStarred] = useState(false);
   const enterTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const leaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -125,6 +126,12 @@ export function EventCard({
   const approvalMeta = getApprovalStatusMeta(event.approvalStatus);
   const typeKey = String(event.ticketType || 'MEETING').toLowerCase();
   const statusKey = String(event.approvalStatus || 'APPROVED').toLowerCase();
+  const showExceptionStatus = statusKey !== 'approved' && statusKey !== 'completed';
+  const showMetaRow =
+    Boolean(event.location) ||
+    showExceptionStatus ||
+    Boolean(event.isAdjusted) ||
+    Boolean(event.continuesFromPreviousDay || event.continuesToNextDay);
   const past = Boolean(
     now &&
       event.end &&
@@ -138,9 +145,9 @@ export function EventCard({
         compact ? 'booking-week-out-hours-card' : ''
       } ${past ? 'booking-week-past-event' : ''} ${
         event.scope === 'personal' ? 'booking-week-personal' : event.isUserParticipant ? 'booking-week-attending' : ''
-      } ${expanded && !disabledHover ? 'booking-week-expanded' : ''} ${upward ? 'booking-week-expand-up' : ''} ${
-        (vertical || compact ? expandLeft : left > 58) ? 'booking-week-expand-left' : ''
-      }`}
+      } ${expanded ? 'booking-week-expanded' : ''} ${
+        expandLeft || left > 58 ? 'booking-week-expand-left' : ''
+      } ${upward ? 'booking-week-expand-up' : ''}`}
       style={
         vertical || compact
           ? undefined
@@ -151,14 +158,7 @@ export function EventCard({
             } as React.CSSProperties)
       }
       onMouseEnter={enter}
-      onMouseMove={enter}
       onMouseLeave={leave}
-      onFocus={() => {
-        if (!disabledHover) setExpanded(true);
-      }}
-      onBlur={(e) => {
-        if (!e.currentTarget.contains(e.relatedTarget as Node)) setExpanded(false);
-      }}
     >
       <button
         type="button"
@@ -172,54 +172,63 @@ export function EventCard({
         }}
       >
         <div className="booking-week-card-top">
-          <span>{eventTime(event)}</span>
+          <span className="booking-week-card-time-group">
+            <span className={`booking-week-type-dot booking-week-dot-${typeKey}`} aria-hidden="true" />
+            <span className="booking-week-card-time">{eventTime(event)}</span>
+          </span>
           <span className="booking-week-card-badges">
-            <span className={`booking-week-type-badge booking-week-type-${typeKey}`}>{typeMeta.label}</span>
-            {event.approvalStatus && event.approvalStatus !== 'APPROVED' && (
-              <span className={`booking-week-status-badge booking-week-status-${statusKey}`}>{approvalMeta.label}</span>
-            )}
-            {badge && <span className="booking-week-badge">{badge}</span>}
             <span
               role="button"
               tabIndex={0}
               className="booking-week-card-star"
               aria-label="Quan tâm lịch họp"
-              title="Quan tâm lịch họp"
+              title="Nhắc trước 15 phút"
               onClick={(e) => {
                 e.stopPropagation();
+                setStarred(true);
                 message.success('Bạn sẽ được nhắc nhở trước 15 phút');
               }}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
                   e.preventDefault();
                   e.stopPropagation();
+                  setStarred(true);
                   message.success('Bạn sẽ được nhắc nhở trước 15 phút');
                 }
               }}
-              style={{
-                background: 'none',
-                border: 'none',
-                cursor: 'pointer',
-                padding: '0 2px',
-                color: '#eab308',
-                display: 'inline-flex',
-                alignItems: 'center',
-              }}
             >
               <StarOutlined />
+              {starred && (
+                <span style={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clip: 'rect(0,0,0,0)' }}>
+                  Bạn sẽ được nhắc nhở trước 15 phút
+                </span>
+              )}
             </span>
+            {typeKey !== 'meeting' && (
+              <span className={`booking-week-type-badge booking-week-type-${typeKey}`}>{typeMeta.label}</span>
+            )}
+            {badge && <span className="booking-week-badge">{badge}</span>}
           </span>
         </div>
-        {(event.continuesFromPreviousDay || event.continuesToNextDay) && (
-          <small className="booking-week-continuation">
-            {event.continuesFromPreviousDay ? 'Tiếp tục từ ngày trước' : 'Kéo dài sang ngày sau'}
-          </small>
-        )}
+
         <div className="booking-week-card-title">{event.title}</div>
-        {event.isAdjusted && <span className="booking-week-adjusted">Đã điều chỉnh</span>}
-        <div className="booking-week-card-location">
-          <EnvironmentOutlined /> {event.location || (event.ticketType === 'TASK' ? 'Task công việc' : 'Chưa có địa điểm')}
-        </div>
+
+        {showMetaRow && (
+          <div className="booking-week-card-meta-row">
+            {event.location && <span className="booking-week-card-loc">{event.location}</span>}
+            {showExceptionStatus && (
+              <span className={`booking-week-status-badge booking-week-status-${statusKey}`}>
+                {approvalMeta.label}
+              </span>
+            )}
+            {event.isAdjusted && <span className="booking-week-adjusted">Đã điều chỉnh</span>}
+            {(event.continuesFromPreviousDay || event.continuesToNextDay) && (
+              <small className="booking-week-continuation">
+                {event.continuesFromPreviousDay ? 'Tiếp tục' : 'Kéo dài'}
+              </small>
+            )}
+          </div>
+        )}
       </button>
 
       {expanded && !disabledHover && (
@@ -353,12 +362,13 @@ function OutHoursSlot({
   );
 }
 
-interface WeekTimelineProps {
+export interface WeekTimelineProps {
   week: Dayjs;
   now: Dayjs;
   selectedDate: Dayjs;
   events: NormalizedMeetingEvent[];
   duties: Record<string, DutyShiftData>;
+  showDuty?: boolean;
   onSelectDay: (day: Dayjs) => void;
   onSelectEvent: (event: NormalizedMeetingEvent) => void;
   loading?: boolean;
@@ -371,6 +381,7 @@ export function WeekTimeline({
   selectedDate,
   events,
   duties,
+  showDuty = true,
   onSelectDay,
   onSelectEvent,
   loading = false,
@@ -439,34 +450,35 @@ export function WeekTimeline({
                       <Skeleton.Input active size="small" style={{ width: 65, height: 14, minWidth: 0 }} />
                     ) : (
                       <>
-                        {dayEvents.length} sự kiện <RightOutlined />
+                        {dayEvents.length} mục ghi <RightOutlined />
                       </>
                     )}
                   </span>
                 </button>
 
-                {loading ? (
-                  <div className="booking-week-duty-skeleton">
-                    <Skeleton.Input active size="small" style={{ width: 150, height: 14, minWidth: 0 }} />
-                  </div>
-                ) : (
-                  <Popover
-                    trigger="click"
-                    placement={index >= 5 ? 'topLeft' : 'bottomLeft'}
-                    content={<DutyInfo duty={duty} past={pastDuty} />}
-                    overlayClassName="booking-week-duty-popover"
-                  >
-                    <button
-                      type="button"
-                      className={`booking-week-duty-button ${pastDuty ? 'booking-week-past-duty' : ''}`}
-                      aria-label="Mở rộng các ca trực"
+                {showDuty &&
+                  (loading ? (
+                    <div className="booking-week-duty-skeleton">
+                      <Skeleton.Input active size="small" style={{ width: 150, height: 14, minWidth: 0 }} />
+                    </div>
+                  ) : (
+                    <Popover
+                      trigger="click"
+                      placement={index >= 5 ? 'topLeft' : 'bottomLeft'}
+                      content={<DutyInfo duty={duty} past={pastDuty} />}
+                      overlayClassName="booking-week-duty-popover"
                     >
-                      <span>TRỰC:</span>
-                      <strong>{duty?.leader || 'Chưa có thông tin'}</strong>
-                      <DownOutlined />
-                    </button>
-                  </Popover>
-                )}
+                      <button
+                        type="button"
+                        className={`booking-week-duty-button ${pastDuty ? 'booking-week-past-duty' : ''}`}
+                        aria-label="Mở rộng các ca trực"
+                      >
+                        <span>TRỰC:</span>
+                        <strong>{duty?.leader || 'Chưa có thông tin'}</strong>
+                        <DownOutlined />
+                      </button>
+                    </Popover>
+                  ))}
               </div>
 
               <OutHoursSlot

@@ -125,8 +125,11 @@ Mỗi module có icon và màu nhận diện nhẹ.
 - Có mật độ thông tin vừa phải.
 - Gần tinh thần Google Workspace nhưng phù hợp môi trường cơ quan.
 
-### Tránh
+### Tránh (Nguyên tắc Anti-AI UI — Bắt buộc toàn hệ thống)
 
+- **Tuyệt đối không để lộ cảm giác UI do AI sinh ra**:
+  - **Cấm tuyệt đối dùng `border-left` trang trí** (ví dụ `border-left: 3px solid ...` trên card, dòng sự kiện, khối ghi chú, tiêu đề phụ...). Thay thế bằng chấm màu nhỏ (`6px` dot) hoặc màu chữ/nhãn tinh tế.
+  - **Hạn chế đóng khung bố cục (`box-in-box`)**: Không bọc các thẻ có viền và đổ bóng lồng bên trong một cột/panel đã có viền. Ưu tiên danh sách phẳng (flat rows), khoảng trắng và đường phân cách ngang `1px` mảnh (`#f1f5f9`).
 - Không giống trang tin.
 - Không dùng hero banner.
 - Không dùng ảnh tin tức.
