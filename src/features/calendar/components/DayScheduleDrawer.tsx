@@ -10,7 +10,9 @@ import {
   ShieldCheck,
   Users,
   Video,
+  X,
 } from 'lucide-react';
+import './DayScheduleDrawer.css';
 import { useMemo } from 'react';
 import type { CalendarEvent } from '@/types/domain';
 import { getDayDutyInfo } from '../dutySchedule';
@@ -57,6 +59,7 @@ export function DayScheduleDrawer({
   return (
     <Drawer
       className="day-schedule-drawer"
+      closable={false}
       destroyOnClose={false}
       onClose={onClose}
       open={open}
@@ -105,15 +108,24 @@ export function DayScheduleDrawer({
             <span className="day-subtitle-count">{dayEvents.length} sự kiện</span>
           </div>
 
-          <Button
-            className="btn-create-day-meeting-compact"
-            icon={<Plus size={14} />}
-            onClick={() => onCreateEvent(currentDay)}
-            size="middle"
-            type="primary"
-          >
-            Tạo lịch họp
-          </Button>
+          <div className="day-schedule-header-actions">
+            <Button
+              className="btn-create-day-meeting-compact"
+              icon={<Plus size={14} />}
+              onClick={() => onCreateEvent(currentDay)}
+              size="middle"
+              type="primary"
+            >
+              Tạo lịch họp
+            </Button>
+            <Button
+              aria-label="Đóng"
+              className="day-drawer-close-btn"
+              icon={<X size={16} />}
+              onClick={onClose}
+              type="text"
+            />
+          </div>
         </header>
 
         {/* Trực ban & Ca trực trong ngày: Viết liền Trực: {leader} */}
