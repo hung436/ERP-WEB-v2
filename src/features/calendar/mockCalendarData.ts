@@ -439,39 +439,29 @@ export function getEventsForWeek(weekStart: Dayjs, existingEvents: CalendarEvent
   const startStr = weekStart.startOf('isoWeek').format('YYYY-MM-DD');
   const endStr = weekStart.endOf('isoWeek').format('YYYY-MM-DD');
 
-  // Lọc sự kiện hiện có rơi vào tuần này
+  // Lọc sự kiện hiện có rơi vào tuần này (bao gồm fixtures và sự kiện do người dùng tạo/sửa)
   const weekExisting = existingEvents.filter((ev) => {
     const d = dayjs(ev.startAt).format('YYYY-MM-DD');
     return d >= startStr && d <= endStr;
   });
 
-  // Nếu tuần này đã có từ 3 sự kiện trở lên (ví dụ tuần 41 với fixtures chuẩn)
-  if (weekExisting.length >= 3) {
-    // Đảm bảo các sự kiện hiện có đều có ticketType chuẩn
-    const enrichedExisting = weekExisting.map((ev) => ({
-      ...ev,
-      ticketType: ev.ticketType || (ev.type === 'meeting' ? 'MEETING' : 'TASK'),
-    }));
+  // Đảm bảo các sự kiện hiện có đều có ticketType chuẩn
+  const enrichedExisting = weekExisting.map((ev) => ({
+    ...ev,
+    ticketType: ev.ticketType || (ev.type === 'meeting' ? 'MEETING' : 'TASK'),
+  }));
 
-    // Bổ sung đầy đủ các sự kiện mẫu (Chờ duyệt PENDING, Đang làm APPROVED, Lấy ý kiến CONSULTING)
-    const existingIds = new Set(enrichedExisting.map((ev) => ev.id));
-    const personalList = getMockPersonalEvents(weekStart);
-    const editorialList = getMockEditorialEvents(weekStart);
+  const existingIds = new Set(enrichedExisting.map((ev) => ev.id));
+  const personalList = getMockPersonalEvents(weekStart);
+  const editorialList = getMockEditorialEvents(weekStart);
 
-    const additions: CalendarEvent[] = [];
-    personalList.forEach((ev) => {
-      if (!existingIds.has(ev.id)) additions.push(ev);
-    });
-    editorialList.forEach((ev) => {
-      if (!existingIds.has(ev.id) && ev.ticketType === 'EVENT') additions.push(ev);
-    });
+  const additions: CalendarEvent[] = [];
+  personalList.forEach((ev) => {
+    if (!existingIds.has(ev.id)) additions.push(ev);
+  });
+  editorialList.forEach((ev) => {
+    if (!existingIds.has(ev.id)) additions.push(ev);
+  });
 
-    return [...enrichedExisting, ...additions];
-  }
-
-  // Nếu tuần này chưa có sự kiện nào (ví dụ chuyển sang tuần mới hoặc tuần hiện tại),
-  // tự động sinh toàn bộ dữ liệu phong phú theo tuần đó
-  const editorial = getMockEditorialEvents(weekStart);
-  const personal = getMockPersonalEvents(weekStart);
-  return [...editorial, ...personal];
+  return [...enrichedExisting, ...additions];
 }

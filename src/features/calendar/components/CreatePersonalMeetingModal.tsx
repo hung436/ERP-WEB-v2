@@ -29,6 +29,7 @@ import { useAuth } from "@/features/auth/AuthContext";
 import { calendarApi } from "@/services/api";
 import type { CalendarAttachmentItem, CalendarEvent } from "@/types/domain";
 
+import { formatBytes, getFileCategory } from "./AttachedFilesList";
 import "./JobTicketDetailDrawer.css";
 
 const TICKET_TYPE_ITEMS = [
@@ -905,24 +906,42 @@ export function CreatePersonalMeetingModal({
 
           {files.length > 0 && (
             <div className="jt-attached-preview-list">
-              {files.map((file, idx) => (
-                <div key={file.uid || idx} className="jt-attached-preview-item">
-                  <PaperClipOutlined style={{ color: "#64748b" }} />
-                  <span className="jt-attached-preview-item__name">
-                    {file.name}
-                  </span>
-                  <button
-                    type="button"
-                    className="jt-attached-preview-item__remove"
-                    onClick={() =>
-                      setFiles((prev) => prev.filter((_, i) => i !== idx))
-                    }
-                    title="Xóa tệp này"
-                  >
-                    <CloseOutlined />
-                  </button>
-                </div>
-              ))}
+              {files.map((file, idx) => {
+                const cat = getFileCategory(file.name);
+                return (
+                  <div key={file.uid || idx} className="jt-attached-preview-item">
+                    <div
+                      className="jt-attached-preview-item__badge"
+                      style={{
+                        background: cat.bg,
+                        color: cat.color,
+                        borderColor: cat.border,
+                      }}
+                    >
+                      <span style={{ fontSize: 13, lineHeight: 1 }}>{cat.icon}</span>
+                      <small style={{ fontSize: 8.5, fontWeight: 800, marginTop: 2 }}>{cat.label}</small>
+                    </div>
+                    <div className="jt-attached-preview-item__details">
+                      <span className="jt-attached-preview-item__name" title={file.name}>
+                        {file.name}
+                      </span>
+                      <span className="jt-attached-preview-item__size">
+                        {formatBytes(file.size)}
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      className="jt-attached-preview-item__remove"
+                      onClick={() =>
+                        setFiles((prev) => prev.filter((_, i) => i !== idx))
+                      }
+                      title="Xóa tệp này"
+                    >
+                      <CloseOutlined />
+                    </button>
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>

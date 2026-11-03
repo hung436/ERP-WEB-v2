@@ -15,7 +15,25 @@ let chatConversationStore: ChatConversation[] = conversations.map((item) => ({ .
 let chatMessageStore: ChatMessage[] = [...messages];
 let chatSequence = 100;
 let meetingEventStore: MeetingEvent[] = meetingEvents.map((item) => ({ ...item, responseStatus: item.responseStatus ?? 'pending' }));
-let calendarEventStore: CalendarEvent[] = calendarEvents.map((item) => ({ ...item, responseStatus: item.responseStatus ?? 'pending' }));
+function getInitialCalendarEvents(): CalendarEvent[] {
+  const base = calendarEvents.map((item) => ({ ...item, responseStatus: item.responseStatus ?? 'pending' }));
+  try {
+    const saved = typeof window !== 'undefined' ? window.localStorage.getItem('jt_calendar_events_store') : null;
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        const map = new Map<string, CalendarEvent>();
+        base.forEach((ev) => map.set(ev.id, ev));
+        parsed.forEach((ev) => map.set(ev.id, ev));
+        return Array.from(map.values());
+      }
+    }
+  } catch {
+    // ignore
+  }
+  return base;
+}
+let calendarEventStore: CalendarEvent[] = getInitialCalendarEvents();
 let calendarNotificationStore: CalendarNotificationItem[] = [...initialCalendarNotifications];
 let recipientGroupStore: CalendarRecipientGroup[] = [...initialRecipientGroups];
 let mailStore: MailItem[] = mails.map((item) => ({ ...item }));
@@ -335,7 +353,7 @@ export async function mockRequest<T>(path: string, options?: { method?: string; 
   }
   else if (/^\/api\/calendar\/events\/[^/]+\/comments$/.test(pathname) && options?.method === 'POST') {
     const eventId = pathname.split('/')[4];
-    const body = options.body as { content: string };
+    const body = options.body as { content: string; attachments?: CalendarAttachmentItem[] };
     const event = calendarEventStore.find((item) => item.id === eventId);
     if (!event) throw new Error('Không tìm thấy sự kiện để bình luận.');
     const newComment = {
@@ -343,10 +361,14 @@ export async function mockRequest<T>(path: string, options?: { method?: string; 
       author: activeUser.fullName,
       content: body.content,
       createdAt: new Date().toISOString(),
+      attachments: body.attachments,
     };
     const updated: CalendarEvent = {
       ...event,
       comments: [...(event.comments || []), newComment],
+      attachments: body.attachments
+        ? [...(event.attachments || []), ...body.attachments]
+        : event.attachments,
     };
     calendarEventStore = calendarEventStore.map((item) => item.id === eventId ? updated : item);
     data = updated;

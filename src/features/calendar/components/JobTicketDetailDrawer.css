@@ -180,6 +180,36 @@
   color: #b91c1c !important;
 }
 
+/* Icon button vuông bo góc nhỏ gọn (Dành cho chuông, menu ba chấm) */
+.jt-drawer-action-btn--icon {
+  width: 32px !important;
+  min-width: 32px !important;
+  height: 32px !important;
+  padding: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.jt-drawer-action-btn--edit {
+  color: #1e293b !important;
+  font-weight: 550 !important;
+}
+
+.jt-drawer-action-btn--edit:hover {
+  border-color: #cbd5e1 !important;
+  color: #d92d20 !important;
+}
+
+.jt-drawer-action-btn--edit .lucide {
+  color: #64748b;
+  transition: color 0.15s ease;
+}
+
+.jt-drawer-action-btn--edit:hover .lucide {
+  color: #d92d20;
+}
+
 /* Nút Back */
 .jt-document-drawer__icon-button {
   width: 32px !important;
@@ -514,6 +544,46 @@
   color: #94a3b8;
   font-weight: 400;
   font-size: 12px;
+}
+
+.jt-doc-info-user-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+}
+
+.jt-doc-info-user-name {
+  color: #0f172a;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.45;
+  word-break: break-word;
+}
+
+.jt-doc-info-item__header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.jt-doc-info-action-btn {
+  height: 24px !important;
+  padding: 0 6px !important;
+  font-size: 11.5px !important;
+  font-weight: 500 !important;
+  color: #475467 !important;
+  border-radius: 4px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  transition: all 0.15s ease !important;
+}
+
+.jt-doc-info-action-btn:hover {
+  background: #f1f5f9 !important;
+  color: #d92d20 !important;
 }
 
 .jt-doc-info-tags {
@@ -1000,6 +1070,162 @@
   margin-left: 4px;
 }
 
+/* Mốc đính kèm tệp trên Timeline trao đổi */
+.jt-timeline-attachment-event {
+  margin: 4px 0 10px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.jt-timeline-attachment-event--outgoing {
+  align-items: flex-end;
+}
+.jt-timeline-attachment-event--outgoing .jt-timeline-attachment-event__header {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+}
+.jt-timeline-attachment-event--outgoing .jt-timeline-attachment-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.jt-timeline-attachment-event--incoming {
+  align-items: flex-start;
+}
+.jt-timeline-attachment-event--incoming .jt-timeline-attachment-event__header {
+  display: flex;
+  justify-content: flex-start;
+  width: 100%;
+}
+.jt-timeline-attachment-event--incoming .jt-timeline-attachment-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+}
+
+.jt-timeline-attachment-event__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 14px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  font-size: 12px;
+  color: #475569;
+}
+
+.jt-timeline-attachment-event__text {
+  font-weight: 500;
+}
+
+.jt-timeline-attachment-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  width: 100%;
+}
+
+.jt-timeline-file-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+  cursor: pointer;
+  transition: all 0.16s ease;
+  user-select: none;
+}
+
+.jt-timeline-file-card:hover {
+  border-color: #cbd5e1;
+  background: #f8fafc;
+  box-shadow: 0 2px 6px rgba(16, 24, 40, 0.08);
+}
+
+.jt-timeline-file-card__badge {
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.jt-timeline-file-card__icon {
+  font-size: 13px;
+  line-height: 1;
+}
+
+.jt-timeline-file-card__ext {
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1.1;
+  margin-top: 1px;
+}
+
+.jt-timeline-file-card__info {
+  flex: 1 1 0%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.jt-timeline-file-card__name {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #1e293b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.jt-timeline-file-card:hover .jt-timeline-file-card__name {
+  color: #d92d20;
+}
+
+.jt-timeline-file-card__meta {
+  font-size: 11px;
+  color: #64748b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.jt-timeline-file-card__download {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  color: #64748b;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  padding: 0;
+}
+
+.jt-timeline-file-card__download:hover {
+  background: #fef2f2;
+  border-color: #fca5a5;
+  color: #d92d20;
+}
+
 /* Bong bóng tin nhắn (Chat Messages) */
 .jt-chat-message {
   display: flex;
@@ -1096,6 +1322,154 @@
   background: #f1f5f9;
   color: #0f172a;
   border: 1px solid #cbd5e1;
+}
+
+/* Tệp đính kèm trong bóng chat (Chat Bubble Attachments) */
+.jt-chat-bubble-attachments {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+
+.jt-chat-bubble-file {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  max-width: 320px;
+  user-select: none;
+}
+
+.jt-chat-bubble-file--incoming {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  color: #0f172a;
+}
+
+.jt-chat-bubble-file--incoming:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.jt-chat-bubble-file--incoming .jt-chat-bubble-file__name {
+  color: #1e293b;
+}
+
+.jt-chat-bubble-file--incoming:hover .jt-chat-bubble-file__name {
+  color: #d92d20;
+}
+
+.jt-chat-bubble-file--incoming .jt-chat-bubble-file__size {
+  color: #64748b;
+}
+
+.jt-chat-bubble-file--incoming .jt-chat-bubble-file__download {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #64748b;
+}
+
+.jt-chat-bubble-file--incoming .jt-chat-bubble-file__download:hover {
+  background: #fef2f2;
+  border-color: #fca5a5;
+  color: #d92d20;
+}
+
+.jt-chat-bubble-file--outgoing {
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  color: #ffffff;
+}
+
+.jt-chat-bubble-file--outgoing:hover {
+  background: rgba(255, 255, 255, 0.24);
+  border-color: rgba(255, 255, 255, 0.45);
+}
+
+.jt-chat-bubble-file--outgoing .jt-chat-bubble-file__name {
+  color: #ffffff;
+}
+
+.jt-chat-bubble-file--outgoing .jt-chat-bubble-file__size {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.jt-chat-bubble-file--outgoing .jt-chat-bubble-file__badge {
+  background: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.8) !important;
+}
+
+.jt-chat-bubble-file--outgoing .jt-chat-bubble-file__download {
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  color: #ffffff;
+}
+
+.jt-chat-bubble-file--outgoing .jt-chat-bubble-file__download:hover {
+  background: #ffffff;
+  color: #d92d20;
+}
+
+.jt-chat-bubble-file__badge {
+  width: 30px;
+  height: 30px;
+  border-radius: 5px;
+  border: 1px solid;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.jt-chat-bubble-file__icon {
+  font-size: 11px;
+  line-height: 1;
+}
+
+.jt-chat-bubble-file__ext {
+  font-size: 8px;
+  font-weight: 700;
+  line-height: 1;
+  margin-top: 1px;
+}
+
+.jt-chat-bubble-file__info {
+  flex: 1 1 0%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.jt-chat-bubble-file__name {
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.jt-chat-bubble-file__size {
+  font-size: 10.5px;
+}
+
+.jt-chat-bubble-file__download {
+  width: 26px;
+  height: 26px;
+  border-radius: 5px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  padding: 0;
 }
 
 /* 3. Sticky Bottom Input Bar */
@@ -1530,6 +1904,87 @@
   border-color: #cbd5e1;
   height: 30px !important;
   padding: 0 12px !important;
+}
+
+/* Danh sách tệp đính kèm đã tải lên (Attached Preview Files) */
+.jt-attached-preview-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.jt-attached-preview-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  transition: all 0.15s ease-in-out;
+}
+
+.jt-attached-preview-item:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 3px 6px rgba(15, 23, 42, 0.06);
+}
+
+.jt-attached-preview-item__badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  flex-shrink: 0;
+  border: 1px solid transparent;
+}
+
+.jt-attached-preview-item__details {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.jt-attached-preview-item__name {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #1e293b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.jt-attached-preview-item__size {
+  font-size: 11px;
+  color: #64748b;
+}
+
+.jt-attached-preview-item__remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: #94a3b8;
+  cursor: pointer;
+  font-size: 12px;
+  padding: 0;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.jt-attached-preview-item__remove:hover {
+  background: #fee2e2;
+  color: #ef4444;
 }
 
 .jt-segmented-radio {

@@ -55,9 +55,10 @@ describe('Lịch làm việc theo tuần (Google Calendar style)', () => {
     // Click vào sự kiện để mở modal
     await user.click(attendingEvent);
 
-    // Kiểm tra nội dung modal chi tiết mở ra
-    expect(await screen.findByText('Thong-bao-chao-co-dau-tuan-thang-10.pdf')).toBeInTheDocument();
-    expect(screen.getByText(/Tài liệu/i)).toBeInTheDocument();
+    // Kiểm tra nội dung modal chi tiết mở ra (tệp hiển thị ở mục Tài liệu và Timeline trao đổi)
+    const fileItems = await screen.findAllByText('Thong-bao-chao-co-dau-tuan-thang-10.pdf');
+    expect(fileItems.length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Tài liệu/i)[0]).toBeInTheDocument();
     expect(screen.getByText(/Thảo luận/i)).toBeInTheDocument();
     expect(screen.getByText('Đính kèm')).toBeInTheDocument();
     expect(screen.getByPlaceholderText(/Viết trao đổi/i)).toBeInTheDocument();
@@ -194,5 +195,28 @@ describe('Lịch làm việc theo tuần (Google Calendar style)', () => {
     expect((await screen.findAllByText(/Trực:/i)).length).toBeGreaterThan(0);
     expect(screen.getAllByRole('button', { name: /Tạo lịch họp/i }).length).toBeGreaterThan(0);
   });
+
+  it('hỗ trợ responsive với nút Bộ lọc thu gọn mở popover đầy đủ các nhóm lọc', async () => {
+    const user = userEvent.setup();
+    renderCalendarWeek();
+    await screen.findByText(/Tuần 41/i);
+
+    // Nút Bộ lọc thu gọn
+    const filterBtn = screen.getByRole('button', { name: /Bộ lọc lịch/i });
+    expect(filterBtn).toBeInTheDocument();
+
+    // Click mở popover
+    await user.click(filterBtn);
+
+    // Nguồn lịch Ban biên tập & Cá nhân luôn ở ngoài thanh công cụ
+    expect(screen.getByRole('button', { name: 'Ban biên tập' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Cá nhân' })).toBeInTheDocument();
+
+    // Popover hiển thị các bộ lọc bổ sung (Tham gia & Loại mục ghi)
+    expect(await screen.findByText('Bộ lọc lịch làm việc')).toBeInTheDocument();
+    expect(screen.getAllByText('Tham gia').length).toBeGreaterThan(0);
+    expect(screen.getByText('Loại mục ghi')).toBeInTheDocument();
+  });
 });
+
 

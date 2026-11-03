@@ -34,7 +34,7 @@ export const calendarApi = {
   create: (data: Partial<CalendarEvent>) => mockRequest<CalendarEvent>('/api/calendar/events', { method: 'POST', body: data }),
   update: (id: string, data: Partial<CalendarEvent>) => mockRequest<CalendarEvent>(`/api/calendar/events/${id}`, { method: 'PUT', body: data }),
   delete: (id: string) => mockRequest<{ success: boolean }>(`/api/calendar/events/${id}`, { method: 'DELETE' }),
-  addComment: (id: string, content: string) => mockRequest<CalendarEvent>(`/api/calendar/events/${id}/comments`, { method: 'POST', body: { content } }),
+  addComment: (id: string, content: string, attachments?: CalendarAttachmentItem[]) => mockRequest<CalendarEvent>(`/api/calendar/events/${id}/comments`, { method: 'POST', body: { content, attachments } }),
   addAttachment: (id: string, attachment: CalendarAttachmentItem) => mockRequest<CalendarEvent>(`/api/calendar/events/${id}/attachments`, { method: 'POST', body: { attachment } }),
 };
 export const calendarNotificationApi = {

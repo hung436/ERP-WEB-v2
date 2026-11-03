@@ -4,6 +4,7 @@ import {
   Checkbox,
   DatePicker,
   Drawer,
+  Dropdown,
   Input,
   Modal,
   Popconfirm,
@@ -12,6 +13,7 @@ import {
   Tooltip,
   message,
 } from 'antd';
+import type { MenuProps } from 'antd';
 import dayjs from 'dayjs';
 import {
   Bell,
@@ -20,13 +22,16 @@ import {
   CheckCircle,
   ChevronDown,
   ChevronUp,
+  Copy,
   Crown,
+  Download,
   Edit3,
   ExternalLink,
   FileText,
   LogOut,
   MapPin,
   MessageSquare,
+  MoreHorizontal,
   Paperclip,
   Send,
   User,
@@ -43,7 +48,7 @@ import { useAuth } from '@/features/auth/AuthContext';
 import { calendarApi } from '@/services/api';
 import type { CalendarAttachmentItem, CalendarEvent } from '@/types/domain';
 
-import { formatBytes } from './AttachedFilesList';
+import { formatBytes, getFileCategory } from './AttachedFilesList';
 import './JobTicketDetailDrawer.css';
 
 export type DetailRoleType = 'CREATOR' | 'APPROVER' | 'CONSULTEE' | 'EXECUTOR' | 'WATCHER';
@@ -77,6 +82,15 @@ export interface CalendarEventDetailModalProps {
   onDeleteEvent?: (eventId: string) => void;
 }
 
+export interface ChatAttachment {
+  id?: string;
+  name: string;
+  size?: number;
+  type?: string;
+  url?: string;
+  uploadedBy?: string;
+}
+
 interface ChatMessage {
   id: string;
   author_name: string;
@@ -84,6 +98,7 @@ interface ChatMessage {
   content: string;
   time: string;
   isMine?: boolean;
+  attachments?: ChatAttachment[];
 }
 
 export function CalendarEventDetailModal({
@@ -187,14 +202,40 @@ export function CalendarEventDetailModal({
           return true;
         })
         .forEach((c) => {
-          msgs.push({
-            id: c.id,
-            author_name: c.author,
-            role: c.author === currentUser ? 'CREATOR' : 'EXECUTOR',
-            content: c.content,
-            time: dayjs(c.createdAt).format('DD/MM HH:mm'),
-            isMine: c.author === currentUser,
-          });
+          const match = c.content?.match(/^\[Tệp đính kèm:\s*(.+)\]$/);
+          if (match) {
+            const fileName = match[1].trim();
+            msgs.push({
+              id: c.id,
+              author_name: c.author,
+              role: c.author === currentUser ? 'CREATOR' : 'EXECUTOR',
+              content: '',
+              time: dayjs(c.createdAt).format('DD/MM HH:mm'),
+              isMine: c.author === currentUser,
+              attachments: [
+                {
+                  id: `att-cmt-${c.id}`,
+                  name: fileName,
+                  size: 0,
+                  type: fileName.split('.').pop() || 'file',
+                  uploadedBy: c.author,
+                },
+              ],
+            });
+          } else {
+            const isMine =
+              c.author === currentUser ||
+              c.author === 'Nguyễn Minh Anh';
+            msgs.push({
+              id: c.id,
+              author_name: c.author,
+              role: isMine ? 'CREATOR' : 'EXECUTOR',
+              content: c.content,
+              time: dayjs(c.createdAt).format('DD/MM HH:mm'),
+              isMine,
+              attachments: c.attachments,
+            });
+          }
         });
     }
 
@@ -362,6 +403,73 @@ export function CalendarEventDetailModal({
     appendSystemLogAndUpdate('CANCELLED', `[Hệ thống] ${currentUser}: ${label}.`);
     message.success(label);
   };
+
+  const handleCopyLink = () => {
+    if (navigator?.clipboard?.writeText) {
+      navigator.clipboard.writeText(window.location.href);
+      message.success('Đã sao chép liên kết vào bộ nhớ tạm');
+    } else {
+      message.info('Đã sao chép liên kết');
+    }
+  };
+
+  const confirmCancelTicket = () => {
+    Modal.confirm({
+      title: isMeeting ? 'Xác nhận hủy lịch họp?' : 'Thu hồi / Hủy phiếu này?',
+      content: isMeeting
+        ? 'Lịch họp này sẽ chuyển sang trạng thái Đã hủy và gửi thông báo đến các thành viên.'
+        : 'Phiếu này sẽ chuyển sang trạng thái Đã thu hồi / hủy.',
+      okText: isMeeting ? 'Hủy lịch họp' : 'Thu hồi / Hủy',
+      okType: 'danger',
+      cancelText: 'Đóng',
+      onOk: () => handleCancelOrRecallTicket(),
+    });
+  };
+
+  const confirmLeaveTicket = () => {
+    Modal.confirm({
+      title: isMeeting ? 'Rời khỏi lịch họp này?' : 'Rời khỏi phiếu này?',
+      content: 'Bạn sẽ không còn nhận thông báo và mục này sẽ được gỡ khỏi danh sách cá nhân.',
+      okText: isMeeting ? 'Rời lịch' : 'Rời phiếu',
+      okType: 'danger',
+      cancelText: 'Hủy',
+      onOk: () => handleLeaveTicket(),
+    });
+  };
+
+  const moreMenuItems: MenuProps['items'] = [
+    {
+      key: 'copy-link',
+      icon: <Copy size={14} />,
+      label: 'Sao chép liên kết',
+      onClick: handleCopyLink,
+    },
+    ...(canLeaveTicket
+      ? [
+          {
+            key: 'leave-ticket',
+            icon: <LogOut size={14} />,
+            label: isMeeting ? 'Rời lịch họp' : 'Rời phiếu',
+            danger: true,
+            onClick: confirmLeaveTicket,
+          },
+        ]
+      : []),
+    ...(canCancelTicket
+      ? [
+          {
+            type: 'divider' as const,
+          },
+          {
+            key: 'cancel-ticket',
+            icon: <XCircle size={14} />,
+            label: isMeeting ? 'Hủy lịch họp' : 'Thu hồi / Hủy phiếu',
+            danger: true,
+            onClick: confirmCancelTicket,
+          },
+        ]
+      : []),
+  ];
 
   const handleOpenEditModal = () => {
     setEditContent(event.notes || event.agenda || event.description || event.title || '');
@@ -575,13 +683,24 @@ export function CalendarEventDetailModal({
     if (!chatInput.trim() && !selectedChatFile) return;
     const content = chatInput.trim();
     const fileToUpload = selectedChatFile;
+    const newAtt: ChatAttachment | undefined = fileToUpload
+      ? {
+          id: `att-${Date.now()}`,
+          name: fileToUpload.name,
+          size: fileToUpload.size,
+          type: fileToUpload.name.split('.').pop() || 'file',
+          uploadedBy: currentUser,
+        }
+      : undefined;
+
     const newMsg: ChatMessage = {
       id: `msg-${Date.now()}`,
       author_name: currentUser,
       role: activeRole === 'WATCHER' ? 'EXECUTOR' : activeRole,
-      content: content || (fileToUpload ? `[Tệp đính kèm: ${fileToUpload.name}]` : ''),
+      content: content,
       time: dayjs().format('HH:mm DD/MM'),
       isMine: true,
+      attachments: newAtt ? [newAtt] : undefined,
     };
     setChatMessages((prev) => [...prev, newMsg]);
     setChatInput('');
@@ -592,12 +711,23 @@ export function CalendarEventDetailModal({
     }, 50);
 
     try {
+      const attachmentsToSend: CalendarAttachmentItem[] | undefined = fileToUpload
+        ? [
+            {
+              id: `att-${Date.now()}`,
+              name: fileToUpload.name,
+              size: fileToUpload.size,
+              type: fileToUpload.name.split('.').pop() || 'file',
+              uploadedAt: new Date().toISOString(),
+              uploadedBy: currentUser,
+            },
+          ]
+        : undefined;
+
+      const res = await calendarApi.addComment(event.id, content, attachmentsToSend);
+      onUpdateEvent(res.data);
       if (fileToUpload) {
-        await handleUploadAttachment(fileToUpload);
-      }
-      if (content) {
-        const res = await calendarApi.addComment(event.id, content);
-        onUpdateEvent(res.data);
+        message.success(`Đã đính kèm tệp: ${fileToUpload.name}`);
       }
     } catch {
       // Local optimistic update remains
@@ -629,83 +759,42 @@ export function CalendarEventDetailModal({
               <h2>{event.title}</h2>
             </div>
             <div className="jt-document-drawer__header-actions">
-              {/* 1. Bật / Tắt thông báo: Tất cả các Role đều có */}
-              <Button
-                className={`jt-drawer-action-btn ${isMuted ? 'jt-drawer-action-btn--muted' : ''}`}
-                icon={isMuted ? <BellOff size={14} /> : <Bell size={14} />}
-                onClick={handleToggleMute}
-                size="small"
-              >
-                {isMuted ? 'Bật thông báo' : 'Tắt thông báo'}
-              </Button>
-
-              {/* 2. Thêm / Quản lý Người theo dõi: Chỉ Người tạo & Người duyệt */}
-              {canManageFollowers && (
+              {/* 1. Bật / Tắt thông báo dạng Icon button kèm Tooltip */}
+              <Tooltip title={isMuted ? 'Bật thông báo' : 'Tắt thông báo'}>
                 <Button
-                  className="jt-drawer-action-btn"
-                  icon={<UserPlus size={14} />}
-                  onClick={() => setFollowerModalOpen(true)}
+                  aria-label={isMuted ? 'Bật thông báo' : 'Tắt thông báo'}
+                  className={`jt-drawer-action-btn jt-drawer-action-btn--icon ${
+                    isMuted ? 'jt-drawer-action-btn--muted' : ''
+                  }`}
+                  icon={isMuted ? <BellOff size={14} /> : <Bell size={14} />}
+                  onClick={handleToggleMute}
                   size="small"
-                >
-                  Người theo dõi
-                </Button>
-              )}
+                />
+              </Tooltip>
 
-              {/* 3. Chỉnh sửa phiếu / lịch họp: Chỉ Người tạo (khi chưa hoàn thành) */}
+              {/* 2. Chỉnh sửa phiếu / lịch họp: Nút chính duy nhất ở Header */}
               {canEditTicket && (
                 <Button
-                  className="jt-drawer-action-btn"
-                  icon={<Edit3 size={14} />}
+                  className="jt-drawer-action-btn jt-drawer-action-btn--edit"
+                  icon={<Edit3 size={13} />}
                   onClick={handleOpenEditModal}
                   size="small"
                 >
-                  {isMeeting ? 'Chỉnh sửa lịch họp' : 'Chỉnh sửa phiếu'}
+                  {isMeeting ? 'Chỉnh sửa lịch' : 'Chỉnh sửa'}
                 </Button>
               )}
 
-              {/* 4. Thu hồi / Hủy phiếu hoặc Hủy lịch họp: Chỉ Người tạo (khi chưa hoàn thành) */}
-              {canCancelTicket && (
-                <Popconfirm
-                  cancelText="Đóng"
-                  description={
-                    isMeeting
-                      ? 'Lịch họp này sẽ chuyển sang trạng thái Đã hủy.'
-                      : 'Phiếu này sẽ chuyển sang trạng thái Đã thu hồi / hủy.'
-                  }
-                  okButtonProps={{ danger: true }}
-                  okText={isMeeting ? 'Hủy lịch họp' : 'Thu hồi / Hủy'}
-                  onConfirm={handleCancelOrRecallTicket}
-                  title={isMeeting ? 'Xác nhận hủy lịch họp?' : 'Thu hồi / Hủy phiếu này?'}
-                >
+              {/* 3. Menu thao tác phụ (More options dropdown) */}
+              {moreMenuItems && moreMenuItems.length > 0 && (
+                <Dropdown menu={{ items: moreMenuItems }} placement="bottomRight" trigger={['click']}>
                   <Button
-                    className="jt-drawer-action-btn jt-drawer-action-btn--leave"
-                    icon={<XCircle size={14} />}
+                    aria-label="Tùy chọn khác"
+                    className="jt-drawer-action-btn jt-drawer-action-btn--icon jt-drawer-action-btn--more"
+                    icon={<MoreHorizontal size={15} />}
                     size="small"
-                  >
-                    {isMeeting ? 'Hủy lịch họp' : 'Thu hồi / Hủy phiếu'}
-                  </Button>
-                </Popconfirm>
-              )}
-
-              {/* 5. Rời phiếu / Rời lịch: Người thực hiện & Người theo dõi (Phiếu/Sự kiện) hoặc Nhân sự tham gia (Lịch họp) */}
-              {canLeaveTicket && (
-                <Popconfirm
-                  cancelText="Hủy"
-                  description="Bạn sẽ không còn nhận thông báo và mục này sẽ được gỡ khỏi danh sách cá nhân."
-                  okButtonProps={{ danger: true }}
-                  okText={isMeeting ? 'Rời lịch' : 'Rời phiếu'}
-                  onConfirm={handleLeaveTicket}
-                  title={isMeeting ? 'Rời khỏi lịch họp này?' : 'Rời khỏi phiếu này?'}
-                >
-                  <Button
-                    className="jt-drawer-action-btn jt-drawer-action-btn--leave"
-                    icon={<LogOut size={14} />}
-                    loading={actionLoading}
-                    size="small"
-                  >
-                    {isMeeting ? 'Rời lịch' : 'Rời phiếu'}
-                  </Button>
-                </Popconfirm>
+                    title="Tùy chọn khác"
+                  />
+                </Dropdown>
               )}
             </div>
             {onClose && (
@@ -925,6 +1014,83 @@ export function CalendarEventDetailModal({
                   </div>
                 </div>
 
+                {/* ĐÍNH KÈM TỆP THEO PHIẾU TRÊN TIMELINE TRAO ĐỔI */}
+                {(() => {
+                  const isCreatorMe =
+                    creatorName === currentUser ||
+                    creatorName === 'Nguyễn Minh Anh' ||
+                    event.organizer === currentUser ||
+                    event.isUserParticipant;
+
+                  const commentAttachmentNames = new Set(
+                    (event.comments || []).flatMap((c) => (c.attachments || []).map((a) => a.name))
+                  );
+                  const ticketAttachments = (event.attachments || []).filter(
+                    (att) => !commentAttachmentNames.has(att.name)
+                  );
+
+                  if (ticketAttachments.length === 0) return null;
+
+                  return (
+                    <div
+                      className={`jt-timeline-attachment-event ${
+                        isCreatorMe ? 'jt-timeline-attachment-event--outgoing' : 'jt-timeline-attachment-event--incoming'
+                      }`}
+                    >
+                      <div className="jt-timeline-attachment-event__header">
+                        <div className="jt-timeline-attachment-event__badge">
+                          <Paperclip size={12} style={{ color: isCreatorMe ? '#d92d20' : '#0284c7' }} />
+                          <span className="jt-timeline-attachment-event__text">
+                            <strong>{creatorName}</strong> đã đính kèm {ticketAttachments.length} tệp tài liệu
+                          </span>
+                          <span className="jt-chat-system-event__time">{createdTimeFormatted}</span>
+                        </div>
+                      </div>
+                      <div className="jt-timeline-attachment-grid">
+                        {ticketAttachments.map((att) => {
+                          const cat = getFileCategory(att.name);
+                          return (
+                            <div
+                              key={att.id}
+                              className="jt-timeline-file-card"
+                              onClick={() => message.info(`Đang mở tệp: ${att.name}`)}
+                              title={`Xem hoặc tải về ${att.name}`}
+                              role="button"
+                              tabIndex={0}
+                            >
+                              <div
+                                className="jt-timeline-file-card__badge"
+                                style={{ background: cat.bg, color: cat.color, borderColor: cat.border }}
+                              >
+                                <span className="jt-timeline-file-card__icon">{cat.icon}</span>
+                                <span className="jt-timeline-file-card__ext">{cat.label}</span>
+                              </div>
+                              <div className="jt-timeline-file-card__info">
+                                <span className="jt-timeline-file-card__name">{att.name}</span>
+                                <span className="jt-timeline-file-card__meta">
+                                  {formatBytes(att.size)}
+                                  {att.uploadedBy && att.uploadedBy !== creatorName ? ` • ${att.uploadedBy}` : ''}
+                                </span>
+                              </div>
+                              <button
+                                type="button"
+                                className="jt-timeline-file-card__download"
+                                title="Tải về"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  message.success(`Đang tải về: ${att.name}`);
+                                }}
+                              >
+                                <Download size={13} />
+                              </button>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                })()}
+
                 {chatMessages.length === 0 ? (
                   <div className="jt-chat-empty-state">
                     Chưa có trao đổi nào. Hãy nhập tin nhắn bên dưới để bắt đầu trao đổi.
@@ -957,7 +1123,51 @@ export function CalendarEventDetailModal({
                               : 'jt-chat-message__bubble--incoming'
                           }`}
                         >
-                          {msg.content}
+                          {msg.content && <div className="jt-chat-message__text">{msg.content}</div>}
+                          {msg.attachments && msg.attachments.length > 0 && (
+                            <div className="jt-chat-bubble-attachments">
+                              {msg.attachments.map((att, idx) => {
+                                const cat = getFileCategory(att.name);
+                                return (
+                                  <div
+                                    key={att.id || `${att.name}-${idx}`}
+                                    className={`jt-chat-bubble-file ${
+                                      msg.isMine ? 'jt-chat-bubble-file--outgoing' : 'jt-chat-bubble-file--incoming'
+                                    }`}
+                                    onClick={() => message.info(`Đang mở tệp: ${att.name}`)}
+                                    title={`Tải về / Xem ${att.name}`}
+                                    role="button"
+                                    tabIndex={0}
+                                  >
+                                    <div
+                                      className="jt-chat-bubble-file__badge"
+                                      style={{ background: cat.bg, color: cat.color, borderColor: cat.border }}
+                                    >
+                                      <span className="jt-chat-bubble-file__icon">{cat.icon}</span>
+                                      <span className="jt-chat-bubble-file__ext">{cat.label}</span>
+                                    </div>
+                                    <div className="jt-chat-bubble-file__info">
+                                      <span className="jt-chat-bubble-file__name">{att.name}</span>
+                                      {att.size ? (
+                                        <span className="jt-chat-bubble-file__size">{formatBytes(att.size)}</span>
+                                      ) : null}
+                                    </div>
+                                    <button
+                                      type="button"
+                                      className="jt-chat-bubble-file__download"
+                                      title="Tải về"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        message.success(`Đang tải về: ${att.name}`);
+                                      }}
+                                    >
+                                      <Download size={13} />
+                                    </button>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -1076,11 +1286,11 @@ export function CalendarEventDetailModal({
                         Người triển khai ({executors.length})
                       </span>
                       {executors.length > 0 ? (
-                        <div className="jt-doc-info-tags">
+                        <div className="jt-doc-info-user-list">
                           {executors.map((u: { name: string }, idx: number) => (
-                            <Tag className="jt-doc-info-user-tag" key={idx}>
+                            <span className="jt-doc-info-user-name" key={idx}>
                               {u.name}
-                            </Tag>
+                            </span>
                           ))}
                         </div>
                       ) : (
@@ -1111,11 +1321,11 @@ export function CalendarEventDetailModal({
                         </span>
                         Thành phần tham gia ({event.participants.length})
                       </span>
-                      <div className="jt-doc-info-tags">
+                      <div className="jt-doc-info-user-list">
                         {event.participants.map((name: string, idx: number) => (
-                          <Tag className="jt-doc-info-user-tag" key={idx}>
+                          <span className="jt-doc-info-user-name" key={idx}>
                             {name}
-                          </Tag>
+                          </span>
                         ))}
                       </div>
                     </div>
@@ -1123,22 +1333,35 @@ export function CalendarEventDetailModal({
 
                   {!isMeeting && (
                     <div className="jt-doc-info-item jt-doc-info-item--block">
-                      <span className="jt-doc-info-item__label">
-                        <span className="jt-doc-info-icon">
-                          <Users size={14} />
+                      <div className="jt-doc-info-item__header-row">
+                        <span className="jt-doc-info-item__label">
+                          <span className="jt-doc-info-icon">
+                            <Users size={14} />
+                          </span>
+                          Người theo dõi ({watchers.length})
                         </span>
-                        Người theo dõi ({watchers.length})
-                      </span>
+                        {canManageFollowers && (
+                          <Button
+                            className="jt-doc-info-action-btn"
+                            icon={<UserPlus size={12} />}
+                            onClick={() => setFollowerModalOpen(true)}
+                            size="small"
+                            type="text"
+                          >
+                            Quản lý
+                          </Button>
+                        )}
+                      </div>
                       {watchers.length > 0 ? (
-                        <div className="jt-doc-info-tags">
+                        <div className="jt-doc-info-user-list">
                           {watchers.map((u: { name: string }, idx: number) => (
-                            <Tag className="jt-doc-info-user-tag" key={idx}>
+                            <span className="jt-doc-info-user-name" key={idx}>
                               {u.name}
-                            </Tag>
+                            </span>
                           ))}
                         </div>
                       ) : (
-                        <span style={{ color: '#94a3b8', fontSize: 12.5 }}>Chưa chọn</span>
+                        <span style={{ color: '#94a3b8', fontSize: 12.5 }}>Chưa có</span>
                       )}
                     </div>
                   )}

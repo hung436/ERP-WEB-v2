@@ -215,7 +215,12 @@ export function EventCard({
 
         {showMetaRow && (
           <div className="booking-week-card-meta-row">
-            {event.location && <span className="booking-week-card-loc">{event.location}</span>}
+            {event.location && (
+              <span className="booking-week-card-loc" title={event.location}>
+                <EnvironmentOutlined className="booking-week-card-loc-icon" aria-hidden="true" />
+                <span>{event.location}</span>
+              </span>
+            )}
             {showExceptionStatus && (
               <span className={`booking-week-status-badge booking-week-status-${statusKey}`}>
                 {approvalMeta.label}

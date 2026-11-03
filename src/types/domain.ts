@@ -83,6 +83,7 @@ export interface CalendarComment {
   avatar?: string;
   content: string;
   createdAt: string;
+  attachments?: CalendarAttachmentItem[];
 }
 
 export interface CalendarAttachmentItem {
