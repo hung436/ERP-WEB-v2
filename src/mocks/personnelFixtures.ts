@@ -1,5 +1,40 @@
 import type { PersonalProfile } from '@/types/personnel';
 
+export const personnelDepartmentOptions = [
+  'Ban Biên tập',
+  'Ban Thư ký toà soạn',
+  'Ban Nội dung & Xuất bản',
+  'Ban Công nghệ thông tin',
+  'Ban Tài chính - Kế toán',
+  'Ban Tổ chức - Nhân sự',
+  'Ban Kỹ thuật & Công nghệ',
+  'Ban Kinh tế - Xã hội',
+  'Ban Quảng cáo & Phát hành',
+  'Ban Thời sự - Chính trị',
+  'Ban Vấn đề - Sự kiện',
+  'Ban Văn hóa - Giải trí',
+  'Ban Bạn đọc',
+  'Đoàn Thanh niên Báo Tuổi Trẻ',
+  'Công đoàn Báo Tuổi Trẻ',
+  'Đảng ủy Báo Tuổi Trẻ',
+];
+
+export const personnelPositionOptions = [
+  'Tổng Biên tập',
+  'Phó Tổng Biên tập',
+  'Trưởng ban',
+  'Phó Trưởng ban',
+  'Phóng viên',
+  'Phóng viên cao cấp',
+  'Biên tập viên',
+  'Biên tập viên chính',
+  'Kế toán viên',
+  'Chuyên viên Nhân sự',
+  'Bí thư Đoàn Thanh niên',
+  'Chủ tịch Công đoàn',
+  'Bí thư Đảng ủy',
+];
+
 export const personalProfile: PersonalProfile = {
   employeeCode: 'NV-001',
   fullName: 'Nguyễn Minh Anh',
@@ -379,4 +414,3 @@ export const initialResignedEmployees = [
   { id: 'res-3', employeeCode: 'NV-2024-012', fullName: 'Đặng Quốc Bảo', department: 'Ban Kỹ thuật & Công nghệ', reason: 'Đi học tập chuyên sâu tại nước ngoài', resignationDate: '20/10/2025', attachmentName: 'Don_Xin_Thoi_Viec_DangQuocBao.pdf' },
   { id: 'res-4', employeeCode: 'NV-2021-099', fullName: 'Ngô Thanh Sơn', department: 'Ban Nội dung & Xuất bản', reason: 'Thay đổi định hướng nghề nghiệp', resignationDate: '30/08/2025', attachmentName: 'Quyet_Dinh_Thoi_Viec_NgoThanhSon.pdf' },
 ];
-

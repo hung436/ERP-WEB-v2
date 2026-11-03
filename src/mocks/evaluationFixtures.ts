@@ -3,6 +3,82 @@ import type { EvaluationCriterion, EvaluationGroup, EvaluationPeriod, Evaluation
 
 const stageOrder: EvaluationStage[] = ['self', 'deputy', 'manager', 'editorial', 'council'];
 
+export interface EvaluationCampaignFixture {
+  id: string;
+  name: string;
+  status: 'active' | 'published';
+  start: string;
+  step1: string;
+  step2: string;
+  step3: string;
+  council: string;
+  publish: string;
+  flow: string;
+}
+
+export const evaluationCampaigns: EvaluationCampaignFixture[] = [
+  {
+    id: 'campaign-q3-check',
+    name: 'Đánh giá lao động quý 3 năm 2026 (Kiểm tra)',
+    status: 'active',
+    start: '30/09/2026',
+    step1: '01/11/2026',
+    step2: '02/11/2026',
+    step3: '03/11/2026',
+    council: '05/11/2026',
+    publish: '06/11/2026',
+    flow: 'v1 | * v2',
+  },
+  {
+    id: 'campaign-0909',
+    name: 'Đánh giá lao động ngày 09-09 lúc 22:56',
+    status: 'published',
+    start: '02/07/2026',
+    step1: '03/07/2026',
+    step2: '04/07/2026',
+    step3: '05/07/2026',
+    council: '09/07/2026',
+    publish: '10/07/2026',
+    flow: 'v1 | * v2',
+  },
+  {
+    id: 'campaign-q3-v2',
+    name: 'Đánh giá lao động quý III v2 năm 2026',
+    status: 'published',
+    start: '01/04/2026',
+    step1: '02/04/2026',
+    step2: '03/04/2026',
+    step3: '04/04/2026',
+    council: '05/04/2026',
+    publish: '06/04/2026',
+    flow: 'v1 | * v2',
+  },
+  {
+    id: 'campaign-q3',
+    name: 'Đánh giá lao động quý III năm 2026',
+    status: 'published',
+    start: '24/02/2026',
+    step1: '26/02/2026',
+    step2: '28/02/2026',
+    step3: '01/03/2026',
+    council: '02/03/2026',
+    publish: '03/03/2026',
+    flow: 'v1 | * v2',
+  },
+  {
+    id: 'campaign-q2',
+    name: 'ĐÁNH GIÁ LAO ĐỘNG QUÝ 2 - 2026',
+    status: 'published',
+    start: '27/01/2026',
+    step1: '30/01/2026',
+    step2: '31/01/2026',
+    step3: '01/02/2026',
+    council: '02/02/2026',
+    publish: '23/02/2026',
+    flow: 'v1 | v2',
+  },
+];
+
 export const evaluationPeriods: EvaluationPeriod[] = [
   { id: '2026-q3', label: 'Quý III/2026', startAt: '2026-08-01T08:00:00+07:00', dueAt: '2026-08-15T17:00:00+07:00', status: 'active' },
   { id: '2026-q2', label: 'Quý II/2026', startAt: '2026-04-01T08:00:00+07:00', dueAt: '2026-04-15T17:00:00+07:00', status: 'closed' },
