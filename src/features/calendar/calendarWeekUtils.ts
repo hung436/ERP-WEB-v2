@@ -167,15 +167,33 @@ export function normalizeMeeting(record: CalendarEvent | any, userId = 'nhanvien
   const watchers = record.watchers || [];
   const watcherText = watchers.map((w: any) => w.display_name || w.name).filter(Boolean).join(', ');
 
+  const isUserExecutor = Array.isArray(executors) && executors.some((e: any) =>
+    String(e.id || e.user_id) === String(userId) || String(e.name || '').includes('Nguyễn Minh Anh')
+  );
+  const isUserApprover = Boolean(
+    record.approver && (String(record.approver.id) === String(userId) || String(record.approver.name || '').includes('Nguyễn Minh Anh'))
+  );
+  const isUserConsultant = Boolean(
+    record.consultantName && String(record.consultantName).includes('Nguyễn Minh Anh')
+  );
+  const isUserLeader = Boolean(
+    (record.leader && String(record.leader).includes('Nguyễn Minh Anh')) ||
+    (record.organizer && String(record.organizer).includes('Nguyễn Minh Anh'))
+  );
+
   const isUserWatcher = Boolean(
     record.isUserWatcher ||
-    (Array.isArray(watchers) && watchers.some((w: any) => String(w.id || w.user_id) === String(userId)))
+    (Array.isArray(watchers) && watchers.some((w: any) => String(w.id || w.user_id) === String(userId) || String(w.name || '').includes('Nguyễn Minh Anh')))
   );
 
   const isUserParticipant = Boolean(
     record.isUserParticipant ||
+    isUserExecutor ||
+    isUserApprover ||
+    isUserConsultant ||
+    isUserLeader ||
     (scope === 'personal' && !isTask) ||
-    (Array.isArray(record.participants) && record.participants.some((p: any) => String(p.id || p.user_id || p) === String(userId)))
+    (Array.isArray(record.participants) && record.participants.some((p: any) => String(p.id || p.user_id || p) === String(userId) || String(p.name || p).includes('Nguyễn Minh Anh')))
   );
 
   const participantText = record.participantText || record.attendees_text || (Array.isArray(record.participants) ? record.participants.map((p: any) => p.display_name || p.name || p).join(', ') : '');

@@ -97,7 +97,19 @@ export function CalendarWeekPage() {
         const saved = localStorage.getItem(EVENTS_STORAGE_KEY);
         if (saved) {
           const parsed = JSON.parse(saved);
-          if (Array.isArray(parsed)) return parsed;
+          if (Array.isArray(parsed)) {
+            const filtered = parsed.filter(
+              (ev) => !/^(ádasd|đâsdasd|sdasd|abcdefgh)$/i.test((ev.title || '').trim())
+            );
+            if (filtered.length !== parsed.length) {
+              try {
+                localStorage.setItem(EVENTS_STORAGE_KEY, JSON.stringify(filtered));
+              } catch {
+                // ignore
+              }
+            }
+            return filtered;
+          }
         }
       } catch {
         // ignore

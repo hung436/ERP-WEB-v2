@@ -168,7 +168,19 @@ export function CalendarEventDetailModal({
     );
 
     if (!isMeetingEvent) {
-      if (event.approver?.name?.includes(currentUser) && (currentStatus === 'PENDING' || currentStatus === 'CONSULTING')) {
+      if (
+        currentStatus === 'CONSULTING' &&
+        (
+          event.consultantName?.includes(currentUser) ||
+          (event.steps || []).some(
+            (s) =>
+              (s.role === 'CONSULTANT' || s.step_order === 2) &&
+              ((s.note && s.note.includes(currentUser)) || (s.actor_name && s.actor_name.includes(currentUser)))
+          )
+        )
+      ) {
+        setActiveRole('CONSULTEE');
+      } else if (event.approver?.name?.includes(currentUser) && (currentStatus === 'PENDING' || currentStatus === 'CONSULTING')) {
         setActiveRole('APPROVER');
       } else if (
         (event.executors || []).some((e) => e.name.includes(currentUser)) &&
@@ -187,6 +199,8 @@ export function CalendarEventDetailModal({
     } else {
       if (resolvedCreator.includes(currentUser)) {
         setActiveRole('CREATOR');
+      } else if ((event.participants || []).some((p) => p.includes(currentUser))) {
+        setActiveRole('EXECUTOR');
       } else {
         setActiveRole('WATCHER');
       }
