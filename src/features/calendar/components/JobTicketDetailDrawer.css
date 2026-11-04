@@ -1829,10 +1829,26 @@
   color: #1e293b;
 }
 
+.jt-create-template-modal .ant-form-item-label {
+  width: 100%;
+}
+
+.jt-create-template-modal .ant-form-item-label > label {
+  display: flex !important;
+  align-items: center;
+  width: 100% !important;
+}
+
+.jt-create-template-modal .ant-form-item-label > label::after {
+  display: none !important;
+  margin: 0 !important;
+}
+
 .jt-content-field-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex: 1;
   width: 100%;
 }
 

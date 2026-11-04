@@ -1680,25 +1680,29 @@ export function CalendarEventDetailModal({
                         </div>
 
                         <div className="jt-step-person-list">
-                          {(event.executors && event.executors.length > 0
-                            ? event.executors
-                            : participantsList.length > 0
-                              ? participantsList.map((p: { name: string; role?: string }, idx: number) => ({
-                                  id: idx,
+                          {(participantsList.length > 0
+                            ? participantsList.map((p: { name: string; role?: string }, idx: number) => {
+                                const matchedExec = (event.executors || []).find((ex) => ex.name === p.name);
+                                return {
+                                  id: matchedExec?.id ?? idx,
                                   name: p.name,
-                                  status: (statusKey === 'COMPLETED' ? 'COMPLETED' : 'IN_PROGRESS') as
+                                  status: (matchedExec?.status ||
+                                    (statusKey === 'COMPLETED' ? 'COMPLETED' : 'IN_PROGRESS')) as
                                     | 'IN_PROGRESS'
                                     | 'COMPLETED',
-                                  completed_at: statusKey === 'COMPLETED' ? event.startAt || new Date().toISOString() : undefined,
-                                }))
-                              : [{
-                                  id: 'exec-default',
-                                  name: currentUser,
-                                  status: (statusKey === 'COMPLETED' ? 'COMPLETED' : 'IN_PROGRESS') as
-                                    | 'IN_PROGRESS'
-                                    | 'COMPLETED',
-                                  completed_at: statusKey === 'COMPLETED' ? event.startAt || new Date().toISOString() : undefined,
-                                }]
+                                  completed_at:
+                                    matchedExec?.completed_at ||
+                                    (statusKey === 'COMPLETED' ? event.startAt || new Date().toISOString() : undefined),
+                                };
+                              })
+                            : [{
+                                id: 'exec-default',
+                                name: currentUser,
+                                status: (statusKey === 'COMPLETED' ? 'COMPLETED' : 'IN_PROGRESS') as
+                                  | 'IN_PROGRESS'
+                                  | 'COMPLETED',
+                                completed_at: statusKey === 'COMPLETED' ? event.startAt || new Date().toISOString() : undefined,
+                              }]
                           ).map((e: { name: string; status?: string; completed_at?: string }, idx: number) => {
                             const isDone = e.status === 'COMPLETED' || statusKey === 'COMPLETED';
                             return (
@@ -2040,10 +2044,12 @@ export function CalendarEventDetailModal({
               Thời gian
             </label>
             <DatePicker
+              allowClear={false}
               format="HH:mm DD/MM/YYYY"
               id="edit-ticket-datetime"
+              needConfirm
               onChange={(val) => setEditDateTime(val)}
-              showTime
+              showTime={{ format: 'HH:mm' }}
               style={{ width: '100%' }}
               value={editDateTime}
             />

@@ -94,7 +94,7 @@ export function EventCard({
     }
   }, [disabledHover]);
 
-  const badge = event.scope === 'personal' ? 'Cá nhân' : event.isUserParticipant ? 'Tham gia' : '';
+  const badge = event.scope !== 'personal' && event.isUserParticipant ? 'Tham gia' : '';
   const typeMeta = getTicketTypeMeta(event.ticketType);
   const approvalMeta = getApprovalStatusMeta(event.approvalStatus, event.ticketType, event.workflowType);
   const typeKey = String(event.ticketType || 'MEETING').toLowerCase();
@@ -255,9 +255,7 @@ export function EventCard({
                   </span>
                 )}
               </span>
-              {typeKey !== 'meeting' && (
-                <span className={`booking-week-type-badge booking-week-type-${typeKey}`}>{typeMeta.label}</span>
-              )}
+              <span className={`booking-week-type-badge booking-week-type-${typeKey}`}>{typeMeta.label}</span>
               {badge && <span className="booking-week-badge">{badge}</span>}
             </span>
           </div>

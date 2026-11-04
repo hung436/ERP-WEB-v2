@@ -175,14 +175,11 @@ export function CalendarEventCard({ event, onSelectEvent, onHoverChange, style, 
           </span>
 
           <div className="card-header-badges">
-            {event.ticketType === 'TASK' && <span className="card-status-badge task">Task</span>}
+            {event.ticketType === 'TASK' && <span className="card-status-badge task">Công việc</span>}
             {event.ticketType === 'EVENT' && <span className="card-status-badge event">Sự kiện</span>}
-            {event.ticketType === 'MEETING' && <span className="card-status-badge meeting">Lịch họp</span>}
+            {(!event.ticketType || event.ticketType === 'MEETING') && <span className="card-status-badge meeting">Lịch họp</span>}
             {isEditorial && isUserAttending && (
               <span className="card-status-badge attending">Tham gia</span>
-            )}
-            {isPersonal && (
-              <span className="card-status-badge personal">Cá nhân</span>
             )}
             {isEditorial && !isUserAttending && !isPast && (
               <button

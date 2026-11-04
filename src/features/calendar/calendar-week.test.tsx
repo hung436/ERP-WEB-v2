@@ -30,7 +30,8 @@ describe('Lịch làm việc theo tuần (Google Calendar style)', () => {
     expect(screen.getByText('Ban biên tập')).toBeInTheDocument();
     expect(screen.getAllByText('Cá nhân').length).toBeGreaterThan(0);
     expect(screen.getByText('Chỉ hiện lịch có mặt tôi')).toBeInTheDocument();
-    expect(screen.getAllByText('Tham gia').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Công việc').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Lịch họp').length).toBeGreaterThan(0);
 
     // Các ngày trong tuần
     expect(screen.getAllByText('Thứ Hai').length).toBeGreaterThan(0);
@@ -47,6 +48,7 @@ describe('Lịch làm việc theo tuần (Google Calendar style)', () => {
     renderCalendarWeek();
 
     await screen.findByText(/Tuần 41/i);
+    await user.click(screen.getByRole('button', { name: 'Ban biên tập' }));
 
     // Chào cờ đầu tuần là sự kiện user tham gia
     const attendingEvent = (await screen.findAllByText('Chào cờ đầu tuần'))[0];
@@ -97,13 +99,13 @@ describe('Lịch làm việc theo tuần (Google Calendar style)', () => {
 
     await screen.findByText(/Tuần 41/i);
     const editorialChip = screen.getByRole('button', { name: 'Ban biên tập' });
-    expect(editorialChip).toHaveAttribute('aria-pressed', 'true');
-
-    await user.click(editorialChip);
     expect(editorialChip).toHaveAttribute('aria-pressed', 'false');
 
     await user.click(editorialChip);
     expect(editorialChip).toHaveAttribute('aria-pressed', 'true');
+
+    await user.click(editorialChip);
+    expect(editorialChip).toHaveAttribute('aria-pressed', 'false');
   });
 
   it('không hiển thị tag Chỉ xem và dòng thông báo Chỉ xem thông tin', async () => {
@@ -130,6 +132,7 @@ describe('Lịch làm việc theo tuần (Google Calendar style)', () => {
     const user = userEvent.setup();
     renderCalendarWeek();
     await screen.findByText(/Tuần 41/i);
+    await user.click(screen.getByRole('button', { name: 'Ban biên tập' }));
 
     // Người trực ban Thứ Hai
     expect((await screen.findAllByText('Anh Hoàng Nguyên')).length).toBeGreaterThan(0);
@@ -155,6 +158,7 @@ describe('Lịch làm việc theo tuần (Google Calendar style)', () => {
     const user = userEvent.setup();
     renderCalendarWeek();
     await screen.findByText(/Tuần 41/i);
+    await user.click(screen.getByRole('button', { name: 'Ban biên tập' }));
 
     // Có các tag Đã điều chỉnh trên giao diện tuần
     const adjustedBadges = await screen.findAllByText('Đã điều chỉnh');

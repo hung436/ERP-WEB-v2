@@ -250,25 +250,25 @@ export function DayScheduleDrawer({
 
                       {/* Cột nội dung chi tiết */}
                       <div className="day-event-content-col">
-                        {((isEditorial && isUserAttending) || isPersonal || event.isAdjusted) && (
-                          <div className="day-event-tags-row">
-                            {isEditorial && isUserAttending && (
-                              <Tag className="event-badge-attending-red">
-                                Tham gia
-                              </Tag>
-                            )}
-                            {isPersonal && (
-                              <Tag className="event-scope-badge scope-blue">
-                                Cá nhân
-                              </Tag>
-                            )}
-                            {event.isAdjusted && (
-                              <Tag className="event-badge-adjusted" color="gold">
-                                Đã điều chỉnh
-                              </Tag>
-                            )}
-                          </div>
-                        )}
+                        <div className="day-event-tags-row">
+                          <Tag className="event-scope-badge scope-blue">
+                            {event.ticketType === 'TASK' || event.type === 'task'
+                              ? 'Công việc'
+                              : event.ticketType === 'EVENT' || event.type === 'event'
+                                ? 'Sự kiện'
+                                : 'Lịch họp'}
+                          </Tag>
+                          {isEditorial && isUserAttending && (
+                            <Tag className="event-badge-attending-red">
+                              Tham gia
+                            </Tag>
+                          )}
+                          {event.isAdjusted && (
+                            <Tag className="event-badge-adjusted" color="gold">
+                              Đã điều chỉnh
+                            </Tag>
+                          )}
+                        </div>
 
                         <h4 className="day-event-title">{event.title}</h4>
 

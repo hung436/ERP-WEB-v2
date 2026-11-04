@@ -134,88 +134,20 @@ function SmartTimePicker({
   value,
   onChange,
 }: SmartTimePickerProps) {
-  const currentVal = value || dayjs().hour(17).minute(30).second(0);
-  const currentTimeStr = currentVal.format("HH:mm");
-
-  const timeOptions = [
-    { label: "08:00 (Đầu giờ sáng)", value: "08:00" },
-    { label: "08:30 (Giao ban sáng)", value: "08:30" },
-    { label: "09:00", value: "09:00" },
-    { label: "09:30", value: "09:30" },
-    { label: "10:00", value: "10:00" },
-    { label: "10:30", value: "10:30" },
-    { label: "11:00", value: "11:00" },
-    { label: "11:30 (Cuối buổi sáng)", value: "11:30" },
-    { label: "13:30 (Đầu giờ chiều)", value: "13:30" },
-    { label: "14:00", value: "14:00" },
-    { label: "14:30", value: "14:30" },
-    { label: "15:00", value: "15:00" },
-    { label: "15:30", value: "15:30" },
-    { label: "16:00", value: "16:00" },
-    { label: "16:30", value: "16:30" },
-    { label: "17:00", value: "17:00" },
-    { label: "17:30 (Hạn cuối ngày)", value: "17:30" },
-    { label: "18:00 (Ca tối)", value: "18:00" },
-    { label: "19:00", value: "19:00" },
-    { label: "20:00", value: "20:00" },
-    { label: "21:00", value: "21:00" },
-  ];
-
-  if (!timeOptions.some((opt) => opt.value === currentTimeStr)) {
-    timeOptions.unshift({ label: `${currentTimeStr} (Tùy chọn)`, value: currentTimeStr });
-  }
-
-  const handleDateChange = (date: Dayjs | null) => {
-    if (!date) return;
-    const [h, m] = currentTimeStr.split(":").map(Number);
-    const updated = date.hour(h).minute(m).second(0);
-    onChange?.(updated);
-  };
-
-  const handleTimeChange = (timeStr: string) => {
-    const [h, m] = timeStr.split(":").map(Number);
-    const updated = currentVal.hour(h).minute(m).second(0);
-    onChange?.(updated);
-  };
-
-  const dayOfWeekNames = [
-    "Chủ Nhật",
-    "Thứ Hai",
-    "Thứ Ba",
-    "Thứ Tư",
-    "Thứ Năm",
-    "Thứ Sáu",
-    "Thứ Bảy",
-  ];
-
   return (
-    <div className="jt-smart-time-picker">
-      <div className="jt-time-inputs-row">
-        <div className="jt-time-date-col">
-          <DatePicker
-            value={currentVal}
-            onChange={handleDateChange}
-            format={(d) => `${dayOfWeekNames[d.day()]}, ${d.format("DD/MM/YYYY")}`}
-            allowClear={false}
-            className="jt-modern-picker"
-            style={{ width: "100%", height: 36, borderRadius: 6 }}
-            placeholder="Chọn ngày..."
-          />
-        </div>
-        <div className="jt-time-hour-col">
-          <Select
-            value={currentTimeStr}
-            onChange={handleTimeChange}
-            options={timeOptions}
-            showSearch
-            className="jt-modern-select"
-            style={{ width: "100%", height: 36 }}
-            suffixIcon={<ClockCircleOutlined style={{ color: "#94a3b8" }} />}
-            placeholder="Chọn giờ..."
-          />
-        </div>
-      </div>
-    </div>
+    <DatePicker
+      value={value}
+      onChange={(val) => {
+        if (val) onChange?.(val);
+      }}
+      showTime={{ format: "HH:mm" }}
+      format="HH:mm DD/MM/YYYY"
+      needConfirm
+      allowClear={false}
+      className="jt-modern-picker"
+      style={{ width: "100%", height: 36, borderRadius: 6 }}
+      placeholder="Chọn thời gian..."
+    />
   );
 }
 

@@ -142,7 +142,7 @@ export function CalendarWeekPage() {
 
   const [query, setQuery] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
-  const [editorial, setEditorial] = useState(true);
+  const [editorial, setEditorial] = useState(false);
   const [personal, setPersonal] = useState(true);
   const [attending, setAttending] = useState(false);
   const [ticketTypes, setTicketTypes] = useState({
