@@ -57,7 +57,7 @@
 .day-heading-text {
   margin: 0;
   font-size: 16px;
-  font-weight: 700;
+  font-weight: 600;
   color: #0f172a;
   line-height: 1.3;
 }
@@ -102,7 +102,7 @@
 }
 
 .day-subtitle-count {
-  font-size: 12.5px;
+  font-size: 12px;
   color: #64748b;
   font-weight: 500;
 }
@@ -120,7 +120,7 @@
   gap: 6px;
   height: 32px !important;
   padding: 0 12px !important;
-  font-size: 12.5px !important;
+  font-size: 12px !important;
   font-weight: 600 !important;
   border-radius: 8px !important;
   background: #d92d20 !important;
@@ -268,37 +268,37 @@
   box-sizing: border-box;
 }
 
-/* Theme màu thẻ: Không border-left, dùng background và border nhẹ nhàng */
+/* Theme màu thẻ: Không border-left, không viền, dùng background êm dịu */
 .day-event-card.theme-red {
   background: #fffafa;
-  border: 1px solid #fecaca;
+  border: 1px solid transparent;
 }
 
 .day-event-card.theme-red:hover {
   background: #fef2f2;
-  border-color: #fca5a5;
+  border-color: transparent;
   box-shadow: 0 2px 8px rgba(220, 38, 38, 0.06);
 }
 
 .day-event-card.theme-blue {
   background: #fbfdff;
-  border: 1px solid #dbeafe;
+  border: 1px solid transparent;
 }
 
 .day-event-card.theme-blue:hover {
   background: #f0f7ff;
-  border-color: #bfdbfe;
+  border-color: transparent;
   box-shadow: 0 2px 8px rgba(37, 99, 235, 0.06);
 }
 
 .day-event-card.theme-gray {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  border: 1px solid transparent;
 }
 
 .day-event-card.theme-gray:hover {
-  background: #f8fafc;
-  border-color: #cbd5e1;
+  background: #f1f5f9;
+  border-color: transparent;
   box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
 }
 
@@ -307,8 +307,8 @@
   display: flex !important;
   flex-direction: column !important;
   align-items: center;
-  justify-content: flex-start;
-  min-width: 62px;
+  justify-content: center;
+  min-width: 58px;
   flex-shrink: 0;
   padding-right: 12px;
   border-right: 1px solid #f1f5f9;
@@ -319,30 +319,9 @@
 .event-start-time {
   display: block !important;
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 600;
   color: #0f172a;
   line-height: 1.2;
-}
-
-.event-end-time {
-  display: block !important;
-  font-size: 12px;
-  font-weight: 500;
-  color: #64748b;
-  line-height: 1.2;
-  margin-top: 2px;
-}
-
-.event-duration-tag {
-  display: inline-block !important;
-  margin-top: 6px;
-  padding: 1px 6px;
-  border-radius: 4px;
-  font-size: 11px;
-  font-weight: 600;
-  background: #f1f5f9;
-  color: #475569;
-  white-space: nowrap;
 }
 
 /* Cột nội dung chi tiết */
@@ -404,7 +383,7 @@
 
 .day-event-title {
   margin: 0;
-  font-size: 13.5px;
+  font-size: 14px;
   font-weight: 600;
   color: #0f172a;
   line-height: 1.4;

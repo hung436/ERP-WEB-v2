@@ -94,13 +94,8 @@ export function MeetingQuickView({ event, onClose }: { event: MeetingEvent; onCl
         {/* TIME CARD */}
         <div className="meeting-time-box">
           <div className="time-endpoint">
-            <span className="time-sublabel">Bắt đầu</span>
+            <span className="time-sublabel">Thời gian</span>
             <strong>{formatDate(event.startAt)}</strong>
-          </div>
-          <span className="time-arrow">➔</span>
-          <div className="time-endpoint">
-            <span className="time-sublabel">Kết thúc</span>
-            <strong>{formatDate(event.endAt)}</strong>
           </div>
         </div>
 
@@ -132,7 +127,7 @@ export function MeetingQuickView({ event, onClose }: { event: MeetingEvent; onCl
         {/* AGENDA SECTION */}
         {event.agenda && (
           <div className="meeting-agenda-box">
-            <h4>Nội dung / Chương trình làm việc</h4>
+            <h4>Chương trình / Nội dung họp trực tuyến</h4>
             <p>{event.agenda}</p>
           </div>
         )}

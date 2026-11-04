@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { Button, Drawer, Empty, Tag, Tooltip } from 'antd';
 import dayjs, { type Dayjs } from 'dayjs';
 import {
@@ -12,10 +13,12 @@ import {
   Video,
   X,
 } from 'lucide-react';
-import './DayScheduleDrawer.css';
-import { useMemo } from 'react';
+
 import type { CalendarEvent } from '@/types/domain';
+
 import { getDayDutyInfo } from '../dutySchedule';
+
+import './DayScheduleDrawer.css';
 
 const VI_DAY_NAMES = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
 
@@ -199,7 +202,6 @@ export function DayScheduleDrawer({
               <div className="day-schedule-timeline-list">
                 {dayEvents.map((event) => {
                   const start = dayjs(event.startAt);
-                  const end = dayjs(event.endAt);
                   const isEditorial = event.scope === 'editorial';
                   const isPersonal = event.scope === 'personal';
                   const isUserAttending = Boolean(event.isUserParticipant);
@@ -215,14 +217,6 @@ export function DayScheduleDrawer({
                     cardColorClass = 'theme-blue';
                   }
 
-                  const durationMinutes = end.diff(start, 'minute');
-                  const durationHour = Math.floor(durationMinutes / 60);
-                  const durationRemMin = durationMinutes % 60;
-                  const durationStr =
-                    durationHour > 0
-                      ? `${durationHour}h${durationRemMin > 0 ? ` ${durationRemMin}p` : ''}`
-                      : `${durationMinutes}p`;
-
                   const canOpen = isPersonal || isUserAttending;
 
                   // Danh sách tham gia
@@ -233,10 +227,18 @@ export function DayScheduleDrawer({
                       : (event.leader || event.organizer));
 
                   return (
-                    <article
+                    <div
                       className={`day-event-card ${cardColorClass}`}
                       key={event.id}
-                      onClick={() => onSelectEvent(event)}
+                      onClick={() => {
+                        if (canOpen) onSelectEvent(event);
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          if (canOpen) onSelectEvent(event);
+                        }
+                      }}
                       role="button"
                       style={{ cursor: canOpen ? 'pointer' : 'default' }}
                       tabIndex={0}
@@ -244,31 +246,29 @@ export function DayScheduleDrawer({
                       {/* Cột mốc thời gian */}
                       <div className="day-event-time-col">
                         <span className="event-start-time">{start.format('HH:mm')}</span>
-                        <span className="event-end-time">{end.format('HH:mm')}</span>
-                        <span className="event-duration-tag">{durationStr}</span>
                       </div>
 
                       {/* Cột nội dung chi tiết */}
                       <div className="day-event-content-col">
-                        <div className="day-event-tags-row">
-                          <Tag className="event-scope-badge scope-blue">
-                            {event.ticketType === 'TASK' || event.type === 'task'
-                              ? 'Công việc'
-                              : event.ticketType === 'EVENT' || event.type === 'event'
-                                ? 'Sự kiện'
-                                : 'Lịch họp'}
-                          </Tag>
-                          {isEditorial && isUserAttending && (
-                            <Tag className="event-badge-attending-red">
-                              Tham gia
-                            </Tag>
-                          )}
-                          {event.isAdjusted && (
-                            <Tag className="event-badge-adjusted" color="gold">
-                              Đã điều chỉnh
-                            </Tag>
-                          )}
-                        </div>
+                        {((isEditorial && isUserAttending) || isPersonal || event.isAdjusted) && (
+                          <div className="day-event-tags-row">
+                            {isEditorial && isUserAttending && (
+                              <Tag className="event-badge-attending-red">
+                                Tham gia
+                              </Tag>
+                            )}
+                            {isPersonal && (
+                              <Tag className="event-scope-badge scope-blue">
+                                Cá nhân
+                              </Tag>
+                            )}
+                            {event.isAdjusted && (
+                              <Tag className="event-badge-adjusted" color="gold">
+                                Đã điều chỉnh
+                              </Tag>
+                            )}
+                          </div>
+                        )}
 
                         <h4 className="day-event-title">{event.title}</h4>
 
@@ -313,7 +313,7 @@ export function DayScheduleDrawer({
                           )}
                         </div>
                       </div>
-                    </article>
+                    </div>
                   );
                 })}
               </div>

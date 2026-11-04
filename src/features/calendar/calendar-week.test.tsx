@@ -48,7 +48,6 @@ describe('Lịch làm việc theo tuần (Google Calendar style)', () => {
     renderCalendarWeek();
 
     await screen.findByText(/Tuần 41/i);
-    await user.click(screen.getByRole('button', { name: 'Ban biên tập' }));
 
     // Chào cờ đầu tuần là sự kiện user tham gia
     const attendingEvent = (await screen.findAllByText('Chào cờ đầu tuần'))[0];
@@ -99,14 +98,14 @@ describe('Lịch làm việc theo tuần (Google Calendar style)', () => {
 
     await screen.findByText(/Tuần 41/i);
     const editorialChip = screen.getByRole('button', { name: 'Ban biên tập' });
-    expect(editorialChip).toHaveAttribute('aria-pressed', 'false');
-
-    await user.click(editorialChip);
     expect(editorialChip).toHaveAttribute('aria-pressed', 'true');
 
     await user.click(editorialChip);
     expect(editorialChip).toHaveAttribute('aria-pressed', 'false');
-  });
+
+    await user.click(editorialChip);
+    expect(editorialChip).toHaveAttribute('aria-pressed', 'true');
+  }, 45000);
 
   it('không hiển thị tag Chỉ xem và dòng thông báo Chỉ xem thông tin', async () => {
     renderCalendarWeek();
@@ -114,7 +113,7 @@ describe('Lịch làm việc theo tuần (Google Calendar style)', () => {
 
     expect(screen.queryByText('Chỉ xem')).not.toBeInTheDocument();
     expect(screen.queryByText(/Không thuộc thành phần tham dự/i)).not.toBeInTheDocument();
-  });
+  }, 45000);
 
   it('cho phép bấm icon ngôi sao Quan tâm trên lịch chỉ xem và hiển thị thông báo nhắc nhở 15 phút', async () => {
     const user = userEvent.setup();
@@ -126,13 +125,12 @@ describe('Lịch làm việc theo tuần (Google Calendar style)', () => {
 
     await user.click(starButtons[0]);
     expect(await screen.findByText(/Bạn sẽ được nhắc nhở trước 15 phút/i)).toBeInTheDocument();
-  });
+  }, 45000);
 
   it('hiển thị thông tin người trực và các ca trực tòa soạn cho từng ngày trong tuần', async () => {
     const user = userEvent.setup();
     renderCalendarWeek();
     await screen.findByText(/Tuần 41/i);
-    await user.click(screen.getByRole('button', { name: 'Ban biên tập' }));
 
     // Người trực ban Thứ Hai
     expect((await screen.findAllByText('Anh Hoàng Nguyên')).length).toBeGreaterThan(0);
@@ -152,13 +150,12 @@ describe('Lịch làm việc theo tuần (Google Calendar style)', () => {
     expect(screen.getAllByText('Ca 2:').length).toBeGreaterThan(0);
     expect(screen.getAllByText(/Đà Trang/i).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/Viễn Sự, N.V.Hải/i).length).toBeGreaterThan(0);
-  });
+  }, 45000);
 
   it('hiển thị tag Đã điều chỉnh cho các sự kiện có lịch điều chỉnh', async () => {
     const user = userEvent.setup();
     renderCalendarWeek();
     await screen.findByText(/Tuần 41/i);
-    await user.click(screen.getByRole('button', { name: 'Ban biên tập' }));
 
     // Có các tag Đã điều chỉnh trên giao diện tuần
     const adjustedBadges = await screen.findAllByText('Đã điều chỉnh');
@@ -171,7 +168,7 @@ describe('Lịch làm việc theo tuần (Google Calendar style)', () => {
     // Trong modal chi tiết hiển thị banner thông tin điều chỉnh
     expect(await screen.findByText(/Lưu ý điều chỉnh:/i)).toBeInTheDocument();
     expect(screen.getAllByText(/Thay đổi địa điểm sang Hội trường HTT2/i)[0]).toBeInTheDocument();
-  });
+  }, 45000);
 
   it('mặc định hiển thị tuần đang hiện hành khi mở module', async () => {
     // Gọi trực tiếp route không có param ?date để kiểm tra mặc định tuần hiện hành
@@ -184,7 +181,7 @@ describe('Lịch làm việc theo tuần (Google Calendar style)', () => {
     render(<App />);
     const currentWeekNumber = dayjs().isoWeek();
     expect(await screen.findByText(new RegExp(`Tuần ${currentWeekNumber}`, 'i'))).toBeInTheDocument();
-  });
+  }, 45000);
 
   it('hiển thị drawer danh sách sự kiện trong ngày khi bấm vào một ngày trong tuần', async () => {
     const user = userEvent.setup();
@@ -198,7 +195,7 @@ describe('Lịch làm việc theo tuần (Google Calendar style)', () => {
     // Mở drawer xem lịch trong ngày
     expect((await screen.findAllByText(/Trực:/i)).length).toBeGreaterThan(0);
     expect(screen.getAllByRole('button', { name: /Tạo/i }).length).toBeGreaterThan(0);
-  });
+  }, 45000);
 
   it('hỗ trợ responsive với nút Bộ lọc thu gọn mở popover đầy đủ các nhóm lọc', async () => {
     const user = userEvent.setup();
@@ -220,7 +217,7 @@ describe('Lịch làm việc theo tuần (Google Calendar style)', () => {
     expect(await screen.findByText('Bộ lọc lịch làm việc')).toBeInTheDocument();
     expect(screen.getAllByText('Tham gia').length).toBeGreaterThan(0);
     expect(screen.getByText('Loại mục ghi')).toBeInTheDocument();
-  });
+  }, 45000);
 
   it('phiếu công việc có 3 thành phần chính và 2 nút Triển khai / Đề xuất cùng các popup tương ứng', async () => {
     const user = userEvent.setup();

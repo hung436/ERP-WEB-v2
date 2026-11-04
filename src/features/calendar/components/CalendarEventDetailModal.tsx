@@ -1,19 +1,14 @@
 import {
-  Avatar,
   Button,
-  Checkbox,
   DatePicker,
   Drawer,
-  Dropdown,
   Input,
   Modal,
-  Popconfirm,
   Select,
   Tag,
   Tooltip,
   message,
 } from 'antd';
-import type { MenuProps } from 'antd';
 import dayjs from 'dayjs';
 import {
   Bell,
@@ -22,28 +17,22 @@ import {
   CheckCircle,
   ChevronDown,
   ChevronUp,
-  Copy,
-  Crown,
   Download,
-  Edit3,
   ExternalLink,
   FileText,
   LogOut,
   MapPin,
   MessageSquare,
-  MoreHorizontal,
   Paperclip,
   Plus,
   Send,
   User,
-  UserPlus,
   Users,
   Video,
-  Wrench,
   X,
   XCircle,
 } from 'lucide-react';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { useAuth } from '@/features/auth/AuthContext';
 import { calendarApi } from '@/services/api';
@@ -51,6 +40,7 @@ import type { CalendarAttachmentItem, CalendarEvent } from '@/types/domain';
 import { avatarTone, nameInitials } from '@/utils/avatar';
 
 import { getApprovalStatusMeta } from '../calendarWeekUtils';
+
 import { formatBytes, getFileCategory } from './AttachedFilesList';
 import { SUGGESTED_MEMBERS } from './CreatePersonalMeetingModal';
 import './JobTicketDetailDrawer.css';
@@ -65,18 +55,6 @@ const CONSULT_CANDIDATE_OPTIONS = [
   { value: 'Trần Thị Bích (Kế toán trưởng)', label: 'Trần Thị Bích (Kế toán trưởng)' },
 ];
 
-const DOC_STATUS_LABELS: Record<string, { label: string; tone: 'warning' | 'success' | 'danger' | 'purple' }> = {
-  DRAFT: { label: 'Bản nháp', tone: 'warning' },
-  PENDING: { label: 'Chờ duyệt', tone: 'warning' },
-  ACTIVE: { label: 'Đang thực hiện', tone: 'success' },
-  CONSULTING: { label: 'Đang lấy ý kiến', tone: 'purple' },
-  COMPLETED: { label: 'Đã hoàn thành', tone: 'success' },
-  APPROVED: { label: 'Đã duyệt', tone: 'success' },
-  NOT_APPROVED: { label: 'Không duyệt', tone: 'danger' },
-  REJECTED: { label: 'Không duyệt', tone: 'danger' },
-  RECALLED: { label: 'Đã thu hồi', tone: 'danger' },
-  CANCELLED: { label: 'Đã hủy', tone: 'danger' },
-};
 
 export interface CalendarEventDetailModalProps {
   event: CalendarEvent | null;
@@ -151,7 +129,7 @@ export function CalendarEventDetailModal({
   const [selectedNewParticipants, setSelectedNewParticipants] = useState<string[]>([]);
   const [selectedNewWatchers, setSelectedNewWatchers] = useState<string[]>([]);
 
-  const isMe = (name?: string) => {
+  const isMe = useCallback((name?: string) => {
     if (!name) return false;
     const n = name.trim().toLowerCase();
     const u = (currentUser || '').trim().toLowerCase();
@@ -161,7 +139,7 @@ export function CalendarEventDetailModal({
       n.includes('nhanvien') ||
       (u !== '' && (n.includes(u) || u.includes(n)))
     );
-  };
+  }, [currentUser]);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatFileInputRef = useRef<HTMLInputElement>(null);
@@ -289,52 +267,10 @@ export function CalendarEventDetailModal({
     }
 
     setChatMessages(msgs);
-  }, [event, currentUser]);
-
-  if (!event) return null;
-
-  const isTask = event.ticketType === 'TASK' || (!event.ticketType && event.type === 'task');
-  const isMeeting = !isTask && (event.ticketType === 'MEETING' || event.type === 'meeting');
-
-  const rawCreator = event.leader || event.organizer || currentUser;
-  const creatorName = rawCreator === 'Bùi Lê Thế Kiệt' ? currentUser : rawCreator;
-  const isCreatorMe = isMe(creatorName) || isMe(event.organizer);
-  const timeDisplay = dayjs(event.deadline || event.startAt).format('HH:mm DD/MM/YYYY');
-
-  const rawDesc = (event.notes || event.agenda || event.description || '').trim();
-  const isDuplicateDesc =
-    !rawDesc ||
-    rawDesc.toLowerCase() === event.title.trim().toLowerCase() ||
-    rawDesc === 'Ghi nhận công việc và trao đổi tiến độ thực hiện.';
-  const hasExtraDesc = !isDuplicateDesc;
-  const hasAttachments = Boolean(event.attachments && event.attachments.length > 0);
-  const hasMeetingDetails = isMeeting && Boolean(event.mode || event.location || event.meetingUrl);
-  const showHeroCard = hasExtraDesc || hasAttachments || hasMeetingDetails;
-
-  const step1 = (event.steps || []).find((s) => s.step_order === 1 || s.role === 'CREATOR');
-  const createdTime = step1?.completed_at || event.createdAt || event.startAt || new Date().toISOString();
-  const createdTimeFormatted = dayjs(createdTime).format('DD/MM HH:mm');
-
-  const isProposal =
-    event.workflowType === 'PROPOSAL' ||
-    Boolean(event.approver?.name) ||
-    (event.approvers && event.approvers.length > 0) ||
-    event.approvalStatus === 'PENDING' ||
-    event.approvalStatus === 'CONSULTING' ||
-    event.approvalStatus === 'REJECTED';
-
-  const approvalMeta = getApprovalStatusMeta(
-    event.approvalStatus,
-    event.ticketType || (isMeeting ? 'MEETING' : 'TASK'),
-    isProposal ? 'PROPOSAL' : 'DISPATCH'
-  );
-  const statusKey = approvalMeta.value;
-  const statusInfo = approvalMeta;
-
-  const executors = event.executors || [];
-  const approver = event.approver;
+  }, [event, currentUser, isMe]);
 
   const participantsList = useMemo(() => {
+    if (!event) return [];
     const list: Array<{ name: string; role?: string }> = [];
     const seen = new Set<string>();
 
@@ -357,21 +293,45 @@ export function CalendarEventDetailModal({
     }
 
     return list;
-  }, [event.executors, event.participants]);
+  }, [event]);
+
+  if (!event) return null;
+
+  const isTask = event.ticketType === 'TASK' || (!event.ticketType && event.type === 'task');
+  const isMeeting = !isTask && (event.ticketType === 'MEETING' || event.type === 'meeting');
+
+  const rawCreator = event.leader || event.organizer || currentUser;
+  const creatorName = rawCreator === 'Bùi Lê Thế Kiệt' ? currentUser : rawCreator;
+  const isCreatorMe = isMe(creatorName) || isMe(event.organizer);
+  const timeDisplay = dayjs(event.deadline || event.startAt).format('HH:mm DD/MM/YYYY');
+
+  const rawDesc = (event.notes || event.agenda || event.description || '').trim();
+  const hasAttachments = Boolean(event.attachments && event.attachments.length > 0);
+
+  const step1 = (event.steps || []).find((s) => s.step_order === 1 || s.role === 'CREATOR');
+  const createdTime = step1?.completed_at || event.createdAt || event.startAt || new Date().toISOString();
+  const createdTimeFormatted = dayjs(createdTime).format('DD/MM HH:mm');
+
+  const isProposal =
+    event.workflowType === 'PROPOSAL' ||
+    Boolean(event.approver?.name) ||
+    (event.approvers && event.approvers.length > 0) ||
+    event.approvalStatus === 'PENDING' ||
+    event.approvalStatus === 'CONSULTING' ||
+    event.approvalStatus === 'REJECTED';
+
+  const approvalMeta = getApprovalStatusMeta(
+    event.approvalStatus,
+    event.ticketType || (isMeeting ? 'MEETING' : 'TASK'),
+    isProposal ? 'PROPOSAL' : 'DISPATCH'
+  );
+  const statusKey = approvalMeta.value;
+  const statusInfo = approvalMeta;
+
+  const approver = event.approver;
+
   const isFinishedOrCancelled =
     statusKey === 'COMPLETED' || statusKey === 'REJECTED' || (statusKey as string) === 'CANCELLED' || (statusKey as string) === 'RECALLED';
-
-  // --- QUY TẮC PHÂN QUYỀN HEADER BUTTONS THEO ROLE_ACTIONS_SPEC.MD ---
-  const canManageFollowers = isMeeting
-    ? activeRole === 'CREATOR'
-    : activeRole === 'CREATOR' || activeRole === 'APPROVER';
-
-  const canEditTicket = activeRole === 'CREATOR' && !isFinishedOrCancelled;
-  const canCancelTicket = activeRole === 'CREATOR' && !isFinishedOrCancelled;
-
-  const canLeaveTicket = isMeeting
-    ? activeRole === 'WATCHER'
-    : activeRole === 'EXECUTOR' || activeRole === 'WATCHER';
 
   // --- QUY TẮC PHÂN QUYỀN TÀI LIỆU & THẢO LUẬN ---
   const canAttachFile = true;
@@ -382,8 +342,6 @@ export function CalendarEventDetailModal({
     event.consultants && event.consultants.some((c) => c.status === 'PENDING')
   );
   const hasAnyConsultants = Boolean(event.consultants && event.consultants.length > 0);
-  const isApprovedOrActive =
-    statusKey === 'APPROVED' || statusKey === 'IN_PROGRESS';
 
   // --- QUY TẮC PHÂN QUYỀN NÚT TRẠNG THÁI THEO USER ROLE ---
   const isUserAnApprover = Boolean(
@@ -483,33 +441,6 @@ export function CalendarEventDetailModal({
     onUpdateEvent(updated);
   };
 
-  const handleCancelOrRecallTicket = () => {
-    const label = isMeeting ? 'Đã hủy lịch họp' : 'Đã thu hồi / hủy phiếu';
-    appendSystemLogAndUpdate('CANCELLED', `[Hệ thống] ${currentUser}: ${label}.`);
-    message.success(label);
-  };
-
-  const handleCopyLink = () => {
-    if (navigator?.clipboard?.writeText) {
-      navigator.clipboard.writeText(window.location.href);
-      message.success('Đã sao chép liên kết vào bộ nhớ tạm');
-    } else {
-      message.info('Đã sao chép liên kết');
-    }
-  };
-
-  const confirmCancelTicket = () => {
-    Modal.confirm({
-      title: isMeeting ? 'Xác nhận hủy lịch họp?' : 'Thu hồi / Hủy phiếu này?',
-      content: isMeeting
-        ? 'Lịch họp này sẽ chuyển sang trạng thái Đã hủy và gửi thông báo đến các thành viên.'
-        : 'Phiếu này sẽ chuyển sang trạng thái Đã thu hồi / hủy.',
-      okText: isMeeting ? 'Hủy lịch họp' : 'Thu hồi / Hủy',
-      okType: 'danger',
-      cancelText: 'Đóng',
-      onOk: () => handleCancelOrRecallTicket(),
-    });
-  };
 
   const confirmLeaveTicket = () => {
     Modal.confirm({
@@ -522,47 +453,6 @@ export function CalendarEventDetailModal({
     });
   };
 
-  const moreMenuItems: MenuProps['items'] = [
-    {
-      key: 'copy-link',
-      icon: <Copy size={14} />,
-      label: 'Sao chép liên kết',
-      onClick: handleCopyLink,
-    },
-    ...(canLeaveTicket
-      ? [
-          {
-            key: 'leave-ticket',
-            icon: <LogOut size={14} />,
-            label: 'Không tham gia',
-            danger: true,
-            onClick: confirmLeaveTicket,
-          },
-        ]
-      : []),
-    ...(canCancelTicket
-      ? [
-          {
-            type: 'divider' as const,
-          },
-          {
-            key: 'cancel-ticket',
-            icon: <XCircle size={14} />,
-            label: isMeeting ? 'Hủy lịch họp' : 'Thu hồi / Hủy phiếu',
-            danger: true,
-            onClick: confirmCancelTicket,
-          },
-        ]
-      : []),
-  ];
-
-  const handleOpenEditModal = () => {
-    setEditContent(event.title || event.notes || event.agenda || event.description || '');
-    setEditLocation(event.location || '');
-    setEditMeetingLink(event.meetingUrl || '');
-    setEditDateTime(dayjs(event.deadline || event.startAt));
-    setEditModalOpen(true);
-  };
 
   const handleConfirmEdit = () => {
     const trimmed = editContent.trim();
@@ -879,25 +769,6 @@ export function CalendarEventDetailModal({
     message.success(isMeeting ? 'Đã kết thúc cuộc họp' : allDone ? 'Đã hoàn thành toàn bộ công việc' : 'Đã báo cáo hoàn thành phần việc');
   };
 
-  const handleUploadAttachment = async (file: File) => {
-    const newAtt: CalendarAttachmentItem = {
-      id: `att-${Date.now()}`,
-      name: file.name,
-      size: file.size,
-      type: file.name.split('.').pop() || 'file',
-      uploadedAt: new Date().toISOString(),
-      uploadedBy: currentUser,
-    };
-
-    try {
-      const res = await calendarApi.addAttachment(event.id, newAtt);
-      message.success(`Đã đính kèm tệp: ${file.name}`);
-      onUpdateEvent(res.data);
-    } catch {
-      message.error('Không thể tải lên tệp.');
-    }
-    return false;
-  };
 
   const handleSelectChatFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -1007,6 +878,7 @@ export function CalendarEventDetailModal({
                   aria-label="Không tham gia"
                   className="jt-drawer-action-btn jt-drawer-action-btn--icon jt-drawer-action-btn--leave"
                   icon={<LogOut size={15} />}
+                  loading={actionLoading}
                   onClick={confirmLeaveTicket}
                   size="small"
                 />
@@ -1157,6 +1029,12 @@ export function CalendarEventDetailModal({
                               key={att.id}
                               className="jt-timeline-file-card"
                               onClick={() => message.info(`Đang mở tệp: ${att.name}`)}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter' || e.key === ' ') {
+                                  e.preventDefault();
+                                  message.info(`Đang mở tệp: ${att.name}`);
+                                }
+                              }}
                               title={`Xem hoặc tải về ${att.name}`}
                               role="button"
                               tabIndex={0}
@@ -1239,6 +1117,12 @@ export function CalendarEventDetailModal({
                                       msg.isMine ? 'jt-chat-bubble-file--outgoing' : 'jt-chat-bubble-file--incoming'
                                     }`}
                                     onClick={() => message.info(`Đang mở tệp: ${att.name}`)}
+                                    onKeyDown={(e) => {
+                                      if (e.key === 'Enter' || e.key === ' ') {
+                                        e.preventDefault();
+                                        message.info(`Đang mở tệp: ${att.name}`);
+                                      }
+                                    }}
                                     title={`Tải về / Xem ${att.name}`}
                                     role="button"
                                     tabIndex={0}
@@ -1453,7 +1337,7 @@ export function CalendarEventDetailModal({
                     style={{
                       borderRadius: 4,
                       fontWeight: 600,
-                      fontSize: 11.5,
+                      fontSize: 12,
                       padding: '1px 8px',
                       backgroundColor: isMeeting
                         ? '#f5f3ff'
@@ -1558,7 +1442,7 @@ export function CalendarEventDetailModal({
                           <div>
                             <span className="jt-doc-step__order">BƯỚC 2</span>
                             <h4>
-                              {Boolean(event.consultants && event.consultants.length > 0)
+                              {event.consultants && event.consultants.length > 0
                                 ? 'Lấy ý kiến & Duyệt phiếu'
                                 : 'Duyệt phiếu'}
                             </h4>
@@ -1610,8 +1494,9 @@ export function CalendarEventDetailModal({
                                     ? 'APPROVED'
                                     : statusKey === 'REJECTED'
                                       ? 'REJECTED'
-                                      : 'PENDING') as 'PENDING' | 'APPROVED' | 'REJECTED',
+                                      : 'PENDING') as 'PENDING' | 'APPROVED' | 'REJECTED' | 'COMPLETED',
                                   completed_at: event.startAt,
+                                  note: undefined as string | undefined,
                                 }]
                               : [{
                                   id: 'appr-default',
@@ -1620,13 +1505,14 @@ export function CalendarEventDetailModal({
                                     ? 'APPROVED'
                                     : statusKey === 'REJECTED'
                                       ? 'REJECTED'
-                                      : 'PENDING') as 'PENDING' | 'APPROVED' | 'REJECTED',
+                                      : 'PENDING') as 'PENDING' | 'APPROVED' | 'REJECTED' | 'COMPLETED',
                                   completed_at: event.startAt,
+                                  note: undefined as string | undefined,
                                 }]
                           ).map((a, idx) => {
                             const isApproved =
                               a.status === 'APPROVED' ||
-                              (a as any).status === 'COMPLETED' ||
+                              (a.status as string) === 'COMPLETED' ||
                               statusKey === 'APPROVED' ||
                               statusKey === 'COMPLETED';
                             const isRejected = a.status === 'REJECTED' || statusKey === 'REJECTED';
@@ -1656,7 +1542,7 @@ export function CalendarEventDetailModal({
                                 </div>
                                 {a.note && (
                                   <div style={{ fontSize: 12, color: '#475569', marginTop: 3, paddingLeft: 19, fontStyle: 'italic', lineHeight: '1.4' }}>
-                                    "{a.note}"
+                                    &ldquo;{a.note}&rdquo;
                                   </div>
                                 )}
                               </div>

@@ -94,7 +94,7 @@ export function RoleSimulationBar({
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginRight: 4 }}>
           <User size={15} style={{ color: '#64748b' }} />
-          <span style={{ fontSize: 13, fontWeight: 700, color: '#0f172a' }}>
+          <span style={{ fontSize: 13, fontWeight: 600, color: '#0f172a' }}>
             Giả lập vai trò:
           </span>
         </div>
@@ -117,7 +117,7 @@ export function RoleSimulationBar({
                     padding: '5px 12px',
                     borderRadius: 20,
                     fontSize: 12,
-                    fontWeight: isActive ? 650 : 500,
+                    fontWeight: isActive ? 600 : 500,
                     border: isActive ? '1.5px solid #dc2626' : '1px solid #e2e8f0',
                     background: isActive ? '#fef2f2' : '#ffffff',
                     color: isActive ? '#dc2626' : '#334155',

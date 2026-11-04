@@ -3,13 +3,12 @@ import dayjs, { type Dayjs } from 'dayjs';
 import { useState } from 'react';
 import { Calendar, Video } from 'lucide-react';
 
-import { ModuleIcon } from '@/components/ModuleIcon';
 import { directoryApi, meetingApi } from '@/services/api';
 import { useAsyncData } from '@/hooks/useAsyncData';
 
 interface FormValues {
   title: string;
-  timeRange: [Dayjs, Dayjs];
+  time: Dayjs;
   platform: string;
   agenda: string;
   participants: string[];
@@ -37,7 +36,8 @@ export function CreateMeetingModal({
   const handleSubmit = async (values: FormValues) => {
     setLoading(true);
     try {
-      const [startAt, endAt] = values.timeRange;
+      const startAt = values.time;
+      const endAt = startAt.add(1, 'hour');
       const roomSlug = values.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || 'room';
       await meetingApi.create({
         title: values.title,
@@ -103,7 +103,7 @@ export function CreateMeetingModal({
         initialValues={{
           platform: 'Phòng họp ứng dụng Tuổi Trẻ',
           recordingAvailable: true,
-          timeRange: [dayjs().add(1, 'hour').startOf('hour'), dayjs().add(2, 'hour').startOf('hour')],
+          time: dayjs().add(1, 'hour').startOf('hour'),
         }}
         layout="vertical"
         onFinish={(values) => void handleSubmit(values)}
@@ -123,13 +123,13 @@ export function CreateMeetingModal({
         <div className="form-row-2col">
           <Form.Item
             label="Thời gian họp"
-            name="timeRange"
+            name="time"
             rules={[{ required: true, message: 'Vui lòng chọn thời gian họp' }]}
           >
-            <DatePicker.RangePicker
+            <DatePicker
               className="modal-form-datepicker"
               format="DD/MM/YYYY HH:mm"
-              placeholder={['Bắt đầu', 'Kết thúc']}
+              placeholder="Chọn ngày và giờ họp"
               showTime={{ format: 'HH:mm' }}
               size="large"
               style={{ width: '100%' }}

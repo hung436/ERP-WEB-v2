@@ -117,6 +117,19 @@ export function CalendarWeekPage() {
     },
   );
 
+  const [deletedEventIds, setDeletedEventIds] = useState<string[]>(() => {
+    try {
+      const saved = localStorage.getItem("jt_calendar_deleted_ids_v8");
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) return parsed;
+      }
+    } catch {
+      // ignore
+    }
+    return [];
+  });
+
   const saveUserEvents = useCallback((events: CalendarEvent[]) => {
     setUserCreatedEvents(events);
     try {
@@ -135,14 +148,17 @@ export function CalendarWeekPage() {
     return Array.from(map.values());
   }, [state.data, userCreatedEvents]);
 
-  // Hợp nhất dữ liệu tuần phong phú
+  // Hợp nhất dữ liệu tuần phong phú (loại bỏ các lịch người dùng đã chọn Không tham gia)
   const allEvents = useMemo(() => {
-    return getEventsForWeek(week, rawEvents);
-  }, [week, rawEvents]);
+    const eventsInWeek = getEventsForWeek(week, rawEvents);
+    if (deletedEventIds.length === 0) return eventsInWeek;
+    const deletedSet = new Set(deletedEventIds);
+    return eventsInWeek.filter((ev) => !deletedSet.has(ev.id));
+  }, [week, rawEvents, deletedEventIds]);
 
   const [query, setQuery] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
-  const [editorial, setEditorial] = useState(false);
+  const [editorial, setEditorial] = useState(true);
   const [personal, setPersonal] = useState(true);
   const [attending, setAttending] = useState(false);
   const [ticketTypes, setTicketTypes] = useState({
@@ -328,26 +344,48 @@ export function CalendarWeekPage() {
     };
   }, [searchedInWeek]);
 
-  // Selection handler
+  // Selection handler - Logic từ feature/hang: Sự kiện Ban biên tập mà user KHÔNG tham gia thì không mở drawer chi tiết
   const handleSelectNormalizedEvent = (normalized: NormalizedMeetingEvent) => {
+    if (normalized.scope === "editorial" && !normalized.isUserParticipant) {
+      return;
+    }
     const raw = normalized.raw || allEvents.find((e) => e.id === normalized.id);
     if (raw) {
       setSelectedEvent(raw);
     }
   };
 
-  const handleUpdateEvent = (updated: CalendarEvent) => {
+  const handleUpdateEvent = useCallback((updated: CalendarEvent) => {
     setSelectedEvent(updated);
     const updatedList = [
       ...userCreatedEvents.filter((item) => item.id !== updated.id),
       updated,
     ];
     saveUserEvents(updatedList);
-  };
+  }, [userCreatedEvents, saveUserEvents]);
+
+  const handleToggleInterest = useCallback(
+    (event: NormalizedMeetingEvent, nextState: boolean) => {
+      const raw = event.raw || allEvents.find((e) => e.id === event.id);
+      if (!raw) return;
+      const updated: CalendarEvent = { ...raw, isInterested: nextState };
+      handleUpdateEvent(updated);
+    },
+    [allEvents, handleUpdateEvent],
+  );
 
   const handleDeleteEvent = (eventId: string) => {
     const updatedList = userCreatedEvents.filter((item) => item.id !== eventId);
     saveUserEvents(updatedList);
+    setDeletedEventIds((prev) => {
+      const next = Array.from(new Set([...prev, eventId]));
+      try {
+        localStorage.setItem("jt_calendar_deleted_ids_v8", JSON.stringify(next));
+      } catch {
+        // ignore
+      }
+      return next;
+    });
     setSelectedEvent(null);
   };
 
@@ -357,6 +395,24 @@ export function CalendarWeekPage() {
       ...userCreatedEvents.filter((item) => item.id !== newEvent.id),
     ];
     saveUserEvents(updatedList);
+    setDeletedEventIds((prev) => {
+      if (!prev.includes(newEvent.id)) return prev;
+      const next = prev.filter((id) => id !== newEvent.id);
+      try {
+        localStorage.setItem("jt_calendar_deleted_ids_v8", JSON.stringify(next));
+      } catch {
+        // ignore
+      }
+      return next;
+    });
+    const evDate = dayjs(newEvent.startAt);
+    if (
+      evDate.isValid() &&
+      (evDate.format("YYYY-MM-DD") < week.format("YYYY-MM-DD") ||
+        evDate.format("YYYY-MM-DD") > end.format("YYYY-MM-DD"))
+    ) {
+      changeDate(evDate);
+    }
     setSelectedEvent(newEvent);
     setCreateDate(null);
     setEditingEvent(null);
@@ -365,7 +421,9 @@ export function CalendarWeekPage() {
   const handleResetData = useCallback(() => {
     localStorage.removeItem(EVENTS_STORAGE_KEY);
     localStorage.removeItem("jt_calendar_events_store");
+    localStorage.removeItem("jt_calendar_deleted_ids_v8");
     setUserCreatedEvents([]);
+    setDeletedEventIds([]);
     message.success("Đã khôi phục dữ liệu gốc thành công!");
   }, []);
 
@@ -384,9 +442,9 @@ export function CalendarWeekPage() {
       locale={locale}
       theme={{
         token: {
-          colorPrimary: "#dc2626",
-          borderRadius: 8,
-          colorBorder: "#dfe5ee",
+          colorPrimary: "#D92D20",
+          borderRadius: 10,
+          colorBorder: "#E4E7EC",
           fontFamily: "Inter, system-ui, -apple-system, sans-serif",
         },
       }}
@@ -1063,6 +1121,7 @@ export function CalendarWeekPage() {
               changeDate(day);
             }}
             onSelectEvent={handleSelectNormalizedEvent}
+            onToggleInterest={handleToggleInterest}
           />
         </div>
 
@@ -1073,6 +1132,9 @@ export function CalendarWeekPage() {
             events={allEvents}
             onClose={() => setSelectedDay(null)}
             onSelectEvent={(ev) => {
+              if (ev.scope === "editorial" && !ev.isUserParticipant) {
+                return;
+              }
               setSelectedEvent(ev);
             }}
             onCreateEvent={(day) => {

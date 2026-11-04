@@ -15,7 +15,6 @@ import type { UploadFile } from "antd/es/upload/interface";
 import {
   ArrowLeftOutlined,
   CheckOutlined,
-  ClockCircleOutlined,
   CheckSquareOutlined,
   CloseOutlined,
   EnvironmentOutlined,
@@ -25,7 +24,6 @@ import {
   RocketOutlined,
   SendOutlined,
   TeamOutlined,
-  UploadOutlined,
   VideoCameraOutlined,
 } from "@ant-design/icons";
 
@@ -451,11 +449,12 @@ export function CreatePersonalMeetingModal({
         }),
       );
 
-      const partsList = Array.isArray(data.participants)
+      const rawPartsList = Array.isArray(data.participants)
         ? data.participants
         : typeof data.participants === "string" && data.participants.trim()
           ? [data.participants]
           : [];
+      const partsList = rawPartsList.length > 0 ? rawPartsList : [currentUserName];
 
       let approverName: string | undefined = undefined;
       let initialApprovalStatus: CalendarEvent["approvalStatus"] = "APPROVED";

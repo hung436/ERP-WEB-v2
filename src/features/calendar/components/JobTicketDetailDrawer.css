@@ -4,13 +4,12 @@
    Dùng cho Drawer Chi tiết phiếu trong Lịch làm việc Booking
    ========================================================================== */
 
-:root,
 .jt-document-drawer,
 .jt-doc-detail,
 .job-ticket-drawer {
-  --jt-color-primary: rgb(227, 14, 22);
-  --jt-color-primary-light: rgba(227, 14, 22, 0.08);
-  --jt-color-primary-hover: rgba(227, 14, 22, 0.12);
+  --jt-color-primary: #D92D20;
+  --jt-color-primary-light: rgba(217, 45, 32, 0.08);
+  --jt-color-primary-hover: rgba(217, 45, 32, 0.12);
   --jt-color-success: rgb(95, 159, 114);
   --jt-color-success-light: rgba(95, 159, 114, 0.1);
   --jt-color-success-hover: rgba(95, 159, 114, 0.18);
@@ -26,7 +25,7 @@
   --jt-radius-sm: 6px;
   --jt-radius-md: 8px;
   --jt-radius-lg: 12px;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
 /* --- DRAWER CONTAINER & HEADER --- */
@@ -92,7 +91,7 @@
   margin: 0;
   color: #0f172a !important;
   font-size: 16px !important;
-  font-weight: 650 !important;
+  font-weight: 600 !important;
   line-height: 1.4;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -193,7 +192,7 @@
 
 .jt-drawer-action-btn--edit {
   color: #1e293b !important;
-  font-weight: 550 !important;
+  font-weight: 500 !important;
 }
 
 .jt-drawer-action-btn--edit:hover {
@@ -360,7 +359,7 @@
   margin: 2px 0 0;
   color: #0f172a;
   font-size: 15px;
-  font-weight: 650;
+  font-weight: 600;
 }
 
 .jt-doc-detail-pane__eyebrow {
@@ -431,12 +430,12 @@
 
 .jt-doc-chat-msg__author {
   font-size: 12px;
-  font-weight: 650;
+  font-weight: 600;
   color: #1e293b;
 }
 
 .jt-doc-chat-msg__role {
-  font-size: 10px;
+  font-size: 11px;
   padding: 1px 6px;
   border-radius: 4px;
   background: #e2e8f0;
@@ -537,7 +536,7 @@
   gap: 6px;
   color: #64748b;
   font-size: 12px;
-  font-weight: 550;
+  font-weight: 500;
   flex-shrink: 0;
 }
 
@@ -547,7 +546,7 @@
 
 .jt-doc-info-item__value {
   color: #0f172a;
-  font-weight: 550;
+  font-weight: 500;
   text-align: right;
   word-break: break-word;
 }
@@ -588,7 +587,7 @@
 .jt-doc-info-action-btn {
   height: 24px !important;
   padding: 0 6px !important;
-  font-size: 11.5px !important;
+  font-size: 12px !important;
   font-weight: 500 !important;
   color: #475467 !important;
   border-radius: 4px !important;
@@ -727,7 +726,7 @@
   margin: 2px 0 0;
   color: #0f172a;
   font-size: 13px;
-  font-weight: 650;
+  font-weight: 600;
 }
 
 .jt-doc-step__actor {
@@ -900,7 +899,7 @@
 .jt-pinned-hero-card__title {
   margin: 0;
   font-size: 15px;
-  font-weight: 700;
+  font-weight: 600;
   color: #0f172a;
   white-space: nowrap;
   overflow: hidden;
@@ -1150,8 +1149,8 @@
 }
 
 .jt-timeline-file-card__ext {
-  font-size: 9px;
-  font-weight: 700;
+  font-size: 10px;
+  font-weight: 600;
   line-height: 1.1;
   margin-top: 1px;
 }
@@ -1165,7 +1164,7 @@
 }
 
 .jt-timeline-file-card__name {
-  font-size: 12.5px;
+  font-size: 12px;
   font-weight: 600;
   color: #1e293b;
   white-space: nowrap;
@@ -1238,8 +1237,8 @@
   justify-content: center;
   text-align: center;
   border-radius: 50%;
-  font-size: 11.5px;
-  font-weight: 700;
+  font-size: 12px;
+  font-weight: 600;
   line-height: 1;
   margin: 0;
   margin-top: 1px;
@@ -1276,7 +1275,7 @@
 .jt-chat-message__bubble {
   position: relative;
   padding: 8px 12px 6px 12px;
-  font-size: 13.5px;
+  font-size: 14px;
   line-height: 1.5;
   word-break: break-word;
   white-space: pre-wrap;
@@ -1300,7 +1299,7 @@
 }
 
 .jt-chat-message__text {
-  font-size: 13.5px;
+  font-size: 14px;
   color: inherit;
   line-height: 1.5;
 }
@@ -1438,8 +1437,8 @@
 }
 
 .jt-chat-bubble-file__ext {
-  font-size: 8px;
-  font-weight: 700;
+  font-size: 10px;
+  font-weight: 600;
   line-height: 1;
   margin-top: 1px;
 }
@@ -1461,7 +1460,7 @@
 }
 
 .jt-chat-bubble-file__size {
-  font-size: 10.5px;
+  font-size: 11px;
 }
 
 .jt-chat-bubble-file__download {
@@ -1562,7 +1561,7 @@
   border-radius: 8px !important;
   border: 1px solid #d0d5dd !important;
   padding: 7px 12px !important;
-  font-size: 13.5px !important;
+  font-size: 14px !important;
   line-height: 1.5 !important;
   resize: none !important;
   background: #ffffff !important;
@@ -1611,7 +1610,7 @@
 .jt-user-template-modal .ant-modal-title {
   color: #0f172a !important;
   font-size: 17px !important;
-  font-weight: 700 !important;
+  font-weight: 600 !important;
 }
 
 .jt-user-template-modal .ant-modal-body {
@@ -1752,7 +1751,7 @@
 .jt-modal-clean-header__title {
   margin: 0;
   font-size: 16px;
-  font-weight: 700;
+  font-weight: 600;
   color: #0f172a;
   letter-spacing: -0.01em;
 }
@@ -1811,7 +1810,7 @@
   align-items: center;
   gap: 8px;
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: #475569;
@@ -1824,7 +1823,7 @@
 }
 
 .jt-field-label {
-  font-size: 13.5px;
+  font-size: 14px;
   font-weight: 600;
   color: #1e293b;
 }
@@ -1881,8 +1880,8 @@
   min-width: 17px;
   height: 17px;
   padding: 0 4px;
-  font-size: 10.5px;
-  font-weight: 700;
+  font-size: 11px;
+  font-weight: 600;
   background: #1d4ed8;
   color: #ffffff;
   border-radius: 9px;
@@ -2019,7 +2018,7 @@
 }
 
 .jt-upload-dropzone__secondary {
-  font-size: 11.5px;
+  font-size: 12px;
   color: #64748b;
 }
 
@@ -2078,7 +2077,7 @@
 }
 
 .jt-attached-preview-item__name {
-  font-size: 12.5px;
+  font-size: 12px;
   font-weight: 600;
   color: #1e293b;
   white-space: nowrap;
@@ -2261,7 +2260,7 @@
   align-items: center;
   gap: 6px;
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 600;
   color: #6b21a8;
 }
 
@@ -2364,7 +2363,7 @@
 
 .jt-review-type-tag {
   margin: 0 !important;
-  font-size: 11.5px !important;
+  font-size: 12px !important;
   font-weight: 500 !important;
   border-radius: 4px !important;
   padding: 1px 7px !important;
@@ -2403,7 +2402,7 @@
   width: 140px;
   flex-shrink: 0;
   color: #64748b;
-  font-size: 12.5px;
+  font-size: 12px;
   font-weight: 500;
 }
 
@@ -2411,7 +2410,7 @@
   flex: 1;
   min-width: 0;
   color: #1e293b;
-  font-weight: 450;
+  font-weight: 400;
   word-break: break-word;
 }
 
@@ -2439,7 +2438,7 @@
   background: #f8fafc;
   border: 1px solid #e2e8f0;
   border-radius: 4px;
-  font-size: 11.5px;
+  font-size: 12px;
   color: #334155;
 }
 
@@ -2498,7 +2497,7 @@
 
 .jt-otp-confirm-modal .ant-modal-title {
   font-size: 16px !important;
-  font-weight: 650 !important;
+  font-weight: 600 !important;
   color: #0f172a !important;
   display: flex !important;
   align-items: center !important;
@@ -2536,7 +2535,7 @@
   border: 1px solid #bbf7d0;
   border-radius: 8px;
   padding: 8px 12px;
-  font-size: 12.5px;
+  font-size: 12px;
   color: #166534;
 }
 
@@ -2639,7 +2638,7 @@
   height: 38px !important;
   padding: 0 16px !important;
   font-weight: 600 !important;
-  font-size: 13.5px !important;
+  font-size: 14px !important;
   border-radius: 8px !important;
   display: inline-flex !important;
   align-items: center !important;
@@ -2767,7 +2766,7 @@
 .jt-modern-modal-title {
   margin: 0;
   font-size: 17px;
-  font-weight: 700;
+  font-weight: 600;
   color: #0f172a;
   line-height: 1.35;
 }
@@ -2800,7 +2799,7 @@
 
 .jt-modern-modal-card-label {
   color: #64748b;
-  font-size: 12.5px;
+  font-size: 12px;
   flex-shrink: 0;
 }
 
@@ -2841,7 +2840,7 @@
   border-radius: 8px !important;
   border: 1px solid #cbd5e1 !important;
   padding: 10px 12px !important;
-  font-size: 13.5px !important;
+  font-size: 14px !important;
   line-height: 1.5 !important;
   box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04) !important;
   transition: all 0.15s ease !important;
@@ -2866,7 +2865,7 @@
   padding: 0 18px !important;
   border-radius: 8px !important;
   font-weight: 600 !important;
-  font-size: 13.5px !important;
+  font-size: 14px !important;
   display: inline-flex !important;
   align-items: center !important;
   gap: 6px !important;
@@ -2948,7 +2947,7 @@
   border-radius: 0;
   background: transparent;
   color: #64748b;
-  font-size: 13.5px;
+  font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   box-shadow: none;
@@ -3015,7 +3014,7 @@
   align-items: center;
   gap: 6px;
   color: #0f172a;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .jt-approver-icon {
@@ -3030,7 +3029,7 @@
   height: 22px;
   padding: 0 9px;
   border-radius: 999px;
-  font-size: 11.5px;
+  font-size: 12px;
   font-weight: 600;
   border: 0;
 }
@@ -3076,7 +3075,7 @@
 }
 
 .jt-quick-log-bar__label {
-  font-size: 12.5px;
+  font-size: 12px;
   font-weight: 600;
   color: #475569;
 }
@@ -3209,7 +3208,7 @@
   background: #f8fafc;
   border: 1px solid #f1f5f9;
   border-radius: 6px;
-  font-size: 12.5px;
+  font-size: 12px;
 }
 
 .jt-step-person-left {
@@ -3230,7 +3229,7 @@
 
 .jt-step-person-time {
   color: #64748b;
-  font-size: 11.5px;
+  font-size: 12px;
   margin-left: auto;
   padding-right: 8px;
   white-space: nowrap;
@@ -3323,8 +3322,8 @@
 
 
 .jt-step-subheading {
-  font-size: 11.5px;
-  font-weight: 700;
+  font-size: 11px;
+  font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   color: #475569;
@@ -3355,7 +3354,7 @@
 }
 
 .jt-time-presets-label {
-  font-size: 11.5px;
+  font-size: 12px;
   font-weight: 600;
   color: #64748b;
   flex-shrink: 0;
@@ -3370,7 +3369,7 @@
 
 .jt-time-preset-chip {
   padding: 3px 9px;
-  font-size: 11.5px;
+  font-size: 12px;
   font-weight: 500;
   color: #334155;
   background: #f1f5f9;
@@ -3420,7 +3419,7 @@
 }
 
 .jt-time-preview-icon {
-  font-size: 12.5px;
+  font-size: 12px;
   color: #0284c7;
 }
 
@@ -3444,7 +3443,7 @@
 
 .jt-pinned-hero-card__header-minimal .jt-pinned-hero-card__title {
   font-size: 15px;
-  font-weight: 650;
+  font-weight: 600;
   color: #0f172a;
   line-height: 1.4;
   margin: 0;
@@ -3524,8 +3523,8 @@
   border-radius: 50%;
   background: #e0e7ff;
   color: #4338ca;
-  font-size: 10px;
-  font-weight: 700;
+  font-size: 11px;
+  font-weight: 600;
   text-transform: uppercase;
   flex-shrink: 0;
 }
@@ -3538,7 +3537,7 @@
 .jt-doc-user-me-tag {
   display: inline-block;
   padding: 0.5px 4px;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
   color: #1d4ed8;
   background: #eff6ff;
@@ -3547,7 +3546,7 @@
 
 .jt-doc-info-empty-text {
   display: inline-block;
-  font-size: 12.5px;
+  font-size: 12px;
   color: #94a3b8;
   font-style: italic;
   margin-top: 4px;
@@ -3557,7 +3556,7 @@
 .jt-doc-pane-title {
   margin: 0;
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 600;
   color: #0f172a;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -3592,7 +3591,7 @@
 }
 
 .jt-pinned-hero-card__text {
-  font-size: 14.5px;
+  font-size: 14px;
   line-height: 1.55;
   color: #1e293b;
   font-weight: 500;
@@ -3605,7 +3604,7 @@
   -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  font-size: 13.5px;
+  font-size: 14px;
   color: #475569;
 }
 
@@ -3621,13 +3620,13 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: 12.5px;
+  font-size: 12px;
   font-weight: 600;
   color: #475569;
 }
 
 .jt-person-sec-count {
-  font-size: 11.5px;
+  font-size: 12px;
   font-weight: 500;
   color: #94a3b8;
 }
@@ -3661,8 +3660,8 @@
   border-radius: 50%;
   background: #e0e7ff;
   color: #4338ca;
-  font-size: 9.5px;
-  font-weight: 700;
+  font-size: 11px;
+  font-weight: 600;
   flex-shrink: 0;
 }
 
@@ -3674,7 +3673,7 @@
 .jt-person-chip__me-tag {
   display: inline-block;
   padding: 0 4px;
-  font-size: 9.5px;
+  font-size: 11px;
   font-weight: 600;
   color: #2563eb;
   background: #eff6ff;
@@ -3690,7 +3689,7 @@
   background: #ffffff;
   border: 1px dashed #cbd5e1;
   border-radius: 12px;
-  font-size: 11.5px;
+  font-size: 12px;
   font-weight: 500;
   color: #475467;
   line-height: 1;
@@ -3759,7 +3758,7 @@
 }
 
 .jt-person-empty-text {
-  font-size: 12.5px;
+  font-size: 12px;
   color: #94a3b8;
   font-style: normal;
   line-height: 20px;
@@ -3788,8 +3787,8 @@
   background-color: #059669 !important;
   border-color: #059669 !important;
   color: #ffffff !important;
-  font-size: 13.5px !important;
-  font-weight: 550 !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
   border-radius: 7px !important;
   box-shadow: 0 1px 2px rgba(5, 150, 105, 0.2) !important;
   transition: all 0.15s ease !important;
@@ -3808,8 +3807,8 @@
   background-color: #059669 !important;
   border-color: #059669 !important;
   color: #ffffff !important;
-  font-size: 13.5px !important;
-  font-weight: 550 !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
   border-radius: 7px !important;
   box-shadow: 0 1px 2px rgba(5, 150, 105, 0.2) !important;
 }
@@ -3826,8 +3825,8 @@
   background-color: #2563eb !important;
   border-color: #2563eb !important;
   color: #ffffff !important;
-  font-size: 13.5px !important;
-  font-weight: 550 !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
   border-radius: 7px !important;
 }
 

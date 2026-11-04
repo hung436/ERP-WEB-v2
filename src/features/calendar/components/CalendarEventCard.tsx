@@ -1,12 +1,12 @@
 import { message } from 'antd';
-import dayjs from 'dayjs';
+import dayjs, { extend } from 'dayjs';
 import isoWeek from 'dayjs/plugin/isoWeek';
 import { ArrowRight, Calendar, Clock, MapPin, MessageSquare, Paperclip, Star, Users } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
 import type { CalendarEvent } from '@/types/domain';
 
-dayjs.extend(isoWeek);
+extend(isoWeek);
 
 interface CalendarEventCardProps {
   event: CalendarEvent;
@@ -97,9 +97,9 @@ export function CalendarEventCard({ event, onSelectEvent, onHoverChange, style, 
     }, 120);
   };
 
-  const timeLabel = isTask
-    ? dayjs(event.deadline || event.endAt || event.startAt).format('HH:mm')
-    : `${start.format('HH:mm')} - ${end.format('HH:mm')}`;
+  const timeLabel = dayjs(
+    isTask && event.deadline ? event.deadline : event.startAt || event.deadline || event.endAt
+  ).format('HH:mm');
 
   const handleToggleInterest = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -175,9 +175,9 @@ export function CalendarEventCard({ event, onSelectEvent, onHoverChange, style, 
           </span>
 
           <div className="card-header-badges">
-            {event.ticketType === 'TASK' && <span className="card-status-badge task">Công việc</span>}
-            {event.ticketType === 'EVENT' && <span className="card-status-badge event">Sự kiện</span>}
-            {(!event.ticketType || event.ticketType === 'MEETING') && <span className="card-status-badge meeting">Lịch họp</span>}
+            {isPersonal && (
+              <span className="card-status-badge personal">Cá nhân</span>
+            )}
             {isEditorial && isUserAttending && (
               <span className="card-status-badge attending">Tham gia</span>
             )}

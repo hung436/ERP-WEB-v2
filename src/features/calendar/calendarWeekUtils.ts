@@ -163,6 +163,8 @@ export interface NormalizedMeetingEvent {
   approvalSteps?: any[];
   isUserParticipant: boolean;
   isAdjusted?: boolean;
+  adjustedNote?: string;
+  dutyInfo?: string;
   meetingUrl?: string;
   mode?: string | null;
   attachments: any[];
@@ -184,19 +186,21 @@ export function normalizeMeeting(record: CalendarEvent | any, userId = 'nhanvien
   const start = rawStart ? dayjs(rawStart) : null;
   if (!start || !start.isValid()) return null;
 
-  const isTask = (record.ticketType || record.ticket_type) === 'TASK';
-  const isMeeting = (record.ticketType || record.ticket_type || 'MEETING') === 'MEETING';
-  const ticketType: 'TASK' | 'MEETING' | 'EVENT' = isTask ? 'TASK' : (record.ticketType || record.ticket_type || 'MEETING');
+  const scope: 'editorial' | 'personal' = record.scope === 'personal' || record.category === 'personal' ? 'personal' : 'editorial';
+  const isTask = scope !== 'editorial' && (record.ticketType || record.ticket_type) === 'TASK';
+  const isMeeting = scope === 'editorial' || (record.ticketType || record.ticket_type || 'MEETING') === 'MEETING';
+  const ticketType: 'TASK' | 'MEETING' | 'EVENT' =
+    scope === 'editorial' ? 'MEETING' : isTask ? 'TASK' : (record.ticketType || record.ticket_type || 'MEETING');
 
   const endObj = rawEnd ? dayjs(rawEnd) : null;
   const end = isTask ? null : (endObj && endObj.isValid() && endObj.isAfter(start) ? endObj : null);
 
-  const scope: 'editorial' | 'personal' = record.scope === 'personal' || record.category === 'personal' ? 'personal' : 'editorial';
-
   const workflowType: 'PROPOSAL' | 'DISPATCH' | undefined =
-    record.workflowType ||
-    record.workflow_type ||
-    (record.approver?.name || (record.approvers && record.approvers.length > 0) ? 'PROPOSAL' : isTask ? 'DISPATCH' : undefined);
+    scope === 'editorial'
+      ? undefined
+      : record.workflowType ||
+        record.workflow_type ||
+        (record.approver?.name || (record.approvers && record.approvers.length > 0) ? 'PROPOSAL' : isTask ? 'DISPATCH' : undefined);
 
   let defaultStatus = 'APPROVED';
   if (isTask) {
@@ -227,20 +231,36 @@ export function normalizeMeeting(record: CalendarEvent | any, userId = 'nhanvien
     (record.organizer && String(record.organizer).includes('Nguyễn Minh Anh'))
   );
 
-  const isUserWatcher = Boolean(
-    record.isUserWatcher ||
-    (Array.isArray(watchers) && watchers.some((w: any) => String(w.id || w.user_id) === String(userId) || String(w.name || '').includes('Nguyễn Minh Anh')))
-  );
+  const isUserWatcher =
+    scope === 'editorial'
+      ? false
+      : Boolean(
+          record.isUserWatcher ||
+          (Array.isArray(watchers) &&
+            watchers.some(
+              (w: any) =>
+                String(w.id || w.user_id) === String(userId) ||
+                String(w.name || '').includes('Nguyễn Minh Anh'),
+            )),
+        );
 
-  const isUserParticipant = Boolean(
-    record.isUserParticipant ||
-    isUserExecutor ||
-    isUserApprover ||
-    isUserConsultant ||
-    isUserLeader ||
-    (scope === 'personal' && !isTask) ||
-    (Array.isArray(record.participants) && record.participants.some((p: any) => String(p.id || p.user_id || p) === String(userId) || String(p.name || p).includes('Nguyễn Minh Anh')))
-  );
+  const isUserParticipant =
+    scope === 'editorial'
+      ? Boolean(record.isUserParticipant)
+      : Boolean(
+          record.isUserParticipant ||
+          isUserExecutor ||
+          isUserApprover ||
+          isUserConsultant ||
+          isUserLeader ||
+          (scope === 'personal' && !isTask) ||
+          (Array.isArray(record.participants) &&
+            record.participants.some(
+              (p: any) =>
+                String(p.id || p.user_id || p) === String(userId) ||
+                String(p.name || p).includes('Nguyễn Minh Anh'),
+            )),
+        );
 
   const participantText = record.participantText || record.attendees_text || (Array.isArray(record.participants) ? record.participants.map((p: any) => p.display_name || p.name || p).join(', ') : '');
 
@@ -270,6 +290,8 @@ export function normalizeMeeting(record: CalendarEvent | any, userId = 'nhanvien
     approvalSteps: record.steps || record.approvalSteps || [],
     isUserParticipant,
     isAdjusted: Boolean(record.isAdjusted || record.is_adjusted || record.adjusted_at),
+    adjustedNote: record.adjustedNote || record.adjusted_note || undefined,
+    dutyInfo: typeof record.dutyInfo === 'string' ? record.dutyInfo : undefined,
     meetingUrl: record.meetingUrl || record.meeting_url || '',
     mode: record.mode || null,
     attachments,
@@ -341,14 +363,7 @@ export const eventTime = (event: NormalizedMeetingEvent): string => {
     const target = event.end || event.start;
     return target ? target.format('HH:mm') : '';
   }
-  return (
-    event.start.format('HH:mm') +
-    (event.end
-      ? ` - ${event.end.format(
-          event.end.isSame(event.start, 'day') ? 'HH:mm' : 'HH:mm DD/MM',
-        )}`
-      : '')
-  );
+  return event.start.format('HH:mm');
 };
 
 export function positionEvents(events: NormalizedMeetingEvent[]) {

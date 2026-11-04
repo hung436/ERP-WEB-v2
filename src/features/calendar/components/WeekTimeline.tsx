@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { Dayjs } from 'dayjs';
 import { Button, Popover, Skeleton, message } from 'antd';
 import {
@@ -7,6 +7,7 @@ import {
   EnvironmentOutlined,
   EyeOutlined,
   RightOutlined,
+  StarFilled,
   StarOutlined,
   TeamOutlined,
   UserOutlined,
@@ -67,6 +68,7 @@ interface EventCardProps {
   width?: number;
   upward?: boolean;
   onSelect: (event: NormalizedMeetingEvent) => void;
+  onToggleInterest?: (event: NormalizedMeetingEvent, nextState: boolean) => void;
   vertical?: boolean;
   compact?: boolean;
   expandLeft?: boolean;
@@ -80,13 +82,18 @@ export function EventCard({
   width = 10,
   upward = false,
   onSelect,
+  onToggleInterest,
   vertical = false,
   compact = false,
   expandLeft = false,
   disabledHover = false,
 }: EventCardProps) {
   const [expanded, setExpanded] = useState(false);
-  const [starred, setStarred] = useState(false);
+  const [starred, setStarred] = useState(Boolean(event.isInterested));
+
+  useEffect(() => {
+    setStarred(Boolean(event.isInterested));
+  }, [event.isInterested]);
 
   useEffect(() => {
     if (disabledHover) {
@@ -94,17 +101,16 @@ export function EventCard({
     }
   }, [disabledHover]);
 
-  const badge = event.scope !== 'personal' && event.isUserParticipant ? 'Tham gia' : '';
+  const isEditorial = event.scope === 'editorial';
+  const isPersonal = event.scope === 'personal';
+  const isUserAttending = Boolean(event.isUserParticipant);
+  const canOpenDrawer = isPersonal || isUserAttending;
+
+  const badge = isPersonal ? 'Cá nhân' : isUserAttending ? 'Tham gia' : '';
   const typeMeta = getTicketTypeMeta(event.ticketType);
   const approvalMeta = getApprovalStatusMeta(event.approvalStatus, event.ticketType, event.workflowType);
   const typeKey = String(event.ticketType || 'MEETING').toLowerCase();
   const statusKey = approvalMeta.tone;
-  const showExceptionStatus = event.ticketType === 'TASK' || (statusKey !== 'scheduled' && statusKey !== 'completed');
-  const showMetaRow =
-    Boolean(event.location) ||
-    showExceptionStatus ||
-    Boolean(event.isAdjusted) ||
-    Boolean(event.continuesFromPreviousDay || event.continuesToNextDay);
   const past = Boolean(
     now &&
       event.end &&
@@ -112,63 +118,130 @@ export function EventCard({
       (event.start.isSame(now, 'isoWeek') || event.end.isSame(now, 'isoWeek'))
   );
 
+  const handleToggleStar = (e: React.MouseEvent | React.KeyboardEvent) => {
+    e.stopPropagation();
+    const nextState = !starred;
+    setStarred(nextState);
+    onToggleInterest?.(event, nextState);
+    if (nextState) {
+      message.success(`Đã quan tâm: "${event.title}". Bạn sẽ được nhắc nhở trước 15 phút!`);
+    } else {
+      message.info(`Đã hủy nhắc nhở lịch "${event.title}".`);
+    }
+  };
+
+  const attachmentTotal = event.attachmentCount ?? event.attachments.length;
+  const commentTotal = event.commentCount ?? event.raw?.comments?.length ?? 0;
+
   const popoverContent = (
     <div className="booking-week-card-expanded-content">
       <div className="booking-week-card-expanded-badges">
-        <span className={`booking-week-type-badge booking-week-type-${typeKey}`}>{typeMeta.label}</span>
-        <span className={`booking-week-status-badge booking-week-status-${statusKey}`}>{approvalMeta.label}</span>
+        {!isEditorial && (
+          <>
+            <span className={`booking-week-type-badge booking-week-type-${typeKey}`}>{typeMeta.label}</span>
+            <span className={`booking-week-status-badge booking-week-status-${statusKey}`}>{approvalMeta.label}</span>
+          </>
+        )}
         {badge && <span className="booking-week-badge">{badge}</span>}
       </div>
       <strong className="booking-week-popover-title">{event.title}</strong>
+
+      {event.isAdjusted && (
+        <div className="booking-week-card-adjusted-alert">
+          <strong>Đã điều chỉnh{event.adjustedNote ? ':' : ''}</strong> {event.adjustedNote}
+        </div>
+      )}
+
       <p>
-        <ClockCircleOutlined /> <span>{eventTime(event)}</span>
+        <ClockCircleOutlined /> <span><b>Thời gian:</b> {eventTime(event)}</span>
       </p>
-      {(event.location || event.ticketType !== 'TASK') && (
+      {(event.location || (!isEditorial && event.ticketType !== 'TASK')) && (
         <p>
-          <EnvironmentOutlined /> <span>{event.location || 'Chưa có địa điểm'}</span>
+          <EnvironmentOutlined /> <span><b>Địa điểm:</b> {event.location || 'Chưa có địa điểm'}</span>
         </p>
       )}
-      {event.ticketType !== 'TASK' && (
+      {Boolean(event.leader?.trim()) && (
         <p>
-          <TeamOutlined />
-          <ParticipantList
-            text={
-              event.participantText ||
-              (event.participantCount ? `${event.participantCount} người tham gia · Xem trong chi tiết` : 'Chưa có thông tin thành phần')
-            }
-            scrollExpanded
-          />
+          <UserOutlined /> <span><b>Chủ trì:</b> {event.leader}</span>
         </p>
       )}
-      {event.ticketType !== 'MEETING' && event.executorText && (
+      {isEditorial ? (
+        Boolean(event.participantText) && (
+          <p>
+            <TeamOutlined />
+            <span>
+              <b>Thành phần:</b> <ParticipantList text={event.participantText} scrollExpanded />
+            </span>
+          </p>
+        )
+      ) : (
+        event.ticketType !== 'TASK' && (
+          <p>
+            <TeamOutlined />
+            <ParticipantList
+              text={
+                event.participantText ||
+                (event.participantCount ? `${event.participantCount} người tham gia · Xem trong chi tiết` : 'Chưa có thông tin thành phần')
+              }
+              scrollExpanded
+            />
+          </p>
+        )
+      )}
+      {Boolean(event.dutyInfo) && (
+        <p>
+          <ClockCircleOutlined /> <span><b>Trực ban:</b> {event.dutyInfo}</span>
+        </p>
+      )}
+      {!isEditorial && event.ticketType !== 'MEETING' && event.executorText && (
         <p>
           <UserOutlined /> <span>Triển khai: {event.executorText}</span>
         </p>
       )}
-      {event.ticketType !== 'MEETING' && event.approver && (
+      {!isEditorial && event.ticketType !== 'MEETING' && event.approver && (
         <p>
           <UserOutlined /> <span>Người duyệt: {event.approver.display_name || event.approver.name}</span>
         </p>
       )}
-      {event.ticketType !== 'MEETING' && event.watcherText && (
+      {!isEditorial && event.ticketType !== 'MEETING' && event.watcherText && (
         <p>
           <EyeOutlined /> <span>Theo dõi: {event.watcherText}</span>
         </p>
       )}
-      <div className="booking-week-card-footer">
-        <span>{event.attachmentCount ?? event.attachments.length} tài liệu</span>
-        <Button
-          type="link"
-          size="small"
-          onClick={(e) => {
-            e.stopPropagation();
-            setExpanded(false);
-            onSelect(event);
-          }}
-        >
-          Xem chi tiết <RightOutlined />
-        </Button>
-      </div>
+
+      {isEditorial && !isUserAttending && !past && (
+        <div className="booking-week-card-interest-row">
+          <button
+            type="button"
+            className={`booking-week-card-interest-btn ${starred ? 'is-active' : ''}`}
+            onClick={handleToggleStar}
+          >
+            <StarOutlined />
+            <span>{starred ? 'Đang quan tâm (Nhắc trước 15p)' : 'Quan tâm (Nhắc trước 15p)'}</span>
+          </button>
+        </div>
+      )}
+
+      {(canOpenDrawer || attachmentTotal > 0 || commentTotal > 0) && (
+        <div className="booking-week-card-footer">
+          <span>
+            {attachmentTotal} tài liệu{commentTotal > 0 ? ` · ${commentTotal} thảo luận` : ''}
+          </span>
+          {canOpenDrawer && (
+            <Button
+              type="link"
+              size="small"
+              onClick={(e) => {
+                e.stopPropagation();
+                setExpanded(false);
+                onSelect(event);
+              }}
+            >
+              Xem chi tiết <RightOutlined />
+            </Button>
+          )}
+        </div>
+      )}
     </div>
   );
 
@@ -183,8 +256,8 @@ export function EventCard({
       className={`booking-week-event booking-week-ticket-${typeKey} ${vertical ? 'booking-week-feed-card' : ''} ${
         compact ? 'booking-week-out-hours-card' : ''
       } ${past ? 'booking-week-past-event' : ''} ${
-        event.scope === 'personal' ? 'booking-week-personal' : event.isUserParticipant ? 'booking-week-attending' : ''
-      }`}
+        isPersonal ? 'booking-week-personal' : isUserAttending ? 'booking-week-attending' : ''
+      } ${expanded && !disabledHover ? 'booking-week-expanded' : ''}`}
       style={
         vertical || compact
           ? undefined
@@ -218,69 +291,67 @@ export function EventCard({
           className="booking-week-card-button"
           aria-label={`${eventTime(event)} ${event.title}`}
           onClick={() => {
+            if (!canOpenDrawer) return;
             setExpanded(false);
             onSelect(event);
           }}
+          style={{ cursor: canOpenDrawer ? 'pointer' : 'default' }}
         >
           <div className="booking-week-card-top">
             <span className="booking-week-card-time-group">
-              <span className={`booking-week-type-dot booking-week-dot-${typeKey}`} aria-hidden="true" />
               <span className="booking-week-card-time">{eventTime(event)}</span>
             </span>
             <span className="booking-week-card-badges">
-              <span
-                role="button"
-                tabIndex={0}
-                className="booking-week-card-star"
-                aria-label="Quan tâm lịch họp"
-                title="Nhắc trước 15 phút"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setStarred(true);
-                  message.success('Bạn sẽ được nhắc nhở trước 15 phút');
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    setStarred(true);
-                    message.success('Bạn sẽ được nhắc nhở trước 15 phút');
-                  }
-                }}
-              >
-                <StarOutlined />
-                {starred && (
-                  <span style={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clip: 'rect(0,0,0,0)' }}>
-                    Bạn sẽ được nhắc nhở trước 15 phút
-                  </span>
-                )}
-              </span>
-              <span className={`booking-week-type-badge booking-week-type-${typeKey}`}>{typeMeta.label}</span>
               {badge && <span className="booking-week-badge">{badge}</span>}
+              {!isEditorial && (
+                <span className={`booking-week-type-badge booking-week-type-${typeKey}`}>
+                  {typeMeta.label}
+                </span>
+              )}
+              {isEditorial && !isUserAttending && !past && (
+                <span
+                  role="button"
+                  tabIndex={0}
+                  className={`booking-week-card-star ${starred ? 'is-interested' : ''}`}
+                  aria-label="Quan tâm lịch họp"
+                  title="Nhắc trước 15 phút"
+                  onClick={handleToggleStar}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      handleToggleStar(e);
+                    }
+                  }}
+                >
+                  {starred ? <StarFilled style={{ color: '#f59e0b' }} /> : <StarOutlined />}
+                  {starred && (
+                    <span style={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clip: 'rect(0,0,0,0)' }}>
+                      Bạn sẽ được nhắc nhở trước 15 phút
+                    </span>
+                  )}
+                </span>
+              )}
             </span>
           </div>
 
+          {(event.continuesFromPreviousDay || event.continuesToNextDay) && (
+            <small className="booking-week-continuation">
+              {event.continuesFromPreviousDay ? 'Tiếp tục từ ngày trước' : 'Kéo dài sang ngày sau'}
+            </small>
+          )}
+
           <div className="booking-week-card-title">{event.title}</div>
 
-          {showMetaRow && (
-            <div className="booking-week-card-meta-row">
-              {event.location && (
-                <span className="booking-week-card-loc" title={event.location}>
-                  <EnvironmentOutlined className="booking-week-card-loc-icon" aria-hidden="true" />
-                  <span>{event.location}</span>
-                </span>
+          {event.isAdjusted && <span className="booking-week-adjusted">Đã điều chỉnh</span>}
+
+          {(event.location || Boolean(event.leader?.trim())) && (
+            <div className="booking-week-card-location" title={event.location || event.leader}>
+              {event.location ? (
+                <EnvironmentOutlined className="booking-week-card-loc-icon" aria-hidden="true" />
+              ) : (
+                <TeamOutlined className="booking-week-card-loc-icon" aria-hidden="true" />
               )}
-              {showExceptionStatus && (
-                <span className={`booking-week-status-badge booking-week-status-${statusKey}`}>
-                  {approvalMeta.label}
-                </span>
-              )}
-              {event.isAdjusted && <span className="booking-week-adjusted">Đã điều chỉnh</span>}
-              {(event.continuesFromPreviousDay || event.continuesToNextDay) && (
-                <small className="booking-week-continuation">
-                  {event.continuesFromPreviousDay ? 'Tiếp tục' : 'Kéo dài'}
-                </small>
-              )}
+              <span>{event.location || event.leader}</span>
             </div>
           )}
         </button>
@@ -320,6 +391,7 @@ function OutHoursSlot({
   now,
   loading = false,
   onSelectEvent,
+  onToggleInterest,
   disabledHover = false,
 }: {
   events: NormalizedMeetingEvent[];
@@ -328,6 +400,7 @@ function OutHoursSlot({
   now: Dayjs;
   loading?: boolean;
   onSelectEvent: (event: NormalizedMeetingEvent) => void;
+  onToggleInterest?: (event: NormalizedMeetingEvent, nextState: boolean) => void;
   disabledHover?: boolean;
 }) {
   return (
@@ -344,6 +417,7 @@ function OutHoursSlot({
             expandLeft={late}
             upward={upward}
             onSelect={onSelectEvent}
+            onToggleInterest={onToggleInterest}
             disabledHover={disabledHover}
           />
         ))
@@ -365,6 +439,7 @@ export interface WeekTimelineProps {
   showDuty?: boolean;
   onSelectDay: (day: Dayjs) => void;
   onSelectEvent: (event: NormalizedMeetingEvent) => void;
+  onToggleInterest?: (event: NormalizedMeetingEvent, nextState: boolean) => void;
   loading?: boolean;
   disabledHover?: boolean;
 }
@@ -378,6 +453,7 @@ export function WeekTimeline({
   showDuty = true,
   onSelectDay,
   onSelectEvent,
+  onToggleInterest,
   loading = false,
   disabledHover = false,
 }: WeekTimelineProps) {
@@ -481,6 +557,7 @@ export function WeekTimeline({
                 upward={index >= 3}
                 loading={loading}
                 onSelectEvent={onSelectEvent}
+                onToggleInterest={onToggleInterest}
                 disabledHover={disabledHover}
               />
 
@@ -521,6 +598,7 @@ export function WeekTimeline({
                     width={width}
                     upward={index >= 3}
                     onSelect={onSelectEvent}
+                    onToggleInterest={onToggleInterest}
                     disabledHover={disabledHover}
                   />
                 ))}
@@ -533,6 +611,7 @@ export function WeekTimeline({
                 upward={index >= 3}
                 loading={loading}
                 onSelectEvent={onSelectEvent}
+                onToggleInterest={onToggleInterest}
                 disabledHover={disabledHover}
               />
             </div>

@@ -1,4 +1,4 @@
-import { useState, type UIEvent } from 'react';
+import { useRef, useState } from 'react';
 import type { Dayjs } from 'dayjs';
 import { Skeleton } from 'antd';
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
@@ -71,6 +71,7 @@ export interface WeekColumnsProps {
   loading?: boolean;
   onSelectDay: (day: Dayjs) => void;
   onSelectEvent: (event: NormalizedMeetingEvent) => void;
+  onToggleInterest?: (event: NormalizedMeetingEvent, nextState: boolean) => void;
   disabledHover?: boolean;
 }
 
@@ -84,23 +85,28 @@ export function WeekColumns({
   loading = false,
   onSelectDay,
   onSelectEvent,
+  onToggleInterest,
   disabledHover = false,
 }: WeekColumnsProps) {
-  const [compact, setCompact] = useState(false);
   const [dutyExpanded, setDutyExpanded] = useState(false);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-  const handleScroll = (event: UIEvent<HTMLDivElement>) => {
-    const top = event.currentTarget.scrollTop;
-    if (top > 70 && !compact) setCompact(true);
-    else if (top < 15 && compact) setCompact(false);
+  const handleToggleDutyExpanded = () => {
+    setDutyExpanded((prev) => {
+      const next = !prev;
+      if (next && scrollContainerRef.current && scrollContainerRef.current.scrollTop > 40) {
+        scrollContainerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+      return next;
+    });
   };
 
   return (
     <div
-      className={`booking-week-columns-scroll ${compact ? 'booking-week-columns-compact' : ''}`}
+      ref={scrollContainerRef}
+      className="booking-week-columns-scroll"
       aria-label="Lịch họp tuần theo cột ngày"
       aria-busy={loading}
-      onScroll={handleScroll}
     >
       <div className="booking-week-columns-grid">
         {dayNames.map((name, index) => {
@@ -141,33 +147,35 @@ export function WeekColumns({
                     {loading ? (
                       <Skeleton active title={false} paragraph={{ rows: 1, width: ['75%'] }} />
                     ) : (
-                      <>
-                        <button
-                          type="button"
-                          className={`booking-week-column-leader booking-week-column-leader--interactive ${
-                            pastDuty ? 'booking-week-past-duty' : ''
-                          }`}
-                          aria-expanded={dutyExpanded}
-                          aria-label={dutyExpanded ? 'Thu gọn các ca trực' : 'Mở rộng các ca trực'}
-                          onClick={() => setDutyExpanded((prev) => !prev)}
-                        >
-                          <span>Trực:</span>
-                          <strong title={duty?.leader}>{duty?.leader || 'Chưa có thông tin'}</strong>
-                          {duty?.shifts &&
-                            (dutyExpanded ? (
-                              <UpOutlined className="booking-week-duty-chevron" />
-                            ) : (
-                              <DownOutlined className="booking-week-duty-chevron" />
-                            ))}
-                        </button>
-                        {dutyExpanded && <DutyShifts shifts={duty?.shifts} past={pastDuty} />}
-                      </>
+                      <button
+                        type="button"
+                        className={`booking-week-column-leader booking-week-column-leader--interactive ${
+                          pastDuty ? 'booking-week-past-duty' : ''
+                        }`}
+                        aria-expanded={dutyExpanded}
+                        aria-label={dutyExpanded ? 'Thu gọn các ca trực' : 'Mở rộng các ca trực'}
+                        onClick={handleToggleDutyExpanded}
+                      >
+                        <span>Trực:</span>
+                        <strong title={duty?.leader}>{duty?.leader || 'Chưa có thông tin'}</strong>
+                        {duty?.shifts &&
+                          (dutyExpanded ? (
+                            <UpOutlined className="booking-week-duty-chevron" />
+                          ) : (
+                            <DownOutlined className="booking-week-duty-chevron" />
+                          ))}
+                      </button>
                     )}
                   </div>
                 )}
               </div>
 
               <div className="booking-week-column-events">
+                {showDuty && !loading && dutyExpanded && duty?.shifts && (
+                  <div className="booking-week-column-shifts-drawer">
+                    <DutyShifts shifts={duty.shifts} past={pastDuty} />
+                  </div>
+                )}
                 {loading ? (
                   [0, 1, 2].map((item) => (
                     <div key={item} className="booking-week-feed-skeleton">
@@ -188,6 +196,7 @@ export function WeekColumns({
                       expandLeft={index >= 5}
                       upward={eventIndex >= 4}
                       onSelect={onSelectEvent}
+                      onToggleInterest={onToggleInterest}
                       disabledHover={disabledHover}
                     />
                   ))
