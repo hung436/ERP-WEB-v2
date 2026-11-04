@@ -18,7 +18,10 @@ let meetingEventStore: MeetingEvent[] = meetingEvents.map((item) => ({ ...item, 
 function getInitialCalendarEvents(): CalendarEvent[] {
   const base = calendarEvents.map((item) => ({ ...item, responseStatus: item.responseStatus ?? 'pending' }));
   try {
-    const saved = typeof window !== 'undefined' ? window.localStorage.getItem('jt_calendar_events_store') : null;
+    if (typeof window !== 'undefined') {
+      try { window.localStorage.removeItem('jt_calendar_events_store'); } catch {}
+    }
+    const saved = typeof window !== 'undefined' ? window.localStorage.getItem('jt_calendar_events_v4') : null;
     if (saved) {
       const parsed = JSON.parse(saved);
       if (Array.isArray(parsed) && parsed.length > 0) {
@@ -235,6 +238,12 @@ export async function mockRequest<T>(path: string, options?: { method?: string; 
       throw new Error('Tên đăng nhập hoặc mật khẩu không đúng.');
     }
   } else if (pathname === '/api/auth/me') {
+    const sessionToken = typeof window !== 'undefined' ? window.sessionStorage?.getItem('erp-session') : null;
+    if (sessionToken === 'mock-admin-token') {
+      activeUser = adminUser;
+    } else if (sessionToken === 'mock-token') {
+      activeUser = demoUser;
+    }
     data = activeUser;
   } else if (pathname === '/api/auth/logout') {
     activeUser = demoUser;

@@ -6,7 +6,7 @@ import { renderApp } from '@/test/testUtils';
 
 describe('Lịch làm việc - Quản lý thông báo & Quản lý nhóm', () => {
   it('hiển thị danh sách thông báo với đúng 3 cột Thời gian gửi, Tiêu đề, Trạng thái (không có cột Thao tác và không có cụm card thống kê)', async () => {
-    renderApp('/calendar/notifications', true);
+    renderApp('/calendar/notifications', 'admin');
 
     expect(await screen.findByText('Lịch làm việc · Quản lý thông báo')).toBeInTheDocument();
     expect(screen.getByText('Tạo Lịch họp ban biên tập')).toBeInTheDocument();
@@ -31,7 +31,7 @@ describe('Lịch làm việc - Quản lý thông báo & Quản lý nhóm', () =>
 
   it('mở modal Tạo Lịch họp ban biên tập với toolbar in đậm, in nghiêng, căn lề và nút Tạo', async () => {
     const user = userEvent.setup();
-    renderApp('/calendar/notifications', true);
+    renderApp('/calendar/notifications', 'admin');
 
     await screen.findByText('Lịch làm việc · Quản lý thông báo');
     await user.click(screen.getByRole('button', { name: /Tạo Lịch họp ban biên tập/i }));
@@ -55,7 +55,7 @@ describe('Lịch làm việc - Quản lý thông báo & Quản lý nhóm', () =>
 
   it('mở modal Tạo Thông báo, có nút Tải biểu mẫu và ô nội dung với toolbar định dạng vẫn hiển thị', async () => {
     const user = userEvent.setup();
-    renderApp('/calendar/notifications', true);
+    renderApp('/calendar/notifications', 'admin');
 
     await screen.findByText('Lịch làm việc · Quản lý thông báo');
     await user.click(screen.getByRole('button', { name: /Tạo thông báo/i }));
@@ -76,7 +76,7 @@ describe('Lịch làm việc - Quản lý thông báo & Quản lý nhóm', () =>
   });
 
   it('hiển thị trang Quản lý nhóm không có mô tả nhóm và không có card thống kê', async () => {
-    renderApp('/calendar/groups', true);
+    renderApp('/calendar/groups', 'admin');
 
     expect(await screen.findByText('Lịch làm việc · Quản lý nhóm')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Tạo nhóm mới/i })).toBeInTheDocument();
@@ -98,7 +98,7 @@ describe('Lịch làm việc - Quản lý thông báo & Quản lý nhóm', () =>
 
   it('mở modal Tạo nhóm mới chỉ có Tên nhóm, Cá nhân, Trạng thái (đã bỏ mô tả)', async () => {
     const user = userEvent.setup();
-    renderApp('/calendar/groups', true);
+    renderApp('/calendar/groups', 'admin');
 
     await screen.findByText('Lịch làm việc · Quản lý nhóm');
     await user.click(screen.getByRole('button', { name: /Tạo nhóm mới/i }));

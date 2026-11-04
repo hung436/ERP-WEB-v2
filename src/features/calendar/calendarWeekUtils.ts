@@ -34,14 +34,12 @@ export const TICKET_TYPES = {
 export type TicketTypeKey = keyof typeof TICKET_TYPES;
 
 export const APPROVAL_STATUS_META = {
-  PENDING: { value: 'PENDING', label: 'Chờ duyệt', color: 'gold' },
-  CONSULTING: {
-    value: 'CONSULTING',
-    label: 'Đang lấy ý kiến',
-    color: 'processing',
-  },
-  APPROVED: { value: 'APPROVED', label: 'Đang triển khai', color: 'success' },
-  REJECTED: { value: 'REJECTED', label: 'Không duyệt', color: 'error' },
+  PENDING: { value: 'PENDING', label: 'Chờ duyệt', color: 'gold', tone: 'pending' },
+  APPROVED: { value: 'APPROVED', label: 'Đã duyệt', color: 'success', tone: 'approved' },
+  REJECTED: { value: 'REJECTED', label: 'Không duyệt', color: 'error', tone: 'rejected' },
+  IN_PROGRESS: { value: 'IN_PROGRESS', label: 'Đang thực hiện', color: 'processing', tone: 'in_progress' },
+  COMPLETED: { value: 'COMPLETED', label: 'Hoàn thành', color: 'success', tone: 'completed' },
+  SCHEDULED: { value: 'SCHEDULED', label: 'Đã lên lịch', color: 'default', tone: 'scheduled' },
 } as const;
 
 export function getTicketTypeMeta(type?: string | { value?: string }) {
@@ -49,20 +47,55 @@ export function getTicketTypeMeta(type?: string | { value?: string }) {
   return TICKET_TYPES[key] || TICKET_TYPES.MEETING;
 }
 
-export function getApprovalStatusMeta(status?: string | { value?: string }) {
+export function getApprovalStatusMeta(
+  status?: string | { value?: string },
+  ticketType?: string,
+  workflowType?: string
+) {
   const key = String(typeof status === 'object' ? status?.value : status || '').toUpperCase();
-  if (['APPROVED', 'COMPLETED', 'DONE'].includes(key)) {
-    return APPROVAL_STATUS_META.APPROVED;
-  }
+
+  // 1. Không duyệt
   if (['REJECTED', 'NOT_APPROVED'].includes(key)) {
     return APPROVAL_STATUS_META.REJECTED;
   }
-  if (['CONSULTING', 'CONSULT'].includes(key)) {
-    return APPROVAL_STATUS_META.CONSULTING;
-  }
-  if (['PENDING', 'PENDING_APPROVAL', 'ACTIVE', 'WAITING'].includes(key)) {
+
+  // 2. Chờ duyệt (nếu có bước lấy ý kiến thì trạng thái chung vẫn là Chờ duyệt)
+  if (['PENDING', 'PENDING_APPROVAL', 'WAITING', 'CONSULTING', 'CONSULT'].includes(key)) {
     return APPROVAL_STATUS_META.PENDING;
   }
+
+  // 3. Hoàn thành
+  if (['COMPLETED', 'DONE'].includes(key)) {
+    return APPROVAL_STATUS_META.COMPLETED;
+  }
+
+  // 4. Đang triển khai
+  if (['IN_PROGRESS', 'DEPLOYING'].includes(key)) {
+    return APPROVAL_STATUS_META.IN_PROGRESS;
+  }
+
+  // 5. Đã lên lịch
+  if (['SCHEDULED'].includes(key)) {
+    return APPROVAL_STATUS_META.SCHEDULED;
+  }
+
+  // 6. Đã duyệt
+  if (key === 'APPROVED') {
+    return APPROVAL_STATUS_META.APPROVED;
+  }
+
+  // 7. Xử lý fallback theo loại phiếu
+  if (ticketType === 'TASK') {
+    if (workflowType === 'DISPATCH' || key === 'ACTIVE') {
+      return APPROVAL_STATUS_META.IN_PROGRESS;
+    }
+    return APPROVAL_STATUS_META.APPROVED;
+  }
+
+  if (ticketType === 'MEETING' || ticketType === 'EVENT') {
+    return APPROVAL_STATUS_META.SCHEDULED;
+  }
+
   return APPROVAL_STATUS_META.APPROVED;
 }
 
@@ -110,6 +143,7 @@ export interface NormalizedMeetingEvent {
   id: string;
   scope: 'editorial' | 'personal';
   ticketType: 'TASK' | 'MEETING' | 'EVENT';
+  workflowType?: 'PROPOSAL' | 'DISPATCH';
   approvalStatus?: string;
   start: Dayjs;
   end: Dayjs | null;
@@ -159,7 +193,19 @@ export function normalizeMeeting(record: CalendarEvent | any, userId = 'nhanvien
 
   const scope: 'editorial' | 'personal' = record.scope === 'personal' || record.category === 'personal' ? 'personal' : 'editorial';
 
-  const approvalStatus = record.approvalStatus || record.approval_status || (isMeeting ? 'APPROVED' : 'PENDING');
+  const workflowType: 'PROPOSAL' | 'DISPATCH' | undefined =
+    record.workflowType ||
+    record.workflow_type ||
+    (record.approver?.name || (record.approvers && record.approvers.length > 0) ? 'PROPOSAL' : isTask ? 'DISPATCH' : undefined);
+
+  let defaultStatus = 'APPROVED';
+  if (isTask) {
+    defaultStatus = workflowType === 'PROPOSAL' ? 'PENDING' : 'IN_PROGRESS';
+  } else if (isMeeting || ticketType === 'EVENT') {
+    defaultStatus = 'SCHEDULED';
+  }
+
+  const approvalStatus = record.approvalStatus || record.approval_status || defaultStatus;
 
   const executors = record.executors || [];
   const executorText = executors.map((e: any) => e.display_name || e.name).filter(Boolean).join(', ');
@@ -204,6 +250,7 @@ export function normalizeMeeting(record: CalendarEvent | any, userId = 'nhanvien
     id: String(record.id),
     scope,
     ticketType,
+    workflowType,
     approvalStatus,
     start,
     end,
@@ -292,7 +339,7 @@ export function collectDuty(records: any[]): Record<string, DutyShiftData> {
 export const eventTime = (event: NormalizedMeetingEvent): string => {
   if (event.ticketType === 'TASK') {
     const target = event.end || event.start;
-    return target ? `Hạn: ${target.format('HH:mm')}` : '';
+    return target ? target.format('HH:mm') : '';
   }
   return (
     event.start.format('HH:mm') +

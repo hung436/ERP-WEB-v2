@@ -98,7 +98,7 @@ export function CalendarEventCard({ event, onSelectEvent, onHoverChange, style, 
   };
 
   const timeLabel = isTask
-    ? `Hạn: ${dayjs(event.deadline || event.endAt || event.startAt).format('HH:mm')}`
+    ? dayjs(event.deadline || event.endAt || event.startAt).format('HH:mm')
     : `${start.format('HH:mm')} - ${end.format('HH:mm')}`;
 
   const handleToggleInterest = (e: React.MouseEvent) => {

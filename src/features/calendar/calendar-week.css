@@ -299,6 +299,24 @@ html:has(.booking-week-page), body:has(.booking-week-page) { height: 100%; overf
 .booking-week-type-dot.dot-task {
   background: #ea580c;
 }
+.booking-week-type-dot.dot-pending {
+  background: #f59e0b;
+}
+.booking-week-type-dot.dot-approved {
+  background: #12b76a;
+}
+.booking-week-type-dot.dot-in_progress {
+  background: #2e90fa;
+}
+.booking-week-type-dot.dot-completed {
+  background: #12b76a;
+}
+.booking-week-type-dot.dot-rejected {
+  background: #ef4444;
+}
+.booking-week-type-dot.dot-scheduled {
+  background: #94a3b8;
+}
 .booking-week-type-popover .ant-popover-inner {
   padding: 6px !important;
   border-radius: 10px !important;
@@ -619,20 +637,33 @@ html:has(.booking-week-page), body:has(.booking-week-page) { height: 100%; overf
   position: relative;
   min-width: 0;
   border-right: 1px solid #f1f5f9;
-  background: #fcfcfd;
+  background: #ffffff;
+  z-index: 1;
 }
 .booking-week-column:last-child { border-right: 0; }
-.booking-week-column:focus-within,
-.booking-week-column:has(.booking-week-expanded) {
-  z-index: 40;
-}
-.booking-week-column-today {
-  background: #fff8f8;
+.booking-week-column-selected:not(.booking-week-column-today) {
+  background: #f8fafc;
   z-index: 2;
 }
-.booking-week-column-selected:not(.booking-week-column-today) {
-  background: #f1f5f9;
-  z-index: 1;
+.booking-week-column-today {
+  background: #fffbfb;
+  z-index: 3;
+}
+/* Thứ tự z-index phân tầng rõ ràng:
+   1: Cột bình thường
+   2: Cột được chọn
+   3: Cột Hôm nay (today)
+   10: Cột đang hover chuột thông thường
+   1000: Cột đang có thẻ chi tiết mở rộng (expanded popup) - luôn nổi lên trên cùng tuyệt đối
+*/
+.booking-week-column:hover:not(:has(.booking-week-card-expanded)):not(:has(.booking-week-expanded)),
+.booking-week-column:focus-within:not(:has(.booking-week-card-expanded)):not(:has(.booking-week-expanded)) {
+  z-index: 10;
+}
+.booking-week-column:has(.booking-week-expanded),
+.booking-week-column:has(.booking-week-card-expanded),
+.booking-week-column.booking-week-column-active {
+  z-index: 1000 !important;
 }
 .booking-week-column-header {
   position: sticky;
@@ -655,8 +686,8 @@ html:has(.booking-week-page), body:has(.booking-week-page) { height: 100%; overf
 }
 .booking-week-column-day-row { display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-bottom: 4px; }
 .booking-week-column-day { display: flex; align-items: center; justify-content: space-between; gap: 6px; width: 100%; height: 24px; padding: 0; border: 0; background: transparent; color: #0f172a; cursor: pointer; text-align: left; }
-.booking-week-column-day > span { font-size: 13px; font-weight: 700; white-space: nowrap; }
-.booking-week-column-date { display: inline-flex; align-items: center; justify-content: center; height: 20px; padding: 0 7px; border-radius: 999px; background: #f1f5f9; font-size: 11.5px; font-weight: 700; color: #334155; white-space: nowrap; }
+.booking-week-column-day > span { font-size: 14px; font-weight: 700; white-space: nowrap; }
+.booking-week-column-date { display: inline-flex; align-items: center; justify-content: center; height: 22px; padding: 0 8px; border-radius: 999px; background: #f1f5f9; font-size: 12.5px; font-weight: 700; color: #334155; white-space: nowrap; }
 .booking-week-column-today .booking-week-column-day > span { color: #d92d20; }
 .booking-week-column-day:hover > span { color: #d92d20; }
 .booking-week-column-today .booking-week-column-date { background: #d92d20; color: #ffffff; }
@@ -673,14 +704,14 @@ html:has(.booking-week-page), body:has(.booking-week-page) { height: 100%; overf
   padding: 2px 0;
   border: 0;
   background: transparent;
-  font-size: 11.5px;
+  font-size: 12.5px;
   line-height: 1.4;
   text-align: left;
 }
 .booking-week-column-leader--interactive { cursor: pointer; border-radius: 4px; transition: color 0.15s ease; }
 .booking-week-column-leader--interactive:hover > strong { color: #d92d20; }
 .booking-week-column-leader > span { flex-shrink: 0; color: #64748b; }
-.booking-week-column-leader > strong { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11.5px; font-weight: 600; color: #334155; }
+.booking-week-column-leader > strong { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12.5px; font-weight: 600; color: #334155; }
 .booking-week-duty-chevron { flex-shrink: 0; font-size: 9px; color: #64748b; margin-left: 2px; }
 .booking-week-column-shifts {
   display: flex;
@@ -694,13 +725,13 @@ html:has(.booking-week-page), body:has(.booking-week-page) { height: 100%; overf
   display: flex;
   align-items: flex-start;
   gap: 4px;
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.4;
   color: #1e293b;
 }
 .booking-week-column-shift > b { flex: 0 0 34px; font-weight: 600; color: #334155; }
 .booking-week-column-shift > div { flex: 1; min-width: 0; }
-.booking-week-column-role { display: flex; align-items: baseline; gap: 3px; }
+.booking-week-column-role { display: flex; align-items: baseline; gap: 3px; font-size: 12px; }
 .booking-week-column-role > b { flex-shrink: 0; font-weight: 500; color: #64748b; }
 .booking-week-column-role > span { overflow-wrap: anywhere; color: #334155; }
 .booking-week-columns-compact .booking-week-column-header { min-height: 48px; }
@@ -711,8 +742,8 @@ html:has(.booking-week-page), body:has(.booking-week-page) { height: 100%; overf
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 0;
-  padding: 4px 6px;
+  gap: 8px;
+  padding: 8px 8px 16px;
 }
 
 .booking-week-column-empty {
@@ -721,13 +752,12 @@ html:has(.booking-week-page), body:has(.booking-week-page) { height: 100%; overf
   justify-content: center;
   padding: 36px 12px;
   color: #94a3b8;
-  font-size: 12px;
+  font-size: 12.5px;
   font-style: italic;
 }
 
 /* =========================================================================
-   Sự kiện dạng danh sách phẳng (Flat Rows — Tuyệt đối không đóng khung)
-   Tuân thủ Điều 30 AGENTS.md: Hạn chế tối đa đóng khung bố cục (box-in-box)
+   Thẻ sự kiện (Flat Card - Không viền, nền xám nhạt #f8fafc, tối giản, thanh lịch)
    ========================================================================= */
 .booking-week-feed-card.booking-week-event {
   position: relative;
@@ -735,9 +765,8 @@ html:has(.booking-week-page), body:has(.booking-week-page) { height: 100%; overf
   height: auto;
   margin: 0 !important;
   border: none !important;
-  border-bottom: 1px solid #f1f5f9 !important;
-  border-radius: 6px !important;
-  background: transparent !important;
+  border-radius: 8px !important;
+  background: #f8fafc !important;
   color: #0f172a;
   box-shadow: none !important;
   transform: none !important;
@@ -745,37 +774,40 @@ html:has(.booking-week-page), body:has(.booking-week-page) { height: 100%; overf
 }
 
 .booking-week-feed-card.booking-week-event:last-child {
-  border-bottom: none !important;
+  border: none !important;
 }
 
 .booking-week-feed-card.booking-week-event:hover {
-  background: #f8fafc !important;
-  border-color: transparent !important;
+  background: #edf2f7 !important;
+  border: none !important;
   box-shadow: none !important;
   transform: none !important;
 }
 
-/* Lịch cá nhân & Lịch tham gia: đồng nhất nền trắng phẳng theo chuẩn Anti-AI UI, loại bỏ hoàn toàn các ô màu nền gây rối */
+/* Lịch cá nhân & Lịch tham gia: đồng nhất nền xám nhạt chung, không dùng màu mè */
 .booking-week-feed-card.booking-week-event.booking-week-personal,
 .booking-week-feed-card.booking-week-event.booking-week-attending {
-  background: transparent !important;
-  border-bottom: 1px solid #f1f5f9 !important;
+  background: #f8fafc !important;
+  border: none !important;
+  box-shadow: none !important;
 }
 .booking-week-feed-card.booking-week-event.booking-week-personal:hover,
 .booking-week-feed-card.booking-week-event.booking-week-attending:hover {
-  background: #f8fafc !important;
-  border-color: transparent !important;
+  background: #edf2f7 !important;
+  border: none !important;
   box-shadow: none !important;
 }
 
-/* Lịch quá khứ: giảm độ tương phản nhẹ, phẳng */
+/* Lịch quá khứ: duy trì độ rõ nét cao, chữ sắc nét dễ đọc */
 .booking-week-feed-card.booking-week-event.booking-week-past-event {
-  opacity: 0.55;
-  background: transparent !important;
+  opacity: 1 !important;
+  background: #f8fafc !important;
+  border: none !important;
 }
 .booking-week-feed-card.booking-week-event.booking-week-past-event:hover {
-  opacity: 0.9;
-  background: #f8fafc !important;
+  opacity: 1 !important;
+  background: #edf2f7 !important;
+  border: none !important;
 }
 
 .booking-week-feed-card .booking-week-card-button {
@@ -783,10 +815,10 @@ html:has(.booking-week-page), body:has(.booking-week-page) { height: 100%; overf
   flex-direction: column;
   width: 100%;
   height: auto;
-  padding: 8px 6px;
-  gap: 4px;
+  padding: 10px 10px;
+  gap: 5px;
   border: 0;
-  border-radius: 6px;
+  border-radius: 7px;
   background: transparent;
   text-align: left;
   cursor: pointer;
@@ -796,11 +828,11 @@ html:has(.booking-week-page), body:has(.booking-week-page) { height: 100%; overf
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 4px;
+  gap: 6px;
   width: 100%;
-  font-size: 11.5px;
+  font-size: 12.5px;
   color: #475569;
-  line-height: 1.3;
+  line-height: 1.35;
 }
 
 .booking-week-card-time-group {
@@ -812,29 +844,17 @@ html:has(.booking-week-page), body:has(.booking-week-page) { height: 100%; overf
 }
 
 .booking-week-type-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  flex-shrink: 0;
-  background: #2563eb;
-}
-.booking-week-dot-meeting { background: #2563eb; }
-.booking-week-dot-event { background: #7c3aed; }
-.booking-week-dot-task { background: #ea580c; }
-.booking-week-feed-card.booking-week-attending .booking-week-type-dot {
-  background: #dc2626;
-}
-.booking-week-feed-card.booking-week-personal .booking-week-type-dot {
-  background: #10b981;
+  display: none !important;
 }
 
 .booking-week-card-time {
   font-weight: 600;
-  color: #334155;
-  font-size: 11.5px;
+  color: #1e293b;
+  font-size: 12.5px;
   white-space: nowrap;
 }
-.booking-week-feed-card.booking-week-attending .booking-week-card-time {
+.booking-week-feed-card.booking-week-attending .booking-week-card-time,
+.booking-week-feed-card.booking-week-personal .booking-week-card-time {
   color: #0f172a;
   font-weight: 700;
 }
@@ -851,11 +871,11 @@ html:has(.booking-week-page), body:has(.booking-week-page) { height: 100%; overf
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  margin: 0;
-  font-size: 12.5px;
+  margin: 1px 0;
+  font-size: 13.5px;
   font-weight: 600;
-  color: #1d2939;
-  line-height: 1.4;
+  color: #0f172a;
+  line-height: 1.45;
   overflow-wrap: anywhere;
 }
 .booking-week-feed-card:hover .booking-week-card-title {
@@ -866,25 +886,25 @@ html:has(.booking-week-page), body:has(.booking-week-page) { height: 100%; overf
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 5px;
-  margin-top: 1px;
+  gap: 6px;
+  margin-top: 3px;
 }
 
 .booking-week-card-loc {
   display: inline-flex;
   align-items: center;
   gap: 3px;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 500;
-  color: #64748b;
+  color: #475569;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   max-width: 100%;
 }
 .booking-week-card-loc-icon {
-  font-size: 10px;
-  color: #94a3b8;
+  font-size: 11px;
+  color: #64748b;
   flex-shrink: 0;
 }
 
@@ -916,39 +936,48 @@ html:has(.booking-week-page), body:has(.booking-week-page) { height: 100%; overf
   color: #eab308;
 }
 
-.booking-week-feed-card .booking-week-badge {
+/* Lược bỏ các nhãn tag dư thừa trên thẻ (Cá nhân, Tham gia, Loại mục ghi) để giữ thẻ tinh gọn, thanh lịch */
+.booking-week-feed-card .booking-week-badge,
+.booking-week-feed-card .booking-week-type-badge,
+.booking-week-event .booking-week-badge,
+.booking-week-event .booking-week-type-badge {
+  display: none !important;
+}
+
+.booking-week-card-expanded .booking-week-badge,
+.booking-week-card-expanded .booking-week-type-badge {
+  display: inline-block !important;
+}
+
+.booking-week-badge {
   padding: 1px 6px;
   border-radius: 4px;
-  background: #fef2f2;
-  color: #b91c1c;
-  border: 1px solid #fee2e2;
-  font-size: 10px;
+  background: #f1f5f9;
+  color: #475569;
+  font-size: 11px;
   font-weight: 600;
-  line-height: 14px;
+  line-height: 15px;
   white-space: nowrap;
-}
-.booking-week-feed-card.booking-week-personal .booking-week-badge {
-  background: #f0fdf4;
-  color: #047857;
-  border: 1px solid #dcfce7;
 }
 .booking-week-feed-card .booking-week-adjusted {
   padding: 1px 5px;
   border-radius: 4px;
   background: #f1f5f9;
   color: #475569;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 500;
-  line-height: 13px;
+  line-height: 14px;
   border: 1px solid #e2e8f0;
 }
 .booking-week-type-badge {
   padding: 1px 5px;
   border-radius: 4px;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
-  line-height: 14px;
+  line-height: 15px;
   white-space: nowrap;
+  background: #f1f5f9;
+  color: #475569;
 }
 .booking-week-type-event {
   background: #f3e8ff;
@@ -961,25 +990,42 @@ html:has(.booking-week-page), body:has(.booking-week-page) { height: 100%; overf
 .booking-week-status-badge {
   padding: 1px 5px;
   border-radius: 4px;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 600;
-  line-height: 14px;
+  line-height: 15px;
 }
 .booking-week-status-pending,
-.booking-week-status-waiting {
-  background: #fff7ed;
-  color: #c2410c;
-  border: 1px solid #ffedd5;
-}
+.booking-week-status-waiting,
 .booking-week-status-consulting {
-  background: #eff6ff;
-  color: #1d4ed8;
-  border: 1px solid #dbeafe;
+  background: #fef3c7;
+  color: #b45309;
+}
+.booking-week-status-approved {
+  background: #ecfdf3;
+  color: #027a48;
+}
+.booking-week-status-in_progress,
+.booking-week-status-in-progress,
+.booking-week-status-active {
+  background: #eff8ff;
+  color: #175cd3;
+}
+.booking-week-status-completed {
+  background: #ecfdf3;
+  color: #027a48;
+}
+.booking-week-status-scheduled {
+  background: #f8fafc;
+  color: #475569;
+}
+.booking-week-status-rejected {
+  background: #fef2f2;
+  color: #b91c1c;
 }
 .booking-week-feed-card .booking-week-card-expanded {
   left: calc(100% + 4px);
   top: 0;
-  z-index: 350;
+  z-index: 700 !important;
 }
 .booking-week-feed-card.booking-week-expand-left .booking-week-card-expanded {
   left: auto;
@@ -988,6 +1034,20 @@ html:has(.booking-week-page), body:has(.booking-week-page) { height: 100%; overf
 .booking-week-feed-card.booking-week-expand-up .booking-week-card-expanded {
   top: auto;
   bottom: 0;
+}
+/* Cầu nối vô hình giúp chuột di chuyển qua khe 4px giữa thẻ và popup mà không bị rớt hover */
+.booking-week-feed-card .booking-week-card-expanded::before {
+  content: "";
+  position: absolute;
+  top: -10px;
+  bottom: -10px;
+  left: -12px;
+  width: 12px;
+  background: transparent;
+}
+.booking-week-feed-card.booking-week-expand-left .booking-week-card-expanded::before {
+  left: auto;
+  right: -12px;
 }
 .booking-week-feed-skeleton { min-height: 68px; padding: 12px; border-bottom: 1px solid #cbd5e1; background: transparent; }
 .booking-week-column-duty .ant-skeleton-paragraph { margin: 4px 0 0; }
@@ -1004,19 +1064,24 @@ html:has(.booking-week-page), body:has(.booking-week-page) { height: 100%; overf
 .booking-week-hours-row { display: flex; position: sticky; top: 0; z-index: 50; height: 18px; background: white; }
 .booking-week-corner { position: sticky; left: 0; flex: 0 0 215px; border-right: 1px solid var(--booking-week-border); border-bottom: 1px solid var(--booking-week-border); background: white; z-index: 2; }
 .booking-week-hours { display: flex; flex: 1; border-bottom: 1px solid var(--booking-week-border); }
-.booking-week-hours > div { flex: 1; width: 0; text-align: center; border-right: 1px solid #f0f3f8; color: #617695; font-size: 11.5px; font-weight: 600; line-height: 17px; }
+.booking-week-hours > div { flex: 1; width: 0; text-align: center; border-right: 1px solid #f0f3f8; color: #617695; font-size: 12.5px; font-weight: 600; line-height: 17px; }
 .booking-week-hours > .booking-week-current-hour { color: #ef4444; font-weight: 700; }
-.booking-week-day-row { display: flex; position: relative; min-height: 118px; border-bottom: 1px solid var(--booking-week-border); }
-.booking-week-day-row:focus-within, .booking-week-day-row:has(.booking-week-expanded) { z-index: 60; }
+.booking-week-day-row { display: flex; position: relative; min-height: 118px; border-bottom: 1px solid var(--booking-week-border); z-index: 1; }
+.booking-week-day-row:hover,
+.booking-week-day-row:focus-within,
+.booking-week-day-row:has(.booking-week-expanded),
+.booking-week-day-row:has(.booking-week-card-expanded) {
+  z-index: 500 !important;
+}
 .booking-week-day-header { position: sticky; left: 0; flex: 0 0 215px; padding: 12px 14px; border-right: 1px solid var(--booking-week-border); background: white; z-index: 25; }
 .booking-week-day-button { display: block; width: 100%; padding: 0; text-align: left; border: 0; background: none; color: inherit; cursor: pointer; }
 .booking-week-day-title { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-.booking-week-day-title b { font-size: 14px; font-weight: 700; }
-.booking-week-date-pill { padding: 1px 8px; background: #f1f5f9; border-radius: 20px; color: #334155; font-size: 13px; font-weight: 700; line-height: 22px; }
-.booking-week-day-count { display: inline-flex; align-items: center; margin-top: 3px; color: #617695; font-size: 11.5px; font-weight: 500; }
+.booking-week-day-title b { font-size: 15px; font-weight: 700; }
+.booking-week-date-pill { padding: 1px 8px; background: #f1f5f9; border-radius: 20px; color: #334155; font-size: 13.5px; font-weight: 700; line-height: 22px; }
+.booking-week-day-count { display: inline-flex; align-items: center; margin-top: 3px; color: #617695; font-size: 12.5px; font-weight: 500; }
 .booking-week-day-count .anticon { margin-left: 3px; font-size: 8px; color: #94a3b8; }
-.booking-week-duty-button { display: flex; align-items: center; gap: 4px; width: 100%; padding: 0; margin-top: 16px; border: 0; background: none; font-size: 11.5px; color: #1e293b; cursor: pointer; text-align: left; }
-.booking-week-duty-button > span:first-child { color: #617695; font-size: 10px; font-weight: 700; }
+.booking-week-duty-button { display: flex; align-items: center; gap: 4px; width: 100%; padding: 0; margin-top: 16px; border: 0; background: none; font-size: 12.5px; color: #1e293b; cursor: pointer; text-align: left; }
+.booking-week-duty-button > span:first-child { color: #617695; font-size: 11px; font-weight: 700; }
 .booking-week-duty-button strong { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
 .booking-week-duty-button .anticon { font-size: 9px; color: #617695; }
 .booking-week-duty-details { font-size: 12px; line-height: 1.8; max-width: 360px; }
@@ -1057,26 +1122,27 @@ html:has(.booking-week-page), body:has(.booking-week-page) { height: 100%; overf
 .booking-week-now-pill { display: inline-flex; position: absolute; top: -14px; left: 50%; transform: translateX(-50%); align-items: center; gap: 4px; padding: 1px 6px; border-radius: 10px; background: #dc2626; color: white; font-size: 10px; font-weight: 700; white-space: nowrap; box-shadow: 0 2px 5px #dc262659; }
 .booking-week-now-pill > span { width: 5px; height: 5px; border-radius: 50%; background: white; }
 .booking-week-now-line { position: absolute; top: -6px; bottom: 0; width: 2px; background: #ef4444; box-shadow: 0 0 6px #ef444473; }
-.booking-week-past-event > .booking-week-card-button, .booking-week-past-duty { opacity: .7; transition: opacity .15s ease; }
+.booking-week-past-event > .booking-week-card-button { opacity: 1 !important; }
+.booking-week-past-duty { opacity: .9; transition: opacity .15s ease; }
 .booking-week-past-event:hover > .booking-week-card-button, .booking-week-past-event:focus-within > .booking-week-card-button, .booking-week-past-event.booking-week-expanded > .booking-week-card-button, .booking-week-past-duty:hover { opacity: 1; }
 .booking-week-selected-day { background: white; }
 .booking-week-selected-day .booking-week-day-header { background: #f0fdf4; border-bottom-color: #86efac; }
 .booking-week-selected-day .booking-week-date-pill { background: #dcfce7; color: #15803d; }
-.booking-week-event { position: absolute; top: 6px; height: 106px; border: 1px solid #e7e5e4; border-radius: 8px; background: #fafaf9; color: #44403c; box-shadow: 0 1px 2px #0f172a04; }
-.booking-week-event:hover, .booking-week-event:focus-within { z-index: 100; }
-.booking-week-event.booking-week-attending, .booking-week-agenda-item.booking-week-attending { border-color: #e2e8f0; background: #ffffff; color: #0f172a; }
-.booking-week-event.booking-week-personal { border-color: #e2e8f0; background: #ffffff; color: #0f172a; }
+.booking-week-event { position: absolute; top: 6px; height: 106px; border: none !important; border-radius: 8px; background: #f8fafc !important; color: #1e293b; box-shadow: none !important; transition: background-color 0.15s ease; }
+.booking-week-event:hover, .booking-week-event:focus-within { z-index: 100; background: #edf2f7 !important; border: none !important; box-shadow: none !important; }
+.booking-week-event.booking-week-attending, .booking-week-agenda-item.booking-week-attending { border: none !important; background: #f8fafc !important; color: #0f172a; }
+.booking-week-event.booking-week-personal { border: none !important; background: #f8fafc !important; color: #0f172a; }
 .booking-week-card-button { display: flex; flex-direction: column; height: 100%; width: 100%; border: 0; border-radius: inherit; padding: 7px 9px; overflow: hidden; background: transparent; color: inherit; text-align: left; cursor: pointer; }
-.booking-week-card-top { display: flex; align-items: center; gap: 4px; width: 100%; white-space: nowrap; font-size: 10.5px; font-weight: 500; line-height: 16px; }
-.booking-week-badge { display: inline-block; border-radius: 3px; padding: 0 4px; background: #fee2e2; color: #dc2626; font-size: 9px; line-height: 14px; font-weight: 600; white-space: nowrap; }
+.booking-week-card-top { display: flex; align-items: center; gap: 4px; width: 100%; white-space: nowrap; font-size: 11.5px; font-weight: 500; line-height: 16px; }
+.booking-week-badge { display: inline-block; border-radius: 3px; padding: 0 4px; background: #fee2e2; color: #dc2626; font-size: 10px; line-height: 15px; font-weight: 600; white-space: nowrap; }
 .booking-week-personal .booking-week-badge { background: #dbeafe; color: #1d4ed8; border: 0; }
-.booking-week-card-title { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; width: 100%; margin-top: 4px; font-size: 13px; line-height: 17px; font-weight: 500; }
+.booking-week-card-title { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; width: 100%; margin-top: 4px; font-size: 13.5px; line-height: 18px; font-weight: 600; color: #0f172a; }
 .booking-week-attending .booking-week-card-title, .booking-week-personal .booking-week-card-title { font-weight: 700; }
-.booking-week-card-location { display: flex; align-items: center; gap: 3px; margin-top: auto; color: #78716c; font-size: 10px; line-height: 14px; white-space: nowrap; }
+.booking-week-card-location { display: flex; align-items: center; gap: 3px; margin-top: auto; color: #475569; font-size: 11px; line-height: 15px; white-space: nowrap; }
 .booking-week-attending .booking-week-card-location, .booking-week-personal .booking-week-card-location { color: #617695; }
-.booking-week-card-location .anticon { font-size: 10px; }
-.booking-week-adjusted { align-self: flex-start; padding: 0 5px; margin-top: 3px; border-radius: 3px; background: #fef3c7; color: #b45309; font-size: 10px; font-weight: 700; }
-.booking-week-event.booking-week-expanded { z-index: 300; }
+.booking-week-card-location .anticon { font-size: 11px; }
+.booking-week-adjusted { align-self: flex-start; padding: 0 5px; margin-top: 3px; border-radius: 3px; background: #fef3c7; color: #b45309; font-size: 11px; font-weight: 700; }
+.booking-week-event.booking-week-expanded { z-index: 600 !important; }
 .booking-week-card-expanded { position: absolute; left: -1px; top: -1px; width: 360px; max-width: 80vw; padding: 16px; border: 1px solid #cbd5e1; border-radius: 9px; background: white; box-shadow: 0 16px 38px -4px #0f172a33, 0 6px 14px -2px #0f172a1a; color: #1e293b; }
 .booking-week-card-expanded > strong { display: block; margin-bottom: 8px; font-size: 14.5px; line-height: 1.5; }
 .booking-week-card-expanded p { display: flex; gap: 8px; align-items: baseline; margin: 10px 0; font-size: 12px; line-height: 1.6; }
@@ -1261,7 +1327,7 @@ html:has(.booking-week-page), body:has(.booking-week-page) { height: 100%; overf
    ========================================================================= */
 
 .booking-week-card-badges { display: inline-flex; align-items: center; gap: 6px; margin-left: auto; justify-content: flex-end; }
-.booking-week-type-badge { display: inline-block; padding: 1px 6px; border-radius: 4px; font-size: 10px; font-weight: 600; line-height: 15px; white-space: nowrap; background: #f1f5f9; color: #475569; }
+.booking-week-type-badge { display: inline-block; padding: 1px 6px; border-radius: 4px; font-size: 11px; font-weight: 600; line-height: 16px; white-space: nowrap; background: #f1f5f9; color: #475569; }
 .booking-week-type-badge.booking-week-type-task { background: #f1f5f9; color: #334155; }
 .booking-week-type-badge.booking-week-type-meeting { background: #f1f5f9; color: #334155; }
 .booking-week-type-badge.booking-week-type-event { background: #f1f5f9; color: #334155; }
@@ -1270,9 +1336,9 @@ html:has(.booking-week-page), body:has(.booking-week-page) { height: 100%; overf
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  padding: 0;
-  background: transparent;
-  font-size: 11px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 11.5px;
   font-weight: 600;
   line-height: 16px;
   white-space: nowrap;
@@ -1285,11 +1351,33 @@ html:has(.booking-week-page), body:has(.booking-week-page) { height: 100%; overf
   background: currentColor;
 }
 .booking-week-status-badge.booking-week-status-pending,
-.booking-week-status-badge.booking-week-status-active { color: #d97706; }
-.booking-week-status-badge.booking-week-status-approved,
-.booking-week-status-badge.booking-week-status-completed { color: #16a34a; }
-.booking-week-status-badge.booking-week-status-rejected { color: #dc2626; }
-.booking-week-status-badge.booking-week-status-consulting { color: #0284c7; }
+.booking-week-status-badge.booking-week-status-waiting,
+.booking-week-status-badge.booking-week-status-consulting {
+  background: #fef3c7;
+  color: #b45309;
+}
+.booking-week-status-badge.booking-week-status-approved {
+  background: #ecfdf3;
+  color: #027a48;
+}
+.booking-week-status-badge.booking-week-status-in_progress,
+.booking-week-status-badge.booking-week-status-in-progress,
+.booking-week-status-badge.booking-week-status-active {
+  background: #eff8ff;
+  color: #175cd3;
+}
+.booking-week-status-badge.booking-week-status-completed {
+  background: #ecfdf3;
+  color: #027a48;
+}
+.booking-week-status-badge.booking-week-status-scheduled {
+  background: #f8fafc;
+  color: #475569;
+}
+.booking-week-status-badge.booking-week-status-rejected {
+  background: #fef2f2;
+  color: #b91c1c;
+}
 
 .booking-week-card-expanded-badges { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; margin-bottom: 6px; }
 .booking-week-out-hours-card .booking-week-card-button .booking-week-card-badges { display: none; }
@@ -1501,10 +1589,58 @@ html:has(.booking-week-page), body:has(.booking-week-page) { height: 100%; overf
     padding: 8px 6px;
   }
   .booking-week-column-events {
-    padding: 4px 4px;
-    gap: 0;
+    padding: 6px 6px 12px;
+    gap: 6px;
   }
   .booking-week-feed-card .booking-week-card-button {
-    padding: 7px 5px;
+    padding: 8px 8px;
+    gap: 4px;
   }
+}
+
+
+/* =========================================================================
+   Ant Design Popover Thẻ sự kiện tuần (Portal - không bị tràn/đè z-index)
+   ========================================================================= */
+.booking-week-card-popover .ant-popover-inner {
+  padding: 16px !important;
+  border-radius: 10px !important;
+  border: 1px solid #cbd5e1 !important;
+  box-shadow: 0 16px 38px -4px rgba(15, 23, 42, 0.18), 0 6px 14px -2px rgba(15, 23, 42, 0.08) !important;
+  width: 360px;
+  max-width: 90vw;
+  background: #ffffff !important;
+  color: #1e293b;
+}
+.booking-week-card-popover .ant-popover-arrow {
+  display: none !important;
+}
+.booking-week-card-expanded-content > strong,
+.booking-week-card-expanded-content .booking-week-popover-title {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14.5px;
+  line-height: 1.5;
+  color: #0f172a;
+  font-weight: 700;
+}
+.booking-week-card-expanded-content p {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  margin: 10px 0;
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: #334155;
+}
+.booking-week-card-expanded-content .anticon {
+  color: #64748b;
+  flex-shrink: 0;
+}
+.booking-week-card-expanded-badges {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
 }

@@ -3,7 +3,8 @@ import dayjs, { type Dayjs } from 'dayjs';
 import type { CalendarEvent } from '@/types/domain';
 
 /**
- * Sinh dữ liệu mẫu động cho tuần đang chọn (Ban biên tập, Cá nhân, Task, Meeting, Event)
+ * Sinh danh sách sự kiện Ban Biên tập chuẩn chỉnh cho tuần đang xem.
+ * Đầy đủ nghiệp vụ Tòa soạn Báo Tuổi Trẻ: Chào cờ, họp BBT, duyệt maket, giao ban báo chí số, tọa đàm, xuất bản.
  */
 export function getMockEditorialEvents(weekStart: Dayjs): CalendarEvent[] {
   const mon = weekStart.startOf('isoWeek');
@@ -14,15 +15,18 @@ export function getMockEditorialEvents(weekStart: Dayjs): CalendarEvent[] {
   const sat = mon.add(5, 'day');
 
   return [
-    // Thứ Hai: Chào cờ đầu tuần
+    // --- THỨ HAI ---
+    // Chào cờ đầu tuần (Sự kiện toàn cơ quan, user tham gia)
     {
-      id: `mock-bbt-mon-flag-${mon.format('YYYYMMDD')}`,
+      id: `bbt-mon-flag-${mon.format('YYYYMMDD')}`,
       title: 'Chào cờ đầu tuần',
       startAt: mon.hour(7).minute(45).second(0).toISOString(),
       endAt: mon.hour(8).minute(0).second(0).toISOString(),
+      createdAt: mon.subtract(2, 'day').hour(10).toISOString(),
       location: 'Sân T.1 BP KQĐ VPĐD',
       type: 'meeting',
       ticketType: 'MEETING',
+      mode: 'offline',
       scope: 'editorial',
       organizer: 'Ban Biên tập',
       leader: 'Ban Biên tập',
@@ -30,11 +34,12 @@ export function getMockEditorialEvents(weekStart: Dayjs): CalendarEvent[] {
       participantCount: 150,
       isUserParticipant: true,
       responseStatus: 'accepted',
-      agenda: 'Chào cờ đầu tuần định kỳ và thông báo chung của Tòa soạn.',
+      approvalStatus: 'SCHEDULED',
+      agenda: 'Chào cờ đầu tuần',
       attachments: [
         {
           id: `att-flag-${mon.format('YYYYMMDD')}`,
-          name: 'Thong-bao-chao-co-dau-tuan-thang-10.pdf',
+          name: 'Thong-bao-chao-co-dau-tuan.pdf',
           size: 245000,
           type: 'pdf',
           uploadedAt: mon.subtract(1, 'day').hour(15).toISOString(),
@@ -43,76 +48,46 @@ export function getMockEditorialEvents(weekStart: Dayjs): CalendarEvent[] {
       ],
       comments: [
         {
-          id: `cmt-flag-1`,
+          id: 'cmt-flag-1',
           author: 'Lê Thanh Vân',
-          content: 'Đề nghị các ban có mặt đúng 7g40 để ổn định vị trí.',
+          content: 'Đề nghị các ban có mặt đúng 7g40 để ổn định vị trí chào cờ.',
           createdAt: mon.subtract(1, 'day').hour(16).minute(30).toISOString(),
         },
       ],
     },
-    // Thứ Hai: Họp Ban Biên tập
+    // Họp Ban Biên tập
     {
-      id: `mock-bbt-mon-bbt-${mon.format('YYYYMMDD')}`,
+      id: `bbt-mon-bbt-${mon.format('YYYYMMDD')}`,
       title: 'Họp Ban Biên tập',
       startAt: mon.hour(8).minute(0).second(0).toISOString(),
       endAt: mon.hour(9).minute(0).second(0).toISOString(),
+      createdAt: mon.subtract(2, 'day').hour(14).toISOString(),
       location: 'PH3A',
       type: 'meeting',
       ticketType: 'MEETING',
+      mode: 'offline',
       scope: 'editorial',
       organizer: 'Ban Biên tập',
       leader: 'Ban Biên tập',
-      participantText: 'Ban Biên tập, Ngọc Hiển',
+      participantText: 'Ban Biên tập, Thư ký Tòa soạn',
       participantCount: 12,
       isUserParticipant: false,
       isAdjusted: true,
       adjustedNote: 'Dời thời gian họp sớm 30 phút (08:00 thay vì 08:30)',
-      agenda: 'Họp giao ban lãnh đạo Ban Biên tập.',
+      approvalStatus: 'SCHEDULED',
+      agenda: 'Họp Ban Biên tập',
     },
-    // Thứ Hai: Họp giao ban tin ca 1
+    // Họp giao ban phóng viên (Có điều chỉnh địa điểm, user tham gia)
     {
-      id: `mock-bbt-mon-news-${mon.format('YYYYMMDD')}`,
-      title: 'Họp giao ban tin ca 1',
-      startAt: mon.hour(8).minute(30).second(0).toISOString(),
-      endAt: mon.hour(9).minute(30).second(0).toISOString(),
-      location: 'PHT5',
-      type: 'meeting',
-      ticketType: 'MEETING',
-      scope: 'editorial',
-      organizer: 'Tòa soạn',
-      leader: 'Anh Hoàng Nguyên',
-      participantText: 'Anh Hoàng Nguyên, TKTS trực, BTV ca trực, BTV tòa soạn, BTV mảng, Văn phòng',
-      isUserParticipant: false,
-      dutyInfo: 'Lịch TS: Ca 0: TKTS: Đà Trang - Ca 1: TKTS: Viễn Sự, N.V.Hải; BTV: Lan Anh, H.Điệp',
-    },
-    // Thứ Hai: Họp trực tuyến Hội đồng biên tập
-    {
-      id: `mock-bbt-mon-board-${mon.format('YYYYMMDD')}`,
-      title: 'Họp trực tuyến Hội đồng biên tập',
-      startAt: mon.hour(9).minute(30).second(0).toISOString(),
-      endAt: mon.hour(11).minute(30).second(0).toISOString(),
-      location: 'HTT2',
-      meetingUrl: 'https://meeting.tuoitre.vn/hoi-dong-bien-tap',
-      type: 'meeting',
-      ticketType: 'MEETING',
-      mode: 'online',
-      scope: 'editorial',
-      organizer: 'Ban Biên tập',
-      leader: 'Anh Xuân Toàn',
-      participantText: 'Anh Xuân Toàn, BBT, TKTS, BTV, Giám đốc các TT',
-      participantCount: 60,
-      isUserParticipant: false,
-      agenda: 'Đánh giá chất lượng nội dung và định hướng tuyên truyền trong tuần.',
-    },
-    // Thứ Hai: Họp giao ban phóng viên (có điều chỉnh)
-    {
-      id: `mock-bbt-mon-reporters-${mon.format('YYYYMMDD')}`,
+      id: `bbt-mon-reporters-${mon.format('YYYYMMDD')}`,
       title: 'Họp giao ban phóng viên',
       startAt: mon.hour(15).minute(30).second(0).toISOString(),
       endAt: mon.hour(17).minute(0).second(0).toISOString(),
+      createdAt: mon.subtract(1, 'day').hour(11).toISOString(),
       location: 'Hội trường HTT2',
       type: 'meeting',
       ticketType: 'MEETING',
+      mode: 'offline',
       scope: 'editorial',
       organizer: 'Ban Biên tập',
       leader: 'Ban Biên tập',
@@ -122,31 +97,40 @@ export function getMockEditorialEvents(weekStart: Dayjs): CalendarEvent[] {
       responseStatus: 'accepted',
       isAdjusted: true,
       adjustedNote: 'Thay đổi địa điểm sang Hội trường HTT2 (thay vì PH1)',
-      agenda: 'Định hướng các tuyến bài phóng sự điều tra và chuyên đề tháng.',
+      approvalStatus: 'SCHEDULED',
+      agenda: 'Họp giao ban phóng viên',
     },
-    // Thứ Ba: Hội đồng Duyệt Maket Báo in & Tuyến bài Phóng sự Điều tra
+
+    // --- THỨ BA ---
+    // Hội đồng Duyệt Maket Báo in & Tuyến bài Phóng sự Điều tra
     {
-      id: `mock-bbt-tue-${tue.format('YYYYMMDD')}`,
+      id: `bbt-tue-maket-${tue.format('YYYYMMDD')}`,
       title: 'Hội đồng Duyệt Maket Báo in & Tuyến bài Phóng sự Điều tra',
       startAt: tue.hour(14).minute(0).second(0).toISOString(),
       endAt: tue.hour(16).minute(30).second(0).toISOString(),
+      createdAt: tue.subtract(2, 'day').hour(9).toISOString(),
       location: 'PH1',
       type: 'meeting',
       ticketType: 'MEETING',
+      mode: 'offline',
       scope: 'editorial',
       organizer: 'Ban Biên tập',
       leader: 'Đ/c Đinh Minh Trung - Phó Tổng Biên tập',
       participantText: 'Hội đồng duyệt bài, Ban Thư ký Tòa soạn, Tổ Thiết kế Maket',
       participantCount: 15,
       isUserParticipant: false,
-      agenda: 'Kiểm duyệt đề cương phóng sự điều tra độc quyền, phê duyệt bố cục maket trang 1.',
+      approvalStatus: 'SCHEDULED',
+      agenda: 'Hội đồng Duyệt Maket Báo in & Tuyến bài Phóng sự Điều tra',
     },
-    // Thứ Tư: Giao ban Chuyển đổi số & Media
+
+    // --- THỨ TƯ ---
+    // Giao ban Chuyển đổi số & Phát triển Báo chí Đa nền tảng (Hybrid Meeting)
     {
-      id: `mock-bbt-wed-${wed.format('YYYYMMDD')}`,
+      id: `bbt-wed-digital-${wed.format('YYYYMMDD')}`,
       title: 'Giao ban Chuyển đổi số & Phát triển Báo chí Đa nền tảng',
       startAt: wed.hour(9).minute(30).second(0).toISOString(),
       endAt: wed.hour(11).minute(30).second(0).toISOString(),
+      createdAt: wed.subtract(1, 'day').hour(14).toISOString(),
       location: 'Hội trường Trung tâm Media (Lầu 1)',
       meetingUrl: 'https://meeting.tuoitre.vn/chuyen-doi-so',
       type: 'meeting',
@@ -158,74 +142,108 @@ export function getMockEditorialEvents(weekStart: Dayjs): CalendarEvent[] {
       participantText: 'Trung tâm Media, Tuổi Trẻ Online, Trung tâm CNTT',
       participantCount: 28,
       isUserParticipant: false,
-      agenda: 'Đánh giá tốc độ truy cập hệ sinh thái CMS, kiểm thử luồng video tin tức trên các nền tảng.',
+      approvalStatus: 'SCHEDULED',
+      agenda: 'Giao ban Chuyển đổi số & Phát triển Báo chí Đa nền tảng',
     },
-    // Thứ Năm: Tọa đàm Hợp tác Phát triển Nội dung Kinh tế - Tài chính Xanh (Sự kiện)
+
+    // --- THỨ NĂM ---
+    // Tọa đàm Hợp tác Phát triển Nội dung Kinh tế - Tài chính Xanh (SỰ KIỆN - EVENT ĐỀ XUẤT)
     {
-      id: `mock-bbt-thu-${thu.format('YYYYMMDD')}`,
+      id: `bbt-thu-event-${thu.format('YYYYMMDD')}`,
       title: 'Tọa đàm Hợp tác Phát triển Nội dung Kinh tế - Tài chính Xanh',
       startAt: thu.hour(15).minute(0).second(0).toISOString(),
       endAt: thu.hour(17).minute(0).second(0).toISOString(),
+      createdAt: thu.subtract(3, 'day').hour(10).toISOString(),
       location: 'Phòng khách Quốc tế (Lầu 2)',
       type: 'work',
       ticketType: 'EVENT',
+      workflowType: 'PROPOSAL',
       scope: 'editorial',
-      organizer: 'Ban Kinh tế & Ban Trị sự',
-      leader: 'Ban Kinh tế & Ban Trị sự',
+      organizer: 'Vũ Hoàng Nam (Ban Kinh tế)',
+      leader: 'Đ/c Lê Thế Chữ (Tổng Biên tập)',
       participantText: 'Ban Kinh tế, Ban Trị sự, Đoàn Chuyên gia Khách mời',
       participantCount: 35,
       isUserParticipant: true,
-      executors: [
-        { id: 'user-201', name: 'Trần Văn Bình', role: 'Điều phối tọa đàm' },
+      approvalStatus: 'PENDING',
+      approvers: [
+        { id: 'user-101', name: 'Đ/c Lê Thế Chữ - Tổng Biên tập', status: 'PENDING' },
+      ],
+      consultants: [
+        { id: 'user-102', name: 'Trần Xuân Toàn', status: 'COMPLETED', completed_at: thu.subtract(1, 'day').toISOString(), reply: 'Đồng ý chủ trương mời thêm các chuyên gia tài chính xanh.' },
       ],
       watchers: [
         { id: 'user-105', name: 'Lê Văn Tuấn (Trưởng ban Trị sự)' },
       ],
-      approver: { id: 'user-101', name: 'Đ/c Lê Thế Chữ - Tổng Biên tập' },
-      approvalStatus: 'PENDING',
-      steps: [
-        { id: 'step-1', step_order: 1, name: 'Khởi tạo sự kiện', status: 'DONE', actor_name: 'Ban Kinh tế' },
-        { id: 'step-2', step_order: 2, name: 'Phê duyệt chủ trương', status: 'ACTIVE', actor_name: 'Lê Thế Chữ' },
-        { id: 'step-3', step_order: 3, name: 'Triển khai tọa đàm', status: 'PENDING', actor_name: 'Trần Văn Bình' },
+      agenda: 'Tọa đàm Hợp tác Phát triển Nội dung Kinh tế - Tài chính Xanh',
+      attachments: [
+        {
+          id: `att-thu-toa-dam-${thu.format('YYYYMMDD')}`,
+          name: 'De-an-Toa-dam-Kinh-te-Xanh-2026.pdf',
+          size: 780000,
+          type: 'pdf',
+          uploadedAt: thu.subtract(2, 'day').toISOString(),
+          uploadedBy: 'Vũ Hoàng Nam (Ban Kinh tế)',
+        },
       ],
-      agenda: 'Trao đổi với đoàn chuyên gia viện nghiên cứu kinh tế về chuyên trang Net Zero và tăng trưởng bền vững.',
     },
-    // Thứ Sáu: Giao ban Xuất bản Báo in & Chuẩn bị Số báo Cuối tuần
+
+    // --- THỨ SÁU ---
+    // Giao ban Xuất bản Báo in & Chuẩn bị Số báo Cuối tuần
     {
-      id: `mock-bbt-fri-${fri.format('YYYYMMDD')}`,
+      id: `bbt-fri-pub-${fri.format('YYYYMMDD')}`,
       title: 'Giao ban Xuất bản Báo in & Chuẩn bị Số báo Cuối tuần',
       startAt: fri.hour(16).minute(0).second(0).toISOString(),
       endAt: fri.hour(17).minute(30).second(0).toISOString(),
+      createdAt: fri.subtract(1, 'day').hour(15).toISOString(),
       location: 'Phòng Giao ban Tòa soạn',
       type: 'meeting',
       ticketType: 'MEETING',
+      mode: 'offline',
       scope: 'editorial',
       organizer: 'Ban Thư ký Tòa soạn',
       leader: 'Ban Thư ký Tòa soạn',
       participantText: 'Ban Thư ký Tòa soạn, Ban Văn hóa, Ban Thể thao',
       participantCount: 20,
       isUserParticipant: false,
-      agenda: 'Tổng kết số lượng phát hành tuần qua, hoàn thiện các trang văn hóa - thể thao Tuổi Trẻ Cuối tuần.',
+      approvalStatus: 'SCHEDULED',
+      agenda: 'Giao ban Xuất bản Báo in & Chuẩn bị Số báo Cuối tuần',
     },
-    // Thứ Bảy: Giao ban Báo cuối tuần & Kế hoạch Xuất bản tuần tới
+
+    // --- THỨ BẢY ---
+    // Giao ban Báo cuối tuần & Kế hoạch Xuất bản tuần tới
     {
-      id: `mock-bbt-sat-${sat.format('YYYYMMDD')}`,
+      id: `bbt-sat-plan-${sat.format('YYYYMMDD')}`,
       title: 'Giao ban Báo cuối tuần & Kế hoạch Xuất bản tuần tới',
       startAt: sat.hour(8).minute(30).second(0).toISOString(),
       endAt: sat.hour(10).minute(30).second(0).toISOString(),
+      createdAt: sat.subtract(1, 'day').hour(16).toISOString(),
       location: 'Phòng họp BBT',
       type: 'meeting',
       ticketType: 'MEETING',
+      mode: 'offline',
       scope: 'editorial',
       organizer: 'Ban Thư ký Tòa soạn',
       leader: 'Ban Thư ký Tòa soạn',
       participantText: 'Ban Thư ký Tòa soạn, BTV trực ca',
       participantCount: 14,
       isUserParticipant: false,
+      approvalStatus: 'SCHEDULED',
+      agenda: 'Giao ban Báo cuối tuần & Kế hoạch Xuất bản tuần tới',
     },
   ];
 }
 
+/**
+ * Sinh danh sách sự kiện và phiếu công việc cá nhân chuẩn chỉnh cho tuần đang xem.
+ * Bao quát 100% mọi vai trò thực tế của người dùng Nguyễn Minh Anh (user-001):
+ * - APPROVER: Người duyệt (Thứ Hai)
+ * - CONSULTEE: Người được lấy ý kiến tham vấn (Thứ Ba)
+ * - EXECUTOR: Người triển khai đang thực hiện (Thứ Tư)
+ * - CREATOR: Người tạo & chủ trì cuộc họp (Thứ Năm)
+ * - COMPLETED EXECUTOR: Người hoàn thành nhiệm vụ (Thứ Sáu)
+ * - WATCHER: Người theo dõi phiếu (Thứ Sáu)
+ * - PARTICIPANT: Người tham gia họp cá nhân (Thứ Bảy)
+ */
 export function getMockPersonalEvents(weekStart: Dayjs): CalendarEvent[] {
   const mon = weekStart.startOf('isoWeek');
   const tue = mon.add(1, 'day');
@@ -235,38 +253,35 @@ export function getMockPersonalEvents(weekStart: Dayjs): CalendarEvent[] {
   const sat = mon.add(5, 'day');
 
   return [
-    // Thứ Hai: ROLE APPROVER - Nguyễn Minh Anh là Người duyệt (Phiếu Chờ duyệt)
+    // --- THỨ HAI: PHIẾU ĐỀ XUẤT - USER LÀ NGƯỜI DUYỆT (CHỜ DUYỆT) ---
     {
-      id: `mock-psn-task-mon-${mon.format('YYYYMMDD')}`,
-      title: 'Phê duyệt đề tài: Tuyến bài Phóng sự Điều tra Gian lận Thương mại điện tử',
+      id: `psn-task-mon-${mon.format('YYYYMMDD')}`,
+      title: 'Đề xuất tuyến bài điều tra 5 kỳ vạch trần đường dây lừa đảo tuyển dụng xuyên biên giới',
       startAt: mon.hour(17).minute(30).second(0).toISOString(),
       endAt: mon.hour(17).minute(30).second(0).toISOString(),
       deadline: mon.hour(17).minute(30).second(0).toISOString(),
+      createdAt: mon.subtract(1, 'day').hour(14).minute(20).toISOString(),
       location: '',
       type: 'work',
       ticketType: 'TASK',
+      workflowType: 'PROPOSAL',
       scope: 'personal',
-      organizer: 'Lê Văn Tuấn',
+      organizer: 'Lê Văn Tuấn (Trưởng ban Thư ký)',
       leader: 'Lê Văn Tuấn (Trưởng ban Thư ký)',
-      participants: [],
-      participantText: '',
+      participants: ['Nguyễn Minh Anh', 'Lê Văn Tuấn', 'Trần Văn Hùng'],
+      participantText: 'Nguyễn Minh Anh, Lê Văn Tuấn, Trần Văn Hùng',
+      participantCount: 3,
       isUserParticipant: true,
-      executors: [
-        { id: 'user-103', name: 'Nguyễn Hoài Nam', role: 'Phóng viên điều tra' },
-        { id: 'user-104', name: 'Đỗ Quang Huy', role: 'Phóng viên tác nghiệp' },
+      approvalStatus: 'PENDING',
+      approvers: [
+        { id: 'user-001', name: 'Nguyễn Minh Anh', status: 'PENDING' },
       ],
       watchers: [
-        { id: 'user-105', name: 'Lê Thanh Vân' },
+        { id: 'user-105', name: 'Lê Thanh Vân (Phó BBT)' },
+        { id: 'user-106', name: 'Võ Hoàng Nam (Thư ký Tòa soạn)' },
       ],
-      approver: { id: 'user-001', name: 'Nguyễn Minh Anh' },
-      approvalStatus: 'PENDING',
-      steps: [
-        { id: 'step-1', step_order: 1, name: 'Khởi tạo', status: 'DONE', completed_at: mon.subtract(1, 'day').toISOString(), actor_name: 'Lê Văn Tuấn', role: 'CREATOR', note: 'Đã hoàn thiện đề cương điều tra và dự toán tác nghiệp liên tỉnh.' },
-        { id: 'step-2', step_order: 2, name: 'Phê duyệt', status: 'ACTIVE', actor_name: 'Nguyễn Minh Anh', role: 'APPROVER', note: 'Chờ Lãnh đạo Nguyễn Minh Anh xem xét duyệt đề tài.' },
-        { id: 'step-3', step_order: 3, name: 'Triển khai', status: 'PENDING', actor_name: 'Nguyễn Hoài Nam', role: 'EXECUTOR' },
-      ],
-      agenda: 'Đề xuất tuyến bài điều tra 5 kỳ vạch trần các đường dây lừa đảo qua sàn thương mại điện tử xuyên biên giới.',
-      notes: 'Đề xuất tuyến bài điều tra 5 kỳ vạch trần các đường dây lừa đảo qua sàn thương mại điện tử xuyên biên giới.',
+      agenda: 'Đề xuất tuyến bài điều tra 5 kỳ vạch trần đường dây lừa đảo tuyển dụng xuyên biên giới',
+      notes: 'Đề xuất tuyến bài điều tra 5 kỳ vạch trần đường dây lừa đảo tuyển dụng xuyên biên giới',
       isInterested: true,
       attachments: [
         {
@@ -282,46 +297,45 @@ export function getMockPersonalEvents(weekStart: Dayjs): CalendarEvent[] {
         {
           id: 'cmt-task-mon-1',
           author: 'Lê Văn Tuấn',
-          content: 'Kính gửi đ/c Nguyễn Minh Anh xem xét và cho ý kiến phê duyệt đề cương tuyến bài.',
+          content: 'Kính gửi đ/c Nguyễn Minh Anh xem xét và cho ý kiến phê duyệt đề cương tuyến bài điều tra.',
           createdAt: mon.hour(8).minute(30).toISOString(),
         },
       ],
     },
 
-    // Thứ Ba: ROLE CONSULTEE - Nguyễn Minh Anh là Người được tham vấn (Phiếu Đang lấy ý kiến)
+    // --- THỨ BA: PHIẾU ĐỀ XUẤT - USER LÀ NGƯỜI ĐƯỢC LẤY Ý KIẾN (ĐANG LẤY Ý KIẾN) ---
     {
-      id: `mock-psn-task-tue-${tue.format('YYYYMMDD')}`,
-      title: 'Tham vấn chuyên môn: Đề án Đổi mới Quy trình Sản xuất Video Tin tức Đa nền tảng',
+      id: `psn-task-tue-${tue.format('YYYYMMDD')}`,
+      title: 'Tham vấn chuyên môn: Đề án đổi mới quy trình sản xuất video tin tức đa nền tảng cho Tuổi Trẻ',
       startAt: tue.hour(16).minute(0).second(0).toISOString(),
       endAt: tue.hour(16).minute(0).second(0).toISOString(),
       deadline: tue.hour(16).minute(0).second(0).toISOString(),
+      createdAt: tue.subtract(1, 'day').hour(9).minute(15).toISOString(),
       location: '',
       type: 'work',
       ticketType: 'TASK',
+      workflowType: 'PROPOSAL',
       scope: 'personal',
-      organizer: 'Trần Thu Hà',
+      organizer: 'Trần Thu Hà (Phó ban Media)',
       leader: 'Trần Thu Hà (Phó ban Media)',
-      participants: [],
-      participantText: '',
+      participants: ['Trần Thu Hà', 'Nguyễn Hoài Nam', 'Nguyễn Minh Anh'],
+      participantText: 'Trần Thu Hà, Nguyễn Hoài Nam, Nguyễn Minh Anh',
+      participantCount: 3,
       isUserParticipant: true,
-      executors: [
-        { id: 'user-104', name: 'Đỗ Quang Huy', role: 'Kỹ thuật viên dựng hình' },
+      approvalStatus: 'PENDING',
+      consultQuestion: 'Đề nghị đ/c Nguyễn Minh Anh cho ý kiến chuyên môn về hạ tầng streaming video và công cụ dựng clip tin tức ngắn tự động.',
+      consultants: [
+        { id: 'user-001', name: 'Nguyễn Minh Anh', status: 'PENDING' },
+        { id: 'user-103', name: 'Nguyễn Hoài Nam', status: 'COMPLETED', completed_at: tue.subtract(1, 'day').hour(17).toISOString(), reply: 'Đã rà soát định dạng video ngắn, đề xuất triển khai trước trên TikTok.' },
+      ],
+      approvers: [
+        { id: 'user-107', name: 'Đ/c Nguyễn Tấn Đạt (Phó Tổng Biên tập)', status: 'PENDING' },
       ],
       watchers: [
         { id: 'user-105', name: 'Lê Thanh Vân' },
       ],
-      approver: { id: 'user-107', name: 'Đ/c Nguyễn Tấn Đạt (Phó Tổng Biên tập)' },
-      approvalStatus: 'CONSULTING',
-      consultantName: 'Nguyễn Minh Anh',
-      consultQuestion: 'Đề nghị đ/c Nguyễn Minh Anh cho ý kiến chuyên môn về hạ tầng streaming video và công cụ dựng clip tin tức ngắn tự động.',
-      steps: [
-        { id: 'step-1', step_order: 1, name: 'Khởi tạo', status: 'DONE', completed_at: tue.subtract(1, 'day').toISOString(), actor_name: 'Trần Thu Hà', role: 'CREATOR', note: 'Đã lập đề án chuẩn hóa video tin tức cho TikTok & Tuổi Trẻ Online.' },
-        { id: 'step-2', step_order: 2, name: 'Lấy ý kiến tham vấn', status: 'CONSULTING', actor_name: 'Nguyễn Minh Anh', role: 'CONSULTANT', note: 'Đang xin ý kiến tham vấn chuyên môn từ Nguyễn Minh Anh.' },
-        { id: 'step-3', step_order: 3, name: 'Phê duyệt', status: 'PENDING', actor_name: 'Đ/c Nguyễn Tấn Đạt (Phó Tổng Biên tập)', role: 'APPROVER' },
-        { id: 'step-4', step_order: 4, name: 'Triển khai', status: 'PENDING', actor_name: 'Đỗ Quang Huy', role: 'EXECUTOR' },
-      ],
-      agenda: 'Đề xuất quy trình sản xuất video đa nền tảng tối ưu thời lượng và tăng tương tác độc giả trẻ.',
-      notes: 'Đề xuất quy trình sản xuất video đa nền tảng tối ưu thời lượng và tăng tương tác độc giả trẻ.',
+      agenda: 'Tham vấn chuyên môn: Đề án đổi mới quy trình sản xuất video tin tức đa nền tảng cho Tuổi Trẻ',
+      notes: 'Tham vấn chuyên môn: Đề án đổi mới quy trình sản xuất video tin tức đa nền tảng cho Tuổi Trẻ',
       isInterested: true,
       attachments: [
         {
@@ -343,39 +357,103 @@ export function getMockPersonalEvents(weekStart: Dayjs): CalendarEvent[] {
       ],
     },
 
-    // Thứ Tư: ROLE EXECUTOR - Nguyễn Minh Anh là Người triển khai / thực hiện (Phiếu Đang triển khai)
+    // --- THỨ TƯ: PHIẾU ĐỀ XUẤT - ĐÃ DUYỆT (USER LÀ NGƯỜI THEO DÕI) ---
     {
-      id: `mock-psn-task-wed-${wed.format('YYYYMMDD')}`,
-      title: 'Triển khai tuyến bài ảnh: Không gian Kiến trúc Xanh và Đô thị Bền vững TP.HCM',
-      startAt: wed.hour(17).minute(30).second(0).toISOString(),
-      endAt: wed.hour(17).minute(30).second(0).toISOString(),
-      deadline: wed.hour(17).minute(30).second(0).toISOString(),
+      id: `psn-task-wed-appr-${wed.format('YYYYMMDD')}`,
+      title: 'Đề xuất chủ trương tổ chức Tuyến bài kỷ niệm 50 năm Ngày Giải phóng miền Nam trên Báo Tuổi Trẻ',
+      startAt: wed.hour(14).minute(0).second(0).toISOString(),
+      endAt: wed.hour(14).minute(0).second(0).toISOString(),
+      deadline: wed.hour(14).minute(0).second(0).toISOString(),
+      createdAt: wed.subtract(3, 'day').hour(9).minute(0).toISOString(),
       location: '',
       type: 'work',
       ticketType: 'TASK',
+      workflowType: 'PROPOSAL',
       scope: 'personal',
-      organizer: 'Hoàng Điệp',
+      organizer: 'Phạm Hồng Ngọc (Trưởng ban Văn hóa - Nghệ thuật)',
+      leader: 'Phạm Hồng Ngọc',
+      participants: ['Phạm Hồng Ngọc', 'Nguyễn Minh Anh'],
+      participantText: 'Phạm Hồng Ngọc, Nguyễn Minh Anh',
+      participantCount: 2,
+      isUserParticipant: false,
+      isUserWatcher: true,
+      approvalStatus: 'APPROVED',
+      approvers: [
+        {
+          id: 'user-101',
+          name: 'Đ/c Lê Thế Chữ (Tổng Biên tập)',
+          status: 'APPROVED',
+          completed_at: wed.subtract(1, 'day').hour(10).minute(30).toISOString(),
+          note: 'Đồng ý phê duyệt chủ trương. Đề nghị Ban Văn hóa phối hợp chặt chẽ với Ban Thư ký Tòa soạn triển khai đúng tiến độ.',
+        },
+      ],
+      watchers: [
+        { id: 'user-001', name: 'Nguyễn Minh Anh' },
+        { id: 'user-105', name: 'Lê Thanh Vân' },
+      ],
+      agenda: 'Đề xuất chủ trương tổ chức Tuyến bài kỷ niệm 50 năm Ngày Giải phóng miền Nam trên Báo Tuổi Trẻ',
+      notes: 'Đề xuất chủ trương tổ chức Tuyến bài kỷ niệm 50 năm Ngày Giải phóng miền Nam trên Báo Tuổi Trẻ',
+      isInterested: true,
+      attachments: [
+        {
+          id: `att-wed-tuyenbai50nam-${wed.format('YYYYMMDD')}`,
+          name: 'De-an-Tuyen-bai-Ky-niem-50-nam.pdf',
+          size: 640000,
+          type: 'pdf',
+          uploadedAt: wed.subtract(3, 'day').hour(9).minute(15).toISOString(),
+          uploadedBy: 'Phạm Hồng Ngọc',
+        },
+      ],
+      comments: [
+        {
+          id: 'cmt-task-wed-appr-1',
+          author: 'Lê Thế Chữ',
+          content: 'Đã phê duyệt đề án. Chúc ban Văn hóa hoàn thành xuất sắc đợt tuyên truyền trọng điểm.',
+          createdAt: wed.subtract(1, 'day').hour(10).minute(30).toISOString(),
+        },
+      ],
+    },
+
+    // --- THỨ TƯ: PHIẾU TRIỂN KHAI - USER LÀ NGƯỜI THỰC HIỆN (ĐANG THỰC HIỆN) ---
+    {
+      id: `psn-task-wed-${wed.format('YYYYMMDD')}`,
+      title: 'Triển khai tuyến bài ảnh: Không gian kiến trúc xanh và phát triển đô thị bền vững TP.HCM',
+      startAt: wed.hour(17).minute(30).second(0).toISOString(),
+      endAt: wed.hour(17).minute(30).second(0).toISOString(),
+      deadline: wed.hour(17).minute(30).second(0).toISOString(),
+      createdAt: wed.subtract(2, 'day').hour(10).minute(0).toISOString(),
+      location: '',
+      type: 'work',
+      ticketType: 'TASK',
+      workflowType: 'DISPATCH',
+      scope: 'personal',
+      organizer: 'Hoàng Điệp (Trưởng ban Văn hóa)',
       leader: 'Hoàng Điệp',
-      participants: [],
-      participantText: '',
+      participants: ['Nguyễn Minh Anh', 'Đỗ Quang Huy', 'Hoàng Điệp'],
+      participantText: 'Nguyễn Minh Anh, Đỗ Quang Huy, Hoàng Điệp',
+      participantCount: 3,
       isUserParticipant: true,
+      approvalStatus: 'IN_PROGRESS',
       executors: [
-        { id: 'user-001', name: 'Nguyễn Minh Anh', role: 'Phóng viên ảnh chính' },
-        { id: 'user-103', name: 'Nguyễn Hoài Nam', role: 'Phóng viên phối hợp' },
+        { id: 'user-001', name: 'Nguyễn Minh Anh', role: 'Phóng viên ảnh chính', status: 'IN_PROGRESS' },
+        { id: 'user-104', name: 'Đỗ Quang Huy', role: 'Phóng viên phối hợp', status: 'IN_PROGRESS' },
       ],
       watchers: [
         { id: 'user-107', name: 'Trần Xuân Toàn' },
       ],
-      approver: { id: 'user-105', name: 'Lê Thanh Vân (Văn phòng BBT)' },
-      approvalStatus: 'APPROVED',
-      steps: [
-        { id: 'step-1', step_order: 1, name: 'Khởi tạo', status: 'DONE', completed_at: wed.subtract(2, 'day').toISOString(), actor_name: 'Hoàng Điệp', role: 'CREATOR' },
-        { id: 'step-2', step_order: 2, name: 'Phê duyệt', status: 'APPROVED', completed_at: wed.subtract(1, 'day').toISOString(), actor_name: 'Lê Thanh Vân (Văn phòng BBT)', role: 'APPROVER', note: 'Đồng ý chủ trương và cấp phương tiện tác nghiệp flycam.' },
-        { id: 'step-3', step_order: 3, name: 'Triển khai', status: 'ACTIVE', actor_name: 'Nguyễn Minh Anh', role: 'EXECUTOR', note: 'Đang tiến hành chụp thực địa tại khu đô thị Thủ Thiêm và bến Bạch Đằng.' },
-      ],
-      agenda: 'Thực hiện phóng sự ảnh flycam và visual story về các mảng xanh kiến trúc mới tại TP.HCM.',
-      notes: 'Thực hiện phóng sự ảnh flycam và visual story về các mảng xanh kiến trúc mới tại TP.HCM.',
+      agenda: 'Triển khai tuyến bài ảnh: Không gian kiến trúc xanh và phát triển đô thị bền vững TP.HCM',
+      notes: 'Triển khai tuyến bài ảnh: Không gian kiến trúc xanh và phát triển đô thị bền vững TP.HCM',
       isInterested: false,
+      attachments: [
+        {
+          id: `att-wed-huongdan-${wed.format('YYYYMMDD')}`,
+          name: 'Ke-hoach-tuyen-bai-anh-khong-gian-xanh.pdf',
+          size: 320000,
+          type: 'pdf',
+          uploadedAt: wed.subtract(1, 'day').hour(14).toISOString(),
+          uploadedBy: 'Hoàng Điệp',
+        },
+      ],
       comments: [
         {
           id: 'cmt-task-wed-1',
@@ -386,12 +464,13 @@ export function getMockPersonalEvents(weekStart: Dayjs): CalendarEvent[] {
       ],
     },
 
-    // Thứ Năm: ROLE CREATOR - Nguyễn Minh Anh là Người tạo lịch họp / chủ trì (Lịch họp cá nhân)
+    // --- THỨ NĂM: LỊCH HỌP CÁ NHÂN - USER LÀ NGƯỜI TẠO & CHỦ TRÌ ---
     {
-      id: `mock-psn-meet-thu-${thu.format('YYYYMMDD')}`,
+      id: `psn-meet-thu-${thu.format('YYYYMMDD')}`,
       title: 'Họp chuyên đề: Đổi mới Format Chương trình Media Trực tuyến Báo Tuổi Trẻ',
       startAt: thu.hour(10).minute(0).second(0).toISOString(),
       endAt: thu.hour(11).minute(30).second(0).toISOString(),
+      createdAt: thu.subtract(2, 'day').hour(8).minute(30).toISOString(),
       location: 'Phòng họp Kỹ thuật (Phòng 302)',
       meetingUrl: 'https://meeting.tuoitre.vn/media-format-2026',
       platform: 'meeting.tuoitre.vn',
@@ -407,8 +486,9 @@ export function getMockPersonalEvents(weekStart: Dayjs): CalendarEvent[] {
       watchers: [
         { id: 'user-107', name: 'Trần Xuân Toàn' },
       ],
-      approvalStatus: 'APPROVED',
-      agenda: 'Rà soát format trường quay podcast và kịch bản tương tác trực tiếp với bạn đọc trên các nền tảng số.',
+      approvalStatus: 'SCHEDULED',
+      agenda: 'Họp chuyên đề: Đổi mới Format Chương trình Media Trực tuyến Báo Tuổi Trẻ',
+      notes: 'Họp chuyên đề: Đổi mới Format Chương trình Media Trực tuyến Báo Tuổi Trẻ',
       attachments: [
         {
           id: `att-thu-khao-sat-${thu.format('YYYYMMDD')}`,
@@ -429,40 +509,134 @@ export function getMockPersonalEvents(weekStart: Dayjs): CalendarEvent[] {
       ],
     },
 
-    // Thứ Sáu: ROLE WATCHER - Nguyễn Minh Anh là Người theo dõi phiếu (Phiếu do phòng khác chủ trì)
+    // --- THỨ NĂM: PHIẾU ĐỀ XUẤT - KHÔNG DUYỆT (USER LÀ NGƯỜI THEO DÕI) ---
     {
-      id: `mock-psn-task-fri-${fri.format('YYYYMMDD')}`,
-      title: 'Kế hoạch Nâng cấp Hệ thống Máy chủ và Diễn tập An toàn Thông tin CMS Tòa soạn',
-      startAt: fri.hour(17).minute(0).second(0).toISOString(),
-      endAt: fri.hour(17).minute(0).second(0).toISOString(),
-      deadline: fri.hour(17).minute(0).second(0).toISOString(),
+      id: `psn-task-thu-rejc-${thu.format('YYYYMMDD')}`,
+      title: 'Đề xuất kinh phí thuê bao bổ sung gói tài khoản AI tạo hình và biên dịch tin tức quốc tế tự động năm 2026',
+      startAt: thu.hour(16).minute(30).second(0).toISOString(),
+      endAt: thu.hour(16).minute(30).second(0).toISOString(),
+      deadline: thu.hour(16).minute(30).second(0).toISOString(),
+      createdAt: thu.subtract(2, 'day').hour(11).minute(0).toISOString(),
       location: '',
       type: 'work',
       ticketType: 'TASK',
+      workflowType: 'PROPOSAL',
       scope: 'personal',
-      organizer: 'Võ Hoàng Nam',
-      leader: 'Võ Hoàng Nam (Trưởng phòng Kỹ thuật)',
-      participants: [],
-      participantText: '',
+      organizer: 'Trần Thu Hà (Phó ban Media)',
+      leader: 'Trần Thu Hà',
+      participants: ['Trần Thu Hà', 'Nguyễn Minh Anh'],
+      participantText: 'Trần Thu Hà, Nguyễn Minh Anh',
+      participantCount: 2,
       isUserParticipant: false,
       isUserWatcher: true,
-      executors: [
-        { id: 'user-106', name: 'Phan Nghệ Đô', role: 'Kỹ sư an toàn mạng' },
-        { id: 'user-108', name: 'Lê Văn Tuấn', role: 'Kỹ thuật viên hệ thống' },
+      approvalStatus: 'REJECTED',
+      approvers: [
+        {
+          id: 'user-102',
+          name: 'Đ/c Đinh Minh Trung (Phó Tổng Biên tập)',
+          status: 'REJECTED',
+          completed_at: thu.hour(11).minute(0).toISOString(),
+          note: 'Kinh phí đề xuất chưa nằm trong danh mục dự toán Quý IV. Yêu cầu Ban Media tận dụng hạ tầng AI dùng chung của Khối Báo điện tử.',
+        },
       ],
       watchers: [
         { id: 'user-001', name: 'Nguyễn Minh Anh' },
         { id: 'user-105', name: 'Lê Thanh Vân' },
       ],
-      approver: { id: 'user-109', name: 'Đ/c Trần Xuân Toàn (Phó Tổng Biên tập)' },
-      approvalStatus: 'APPROVED',
-      steps: [
-        { id: 'step-1', step_order: 1, name: 'Khởi tạo', status: 'DONE', completed_at: fri.subtract(2, 'day').toISOString(), actor_name: 'Võ Hoàng Nam', role: 'CREATOR' },
-        { id: 'step-2', step_order: 2, name: 'Phê duyệt', status: 'APPROVED', completed_at: fri.subtract(1, 'day').toISOString(), actor_name: 'Trần Xuân Toàn (Phó Tổng Biên tập)', role: 'APPROVER' },
-        { id: 'step-3', step_order: 3, name: 'Triển khai', status: 'ACTIVE', actor_name: 'Phan Nghệ Đô', role: 'EXECUTOR', note: 'Đang cấu hình cụm máy chủ dự phòng và kịch bản chống tấn công DDoS.' },
+      agenda: 'Đề xuất kinh phí thuê bao bổ sung gói tài khoản AI tạo hình và biên dịch tin tức quốc tế tự động năm 2026',
+      notes: 'Đề xuất kinh phí thuê bao bổ sung gói tài khoản AI tạo hình và biên dịch tin tức quốc tế tự động năm 2026',
+      isInterested: false,
+      attachments: [
+        {
+          id: `att-thu-kinhphi-ai-${thu.format('YYYYMMDD')}`,
+          name: 'To-trinh-Kinh-phi-AI-Tools-2026.docx',
+          size: 285000,
+          type: 'docx',
+          uploadedAt: thu.subtract(2, 'day').hour(11).minute(15).toISOString(),
+          uploadedBy: 'Trần Thu Hà',
+        },
       ],
-      agenda: 'Diễn tập quy trình ứng cứu sự cố gián đoạn dịch vụ báo điện tử trong khung giờ cao điểm phát hành bản tin nóng.',
-      notes: 'Diễn tập quy trình ứng cứu sự cố gián đoạn dịch vụ báo điện tử trong khung giờ cao điểm phát hành bản tin nóng.',
+      comments: [
+        {
+          id: 'cmt-task-thu-rejc-1',
+          author: 'Đinh Minh Trung',
+          content: 'Đã trao đổi với đồng chí Hà về phương án sử dụng API dùng chung, tạm thời không phê duyệt gói riêng này.',
+          createdAt: thu.hour(11).minute(0).toISOString(),
+        },
+      ],
+    },
+
+    // --- THỨ SÁU: PHIẾU TRIỂN KHAI - USER ĐÃ HOÀN THÀNH (HOÀN THÀNH) ---
+    {
+      id: `psn-task-fri-done-${fri.format('YYYYMMDD')}`,
+      title: 'Quyết toán chi phí tác nghiệp hiện trường và nghiệm thu loạt bài điều tra Quý III',
+      startAt: fri.hour(15).minute(30).second(0).toISOString(),
+      endAt: fri.hour(15).minute(30).second(0).toISOString(),
+      deadline: fri.hour(15).minute(30).second(0).toISOString(),
+      createdAt: fri.subtract(3, 'day').hour(9).minute(0).toISOString(),
+      location: '',
+      type: 'work',
+      ticketType: 'TASK',
+      workflowType: 'DISPATCH',
+      scope: 'personal',
+      organizer: 'Nguyễn Minh Anh',
+      leader: 'Trần Thị Bích (Kế toán)',
+      participants: ['Nguyễn Minh Anh', 'Trần Thị Bích (Kế toán)'],
+      participantText: 'Nguyễn Minh Anh, Trần Thị Bích',
+      participantCount: 2,
+      isUserParticipant: true,
+      approvalStatus: 'COMPLETED',
+      executors: [
+        { id: 'user-001', name: 'Nguyễn Minh Anh', role: 'Cán bộ lập báo cáo', status: 'COMPLETED', completed_at: fri.hour(15).minute(0).toISOString() },
+      ],
+      watchers: [
+        { id: 'user-105', name: 'Lê Thanh Vân' },
+      ],
+      agenda: 'Quyết toán chi phí tác nghiệp hiện trường và nghiệm thu loạt bài điều tra Quý III',
+      notes: 'Quyết toán chi phí tác nghiệp hiện trường và nghiệm thu loạt bài điều tra Quý III',
+      attachments: [
+        {
+          id: `att-fri-quyet-toan-${fri.format('YYYYMMDD')}`,
+          name: 'Bang-quyet-toan-chi-phi-tac-nghiep-Q3.xlsx',
+          size: 198000,
+          type: 'xlsx',
+          uploadedAt: fri.hour(14).minute(30).toISOString(),
+          uploadedBy: 'Nguyễn Minh Anh',
+        },
+      ],
+    },
+
+    // --- THỨ SÁU: PHIẾU TRIỂN KHAI - USER LÀ NGƯỜI THEO DÕI ---
+    {
+      id: `psn-task-fri-watch-${fri.format('YYYYMMDD')}`,
+      title: 'Kế hoạch nâng cấp hạ tầng máy chủ và diễn tập an toàn thông tin CMS Tòa soạn',
+      startAt: fri.hour(17).minute(0).second(0).toISOString(),
+      endAt: fri.hour(17).minute(0).second(0).toISOString(),
+      deadline: fri.hour(17).minute(0).second(0).toISOString(),
+      createdAt: fri.subtract(2, 'day').hour(13).minute(45).toISOString(),
+      location: '',
+      type: 'work',
+      ticketType: 'TASK',
+      workflowType: 'DISPATCH',
+      scope: 'personal',
+      organizer: 'Võ Hoàng Nam (Trưởng phòng Kỹ thuật)',
+      leader: 'Võ Hoàng Nam (Trưởng phòng Kỹ thuật)',
+      participants: ['Phan Nghệ Đô', 'Lê Văn Tuấn', 'Võ Hoàng Nam'],
+      participantText: 'Phan Nghệ Đô, Lê Văn Tuấn, Võ Hoàng Nam',
+      participantCount: 3,
+      isUserParticipant: false,
+      isUserWatcher: true,
+      approvalStatus: 'IN_PROGRESS',
+      executors: [
+        { id: 'user-106', name: 'Phan Nghệ Đô', role: 'Kỹ sư an toàn mạng', status: 'IN_PROGRESS' },
+        { id: 'user-108', name: 'Lê Văn Tuấn', role: 'Kỹ thuật viên hệ thống', status: 'IN_PROGRESS' },
+      ],
+      watchers: [
+        { id: 'user-001', name: 'Nguyễn Minh Anh' },
+        { id: 'user-105', name: 'Lê Thanh Vân' },
+      ],
+      agenda: 'Kế hoạch nâng cấp hạ tầng máy chủ và diễn tập an toàn thông tin CMS Tòa soạn',
+      notes: 'Kế hoạch nâng cấp hạ tầng máy chủ và diễn tập an toàn thông tin CMS Tòa soạn',
       isInterested: false,
       comments: [
         {
@@ -474,12 +648,13 @@ export function getMockPersonalEvents(weekStart: Dayjs): CalendarEvent[] {
       ],
     },
 
-    // Thứ Bảy: Họp Ban Thư ký Tòa soạn & Trực ca báo cuối tuần
+    // --- THỨ BẢY: LỊCH HỌP CÁ NHÂN - USER THAM GIA ---
     {
-      id: `mock-psn-meet-sat-${sat.format('YYYYMMDD')}`,
+      id: `psn-meet-sat-${sat.format('YYYYMMDD')}`,
       title: 'Họp Ban Thư ký Tòa soạn & Trực ca báo cuối tuần',
       startAt: sat.hour(9).minute(0).second(0).toISOString(),
       endAt: sat.hour(11).minute(0).second(0).toISOString(),
+      createdAt: sat.subtract(2, 'day').hour(16).toISOString(),
       location: 'Phòng họp Thư ký Tòa soạn',
       type: 'meeting',
       ticketType: 'MEETING',
@@ -490,27 +665,27 @@ export function getMockPersonalEvents(weekStart: Dayjs): CalendarEvent[] {
       participantText: 'Nguyễn Minh Anh, Hoàng Điệp, Phạm Hồng Ngọc',
       participants: ['Nguyễn Minh Anh', 'Hoàng Điệp', 'Phạm Hồng Ngọc'],
       isUserParticipant: true,
-      agenda: 'Rà soát quy trình xuất bản các ấn phẩm phụ san và bản tin đặc biệt ngày Chủ nhật.',
+      approvalStatus: 'SCHEDULED',
+      agenda: 'Họp Ban Thư ký Tòa soạn & Trực ca báo cuối tuần',
+      notes: 'Họp Ban Thư ký Tòa soạn & Trực ca báo cuối tuần',
     },
   ];
 }
 
 /**
  * Lấy danh sách sự kiện cho tuần đang xem.
- * Nếu tuần đó đã có dữ liệu từ database/fixtures (ví dụ tuần 41), bổ sung các sự kiện Task/Event còn thiếu.
- * Nếu tuần đó chưa có dữ liệu (ví dụ tuần hiện tại hoặc các tuần khác), tự động sinh đầy đủ dữ liệu mẫu cho tuần đó.
+ * Đảm bảo 100% dữ liệu mới, chuẩn hóa và loại bỏ các id trùng lặp.
  */
 export function getEventsForWeek(weekStart: Dayjs, existingEvents: CalendarEvent[] = []): CalendarEvent[] {
   const startStr = weekStart.startOf('isoWeek').format('YYYY-MM-DD');
   const endStr = weekStart.endOf('isoWeek').format('YYYY-MM-DD');
 
-  // Lọc sự kiện hiện có rơi vào tuần này (bao gồm fixtures và sự kiện do người dùng tạo/sửa)
+  // Lọc sự kiện hiện có rơi vào tuần này
   const weekExisting = existingEvents.filter((ev) => {
     const d = dayjs(ev.startAt).format('YYYY-MM-DD');
     return d >= startStr && d <= endStr;
   });
 
-  // Đảm bảo các sự kiện hiện có đều có ticketType chuẩn
   const enrichedExisting = weekExisting.map((ev) => ({
     ...ev,
     ticketType: ev.ticketType || (ev.type === 'meeting' ? 'MEETING' : 'TASK'),

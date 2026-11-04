@@ -1,43 +1,50 @@
 /* ==========================================================================
    DayScheduleDrawer.css - Drawer danh sách lịch theo ngày (Tuổi Trẻ ERP)
-   Tuân thủ Anti-AI UI: Flat surfaces, không border-left, spacing & typography chuẩn
+   Tuân thủ Anti-AI UI: Flat surfaces, không border-left, typography & spacing chuẩn
    ========================================================================== */
 
+/* Ant Design Drawer Root & Reset */
 .day-schedule-drawer .ant-drawer-header {
-  display: none;
+  display: none !important;
 }
 
 .day-schedule-drawer .ant-drawer-body {
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  background: #ffffff;
+  padding: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100% !important;
+  overflow: hidden !important;
+  background: #ffffff !important;
 }
 
 .day-schedule-wrapper {
-  padding: 20px 24px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  min-height: 100%;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
   box-sizing: border-box;
+  background: #ffffff;
 }
 
 /* --- 1. HEADER NGÀY & ĐIỀU HƯỚNG --- */
 .day-schedule-simple-header {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding-bottom: 16px;
+  padding: 16px 20px;
+  background: #ffffff;
   border-bottom: 1px solid #e4e7ec;
+  flex-shrink: 0;
+  box-sizing: border-box;
 }
 
 .day-schedule-title-area {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 3px;
+  min-width: 0;
 }
 
 .day-schedule-heading-row {
@@ -49,9 +56,9 @@
 
 .day-heading-text {
   margin: 0;
-  font-size: 16.5px;
+  font-size: 16px;
   font-weight: 700;
-  color: #1d2939;
+  color: #0f172a;
   line-height: 1.3;
 }
 
@@ -65,35 +72,38 @@
   display: inline-flex !important;
   align-items: center;
   justify-content: center;
-  width: 24px !important;
-  height: 24px !important;
-  min-width: 24px !important;
+  width: 26px !important;
+  height: 26px !important;
+  min-width: 26px !important;
   padding: 0 !important;
-  border-radius: 6px;
-  color: #667085 !important;
+  border-radius: 6px !important;
+  color: #64748b !important;
+  border: 1px solid transparent !important;
+  transition: all 0.15s ease !important;
 }
 
 .day-nav-btn:hover {
-  background: #f2f4f7 !important;
-  color: #1d2939 !important;
+  background: #f1f5f9 !important;
+  color: #0f172a !important;
+  border-color: #e2e8f0 !important;
 }
 
 .tag-today-pill {
   margin: 0 !important;
   border-radius: 999px !important;
-  font-weight: 600;
+  font-weight: 600 !important;
   font-size: 11px !important;
   padding: 0 8px !important;
   height: 20px !important;
   line-height: 18px !important;
-  background: #eff8ff !important;
-  border-color: #b2ddff !important;
-  color: #175cd3 !important;
+  background: #eff6ff !important;
+  border-color: #bfdbfe !important;
+  color: #1d4ed8 !important;
 }
 
 .day-subtitle-count {
-  font-size: 13px;
-  color: #667085;
+  font-size: 12.5px;
+  color: #64748b;
   font-weight: 500;
 }
 
@@ -101,21 +111,23 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  flex-shrink: 0;
 }
 
 .btn-create-day-meeting-compact {
   display: inline-flex !important;
   align-items: center;
   gap: 6px;
-  height: 34px !important;
-  padding: 0 14px !important;
-  font-size: 13px !important;
+  height: 32px !important;
+  padding: 0 12px !important;
+  font-size: 12.5px !important;
   font-weight: 600 !important;
   border-radius: 8px !important;
   background: #d92d20 !important;
   border-color: #d92d20 !important;
   color: #ffffff !important;
   box-shadow: 0 1px 2px rgba(16, 24, 40, 0.05);
+  transition: all 0.15s ease;
 }
 
 .btn-create-day-meeting-compact:hover {
@@ -127,48 +139,60 @@
   display: inline-flex !important;
   align-items: center;
   justify-content: center;
-  width: 34px !important;
-  height: 34px !important;
-  min-width: 34px !important;
+  width: 32px !important;
+  height: 32px !important;
+  min-width: 32px !important;
   padding: 0 !important;
   border-radius: 8px !important;
-  border: 1px solid #e4e7ec !important;
-  color: #667085 !important;
+  border: 1px solid #e2e8f0 !important;
+  color: #64748b !important;
   background: #ffffff !important;
+  transition: all 0.15s ease !important;
 }
 
 .day-drawer-close-btn:hover {
-  background: #f2f4f7 !important;
-  color: #1d2939 !important;
+  background: #f1f5f9 !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
 }
 
-/* --- 2. BANNER TRỰC BAN & CA TRỰC --- */
+/* --- 2. VÙNG CUỘN NỘI DUNG --- */
+.day-schedule-scroll-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-sizing: border-box;
+}
+
+/* --- 3. BANNER TRỰC BAN & CA TRỰC --- */
 .day-schedule-duty-banner {
-  background: #f9fafb;
-  border: 1px solid #e4e7ec;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
   border-radius: 10px;
-  padding: 12px 14px;
+  padding: 11px 14px;
 }
 
 .duty-banner-header {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 6px;
 }
 
 .duty-banner-icon {
-  color: #475467;
+  color: #475569;
   flex-shrink: 0;
 }
 
 .duty-banner-inline-leader {
   font-size: 13px;
-  color: #1d2939;
+  color: #0f172a;
 }
 
 .duty-banner-inline-leader strong {
-  color: #475467;
+  color: #475569;
   font-weight: 600;
   margin-right: 4px;
 }
@@ -176,9 +200,10 @@
 .duty-banner-shifts-list {
   display: flex;
   flex-direction: column;
-  gap: 5px;
-  padding-top: 6px;
-  border-top: 1px dashed #e4e7ec;
+  gap: 4px;
+  padding-top: 8px;
+  margin-top: 8px;
+  border-top: 1px dashed #e2e8f0;
 }
 
 .duty-banner-shift-row {
@@ -191,7 +216,7 @@
 
 .shift-badge-text {
   font-weight: 600;
-  color: #344054;
+  color: #334155;
   flex-shrink: 0;
 }
 
@@ -200,27 +225,27 @@
   align-items: center;
   gap: 6px;
   flex-wrap: wrap;
-  color: #475467;
+  color: #475569;
 }
 
 .sub-lbl {
   font-weight: 600;
-  color: #344054;
+  color: #334155;
 }
 
 .shift-dot {
-  color: #98a2b3;
+  color: #94a3b8;
 }
 
-/* --- 3. DANH SÁCH SỰ KIỆN TRONG NGÀY --- */
+/* --- 4. DANH SÁCH SỰ KIỆN TRONG NGÀY --- */
 .day-schedule-events-container {
-  flex: 1;
   display: flex;
   flex-direction: column;
+  gap: 10px;
 }
 
 .day-schedule-empty {
-  padding: 40px 0;
+  padding: 48px 0;
   text-align: center;
 }
 
@@ -232,84 +257,116 @@
 
 /* Card sự kiện: phẳng, không dùng border-left trang trí */
 .day-event-card {
-  display: flex;
+  display: flex !important;
+  flex-direction: row !important;
   gap: 14px;
   padding: 12px 14px;
-  background: #ffffff;
-  border: 1px solid #e4e7ec;
   border-radius: 10px;
   cursor: pointer;
   transition: all 0.15s ease;
   position: relative;
+  box-sizing: border-box;
 }
 
-.day-event-card:hover {
-  background: #f9fafb;
-  border-color: #d0d5dd;
-  box-shadow: 0 2px 8px rgba(16, 24, 40, 0.04);
+/* Theme màu thẻ: Không border-left, dùng background và border nhẹ nhàng */
+.day-event-card.theme-red {
+  background: #fffafa;
+  border: 1px solid #fecaca;
+}
+
+.day-event-card.theme-red:hover {
+  background: #fef2f2;
+  border-color: #fca5a5;
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.06);
+}
+
+.day-event-card.theme-blue {
+  background: #fbfdff;
+  border: 1px solid #dbeafe;
+}
+
+.day-event-card.theme-blue:hover {
+  background: #f0f7ff;
+  border-color: #bfdbfe;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.06);
+}
+
+.day-event-card.theme-gray {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+}
+
+.day-event-card.theme-gray:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
 }
 
 /* Cột mốc thời gian */
 .day-event-time-col {
-  display: flex;
-  flex-direction: column;
+  display: flex !important;
+  flex-direction: column !important;
   align-items: center;
   justify-content: flex-start;
-  min-width: 60px;
+  min-width: 62px;
   flex-shrink: 0;
   padding-right: 12px;
-  border-right: 1px solid #f2f4f7;
+  border-right: 1px solid #f1f5f9;
   text-align: center;
+  box-sizing: border-box;
 }
 
 .event-start-time {
+  display: block !important;
   font-size: 14px;
   font-weight: 700;
-  color: #1d2939;
+  color: #0f172a;
   line-height: 1.2;
 }
 
 .event-end-time {
+  display: block !important;
   font-size: 12px;
   font-weight: 500;
-  color: #667085;
+  color: #64748b;
   line-height: 1.2;
   margin-top: 2px;
 }
 
 .event-duration-tag {
-  display: inline-block;
+  display: inline-block !important;
   margin-top: 6px;
   padding: 1px 6px;
   border-radius: 4px;
   font-size: 11px;
   font-weight: 600;
-  background: #f2f4f7;
-  color: #475467;
+  background: #f1f5f9;
+  color: #475569;
   white-space: nowrap;
 }
 
 /* Cột nội dung chi tiết */
 .day-event-content-col {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 5px;
   flex: 1;
   min-width: 0;
+  box-sizing: border-box;
 }
 
 .day-event-tags-row {
-  display: flex;
+  display: flex !important;
   align-items: center;
   gap: 6px;
   flex-wrap: wrap;
-  margin-bottom: 2px;
+  margin-bottom: 1px;
 }
 
 .event-badge-attending-red {
-  background: #fef3f2 !important;
-  border: 1px solid #fee4e2 !important;
-  color: #d92d20 !important;
+  background: #fef2f2 !important;
+  border: 1px solid #fecaca !important;
+  color: #b91c1c !important;
   font-size: 11px !important;
   font-weight: 600 !important;
   border-radius: 4px !important;
@@ -320,9 +377,9 @@
 }
 
 .event-scope-badge.scope-blue {
-  background: #eff8ff !important;
-  border: 1px solid #b2ddff !important;
-  color: #175cd3 !important;
+  background: #eff6ff !important;
+  border: 1px solid #bfdbfe !important;
+  color: #1d4ed8 !important;
   font-size: 11px !important;
   font-weight: 600 !important;
   border-radius: 4px !important;
@@ -333,6 +390,9 @@
 }
 
 .event-badge-adjusted {
+  background: #fffbeb !important;
+  border: 1px solid #fde68a !important;
+  color: #b45309 !important;
   font-size: 11px !important;
   font-weight: 600 !important;
   border-radius: 4px !important;
@@ -346,61 +406,65 @@
   margin: 0;
   font-size: 13.5px;
   font-weight: 600;
-  color: #1d2939;
+  color: #0f172a;
   line-height: 1.4;
   word-break: break-word;
 }
 
 .day-event-meta-list {
-  display: flex;
-  flex-direction: column;
+  display: flex !important;
+  flex-direction: column !important;
   gap: 4px;
   margin-top: 2px;
 }
 
 .day-event-meta-item {
-  display: flex;
+  display: flex !important;
   align-items: center;
   gap: 6px;
-  font-size: 12.5px;
-  color: #475467;
-  line-height: 1.3;
+  font-size: 12px;
+  color: #475569;
+  line-height: 1.35;
 }
 
 .day-event-meta-item svg {
   flex-shrink: 0;
-  color: #667085;
+  color: #64748b;
 }
 
 .day-event-meta-item.is-online {
-  color: #175cd3;
+  color: #1d4ed8;
   font-weight: 500;
+}
+
+.day-event-meta-item.is-online svg {
+  color: #2563eb;
 }
 
 .day-event-meta-item.is-participants .participants-text-line {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 320px;
-  color: #475467;
+  max-width: 330px;
+  color: #475569;
 }
 
 .day-event-meta-counts {
-  display: flex;
+  display: flex !important;
   align-items: center;
-  gap: 8px;
-  margin-top: 4px;
+  gap: 6px;
+  margin-top: 3px;
 }
 
 .meta-count-chip {
-  display: inline-flex;
+  display: inline-flex !important;
   align-items: center;
   gap: 4px;
-  font-size: 11.5px;
+  font-size: 11px;
   font-weight: 500;
-  color: #667085;
-  background: #f9fafb;
+  color: #64748b;
+  background: #f8fafc;
   padding: 2px 7px;
   border-radius: 4px;
-  border: 1px solid #f2f4f7;
+  border: 1px solid #e2e8f0;
 }
