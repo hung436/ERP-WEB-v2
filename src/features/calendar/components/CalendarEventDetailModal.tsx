@@ -4,6 +4,7 @@ import {
   Drawer,
   Input,
   Modal,
+  Popconfirm,
   Select,
   Tag,
   Tooltip,
@@ -17,7 +18,9 @@ import {
   CheckCircle,
   ChevronDown,
   ChevronUp,
+  Copy,
   Download,
+  Edit3,
   ExternalLink,
   FileText,
   LogOut,
@@ -26,6 +29,8 @@ import {
   Paperclip,
   Plus,
   Send,
+  Star,
+  Trash2,
   User,
   Users,
   Video,
@@ -55,6 +60,22 @@ const CONSULT_CANDIDATE_OPTIONS = [
   { value: 'Trần Thị Bích (Kế toán trưởng)', label: 'Trần Thị Bích (Kế toán trưởng)' },
 ];
 
+
+function highlightCurrentUserName(text: string, currentUserName = 'Nguyễn Minh Anh') {
+  if (!text) return 'Chưa cập nhật';
+  const regex = new RegExp(`(${currentUserName})`, 'gi');
+  const parts = text.split(regex);
+  return parts.map((part, idx) => {
+    if (part.toLowerCase() === currentUserName.toLowerCase()) {
+      return (
+        <span key={idx} style={{ fontWeight: 700, color: '#0f172a' }}>
+          {part}
+        </span>
+      );
+    }
+    return <span key={idx}>{part}</span>;
+  });
+}
 
 export interface CalendarEventDetailModalProps {
   event: CalendarEvent | null;
@@ -97,6 +118,7 @@ export function CalendarEventDetailModal({
   const [cardCollapsed, setCardCollapsed] = useState(false);
   const [followerModalOpen, setFollowerModalOpen] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   // State cho các popup action theo từng Role
   const [approveModalOpen, setApproveModalOpen] = useState(false);
@@ -298,7 +320,10 @@ export function CalendarEventDetailModal({
   if (!event) return null;
 
   const isTask = event.ticketType === 'TASK' || (!event.ticketType && event.type === 'task');
-  const isMeeting = !isTask && (event.ticketType === 'MEETING' || event.type === 'meeting');
+  const isMeeting = !isTask && (event.ticketType === 'MEETING' || event.type === 'meeting' || event.scope === 'editorial');
+  const isPersonal = event.scope === 'personal';
+  const isEditorial = event.scope === 'editorial';
+  const isUserAttending = Boolean(event.isUserParticipant);
 
   const rawCreator = event.leader || event.organizer || currentUser;
   const creatorName = rawCreator === 'Bùi Lê Thế Kiệt' ? currentUser : rawCreator;
@@ -451,6 +476,46 @@ export function CalendarEventDetailModal({
       cancelText: 'Hủy',
       onOk: () => handleLeaveTicket(),
     });
+  };
+
+  const handleToggleInterest = () => {
+    if (!event) return;
+    const nextState = !event.isInterested;
+    onUpdateEvent({ ...event, isInterested: nextState });
+    if (nextState) {
+      message.success(`Đã quan tâm: "${event.title}". Bạn sẽ được nhắc nhở trước 15 phút!`);
+    } else {
+      message.info(`Đã hủy nhắc nhở lịch "${event.title}".`);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!event) return;
+    try {
+      setDeleting(true);
+      await calendarApi.delete(event.id);
+      message.success(`Đã xóa lịch làm việc "${event.title}" thành công!`);
+      onDeleteEvent?.(event.id);
+      onClose();
+    } catch {
+      message.error('Không thể xóa lịch làm việc. Vui lòng thử lại.');
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  const handleOpenEditModal = () => {
+    setEditContent(event.title || rawDesc);
+    setEditLocation(event.location || '');
+    setEditMeetingLink(event.meetingUrl || '');
+    setEditDateTime(dayjs(event.startAt || event.deadline));
+    setEditModalOpen(true);
+  };
+
+  const handleCopyMeetingLink = () => {
+    if (!event?.meetingUrl) return;
+    navigator.clipboard.writeText(event.meetingUrl);
+    message.success('Đã sao chép liên kết phòng họp!');
   };
 
 
@@ -854,11 +919,86 @@ export function CalendarEventDetailModal({
               <h2 className="jt-document-drawer__title-text">
                 {isMeeting ? 'Chi tiết lịch họp' : 'Chi tiết phiếu'}
               </h2>
-              <span className={`booking-week-status-badge booking-week-status-${approvalMeta.tone}`}>
-                {statusInfo.label}
-              </span>
+              {event.isAdjusted && (
+                <Tag bordered={false} color="warning" style={{ fontSize: 12, padding: '2px 8px', fontWeight: 600 }}>
+                  Đã điều chỉnh
+                </Tag>
+              )}
+              {isEditorial ? (
+                <Tag color="error" style={{ fontSize: 12, padding: '2px 8px' }}>
+                  Lịch Ban biên tập
+                </Tag>
+              ) : isPersonal ? (
+                <Tag color="blue" style={{ fontSize: 12, padding: '2px 8px' }}>
+                  Lịch cá nhân
+                </Tag>
+              ) : null}
+              {isEditorial && isUserAttending && (
+                <Tag color="error" style={{ fontSize: 12, padding: '2px 8px', fontWeight: 600 }}>
+                  Bạn tham gia
+                </Tag>
+              )}
+              {isTask && (
+                <span className={`booking-week-status-badge booking-week-status-${approvalMeta.tone}`}>
+                  {statusInfo.label}
+                </span>
+              )}
             </div>
             <div className="jt-document-drawer__header-actions">
+              {/* Lịch cá nhân: Cho phép Chỉnh sửa và Xóa */}
+              {isPersonal && (
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                  <Button
+                    icon={<Edit3 size={14} />}
+                    onClick={handleOpenEditModal}
+                    size="small"
+                  >
+                    Chỉnh sửa
+                  </Button>
+                  <Popconfirm
+                    cancelText="Hủy"
+                    description="Bạn có chắc chắn muốn xóa lịch làm việc cá nhân này không?"
+                    okButtonProps={{ danger: true }}
+                    okText="Xóa"
+                    onConfirm={handleDelete}
+                    placement="bottomRight"
+                    title="Xóa lịch làm việc"
+                  >
+                    <Button
+                      danger
+                      icon={<Trash2 size={14} />}
+                      loading={deleting}
+                      size="small"
+                    >
+                      Xóa
+                    </Button>
+                  </Popconfirm>
+                </div>
+              )}
+
+              {/* Lịch Ban biên tập: Cho phép toggle Quan tâm / Bỏ quan tâm */}
+              {isEditorial && (
+                <Button
+                  aria-label={event.isInterested ? 'Bỏ quan tâm' : 'Quan tâm lịch họp'}
+                  icon={
+                    <Star
+                      color={event.isInterested ? '#d97706' : '#64748b'}
+                      fill={event.isInterested ? '#f59e0b' : 'none'}
+                      size={14}
+                    />
+                  }
+                  onClick={handleToggleInterest}
+                  size="small"
+                  style={
+                    event.isInterested
+                      ? { borderColor: '#fcd34d', background: '#fffbeb', color: '#b45309' }
+                      : undefined
+                  }
+                >
+                  {event.isInterested ? 'Đang quan tâm' : 'Quan tâm'}
+                </Button>
+              )}
+
               {/* 1. Bật / Tắt thông báo dạng Icon button kèm Tooltip */}
               <Tooltip title={isMuted ? 'Bật thông báo' : 'Tắt thông báo'}>
                 <Button
@@ -872,17 +1012,19 @@ export function CalendarEventDetailModal({
                 />
               </Tooltip>
 
-              {/* 2. Không tham gia dạng Icon button kèm Tooltip */}
-              <Tooltip title="Không tham gia">
-                <Button
-                  aria-label="Không tham gia"
-                  className="jt-drawer-action-btn jt-drawer-action-btn--icon jt-drawer-action-btn--leave"
-                  icon={<LogOut size={15} />}
-                  loading={actionLoading}
-                  onClick={confirmLeaveTicket}
-                  size="small"
-                />
-              </Tooltip>
+              {/* 2. Không tham gia (chỉ dành cho Task) */}
+              {isTask && (
+                <Tooltip title="Không tham gia">
+                  <Button
+                    aria-label="Không tham gia"
+                    className="jt-drawer-action-btn jt-drawer-action-btn--icon jt-drawer-action-btn--leave"
+                    icon={<LogOut size={15} />}
+                    loading={actionLoading}
+                    onClick={confirmLeaveTicket}
+                    size="small"
+                  />
+                </Tooltip>
+              )}
 
               {/* 3. Nút Đóng drawer */}
               {onClose && (
@@ -942,7 +1084,7 @@ export function CalendarEventDetailModal({
 
                   {!cardCollapsed && (
                     <>
-                      {isMeeting && (event.mode || event.location || event.meetingUrl) && (
+                      {isMeeting && (event.mode || event.location) && (
                         <div className="jt-pinned-hero-card__meta-bar">
                           {event.mode && (
                             <span className="jt-pinned-meta-chip">
@@ -959,16 +1101,109 @@ export function CalendarEventDetailModal({
                               <MapPin size={13} /> {event.location}
                             </span>
                           )}
-                          {event.meetingUrl && (
-                            <a
-                              className="jt-pinned-meta-chip jt-pinned-meta-chip--link"
-                              href={event.meetingUrl}
-                              rel="noopener noreferrer"
-                              target="_blank"
+                        </div>
+                      )}
+
+                      {/* Khung phòng họp trực tuyến Google Meet / Zoom */}
+                      {event.meetingUrl && (
+                        <div
+                          style={{
+                            background: '#f0f9ff',
+                            border: '1px solid #bae6fd',
+                            borderRadius: 8,
+                            padding: '10px 12px',
+                            marginTop: 10,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            gap: 12,
+                          }}
+                        >
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0, flex: 1 }}>
+                            <div
+                              style={{
+                                width: 32,
+                                height: 32,
+                                borderRadius: 6,
+                                background: '#e0f2fe',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                color: '#0284c7',
+                                flexShrink: 0,
+                              }}
                             >
-                              <ExternalLink size={13} /> Tham gia họp trực tuyến
-                            </a>
-                          )}
+                              <Video size={16} />
+                            </div>
+                            <div style={{ minWidth: 0, flex: 1 }}>
+                              <div style={{ fontSize: 12.5, fontWeight: 600, color: '#0369a1', lineHeight: 1.3 }}>
+                                Phòng họp trực tuyến
+                              </div>
+                              <a
+                                href={event.meetingUrl}
+                                rel="noopener noreferrer"
+                                style={{
+                                  fontSize: 12,
+                                  color: '#475569',
+                                  display: 'block',
+                                  whiteSpace: 'nowrap',
+                                  overflow: 'hidden',
+                                  textOverflow: 'ellipsis',
+                                  textDecoration: 'none',
+                                  marginTop: 2,
+                                }}
+                                target="_blank"
+                                title={event.meetingUrl}
+                              >
+                                {event.meetingUrl}
+                              </a>
+                            </div>
+                          </div>
+
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+                            <Tooltip title="Sao chép liên kết">
+                              <Button
+                                aria-label="Sao chép liên kết"
+                                icon={<Copy size={14} />}
+                                onClick={handleCopyMeetingLink}
+                                size="small"
+                                style={{ color: '#0284c7' }}
+                                type="text"
+                              />
+                            </Tooltip>
+                            <Button
+                              href={event.meetingUrl}
+                              icon={<ExternalLink size={13} />}
+                              size="small"
+                              target="_blank"
+                              type="primary"
+                            >
+                              Tham gia
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Khung ca trực tòa soạn nếu có */}
+                      {event.dutyInfo && (
+                        <div
+                          style={{
+                            marginTop: 10,
+                            background: '#fef2f2',
+                            border: '1px solid #fecaca',
+                            padding: '8px 12px',
+                            borderRadius: 8,
+                            fontSize: 12.5,
+                            color: '#991b1b',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 8,
+                          }}
+                        >
+                          <Calendar size={14} style={{ display: 'inline', flexShrink: 0 }} />
+                          <span>
+                            <strong>Lịch trực tòa soạn:</strong> {event.dutyInfo}
+                          </span>
                         </div>
                       )}
 
@@ -1254,15 +1489,51 @@ export function CalendarEventDetailModal({
                     <span className="jt-doc-info-item__value">{timeDisplay}</span>
                   </div>
 
+                  {/* Địa điểm (nếu có) */}
+                  {Boolean(event.location?.trim()) && (
+                    <div className="jt-doc-info-item">
+                      <span className="jt-doc-info-item__label">
+                        <span className="jt-doc-info-icon">
+                          <MapPin size={14} />
+                        </span>
+                        Địa điểm
+                      </span>
+                      <span className="jt-doc-info-item__value">{event.location}</span>
+                    </div>
+                  )}
+
+                  {/* Chủ trì cuộc họp (nếu có) */}
+                  {Boolean((event.leader || event.organizer)?.trim()) && (
+                    <div className="jt-doc-info-item">
+                      <span className="jt-doc-info-item__label">
+                        <span className="jt-doc-info-icon">
+                          <User size={14} />
+                        </span>
+                        Chủ trì
+                      </span>
+                      <span className="jt-doc-info-item__value">
+                        {highlightCurrentUserName(event.leader || event.organizer || '')}
+                      </span>
+                    </div>
+                  )}
+
                   {/* Thành phần */}
                   <div className="jt-doc-info-item jt-doc-info-item--block">
                     <div className="jt-person-sec-header">
                       <span className="jt-person-sec-title">
                         <Users size={13} style={{ color: '#64748b' }} />
                         <span>Thành phần</span>
-                        <span className="jt-person-sec-count">({participantsList.length})</span>
+                        <span className="jt-person-sec-count">
+                          ({event.participantCount || participantsList.length})
+                        </span>
                       </span>
                     </div>
+
+                    {Boolean(event.participantText?.trim()) && (
+                      <div style={{ fontSize: 12.5, color: '#334155', lineHeight: '1.5', marginBottom: 8, padding: '4px 6px', background: '#f8fafc', borderRadius: 6, border: '1px solid #f1f5f9' }}>
+                        {highlightCurrentUserName(event.participantText || '')}
+                      </div>
+                    )}
 
                     <div className="jt-person-avatar-row">
                       {participantsList.map((p: { name: string; role?: string }, idx: number) => (
@@ -1274,18 +1545,20 @@ export function CalendarEventDetailModal({
                           {isMe(p.name) && <span className="jt-person-chip__me-tag">Bạn</span>}
                         </span>
                       ))}
-                      <button
-                        type="button"
-                        className="jt-person-add-tag-chip"
-                        onClick={() => {
-                          setSelectedNewParticipants([]);
-                          setAddParticipantModalOpen(true);
-                        }}
-                        aria-label="Thêm thành phần"
-                      >
-                        <Plus size={12} strokeWidth={2.2} />
-                        <span>Thêm thành phần</span>
-                      </button>
+                      {!isEditorial && (
+                        <button
+                          type="button"
+                          className="jt-person-add-tag-chip"
+                          onClick={() => {
+                            setSelectedNewParticipants([]);
+                            setAddParticipantModalOpen(true);
+                          }}
+                          aria-label="Thêm thành phần"
+                        >
+                          <Plus size={12} strokeWidth={2.2} />
+                          <span>Thêm thành phần</span>
+                        </button>
+                      )}
                     </div>
                   </div>
 
