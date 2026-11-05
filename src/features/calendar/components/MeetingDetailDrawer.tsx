@@ -385,49 +385,122 @@ export const MeetingDetailDrawer: React.FC<MeetingDetailDrawerProps> = ({
       >
         {/* Header & Badges */}
         <div className="meeting-drawer-header">
-          <div className="meeting-drawer-badges">
-            {event.isAdjusted && (
-              <Tag
-                bordered={false}
-                color="warning"
-                style={{ fontSize: 12, padding: "2px 8px", fontWeight: 600 }}
-              >
-                Đã điều chỉnh
-              </Tag>
-            )}
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, marginBottom: 10 }}>
+            <div className="meeting-drawer-badges" style={{ marginBottom: 0 }}>
+              {event.isAdjusted && (
+                <Tag
+                  bordered={false}
+                  color="warning"
+                  style={{ fontSize: 12, padding: "2px 8px", fontWeight: 600 }}
+                >
+                  Đã điều chỉnh
+                </Tag>
+              )}
 
-            {isEditorial ? (
-              <Tag color="error" style={{ fontSize: 12, padding: "2px 8px" }}>
-                Lịch Ban biên tập
-              </Tag>
-            ) : isPersonal ? (
-              <Tag color="blue" style={{ fontSize: 12, padding: "2px 8px" }}>
-                Lịch cá nhân
-              </Tag>
-            ) : (
-              <Tag color="purple" style={{ fontSize: 12, padding: "2px 8px" }}>
-                Lịch họp
-              </Tag>
-            )}
+              {isEditorial ? (
+                <Tag color="error" style={{ fontSize: 12, padding: "2px 8px" }}>
+                  Lịch chung
+                </Tag>
+              ) : isPersonal ? (
+                <Tag color="blue" style={{ fontSize: 12, padding: "2px 8px" }}>
+                  Lịch cá nhân
+                </Tag>
+              ) : (
+                <Tag color="purple" style={{ fontSize: 12, padding: "2px 8px" }}>
+                  Lịch họp
+                </Tag>
+              )}
 
-            {isProposal && (
-              <Tag
-                color={
-                  event.approvalStatus === "APPROVED"
-                    ? "success"
+              {isProposal && (
+                <Tag
+                  color={
+                    event.approvalStatus === "APPROVED"
+                      ? "success"
+                      : event.approvalStatus === "REJECTED"
+                        ? "error"
+                        : "warning"
+                  }
+                  style={{ fontSize: 12, padding: "2px 8px", fontWeight: 600 }}
+                >
+                  {event.approvalStatus === "APPROVED"
+                    ? "Đã duyệt"
                     : event.approvalStatus === "REJECTED"
-                      ? "error"
-                      : "warning"
-                }
-                style={{ fontSize: 12, padding: "2px 8px", fontWeight: 600 }}
+                      ? "Từ chối"
+                      : "Chờ duyệt"}
+                </Tag>
+              )}
+            </div>
+
+            <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
+              <Button
+                icon={<ExternalLink size={13} />}
+                onClick={() => {
+                  window.open(`/calendar/events/${event.id}`, '_blank');
+                }}
+                size="small"
+                type="primary"
               >
-                {event.approvalStatus === "APPROVED"
-                  ? "Đã duyệt"
-                  : event.approvalStatus === "REJECTED"
-                    ? "Từ chối"
-                    : "Chờ duyệt"}
-              </Tag>
-            )}
+                Xem chi tiết
+              </Button>
+              {isPersonal && (
+                <>
+                  <Button
+                    icon={<Edit3 size={14} />}
+                    onClick={() => setEditModalOpen(true)}
+                    size="small"
+                  >
+                    Chỉnh sửa
+                  </Button>
+                  <Popconfirm
+                    cancelText="Hủy"
+                    description="Bạn có chắc chắn muốn xóa lịch làm việc cá nhân này không?"
+                    okButtonProps={{ danger: true }}
+                    okText="Xóa"
+                    onConfirm={handleDelete}
+                    placement="bottomRight"
+                    title="Xóa lịch làm việc"
+                  >
+                    <Button
+                      danger
+                      icon={<Trash2 size={14} />}
+                      loading={deleting}
+                      size="small"
+                    >
+                      Xóa
+                    </Button>
+                  </Popconfirm>
+                </>
+              )}
+              {isEditorial &&
+                !isUserAttending &&
+                !dayjs(event.endAt).isBefore(dayjs()) && (
+                <Button
+                  aria-label={
+                    event.isInterested ? "Bỏ quan tâm" : "Quan tâm lịch họp"
+                  }
+                  icon={
+                    <Star
+                      color={event.isInterested ? "#d97706" : "#64748b"}
+                      fill={event.isInterested ? "#f59e0b" : "none"}
+                      size={14}
+                    />
+                  }
+                  onClick={handleToggleInterest}
+                  size="small"
+                  style={
+                    event.isInterested
+                      ? {
+                          borderColor: "#fcd34d",
+                          background: "#fffbeb",
+                          color: "#b45309",
+                        }
+                      : undefined
+                  }
+                >
+                  {event.isInterested ? "Đang quan tâm" : "Quan tâm"}
+                </Button>
+              )}
+            </div>
           </div>
 
           <h2 className="meeting-drawer-title">{event.title}</h2>
@@ -891,7 +964,7 @@ export const MeetingDetailDrawer: React.FC<MeetingDetailDrawerProps> = ({
                       handleSendComment();
                     }
                   }}
-                  placeholder="Viết trao đổi..."
+                  placeholder="Nhập nội dung trao đổi"
                   ref={inputRef}
                   value={commentText}
                 />
@@ -946,7 +1019,7 @@ export const MeetingDetailDrawer: React.FC<MeetingDetailDrawerProps> = ({
           </div>
           <Input.TextArea
             onChange={(e) => setRejectReason(e.target.value)}
-            placeholder="Nhập lý do không duyệt lịch họp..."
+            placeholder="Nhập lý do không duyệt lịch họp"
             rows={3}
             value={rejectReason}
           />

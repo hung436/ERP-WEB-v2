@@ -314,12 +314,8 @@ export function CalendarWeekPage() {
     };
   }, [searchedInWeek]);
 
-  // Selection handler: Sự kiện/lịch mà user KHÔNG tham gia thì không mở drawer/modal chi tiết
+  // Selection handler: Mọi sự kiện trên lịch khi click đều mở Drawer xem nhanh (Task 5)
   const handleSelectNormalizedEvent = (normalized: NormalizedMeetingEvent) => {
-    const isAttending = Boolean(normalized.isUserParticipant || normalized.isUserWatcher);
-    if (!isAttending) {
-      return;
-    }
     const raw = normalized.raw || allEvents.find((e) => e.id === normalized.id);
     if (raw) {
       setSelectedEvent(raw);
@@ -435,7 +431,7 @@ export function CalendarWeekPage() {
                 aria-label="Tìm kiếm lịch công tác"
                 prefix={<SearchOutlined />}
                 value={query}
-                placeholder="Tìm công việc, lịch họp, sự kiện..."
+                placeholder="Tìm kiếm công việc, lịch họp, sự kiện"
                 onChange={(event) => setQuery(event.target.value)}
                 onBlur={() => {
                   if (!query) setSearchOpen(false);
@@ -511,12 +507,7 @@ export function CalendarWeekPage() {
               />
             </div>
 
-            <Button
-              className="booking-week-today-btn"
-              onClick={() => changeDate(vietnamNow())}
-            >
-              Hôm nay
-            </Button>
+
           </div>
 
           <div className="booking-week-divider booking-week-divider-nav" />
@@ -531,14 +522,14 @@ export function CalendarWeekPage() {
               type="button"
               className={`booking-week-source-btn is-editorial ${editorial ? "is-active" : ""}`}
               aria-pressed={editorial}
-              aria-label="Ban biên tập"
+              aria-label="Lịch chung"
               onClick={() => setEditorial((value) => !value)}
             >
               <span
                 className="booking-week-semantic-dot dot-editorial"
                 aria-hidden="true"
               />
-              <span className="booking-week-source-label">Ban biên tập</span>
+              <span className="booking-week-source-label">Lịch chung</span>
               <span
                 className={`booking-week-source-count ${state.loading ? "booking-week-count-loading" : ""}`}
               >
@@ -550,14 +541,14 @@ export function CalendarWeekPage() {
               type="button"
               className={`booking-week-source-btn is-personal ${personal ? "is-active" : ""}`}
               aria-pressed={personal}
-              aria-label="Cá nhân"
+              aria-label="Lịch cá nhân"
               onClick={() => setPersonal((value) => !value)}
             >
               <span
                 className="booking-week-semantic-dot dot-personal"
                 aria-hidden="true"
               />
-              <span className="booking-week-source-label">Cá nhân</span>
+              <span className="booking-week-source-label">Lịch cá nhân</span>
               <span
                 className={`booking-week-source-count ${state.loading ? "booking-week-count-loading" : ""}`}
               >
@@ -936,7 +927,7 @@ export function CalendarWeekPage() {
         <div className="booking-week-timeline-wrap">
           {state.loading && (
             <span className="booking-week-loading-label" role="status">
-              Đang tải lịch họp...
+              Đang tải lịch họp
             </span>
           )}
           <CalendarView
@@ -969,10 +960,6 @@ export function CalendarWeekPage() {
             events={allEvents}
             onClose={() => setSelectedDay(null)}
             onSelectEvent={(ev) => {
-              const isAttending = Boolean(ev.isUserParticipant || ev.isUserWatcher);
-              if (!isAttending) {
-                return;
-              }
               setSelectedEvent(ev);
             }}
             onCreateEvent={(day) => {

@@ -1124,7 +1124,7 @@ export function CreatePersonalMeetingModal({
                         <span>
                           {ticketType === "EVENT"
                             ? "Chọn thành phần tham gia sự kiện..."
-                            : "Chọn thành phần thực hiện công việc..."}
+                            : "Chọn thành phần..."}
                         </span>
                       </span>
                     </button>
@@ -1464,7 +1464,7 @@ export function CreatePersonalMeetingModal({
           ticketType === "EVENT"
             ? "Chọn thành phần tham gia"
             : ticketType === "TASK"
-              ? "Chọn thành phần thực hiện"
+              ? "Chọn thành phần"
               : "Chọn thành phần tham dự"
         }
         initialSelected={selectedParticipantsList}

@@ -1,6 +1,6 @@
 import dayjs, { extend } from 'dayjs';
 import isoWeek from 'dayjs/plugin/isoWeek';
-import { render, screen, within } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 
@@ -27,11 +27,13 @@ describe('Lịch làm việc theo tuần (Google Calendar style)', () => {
     expect(screen.getByRole('button', { name: /^Tạo$/i })).toBeInTheDocument();
 
     // 3 Filter Chips ở Cụm Giữa
-    expect(screen.getByText('Ban biên tập')).toBeInTheDocument();
-    expect(screen.getAllByText('Cá nhân').length).toBeGreaterThan(0);
+    expect(screen.getByText('Lịch chung')).toBeInTheDocument();
+    expect(screen.getAllByText('Lịch cá nhân').length).toBeGreaterThan(0);
     expect(screen.getByText('Chỉ hiện lịch có mặt tôi')).toBeInTheDocument();
-    expect((await screen.findAllByText(/Phiếu công việc|Công việc/)).length).toBeGreaterThan(0);
-    expect(screen.getAllByText('Lịch họp').length).toBeGreaterThan(0);
+    // Task 7: Thay tag loại bằng chấm tròn trạng thái trên thẻ
+    await waitFor(() => {
+      expect(document.querySelectorAll('.booking-week-status-dot').length).toBeGreaterThan(0);
+    });
 
     // Các ngày trong tuần
     expect(screen.getAllByText('Thứ Hai').length).toBeGreaterThan(0);
@@ -62,7 +64,7 @@ describe('Lịch làm việc theo tuần (Google Calendar style)', () => {
     expect(screen.getAllByText(/Tài liệu/i)[0]).toBeInTheDocument();
     expect(screen.getByText(/Thảo luận/i)).toBeInTheDocument();
     expect(screen.getByText('Đính kèm')).toBeInTheDocument();
-    expect(screen.getByPlaceholderText(/Viết trao đổi/i)).toBeInTheDocument();
+    expect(screen.getByPlaceholderText(/Nhập nội dung trao đổi/i)).toBeInTheDocument();
     expect(screen.getByText('Đề nghị các ban có mặt đúng 7g40 để ổn định vị trí.')).toBeInTheDocument();
   });
 
@@ -97,7 +99,7 @@ describe('Lịch làm việc theo tuần (Google Calendar style)', () => {
     renderCalendarWeek();
 
     await screen.findByText(/Tuần 41/i);
-    const editorialChip = screen.getByRole('button', { name: 'Ban biên tập' });
+    const editorialChip = screen.getByRole('button', { name: 'Lịch chung' });
     expect(editorialChip).toHaveAttribute('aria-pressed', 'true');
 
     await user.click(editorialChip);
@@ -152,14 +154,15 @@ describe('Lịch làm việc theo tuần (Google Calendar style)', () => {
     expect(screen.getAllByText(/Viễn Sự, N.V.Hải/i).length).toBeGreaterThan(0);
   }, 45000);
 
-  it('hiển thị tag Đã điều chỉnh cho các sự kiện có lịch điều chỉnh', async () => {
+  it('hiển thị chấm vàng Đã điều chỉnh cho các sự kiện có lịch điều chỉnh', async () => {
     const user = userEvent.setup();
     renderCalendarWeek();
     await screen.findByText(/Tuần 41/i);
 
-    // Có các tag Đã điều chỉnh trên giao diện tuần
-    const adjustedBadges = await screen.findAllByText('Đã điều chỉnh');
-    expect(adjustedBadges.length).toBeGreaterThan(0);
+    // Task 7: Có chấm vàng Đã điều chỉnh trên giao diện tuần
+    await waitFor(() => {
+      expect(document.querySelectorAll('.booking-week-adjusted-dot').length).toBeGreaterThan(0);
+    });
 
     // Click vào sự kiện có điều chỉnh mà user tham gia (Họp giao ban phóng viên)
     const adjustedAttendingEvent = screen.getAllByText('Họp giao ban phóng viên')[0];
@@ -210,8 +213,8 @@ describe('Lịch làm việc theo tuần (Google Calendar style)', () => {
     await user.click(filterBtn);
 
     // Nguồn lịch Ban biên tập & Cá nhân luôn ở ngoài thanh công cụ
-    expect(screen.getByRole('button', { name: 'Ban biên tập' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Cá nhân' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Lịch chung' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Lịch cá nhân' })).toBeInTheDocument();
 
     // Popover hiển thị các bộ lọc bổ sung (Tham gia & Loại mục ghi)
     expect(await screen.findByText('Bộ lọc lịch làm việc')).toBeInTheDocument();

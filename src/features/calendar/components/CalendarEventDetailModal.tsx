@@ -391,7 +391,7 @@ export function CalendarEventDetailModal({
       event.type === "meeting" ||
       event.scope === "editorial");
 
-  // Đối với lịch họp: Render bản Drawer tinh gọn, hiện đại tham khảo từ branch feature/hang
+  // Đồng bộ giao diện lịch họp và Drawer: Đối với lịch họp, render MeetingDetailDrawer
   if (isMeeting) {
     return (
       <MeetingDetailDrawer
@@ -415,10 +415,8 @@ export function CalendarEventDetailModal({
   if (isMeeting && event.startAt && event.endAt) {
     const s = dayjs(event.startAt);
     const e = dayjs(event.endAt);
-    if (s.isValid() && e.isValid()) {
-      timeDisplay = s.isSame(e, "day")
-        ? `${s.format("HH:mm")} - ${e.format("HH:mm")} ${s.format("DD/MM/YYYY")}`
-        : `${s.format("HH:mm DD/MM/YYYY")} - ${e.format("HH:mm DD/MM/YYYY")}`;
+    if (s.isValid()) {
+      timeDisplay = `${s.format("HH:mm")} (${s.format("DD/MM/YYYY")})`;
     }
   }
   if (!timeDisplay) {
@@ -1198,7 +1196,7 @@ export function CalendarEventDetailModal({
               )}
               {isMeeting && isEditorial && (
                 <Tag color="error" style={{ fontSize: 12, padding: "2px 8px" }}>
-                  Lịch Ban biên tập
+                  Lịch chung
                 </Tag>
               )}
               {isMeeting && isEditorial && isUserAttending && (
@@ -1310,6 +1308,16 @@ export function CalendarEventDetailModal({
                   />
                 </Tooltip>
               )}
+
+              {/* Mở tab mới xem chi tiết toàn màn hình (Task 3 & 6) */}
+              <Button
+                icon={<ExternalLink size={14} />}
+                size="small"
+                onClick={() => window.open(`/calendar/events/${event.id}`, '_blank')}
+                style={{ fontSize: 13 }}
+              >
+                Xem chi tiết
+              </Button>
 
               {/* 3. Nút Đóng drawer */}
               {onClose && (

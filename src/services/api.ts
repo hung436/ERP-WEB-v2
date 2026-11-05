@@ -29,6 +29,7 @@ export const meetingApi = {
   create: (data: Partial<MeetingEvent>) => mockRequest<MeetingEvent>('/api/meeting/events', { method: 'POST', body: data }),
 };
 export const calendarApi = {
+  get: (id: string) => mockRequest<CalendarEvent>(`/api/calendar/events/${id}`),
   list: (query = '') => mockRequest<CalendarEvent[]>(`/api/calendar/events${query}`),
   respond: (id: string, responseStatus: NonNullable<CalendarEvent['responseStatus']>) => mockRequest<CalendarEvent>(`/api/calendar/events/${id}/respond`, { method: 'POST', body: { responseStatus } }),
   create: (data: Partial<CalendarEvent>) => mockRequest<CalendarEvent>('/api/calendar/events', { method: 'POST', body: data }),

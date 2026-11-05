@@ -1,16 +1,12 @@
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import type { TooltipPlacement } from 'antd/es/tooltip';
 import type { Dayjs } from 'dayjs';
 import { Button, Popover, Skeleton, message } from 'antd';
 import {
-  ClockCircleOutlined,
   DownOutlined,
   EnvironmentOutlined,
-  EyeOutlined,
   RightOutlined,
   StarFilled,
   StarOutlined,
-  TeamOutlined,
   UserOutlined,
 } from '@ant-design/icons';
 
@@ -18,15 +14,12 @@ import {
   dayNames,
   eventTime,
   eventTimeRange,
-  eventDurationText,
   getApprovalStatusMeta,
-  getTicketTypeMeta,
   positionEvents,
   type DutyShiftData,
   type NormalizedMeetingEvent,
 } from '../calendarWeekUtils';
 
-import { ParticipantList } from './ParticipantList';
 
 export function DutyInfo({ duty, past = false }: { duty?: DutyShiftData; past?: boolean }) {
   if (!duty) return <span className="booking-week-muted">Chưa có thông tin trực</span>;
@@ -83,117 +76,25 @@ export const EventCard = memo(function EventCard({
   now,
   left = 0,
   width = 10,
-  upward = false,
   onSelect,
   onToggleInterest,
   vertical = false,
   compact = false,
-  expandLeft = false,
-  disabledHover = false,
 }: EventCardProps) {
-  const [expanded, setExpanded] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
-
-  const getInitialPlacement = (): TooltipPlacement => {
-    if (vertical) {
-      return expandLeft ? 'leftTop' : 'rightTop';
-    }
-    return upward ? 'top' : 'bottom';
-  };
-
-  const [placement, setPlacement] = useState<TooltipPlacement>(getInitialPlacement);
-
-  const updatePlacement = useCallback(() => {
-    if (!cardRef.current) return;
-    const rect = cardRef.current.getBoundingClientRect();
-    const vw = window.innerWidth;
-    const vh = window.innerHeight;
-
-    const POPOVER_WIDTH = 340;
-    const POPOVER_HEIGHT = 280;
-
-    if (vertical) {
-      const spaceRight = vw - rect.right;
-      const spaceLeft = rect.left;
-
-      // Card horizontal center - nếu nằm ở nửa phải màn hình hoặc bên phải không đủ rộng thì mở sang trái
-      const cardCenterX = rect.left + rect.width / 2;
-      const goLeft = spaceRight < POPOVER_WIDTH || cardCenterX > vw / 2 || (expandLeft && spaceLeft >= POPOVER_WIDTH);
-
-      // Căn chỉnh trục dọc:
-      // Khi căn top (*Top), đỉnh popover nằm ở rect.top (không bao giờ âm nếu rect.top >= 0).
-      // Chỉ căn bottom (*Bottom) khi khoảng trống phía dưới không đủ VÀ rect.bottom đủ cao để không bị tràn ngược lên đỉnh màn hình!
-      const spaceBelow = vh - rect.top;
-      const canFitBelow = spaceBelow >= POPOVER_HEIGHT;
-      const canFitAbove = rect.bottom >= POPOVER_HEIGHT + 20;
-      const goUpward = !canFitBelow && canFitAbove;
-
-      if (goLeft) {
-        setPlacement(goUpward ? 'leftBottom' : 'leftTop');
-      } else {
-        setPlacement(goUpward ? 'rightBottom' : 'rightTop');
-      }
-    } else {
-      const spaceBelow = vh - rect.bottom;
-      const spaceAbove = rect.top;
-      const goUpward = spaceBelow < POPOVER_HEIGHT && spaceAbove >= POPOVER_HEIGHT + 20;
-      setPlacement(goUpward ? 'top' : 'bottom');
-    }
-  }, [vertical, expandLeft]);
-
-  useEffect(() => {
-    setPlacement(getInitialPlacement());
-  }, [vertical, expandLeft, upward]);
   const [starred, setStarred] = useState(Boolean(event.isInterested));
 
   useEffect(() => {
     setStarred(Boolean(event.isInterested));
   }, [event.isInterested]);
 
-  useEffect(() => {
-    if (disabledHover) {
-      setExpanded(false);
-    }
-  }, [disabledHover]);
-
   const isEditorial = event.scope === 'editorial';
-  const isPersonal = event.scope === 'personal';
-  const isTaskTicket = event.ticketType === 'TASK';
-
-  // Lịch có tôi tham gia (kể cả họp MEETING hay sự kiện EVENT, hoặc do tôi tạo / cá nhân / theo dõi)
   const isUserAttending = Boolean(event.isUserParticipant || event.isUserWatcher);
-  const canOpenDrawer = isUserAttending;
 
-  const typeMeta = getTicketTypeMeta(event.ticketType);
   const approvalMeta = getApprovalStatusMeta(event.approvalStatus, event.ticketType, event.workflowType);
   const typeKey = String(event.ticketType || 'MEETING').toLowerCase();
   const statusKey = approvalMeta.tone;
 
-  // Chỉ dùng 2 màu đánh dấu theo yêu cầu:
-  // 1. Phiếu cá nhân / việc cá nhân: Xanh dương (booking-week-personal)
-  // 2. Ban biên tập có tôi tham gia: Đỏ (booking-week-attending)
-  // 3. Toàn bộ còn lại (không tham gia): Trung tính xám / trắng (booking-week-non-attending)
-  const isMyPersonal = isPersonal || isTaskTicket;
-  const isMyEditorial = isEditorial && isUserAttending;
-
-  const cardColorClass = !isUserAttending
-    ? 'booking-week-non-attending'
-    : isMyPersonal
-    ? 'booking-week-personal'
-    : 'booking-week-attending';
-
-  const typeBadgeClass = !isUserAttending
-    ? 'booking-week-type-badge booking-week-type-neutral'
-    : isMyPersonal
-    ? 'booking-week-type-badge booking-week-type-task'
-    : 'booking-week-type-badge booking-week-type-meeting';
-
-  const hasStatus = Boolean(
-    approvalMeta &&
-    approvalMeta.label &&
-    (!isEditorial || (event.approvalStatus && event.approvalStatus !== 'SCHEDULED')) &&
-    approvalMeta.value !== 'SCHEDULED'
-  );
   const past = Boolean(
     now &&
       event.end &&
@@ -213,135 +114,12 @@ export const EventCard = memo(function EventCard({
     }
   };
 
-  const attachmentTotal = event.attachmentCount ?? event.attachments.length;
-  const commentTotal = event.commentCount ?? event.raw?.comments?.length ?? 0;
-
-  const popoverContent = (
-    <div className="booking-week-card-expanded-content">
-      <div className="booking-week-card-expanded-badges">
-        <span className={typeBadgeClass}>{typeMeta.label}</span>
-        {hasStatus && (
-          <span className={`booking-week-status-badge booking-week-status-${statusKey}`}>{approvalMeta.label}</span>
-        )}
-      </div>
-      <strong className="booking-week-popover-title">{event.title}</strong>
-
-      {event.isAdjusted && (
-        <div className="booking-week-card-adjusted-alert">
-          <strong>Đã điều chỉnh{event.adjustedNote ? ':' : ''}</strong> {event.adjustedNote}
-        </div>
-      )}
-
-      <div className="booking-week-popover-row">
-        <span className="booking-week-popover-icon"><ClockCircleOutlined /></span>
-        <span className="booking-week-popover-text">
-          <b>Thời gian:</b> {eventTimeRange(event)}
-          {eventDurationText(event) ? ` (${eventDurationText(event)})` : ''}
-        </span>
-      </div>
-      {(event.location || (!isEditorial && event.ticketType !== 'TASK')) && (
-        <div className="booking-week-popover-row">
-          <span className="booking-week-popover-icon"><EnvironmentOutlined /></span>
-          <span className="booking-week-popover-text"><b>Địa điểm:</b> {event.location || 'Chưa có địa điểm'}</span>
-        </div>
-      )}
-      {event.ticketType === 'MEETING' && Boolean(event.leader?.trim()) && (
-        <div className="booking-week-popover-row">
-          <span className="booking-week-popover-icon"><UserOutlined /></span>
-          <span className="booking-week-popover-text"><b>Chủ trì:</b> {event.leader}</span>
-        </div>
-      )}
-      {isEditorial ? (
-        Boolean(event.participantText) && (
-          <div className="booking-week-popover-row">
-            <span className="booking-week-popover-icon"><TeamOutlined /></span>
-            <span className="booking-week-popover-text">
-              <b>Thành phần:</b> <ParticipantList text={event.participantText} scrollExpanded />
-            </span>
-          </div>
-        )
-      ) : (
-        event.ticketType !== 'TASK' && (
-          <div className="booking-week-popover-row">
-            <span className="booking-week-popover-icon"><TeamOutlined /></span>
-            <span className="booking-week-popover-text">
-              <ParticipantList
-                text={
-                  event.participantText ||
-                  (event.participantCount ? `${event.participantCount} người tham gia · Xem trong chi tiết` : 'Chưa có thông tin thành phần')
-                }
-                scrollExpanded
-              />
-            </span>
-          </div>
-        )
-      )}
-      {Boolean(event.dutyInfo) && (
-        <div className="booking-week-popover-row">
-          <span className="booking-week-popover-icon"><ClockCircleOutlined /></span>
-          <span className="booking-week-popover-text"><b>Trực ban:</b> {event.dutyInfo}</span>
-        </div>
-      )}
-      {!isEditorial && event.ticketType !== 'MEETING' && event.executorText && (
-        <div className="booking-week-popover-row">
-          <span className="booking-week-popover-icon"><UserOutlined /></span>
-          <span className="booking-week-popover-text">Triển khai: {event.executorText}</span>
-        </div>
-      )}
-      {!isEditorial && event.ticketType !== 'MEETING' && event.approver && (
-        <div className="booking-week-popover-row">
-          <span className="booking-week-popover-icon"><UserOutlined /></span>
-          <span className="booking-week-popover-text">Người duyệt: {event.approver.display_name || event.approver.name}</span>
-        </div>
-      )}
-      {!isEditorial && event.ticketType !== 'MEETING' && event.watcherText && (
-        <div className="booking-week-popover-row">
-          <span className="booking-week-popover-icon"><EyeOutlined /></span>
-          <span className="booking-week-popover-text">Theo dõi: {event.watcherText}</span>
-        </div>
-      )}
-
-
-      {(canOpenDrawer || attachmentTotal > 0 || commentTotal > 0) && (
-        <div className="booking-week-card-footer">
-          <span>
-            {attachmentTotal} tài liệu{commentTotal > 0 ? ` · ${commentTotal} thảo luận` : ''}
-          </span>
-          {canOpenDrawer && (
-            <Button
-              type="link"
-              size="small"
-              onClick={(e) => {
-                e.stopPropagation();
-                setExpanded(false);
-                onSelect(event);
-              }}
-            >
-              Xem chi tiết <RightOutlined />
-            </Button>
-          )}
-        </div>
-      )}
-    </div>
-  );
-
-  // dynamic placement
-
-
-
-
-
   return (
     <div
       ref={cardRef}
-      onMouseEnter={() => {
-        if (!disabledHover) {
-          updatePlacement();
-        }
-      }}
-      className={`booking-week-event booking-week-ticket-${typeKey} ${vertical ? 'booking-week-feed-card' : ''} ${
+      className={`booking-week-event booking-week-flat-card booking-week-ticket-${typeKey} ${isUserAttending ? 'booking-week-attending' : 'booking-week-non-attending'} ${vertical ? 'booking-week-feed-card' : ''} ${
         compact ? 'booking-week-out-hours-card' : ''
-      } ${past ? 'booking-week-past-event' : ''} ${cardColorClass} ${expanded && !disabledHover ? 'booking-week-expanded' : ''}`}
+      } ${past ? 'booking-week-past-event' : ''}`}
       style={
         vertical || compact
           ? undefined
@@ -352,113 +130,92 @@ export const EventCard = memo(function EventCard({
             } as React.CSSProperties)
       }
     >
-      <Popover
-        content={popoverContent}
-        open={expanded && !disabledHover}
-        onOpenChange={(visible) => {
-          if (disabledHover) {
-            setExpanded(false);
-            return;
-          }
-          if (visible) {
-            updatePlacement();
-          }
-          setExpanded(visible);
-        }}
-        trigger="hover"
-        mouseEnterDelay={0.09}
-        mouseLeaveDelay={0.12}
-        placement={placement}
-        overlayClassName="booking-week-card-popover"
-        autoAdjustOverflow={{ adjustX: 1, adjustY: 1 }}
-        destroyOnHidden
-        arrow={false}
+      <button
+        type="button"
+        className="booking-week-card-button"
+        aria-label={`${eventTime(event)} ${event.title}`}
+        onClick={() => onSelect(event)}
+        style={{ cursor: 'pointer', position: 'relative' }}
       >
-        <button
-          type="button"
-          className="booking-week-card-button"
-          aria-label={`${eventTime(event)} ${event.title}`}
-          onClick={() => {
-            if (!canOpenDrawer) return;
-            setExpanded(false);
-            onSelect(event);
-          }}
-          style={{ cursor: canOpenDrawer ? 'pointer' : 'default' }}
-        >
-          <div className="booking-week-card-top">
-            <span className="booking-week-card-time" title={eventTime(event)}>
-              {eventTimeRange(event)}
+        {/* Chấm tròn vàng ở góc phải nếu lịch đã điều chỉnh (Task 7) */}
+        {event.isAdjusted && (
+          <span
+            className="booking-week-adjusted-dot"
+            title={event.adjustedNote ? `Đã điều chỉnh: ${event.adjustedNote}` : 'Lịch đã điều chỉnh'}
+          />
+        )}
+
+        <div className="booking-week-card-top">
+          <div className="booking-week-card-time-group" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            {/* Chấm tròn trạng thái trước giờ (Task 7) */}
+            <span
+              className={`booking-week-status-dot dot-${statusKey}`}
+              title={`Trạng thái: ${approvalMeta.label}`}
+            />
+            <span
+              className={`booking-week-card-time ${isUserAttending ? 'is-attending-time' : ''}`}
+              title={eventTime(event)}
+              style={isUserAttending ? { color: '#D92D20', fontWeight: 600 } : { color: '#475467', fontWeight: 500 }}
+            >
+              {eventTime(event)}
             </span>
-            <span className="booking-week-card-badges">
-              <span className={typeBadgeClass}>
-                {typeMeta.label}
-              </span>
-              {isEditorial && !isUserAttending && !past && (
-                <span
-                  role="button"
-                  tabIndex={0}
-                  className={`booking-week-card-star ${starred ? 'is-interested' : ''}`}
-                  aria-label="Quan tâm lịch họp"
-                  title="Nhắc trước 15 phút"
-                  onClick={handleToggleStar}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      handleToggleStar(e);
-                    }
-                  }}
-                >
-                  {starred ? <StarFilled style={{ color: '#f59e0b' }} /> : <StarOutlined />}
-                  {starred && (
-                    <span style={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clip: 'rect(0,0,0,0)' }}>
-                      Bạn sẽ được nhắc nhở trước 15 phút
-                    </span>
-                  )}
+          </div>
+
+          {isEditorial && !isUserAttending && !past && (
+            <span
+              role="button"
+              tabIndex={0}
+              className={`booking-week-card-star ${starred ? 'is-interested' : ''}`}
+              aria-label="Quan tâm lịch họp"
+              title="Nhắc trước 15 phút"
+              onClick={handleToggleStar}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  handleToggleStar(e);
+                }
+              }}
+            >
+              {starred ? <StarFilled style={{ color: '#f59e0b' }} /> : <StarOutlined />}
+              {starred && (
+                <span style={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clip: 'rect(0,0,0,0)' }}>
+                  Bạn sẽ được nhắc nhở trước 15 phút
                 </span>
               )}
             </span>
-          </div>
-
-          {(event.continuesFromPreviousDay || event.continuesToNextDay) && (
-            <small className="booking-week-continuation">
-              {event.continuesFromPreviousDay ? 'Tiếp tục từ ngày trước' : 'Kéo dài sang ngày sau'}
-            </small>
           )}
+        </div>
 
-          {hasStatus && (
-            <div className="booking-week-card-status-row">
-              <span className={`booking-week-status-badge booking-week-status-${statusKey}`}>
-                {approvalMeta.label}
-              </span>
+        {(event.continuesFromPreviousDay || event.continuesToNextDay) && (
+          <small className="booking-week-continuation">
+            {event.continuesFromPreviousDay ? 'Tiếp tục từ ngày trước' : 'Kéo dài sang ngày sau'}
+          </small>
+        )}
+
+        {/* Tên sự kiện: Hiển thị đầy đủ, không cắt 3 chấm (Task 4) */}
+        <div className="booking-week-card-title">{event.title}</div>
+
+        <div className="booking-week-card-meta-list">
+          {Boolean(event.location) && (
+            <div className="booking-week-card-location" title={event.location}>
+              <EnvironmentOutlined className="booking-week-card-loc-icon" aria-hidden="true" />
+              <span>{event.location}</span>
             </div>
           )}
-
-          <div className="booking-week-card-title">{event.title}</div>
-
-          {event.isAdjusted && <span className="booking-week-adjusted">Đã điều chỉnh</span>}
-
-          <div className="booking-week-card-meta-list">
-            {Boolean(event.location) && (
-              <div className="booking-week-card-location" title={event.location}>
-                <EnvironmentOutlined className="booking-week-card-loc-icon" aria-hidden="true" />
-                <span>{event.location}</span>
-              </div>
-            )}
-            {event.ticketType === 'MEETING' && Boolean(event.leader?.trim()) && (
-              <div className="booking-week-card-leader" title={`Chủ trì: ${event.leader}`}>
-                <UserOutlined className="booking-week-card-loc-icon" aria-hidden="true" />
-                <span>Chủ trì: <strong>{event.leader}</strong></span>
-              </div>
-            )}
-            {event.ticketType === 'TASK' && Boolean(event.executorText) && (
-              <div className="booking-week-card-leader" title={`Thực hiện: ${event.executorText}`}>
-                <UserOutlined className="booking-week-card-loc-icon" aria-hidden="true" />
-                <span>{event.executorText}</span>
-              </div>
-            )}
-          </div>
-        </button>
-      </Popover>
+          {event.ticketType === 'MEETING' && Boolean(event.leader?.trim()) && (
+            <div className="booking-week-card-leader" title={`Chủ trì: ${event.leader}`}>
+              <UserOutlined className="booking-week-card-loc-icon" aria-hidden="true" />
+              <span>Chủ trì: <strong>{event.leader}</strong></span>
+            </div>
+          )}
+          {event.ticketType === 'TASK' && Boolean(event.executorText) && (
+            <div className="booking-week-card-leader" title={`Thực hiện: ${event.executorText}`}>
+              <UserOutlined className="booking-week-card-loc-icon" aria-hidden="true" />
+              <span>{event.executorText}</span>
+            </div>
+          )}
+        </div>
+      </button>
     </div>
   );
 });

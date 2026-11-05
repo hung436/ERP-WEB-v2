@@ -2225,16 +2225,22 @@ html:has(.booking-week-page), body:has(.booking-week-page) { height: 100%; overf
    2. Ban biên tập có tôi tham gia: Đỏ (#C8161D)
    3. Các mục còn lại: Xám trung tính (#52525B)
 */
-.booking-week-event.booking-week-personal .booking-week-card-time {
-  color: #1D4ED8 !important;
+/* Phân biệt Card có tôi tham gia: Tô màu đỏ ở phần thời gian (#D92D20) */
+.booking-week-card-time.is-attending-time,
+.card-time-tag.is-attending-time,
+.booking-week-event.booking-week-attending .booking-week-card-time,
+.calendar-list-card.card-attending .card-time-tag {
+  color: #D92D20 !important;
+  font-weight: 600 !important;
 }
-.booking-week-event.booking-week-attending .booking-week-card-time {
-  color: #C8161D !important;
-}
+
+.booking-week-card-time:not(.is-attending-time),
+.card-time-tag:not(.is-attending-time),
 .booking-week-event.booking-week-non-attending .booking-week-card-time,
-.booking-week-event:not(.booking-week-attending):not(.booking-week-personal) .booking-week-card-time,
-.booking-week-event.booking-week-ticket-event .booking-week-card-time {
-  color: #52525B !important;
+.booking-week-event:not(.booking-week-attending) .booking-week-card-time,
+.calendar-list-card.card-non-attending .card-time-tag {
+  color: #475467 !important;
+  font-weight: 500 !important;
 }
 
 /* =========================================================================
@@ -2304,4 +2310,110 @@ html:has(.booking-week-page), body:has(.booking-week-page) { height: 100%; overf
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.01em;
   white-space: nowrap;
+}
+
+/* =========================================================================
+   TASK 7 & TASK 4: Thẻ phẳng không background, chấm status trước giờ,
+   chấm vàng điều chỉnh góc phải, tên hiển thị trọn vẹn không dấu 3 chấm.
+   ========================================================================= */
+
+/* 1. Chấm tròn trạng thái (dot) trước giờ */
+.booking-week-status-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.booking-week-status-dot.dot-approved,
+.booking-week-status-dot.dot-completed {
+  background-color: #12b76a;
+}
+
+.booking-week-status-dot.dot-pending {
+  background-color: #f79009;
+}
+
+.booking-week-status-dot.dot-in_progress,
+.booking-week-status-dot.dot-in-progress {
+  background-color: #0ba5ec;
+}
+
+.booking-week-status-dot.dot-rejected {
+  background-color: #f04438;
+}
+
+.booking-week-status-dot.dot-scheduled {
+  background-color: #94a3b8;
+}
+
+/* 2. Chấm tròn vàng ở góc phải nếu lịch đã điều chỉnh */
+.booking-week-adjusted-dot {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: #f59e0b;
+  box-shadow: 0 0 0 1.5px #ffffff;
+  z-index: 3;
+}
+
+/* 3. Bỏ toàn bộ background màu, chuyển sang card phẳng chuẩn Anti-AI UI */
+.booking-week-event,
+.booking-week-flat-card,
+.calendar-list-card {
+  background: #ffffff !important;
+  border: 1px solid #E4E7EC !important;
+  border-radius: 8px !important;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.03) !important;
+  transition: all 0.15s ease !important;
+}
+
+.booking-week-event:hover,
+.booking-week-flat-card:hover,
+.calendar-list-card:hover {
+  background: #ffffff !important;
+  border-color: #D0D5DD !important;
+  box-shadow: 0 2px 6px rgba(16, 24, 40, 0.07) !important;
+}
+
+.booking-week-feed-card.booking-week-event.booking-week-attending,
+.booking-week-feed-card.booking-week-event.booking-week-personal,
+.booking-week-feed-card.booking-week-event.booking-week-non-attending {
+  background: #ffffff !important;
+  border: 1px solid #E4E7EC !important;
+}
+
+.booking-week-feed-card.booking-week-event.booking-week-attending:hover,
+.booking-week-feed-card.booking-week-event.booking-week-personal:hover,
+.booking-week-feed-card.booking-week-event.booking-week-non-attending:hover {
+  background: #ffffff !important;
+  border-color: #D0D5DD !important;
+}
+
+/* 4. Task 4: Tên hiển thị đầy đủ, không cắt 3 chấm */
+.booking-week-card-title,
+.card-title {
+  display: block !important;
+  font-size: 13.5px !important;
+  font-weight: 600 !important;
+  color: #0f172a !important;
+  line-height: 1.4 !important;
+  margin: 4px 0 6px 0 !important;
+  overflow: visible !important;
+  white-space: normal !important;
+  word-break: break-word !important;
+  text-overflow: clip !important;
+  -webkit-line-clamp: unset !important;
+  line-clamp: unset !important;
+}
+
+.booking-week-card-time-group,
+.card-time-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
