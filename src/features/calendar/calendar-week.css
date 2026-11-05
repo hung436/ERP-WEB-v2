@@ -2236,3 +2236,72 @@ html:has(.booking-week-page), body:has(.booking-week-page) { height: 100%; overf
 .booking-week-event.booking-week-ticket-event .booking-week-card-time {
   color: #52525B !important;
 }
+
+/* =========================================================================
+   Tối ưu hóa khả năng quét nhanh cho người đọc (Scanability & Readability)
+   ========================================================================= */
+
+.booking-week-column-day-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.booking-week-today-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 7px;
+  background-color: #fee2e2;
+  color: #b91c1c;
+  font-size: 11px;
+  font-weight: 700;
+  border-radius: 9999px;
+  line-height: 15px;
+  letter-spacing: 0.02em;
+}
+
+.booking-week-card-meta-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: auto;
+  width: 100%;
+}
+
+.booking-week-card-leader {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #475569;
+  font-size: 11.5px;
+  font-weight: 500;
+  line-height: 1.35;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.booking-week-card-leader strong {
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.booking-week-card-leader .anticon {
+  font-size: 11px;
+  color: #64748b;
+  flex-shrink: 0;
+}
+
+.booking-week-feed-card.booking-week-event.booking-week-attending .booking-week-card-leader .anticon {
+  color: #dc2626 !important;
+}
+
+.booking-week-feed-card.booking-week-event.booking-week-personal .booking-week-card-leader .anticon {
+  color: #0284c7 !important;
+}
+
+.booking-week-card-time {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}

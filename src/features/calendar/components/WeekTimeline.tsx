@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { TooltipPlacement } from 'antd/es/tooltip';
 import type { Dayjs } from 'dayjs';
 import { Button, Popover, Skeleton, message } from 'antd';
@@ -17,6 +17,8 @@ import {
 import {
   dayNames,
   eventTime,
+  eventTimeRange,
+  eventDurationText,
   getApprovalStatusMeta,
   getTicketTypeMeta,
   positionEvents,
@@ -76,7 +78,7 @@ interface EventCardProps {
   disabledHover?: boolean;
 }
 
-export function EventCard({
+export const EventCard = memo(function EventCard({
   event,
   now,
   left = 0,
@@ -232,7 +234,10 @@ export function EventCard({
 
       <div className="booking-week-popover-row">
         <span className="booking-week-popover-icon"><ClockCircleOutlined /></span>
-        <span className="booking-week-popover-text"><b>Thời gian:</b> {eventTime(event)}</span>
+        <span className="booking-week-popover-text">
+          <b>Thời gian:</b> {eventTimeRange(event)}
+          {eventDurationText(event) ? ` (${eventDurationText(event)})` : ''}
+        </span>
       </div>
       {(event.location || (!isEditorial && event.ticketType !== 'TASK')) && (
         <div className="booking-week-popover-row">
@@ -361,8 +366,8 @@ export function EventCard({
           setExpanded(visible);
         }}
         trigger="hover"
-        mouseEnterDelay={0.16}
-        mouseLeaveDelay={0.16}
+        mouseEnterDelay={0.09}
+        mouseLeaveDelay={0.12}
         placement={placement}
         overlayClassName="booking-week-card-popover"
         autoAdjustOverflow={{ adjustX: 1, adjustY: 1 }}
@@ -381,7 +386,9 @@ export function EventCard({
           style={{ cursor: canOpenDrawer ? 'pointer' : 'default' }}
         >
           <div className="booking-week-card-top">
-            <span className="booking-week-card-time">{eventTime(event)}</span>
+            <span className="booking-week-card-time" title={eventTime(event)}>
+              {eventTimeRange(event)}
+            </span>
             <span className="booking-week-card-badges">
               <span className={typeBadgeClass}>
                 {typeMeta.label}
@@ -430,21 +437,31 @@ export function EventCard({
 
           {event.isAdjusted && <span className="booking-week-adjusted">Đã điều chỉnh</span>}
 
-          {(event.location || (event.ticketType === 'MEETING' && Boolean(event.leader?.trim()))) && (
-            <div className="booking-week-card-location" title={event.location || (event.ticketType === 'MEETING' ? event.leader : '')}>
-              {event.location ? (
+          <div className="booking-week-card-meta-list">
+            {Boolean(event.location) && (
+              <div className="booking-week-card-location" title={event.location}>
                 <EnvironmentOutlined className="booking-week-card-loc-icon" aria-hidden="true" />
-              ) : (
-                <TeamOutlined className="booking-week-card-loc-icon" aria-hidden="true" />
-              )}
-              <span>{event.location || (event.ticketType === 'MEETING' ? event.leader : '')}</span>
-            </div>
-          )}
+                <span>{event.location}</span>
+              </div>
+            )}
+            {event.ticketType === 'MEETING' && Boolean(event.leader?.trim()) && (
+              <div className="booking-week-card-leader" title={`Chủ trì: ${event.leader}`}>
+                <UserOutlined className="booking-week-card-loc-icon" aria-hidden="true" />
+                <span>Chủ trì: <strong>{event.leader}</strong></span>
+              </div>
+            )}
+            {event.ticketType === 'TASK' && Boolean(event.executorText) && (
+              <div className="booking-week-card-leader" title={`Thực hiện: ${event.executorText}`}>
+                <UserOutlined className="booking-week-card-loc-icon" aria-hidden="true" />
+                <span>{event.executorText}</span>
+              </div>
+            )}
+          </div>
         </button>
       </Popover>
     </div>
   );
-}
+});
 
 function OutHoursIcon({ late = false }: { late?: boolean }) {
   return (
@@ -547,6 +564,17 @@ export function WeekTimeline({
   const currentMinutes = now.hour() * 60 + now.minute();
   const withinTimeline = week.isSame(now, 'isoWeek') && currentMinutes >= 420 && currentMinutes < 1080;
 
+  // Tối ưu hóa: Nhóm sự kiện theo ngày một lần duy nhất với useMemo
+  const eventsByDay = useMemo(() => {
+    const map = new Map<string, NormalizedMeetingEvent[]>();
+    for (const ev of events) {
+      const list = map.get(ev.date) || [];
+      list.push(ev);
+      map.set(ev.date, list);
+    }
+    return map;
+  }, [events]);
+
   return (
     <div className="booking-week-grid-scroll" aria-label="Lịch họp tuần" aria-busy={loading}>
       <div className="booking-week-grid">
@@ -573,7 +601,7 @@ export function WeekTimeline({
           const day = week.add(index, 'day');
           const date = day.format('YYYY-MM-DD');
           const selected = date === selectedDate.format('YYYY-MM-DD');
-          const dayEvents = events.filter((event) => event.date === date);
+          const dayEvents = eventsByDay.get(date) || [];
           const earlyEvents = dayEvents
             .filter((event) => event.start.hour() < 7)
             .sort((a, b) => a.start.valueOf() - b.start.valueOf());

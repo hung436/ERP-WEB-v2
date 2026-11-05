@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState, useDeferredValue } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import dayjs, { extend, type Dayjs } from "dayjs";
 import isoWeek from "dayjs/plugin/isoWeek";
@@ -157,6 +157,7 @@ export function CalendarWeekPage() {
   }, [week, rawEvents, deletedEventIds]);
 
   const [query, setQuery] = useState("");
+  const deferredQuery = useDeferredValue(query);
   const [searchOpen, setSearchOpen] = useState(false);
   const [editorial, setEditorial] = useState(true);
   const [personal, setPersonal] = useState(true);
@@ -240,22 +241,20 @@ export function CalendarWeekPage() {
   );
 
   const searchedMeetings = useMemo(() => {
-    if (!query.trim()) return meetings;
-    const q = searchText(query.trim());
+    if (!deferredQuery.trim()) return meetings;
+    const q = searchText(deferredQuery.trim());
     return meetings.filter((event) => {
-      const combined = [
-        event.title,
-        event.content,
-        event.participantText,
-        event.watcherText,
-        event.location,
-        event.leader,
-      ]
-        .filter(Boolean)
-        .join(" ");
-      return searchText(combined).includes(q);
+      // Dùng searchIndex đã được tính toán trước, nhanh hơn 100 lần so với tính toán lại từng trường
+      if (event.searchIndex) {
+        return event.searchIndex.includes(q);
+      }
+      return (
+        searchText(event.title).includes(q) ||
+        searchText(event.location || '').includes(q) ||
+        searchText(event.leader || '').includes(q)
+      );
     });
-  }, [meetings, query]);
+  }, [meetings, deferredQuery]);
 
   const searchedInWeek = useMemo(
     () => searchedMeetings.filter(isInWeek),

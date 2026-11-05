@@ -110,9 +110,12 @@ export function getApprovalStatusMeta(
 
 export function plainText(value?: string): string {
   if (!value) return '';
+  const str = String(value);
+  // Fast path: nếu không chứa ký tự '<' thì chắc chắn là plain text thông thường, không cần khởi tạo DOMParser
+  if (!str.includes('<')) return str.trim();
   if (typeof DOMParser !== 'undefined') {
     try {
-      const doc = new DOMParser().parseFromString(String(value || ''), 'text/html');
+      const doc = new DOMParser().parseFromString(str, 'text/html');
       doc.querySelectorAll('script, style').forEach((node) => node.remove());
       doc.querySelectorAll('br').forEach((node) => node.replaceWith('\n'));
       doc.querySelectorAll('p, div, li').forEach((node) => node.append('\n'));
@@ -121,9 +124,7 @@ export function plainText(value?: string): string {
       // fallback
     }
   }
-  return String(value || '')
-    .replace(/<[^>]*>/g, ' ')
-    .trim();
+  return str.replace(/<[^>]*>/g, ' ').trim();
 }
 
 export const searchText = (value: string): string =>
@@ -183,6 +184,7 @@ export interface NormalizedMeetingEvent {
   continuesFromPreviousDay?: boolean;
   continuesToNextDay?: boolean;
   isInterested?: boolean;
+  searchIndex: string;
   raw: any;
 }
 
@@ -283,6 +285,7 @@ export function normalizeMeeting(record: CalendarEvent | any, userId = 'nhanvien
   const participantText = record.participantText || record.attendees_text || (Array.isArray(record.participants) ? record.participants.map((p: any) => p.display_name || p.name || p).join(', ') : '');
 
   const attachments = Array.isArray(record.attachments) ? record.attachments : Array.isArray(record.file_attachments) ? record.file_attachments : [];
+  const content = plainText(record.content || record.description || record.notes);
 
   return {
     id: String(record.id),
@@ -294,7 +297,7 @@ export function normalizeMeeting(record: CalendarEvent | any, userId = 'nhanvien
     end,
     date: record.date || record.calendar_date || start.format('YYYY-MM-DD'),
     title: record.title || 'Cuộc họp',
-    content: plainText(record.content || record.description || record.notes),
+    content,
     location: isTask ? '' : (record.location || (record.mode === 'online' ? 'Trực tuyến' : '')),
     leader: isMeeting ? (record.leader || record.host?.display_name || record.host?.name || record.organizer) : undefined,
     participantText,
@@ -319,6 +322,19 @@ export function normalizeMeeting(record: CalendarEvent | any, userId = 'nhanvien
     continuesFromPreviousDay: Boolean(record.continuesFromPreviousDay || record.continues_from_previous_day),
     continuesToNextDay: Boolean(record.continuesToNextDay || record.continues_to_next_day),
     isInterested: Boolean(record.isInterested || record.is_interested),
+    searchIndex: searchText(
+      [
+        record.title || '',
+        content,
+        participantText,
+        watcherText,
+        executorText,
+        isTask ? '' : (record.location || ''),
+        isMeeting ? (record.leader || record.host?.display_name || record.host?.name || record.organizer || '') : '',
+      ]
+        .filter(Boolean)
+        .join(' ')
+    ),
     raw: record,
   };
 }
@@ -382,6 +398,36 @@ export const eventTime = (event: NormalizedMeetingEvent): string => {
     return target ? target.format('HH:mm') : '';
   }
   return event.start.format('HH:mm');
+};
+
+/**
+ * Hiển thị khung giờ đầy đủ giúp người đọc quét nhanh:
+ * - Lịch họp / Sự kiện: 08:30 – 10:00 (hoặc 08:30 nếu không có giờ kết thúc)
+ * - Phiếu công việc (TASK): Hạn: 17:30
+ */
+export const eventTimeRange = (event: NormalizedMeetingEvent): string => {
+  if (event.ticketType === 'TASK') {
+    const target = event.end || event.start;
+    return target ? `Hạn: ${target.format('HH:mm')}` : '';
+  }
+  if (event.end && event.end.isValid() && !event.end.isSame(event.start)) {
+    return `${event.start.format('HH:mm')} – ${event.end.format('HH:mm')}`;
+  }
+  return event.start.format('HH:mm');
+};
+
+/**
+ * Tính thời lượng bằng tiếng Việt dễ đọc (vd: 1 giờ 30 phút, 45 phút)
+ */
+export const eventDurationText = (event: NormalizedMeetingEvent): string => {
+  if (!event.end || !event.end.isValid() || event.end.isSame(event.start)) return '';
+  const diffMinutes = event.end.diff(event.start, 'minute');
+  if (diffMinutes <= 0) return '';
+  const hours = Math.floor(diffMinutes / 60);
+  const minutes = diffMinutes % 60;
+  if (hours > 0 && minutes > 0) return `${hours} giờ ${minutes} phút`;
+  if (hours > 0) return `${hours} giờ`;
+  return `${minutes} phút`;
 };
 
 export function positionEvents(events: NormalizedMeetingEvent[]) {

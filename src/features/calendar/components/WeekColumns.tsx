@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import type { Dayjs } from 'dayjs';
 import { Skeleton } from 'antd';
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
@@ -91,6 +91,20 @@ export function WeekColumns({
   const [dutyExpanded, setDutyExpanded] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
+  // Tối ưu hóa: Nhóm các sự kiện theo ngày 1 lần duy nhất với useMemo (O(N) thay vì lặp O(7*N))
+  const eventsByDay = useMemo(() => {
+    const map = new Map<string, NormalizedMeetingEvent[]>();
+    for (const ev of events) {
+      const list = map.get(ev.date) || [];
+      list.push(ev);
+      map.set(ev.date, list);
+    }
+    for (const list of map.values()) {
+      list.sort((a, b) => a.start.valueOf() - b.start.valueOf());
+    }
+    return map;
+  }, [events]);
+
   const handleToggleDutyExpanded = () => {
     setDutyExpanded((prev) => {
       const next = !prev;
@@ -116,9 +130,7 @@ export function WeekColumns({
           const selected = date === selectedDate.format('YYYY-MM-DD');
           const isToday = day.isSame(now, 'day');
           const pastDuty = week.isSame(now, 'isoWeek') && day.isBefore(now, 'day');
-          const dayEvents = events
-            .filter((event) => event.date === date)
-            .sort((a, b) => a.start.valueOf() - b.start.valueOf());
+          const dayEvents = eventsByDay.get(date) || [];
 
           return (
             <section
@@ -137,7 +149,10 @@ export function WeekColumns({
                     onClick={() => onSelectDay(day)}
                     disabled={loading}
                   >
-                    <span>{name}</span>
+                    <span className="booking-week-column-day-title">
+                      <span>{name}</span>
+                      {isToday && <span className="booking-week-today-pill">Hôm nay</span>}
+                    </span>
                     <b className="booking-week-column-date">{day.format('DD/MM')}</b>
                   </button>
                 </div>
