@@ -257,15 +257,22 @@ export function CalendarEventDetailModal({
         (currentStatus === "PENDING" || currentStatus === "CONSULTING")
       ) {
         setActiveRole("APPROVER");
-      } else if (isUserConsultee && currentStatus === "CONSULTING") {
+      } else if (
+        isUserConsultee &&
+        (currentStatus === "PENDING" || currentStatus === "CONSULTING")
+      ) {
         setActiveRole("CONSULTEE");
-      } else if (isMe(resolvedCreator)) {
+      } else if (isMe(resolvedCreator) && !isUserExecutor) {
         setActiveRole("CREATOR");
       } else if (
         isUserExecutor &&
-        (currentStatus === "APPROVED" || currentStatus === "ACTIVE")
+        (currentStatus === "APPROVED" ||
+          currentStatus === "ACTIVE" ||
+          currentStatus === "IN_PROGRESS")
       ) {
         setActiveRole("EXECUTOR");
+      } else if (isMe(resolvedCreator)) {
+        setActiveRole("CREATOR");
       } else if (isUserExecutor) {
         setActiveRole("EXECUTOR");
       } else if ((event.watchers || []).some((w) => isMe(w.name))) {
@@ -495,69 +502,88 @@ export function CalendarEventDetailModal({
     event.consultants.some((c) => isMe(c.name) && c.status === "PENDING"),
   );
   const isUserExecutorDone = Boolean(
-    event.executors &&
-    event.executors.some((e) => isMe(e.name)) &&
-    event.executors
-      .filter((e) => isMe(e.name))
-      .every((e) => e.status === "COMPLETED"),
+    (event.executors &&
+      event.executors.some((e) => isMe(e.name)) &&
+      event.executors
+        .filter((e) => isMe(e.name))
+        .every(
+          (e) =>
+            e.status === "COMPLETED" ||
+            (e as { status?: string }).status === "completed" ||
+            Boolean(e.completed_at),
+        )) ||
+      statusKey === "COMPLETED" ||
+      (event.steps || []).some(
+        (s) =>
+          (s.role === "EXECUTOR" || s.step_order === 3 || s.step_order === 2) &&
+          isMe(s.actor_name) &&
+          s.status === "COMPLETED",
+      ),
   );
-  const isCreatorOfTicket = Boolean(
-    isMe(creatorName) || isMe(event.organizer) || activeRole === "CREATOR",
-  );
-
   const isUserAnExecutor = Boolean(
     event.executors &&
     event.executors.some((e) => isMe(e.name)) &&
-    !isCreatorOfTicket &&
     !isUserExecutorDone,
   );
+  const isCreatorOnly = Boolean(
+    (isMe(creatorName) || isMe(event.organizer)) && !isUserAnExecutor,
+  );
 
-  // Người duyệt: Khi Chờ duyệt -> Duyệt, Lấy ý kiến, Không duyệt
+  // Đang lấy ý kiến tham vấn từ người khác
+  const isConsultingInProgress = Boolean(
+    hasPendingConsultants ||
+    event.approvalStatus === "CONSULTING" ||
+    (event.steps || []).some(
+      (s) =>
+        (s.role === "CONSULTANT" || s.role === "APPROVER" || s.step_order === 2) &&
+        s.status === "CONSULTING",
+    ),
+  );
+
+  // Người duyệt: Khi Chờ duyệt và KHÔNG trong trạng thái đang lấy ý kiến tham vấn -> Duyệt, Lấy ý kiến, Không duyệt
+  // ĐANG LẤY ý kiến của người khác thì không cho thực hiện action gì cả (ẩn toàn bộ action duyệt / lấy ý kiến / không duyệt)
   const showApproverApproveBtn =
     !isMeeting &&
     (activeRole === "APPROVER" || isUserAnApprover) &&
-    isPendingApproval;
+    isPendingApproval &&
+    !isConsultingInProgress;
+
   const showApproverConsultBtn =
     !isMeeting &&
     (activeRole === "APPROVER" || isUserAnApprover) &&
     isPendingApproval &&
-    !hasAnyConsultants;
+    !hasAnyConsultants &&
+    !isConsultingInProgress;
+
   const showApproverRejectBtn =
     !isMeeting &&
     (activeRole === "APPROVER" || isUserAnApprover) &&
-    isPendingApproval;
+    isPendingApproval &&
+    !isConsultingInProgress;
 
-  // Người được lấy ý kiến: Khi có ý kiến tham vấn đang chờ xử lý của mình -> Gửi ý kiến
+  // Người được lấy ý kiến: Khi chính mình có ý kiến tham vấn đang chờ xử lý -> Gửi ý kiến
   const showConsulteeReplyBtn =
     !isMeeting && isUserAConsultee && hasPendingConsultants;
 
-  // Người thực hiện: Khi là Phiếu Triển khai đang thực hiện -> Hoàn thành (Người tạo triển khai và Phiếu Đề xuất không có nút Hoàn thành)
+  // Người thực hiện: Khi là Phiếu Triển khai đang thực hiện -> Hoàn thành (Người tạo không kiêm thực hiện, Phiếu Đề xuất không có nút Hoàn thành, và chưa hoàn thành)
   const showExecutorCompleteBtn =
     !isMeeting &&
     !isProposal &&
-    !isCreatorOfTicket &&
+    !isCreatorOnly &&
+    !isUserExecutorDone &&
     (activeRole === "EXECUTOR" || isUserAnExecutor) &&
     statusKey === "IN_PROGRESS" &&
-    !isFinishedOrCancelled;
-
-  // Người theo dõi: Khi người dùng hiện tại đang theo dõi và không phải người tạo
-  const isUserCurrentlyWatching = Boolean(
-    watchers.some((w) => isMe(w.name)) || event.isUserWatcher,
-  );
-  const showWatcherUnfollowBtn =
-    !isMeeting &&
-    isUserCurrentlyWatching &&
-    !isCreatorMe &&
-    !isFinishedOrCancelled;
+    !isFinishedOrCancelled &&
+    !isConsultingInProgress;
 
   // Lịch họp: Không có các action Kết thúc cuộc họp và Tham gia cuộc họp
+  // Nếu không có bất kỳ action xử lý nào (hoặc đang lấy ý kiến của người khác) -> Ẩn toàn bộ khối action
   const hasAnyWorkflowAction =
     showApproverApproveBtn ||
     showApproverConsultBtn ||
     showApproverRejectBtn ||
     showConsulteeReplyBtn ||
-    showExecutorCompleteBtn ||
-    showWatcherUnfollowBtn;
+    showExecutorCompleteBtn;
 
   const handleToggleMute = () => {
     const nextState = !isMuted;
@@ -990,18 +1016,35 @@ export function CalendarEventDetailModal({
     const nowIso = new Date().toISOString();
 
     const currentExecutors = event.executors || [];
-    const updatedExecutors = currentExecutors.map((ex) => ({
-      ...ex,
-      status: "COMPLETED" as const,
-      completed_at: ex.completed_at || nowIso,
-    }));
+    const hasMeInExecutors = currentExecutors.some((ex) => isMe(ex.name));
 
-    const allDone = true;
+    const updatedExecutors = currentExecutors.map((ex) => {
+      if (!hasMeInExecutors || isMe(ex.name)) {
+        return {
+          ...ex,
+          status: "COMPLETED" as const,
+          completed_at: ex.completed_at || nowIso,
+        };
+      }
+      return ex;
+    });
+
+    const allDone =
+      updatedExecutors.length === 0 ||
+      updatedExecutors.every(
+        (ex) =>
+          ex.status === "COMPLETED" ||
+          (ex as { status?: string }).status === "completed" ||
+          Boolean(ex.completed_at),
+      );
+
     const nextStatus = isMeeting
       ? "COMPLETED"
       : isProposal
         ? "APPROVED"
-        : "COMPLETED";
+        : allDone
+          ? "COMPLETED"
+          : "IN_PROGRESS";
 
     const updatedSteps = (event.steps || []).map((st) => {
       if (st.step_order === 3 || st.role === "EXECUTOR") {
@@ -1009,8 +1052,8 @@ export function CalendarEventDetailModal({
           ...st,
           status: allDone ? ("COMPLETED" as const) : ("IN_PROGRESS" as const),
           actor_name: defaultExecutor,
-          completed_at: allDone ? nowIso : undefined,
-          note: report || (allDone ? "Đã hoàn thành công việc." : undefined),
+          completed_at: allDone ? nowIso : st.completed_at,
+          note: report || (allDone ? "Đã hoàn thành công việc." : st.note),
         };
       }
       return st;

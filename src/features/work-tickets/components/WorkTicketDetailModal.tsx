@@ -273,7 +273,7 @@ export function WorkTicketDetailModal({ ticket, onClose, onUpdated, initialTab =
   };
 
   return <>
-    <Modal centered className="document-detail-modal work-ticket-detail-modal" footer={ticket && isMyTurn(ticket) ? <div className="document-approval-footer">
+    <Modal centered className="document-detail-modal work-ticket-detail-modal" footer={ticket && isMyTurn(ticket) && !pendingConsult ? <div className="document-approval-footer">
       <Input.TextArea aria-label="Ý kiến xử lý" onChange={(event) => setNote(event.target.value)} placeholder="Nhập ý kiến xử lý (không bắt buộc)" rows={2} value={note} />
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
         <Button icon={<MessageSquare size={14} />} onClick={() => setConsultModalOpen(true)}>{pendingConsult ? 'Thêm người lấy ý kiến' : 'Lấy ý kiến'}</Button>
