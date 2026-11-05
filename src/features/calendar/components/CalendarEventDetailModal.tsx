@@ -2556,8 +2556,6 @@ export function CalendarEventDetailModal({
                       </Button>
                     </div>
                   )}
-
-              
                 </div>
               )}
             </div>
@@ -2641,10 +2639,6 @@ export function CalendarEventDetailModal({
         open={consultModalOpen}
         title="Lấy ý kiến tham vấn"
       >
-        <p style={{ color: "#475569", fontSize: 13, marginBottom: 12 }}>
-          Chọn nhân sự hoặc chuyên gia cần lấy ý kiến chuyên môn trước khi đưa
-          ra quyết định duyệt.
-        </p>
         <Select
           mode="multiple"
           onChange={setSelectedConsultees}
