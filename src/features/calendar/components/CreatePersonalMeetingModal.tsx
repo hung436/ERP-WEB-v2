@@ -1135,7 +1135,15 @@ export function CreatePersonalMeetingModal({
                         isPendingDeployAfterSelection.current = false;
                         setShowParticipantModal(true);
                       }}
-                      role="region"
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          isPendingDeployAfterSelection.current = false;
+                          setShowParticipantModal(true);
+                        }
+                      }}
+                      role="button"
+                      tabIndex={0}
                       aria-label="Thành phần đã chọn"
                     >
                       <div className="jt-modern-picker-tag-list">
@@ -1146,7 +1154,6 @@ export function CreatePersonalMeetingModal({
                             <span
                               key={name}
                               className="jt-modern-user-tag"
-                              onClick={(e) => e.stopPropagation()}
                             >
                               <span className={`jt-user-tag-avatar ${toneClass}`}>
                                 {initials}
@@ -1784,6 +1791,90 @@ export function CreatePersonalMeetingModal({
                       </div>
                     );
                   })}
+                </div>
+              )}
+
+              {/* Nếu là Gửi duyệt và có người trong danh sách thành phần: Chuyển thành Người theo dõi và cho phép loại bỏ */}
+              {confirmActionType === "PROPOSE" && draftWatchers.length > 0 && (
+                <div style={{ marginTop: 14 }}>
+                  <div
+                    style={{
+                      fontSize: 13,
+                      fontWeight: 600,
+                      color: "#344054",
+                      marginBottom: 8,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    <span>Chuyển thành người theo dõi ({draftWatchers.length})</span>
+                    <span style={{ fontSize: 11.5, color: "#667085", fontWeight: 400 }}>
+                      Nhận thông báo tiến độ phiếu
+                    </span>
+                  </div>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                    {draftWatchers.map((name, pIdx) => (
+                      <span
+                        key={`draft-watcher-${name}-${pIdx}`}
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: 6,
+                          padding: "3px 8px 3px 6px",
+                          backgroundColor: "#f8fafc",
+                          border: "1px solid #e2e8f0",
+                          borderRadius: 14,
+                          fontSize: 12.5,
+                          color: "#334155",
+                        }}
+                      >
+                        <span
+                          className={`mini-avatar ${avatarTone(name)}`}
+                          style={{
+                            width: 18,
+                            height: 18,
+                            borderRadius: "50%",
+                            fontSize: 9,
+                            fontWeight: 700,
+                            display: "inline-flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                        >
+                          {nameInitials(name)}
+                        </span>
+                        <span>{name}</span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const updated = draftWatchers.filter((n) => n !== name);
+                            setModalParticipants(updated);
+                            form.setFieldValue("participants", updated);
+                          }}
+                          title={`Bỏ người theo dõi: ${name}`}
+                          aria-label={`Bỏ người theo dõi: ${name}`}
+                          style={{
+                            display: "inline-flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            width: 16,
+                            height: 16,
+                            padding: 0,
+                            marginLeft: 2,
+                            border: "none",
+                            background: "transparent",
+                            color: "#94a3b8",
+                            cursor: "pointer",
+                            borderRadius: "50%",
+                            transition: "all 0.15s ease",
+                          }}
+                        >
+                          <CloseOutlined style={{ fontSize: 9 }} />
+                        </button>
+                      </span>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>
