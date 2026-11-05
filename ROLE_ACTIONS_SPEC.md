@@ -156,8 +156,8 @@
 
 **Nút trong nội dung:**
 
-- [x] Tham gia họp trực tuyến (nếu có link)
-- [x] Hoàn thành / Kết thúc cuộc họp
+- [x] Nút Tham gia trong khung link phòng họp trực tuyến
+- [ ] Hoàn thành / Kết thúc cuộc họp
 - [x] Thêm tệp đính kèm
 - [x] Gửi bình luận trao đổi
 
@@ -173,7 +173,7 @@
 
 **Nút trong nội dung:**
 
-- [x] Tham gia họp trực tuyến (nếu có link)
+- [x] Nút Tham gia trong khung link phòng họp trực tuyến
 - [ ] Hoàn thành / Kết thúc cuộc họp
 - [ ] Thêm tệp đính kèm (chỉ xem/tải tài liệu họp)
 - [x] Gửi bình luận trao đổi

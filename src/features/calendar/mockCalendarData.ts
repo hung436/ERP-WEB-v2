@@ -1864,7 +1864,6 @@ export function getEventsForWeek(weekStart: Dayjs, existingEvents: CalendarEvent
   }));
 
   const existingIds = new Set(enrichedExisting.map((ev) => ev.id));
-  const hasExistingEditorial = enrichedExisting.some((ev) => ev.scope === 'editorial');
   const personalList = getMockPersonalEvents(weekStart);
   const editorialList = getMockEditorialEvents(weekStart);
 
@@ -1872,11 +1871,9 @@ export function getEventsForWeek(weekStart: Dayjs, existingEvents: CalendarEvent
   personalList.forEach((ev) => {
     if (!existingIds.has(ev.id)) additions.push(ev);
   });
-  if (!hasExistingEditorial) {
-    editorialList.forEach((ev) => {
-      if (!existingIds.has(ev.id)) additions.push(ev);
-    });
-  }
+  editorialList.forEach((ev) => {
+    if (!existingIds.has(ev.id)) additions.push(ev);
+  });
 
   return [...enrichedExisting, ...additions];
 }

@@ -193,7 +193,7 @@ export function WeekColumns({
                       event={event}
                       now={now}
                       vertical
-                      expandLeft={index >= 5}
+                      expandLeft={index >= 3}
                       upward={eventIndex >= 4}
                       onSelect={onSelectEvent}
                       onToggleInterest={onToggleInterest}

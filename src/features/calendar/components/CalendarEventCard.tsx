@@ -6,6 +6,8 @@ import { useEffect, useRef, useState } from 'react';
 
 import type { CalendarEvent } from '@/types/domain';
 
+import { getApprovalStatusMeta } from '../calendarWeekUtils';
+
 extend(isoWeek);
 
 interface CalendarEventCardProps {
@@ -27,6 +29,14 @@ export function CalendarEventCard({ event, onSelectEvent, onHoverChange, style, 
   const isUserAttending = Boolean(event.isUserParticipant || event.isUserWatcher);
   const [isInterested, setIsInterested] = useState(Boolean(event.isInterested));
   const [isHoverExpanded, setIsHoverExpanded] = useState(false);
+
+  const approvalMeta = getApprovalStatusMeta(event.approvalStatus, event.ticketType, event.workflowType);
+  const hasStatus = Boolean(
+    approvalMeta &&
+      approvalMeta.label &&
+      (!isEditorial || (event.approvalStatus && event.approvalStatus !== 'SCHEDULED')) &&
+      approvalMeta.value !== 'SCHEDULED',
+  );
 
   const enterTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const leaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -175,8 +185,14 @@ export function CalendarEventCard({ event, onSelectEvent, onHoverChange, style, 
           </span>
 
           <div className="card-header-badges">
-            {isPersonal && (
-              <span className="card-status-badge personal">Cá nhân</span>
+            {event.ticketType === 'MEETING' && (
+              <span className="card-status-badge meeting">Lịch họp</span>
+            )}
+            {event.ticketType === 'TASK' && (
+              <span className="card-status-badge task">Phiếu công việc</span>
+            )}
+            {event.ticketType === 'EVENT' && (
+              <span className="card-status-badge event">Sự kiện</span>
             )}
             {isEditorial && isUserAttending && (
               <span className="card-status-badge attending">Tham gia</span>
@@ -195,6 +211,14 @@ export function CalendarEventCard({ event, onSelectEvent, onHoverChange, style, 
           </div>
         </div>
 
+        {hasStatus && (
+          <div className="booking-week-card-status-row">
+            <span className={`booking-week-status-badge booking-week-status-${(approvalMeta.value || '').toLowerCase().replace(/_/g, '-')}`}>
+              {approvalMeta.label}
+            </span>
+          </div>
+        )}
+
         <div className="card-title">{event.title}</div>
 
         {event.isAdjusted && (
@@ -205,14 +229,14 @@ export function CalendarEventCard({ event, onSelectEvent, onHoverChange, style, 
           </div>
         )}
 
-        {(event.location || Boolean(event.leader?.trim())) && (
+        {(event.location || (event.ticketType === 'MEETING' && Boolean(event.leader?.trim()))) && (
           <div className="card-location-row">
             {event.location ? (
               <div className="card-location-info" title={event.location}>
                 <MapPin size={12} style={{ flexShrink: 0 }} />
                 <span>{event.location}</span>
               </div>
-            ) : event.leader?.trim() ? (
+            ) : (event.ticketType === 'MEETING' && event.leader?.trim()) ? (
               <div className="card-location-info" title={event.leader}>
                 <Users size={12} style={{ flexShrink: 0 }} />
                 <span>{event.leader}</span>
@@ -229,14 +253,11 @@ export function CalendarEventCard({ event, onSelectEvent, onHoverChange, style, 
         <div className="card-rich-header">
           <div className="card-rich-title">{event.title}</div>
           <div className="card-rich-badges">
-            {event.ticketType === 'TASK' && <span className="card-status-badge task">Task</span>}
-            {event.ticketType === 'EVENT' && <span className="card-status-badge event">Sự kiện</span>}
             {event.ticketType === 'MEETING' && <span className="card-status-badge meeting">Lịch họp</span>}
+            {event.ticketType === 'TASK' && <span className="card-status-badge task">Phiếu công việc</span>}
+            {event.ticketType === 'EVENT' && <span className="card-status-badge event">Sự kiện</span>}
             {isEditorial && isUserAttending && (
               <span className="card-status-badge attending">Tham gia</span>
-            )}
-            {isPersonal && (
-              <span className="card-status-badge personal">Cá nhân</span>
             )}
           </div>
         </div>
@@ -268,7 +289,7 @@ export function CalendarEventCard({ event, onSelectEvent, onHoverChange, style, 
           </div>
         )}
 
-        {Boolean(event.leader?.trim()) && (
+        {event.ticketType === 'MEETING' && Boolean(event.leader?.trim()) && (
           <div className="card-rich-row">
             <Users size={13} />
             <span>

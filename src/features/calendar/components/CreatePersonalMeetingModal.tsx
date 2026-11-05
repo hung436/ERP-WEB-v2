@@ -1,14 +1,12 @@
-import { useEffect, useRef, useState } from "react";
-import dayjs, { type Dayjs } from "dayjs";
+import { useEffect, useMemo, useRef, useState } from "react";
+import dayjs, { type Dayjs, isDayjs } from "dayjs";
 import {
   Alert,
   Button,
-  DatePicker,
   Form,
   Input,
   Modal,
-  Radio,
-  Select,
+  Checkbox,
   message,
 } from "antd";
 import type { UploadFile } from "antd/es/upload/interface";
@@ -18,9 +16,11 @@ import {
   CheckSquareOutlined,
   CloseOutlined,
   EnvironmentOutlined,
+  ExclamationCircleOutlined,
   LinkOutlined,
   NotificationOutlined,
   PaperClipOutlined,
+  PlusOutlined,
   RocketOutlined,
   SendOutlined,
   TeamOutlined,
@@ -28,11 +28,63 @@ import {
 } from "@ant-design/icons";
 
 import { useAuth } from "@/features/auth/AuthContext";
+import { directoryContacts } from "@/mocks/fixtures";
 import { calendarApi } from "@/services/api";
 import type { CalendarAttachmentItem, CalendarEvent } from "@/types/domain";
+import { avatarTone, nameInitials } from "@/utils/avatar";
 
-import { formatBytes, getFileCategory } from "./AttachedFilesList";
+import { AttachedFilesGrid } from "./AttachedFilesList";
+import { SmartTimePicker } from "./SmartTimePicker";
+import { SmartParticipantPicker } from "./SmartParticipantPicker";
+import { UserSelectionModal } from "./UserSelectionModal";
 import "./JobTicketDetailDrawer.css";
+
+
+const POSITION_MAP: Record<string, string> = {
+  'Nguyễn Minh Anh': 'Phóng viên',
+  'Trần Thu Hà': 'Phó Trưởng ban',
+  'Phạm Đức Long': 'Quản trị viên hệ thống',
+  'Nguyễn Hoài Nam': 'Phóng viên chuyên đề',
+  'Lê Thanh Vân': 'Thư ký điều phối',
+  'Đỗ Quang Huy': 'Trưởng ban',
+  'Mai Phương Thảo': 'Chuyên viên lưu trữ',
+  'Vũ Minh Khôi': 'Chuyên viên',
+  'Hoàng Tuấn Anh': 'Thư ký biên tập',
+  'Ngô Mỹ Linh': 'Chuyên viên văn thư',
+  'Bùi Anh Tú': 'Phóng viên thời sự',
+  'Phan Thùy Dung': 'Chuyên viên tư liệu',
+  'Đặng Quốc Bảo': 'Kỹ sư phần mềm',
+  'Tạ Minh Châu': 'Kỹ sư hệ thống',
+  'Đinh Gia Hân': 'Phóng viên',
+  'Lương Hải Đăng': 'Phóng viên',
+  'Cao Thanh Tâm': 'Kế toán viên',
+  'Trịnh Khánh Vy': 'Chuyên viên nhân sự',
+  'Nguyễn Tấn Đạt': 'Phó Tổng Biên tập',
+  'Lê Văn Tuấn': 'Trưởng ban Thư ký',
+};
+
+function parsePersonInfo(raw: string): { name: string; roleOrDept: string } {
+  const trimmed = (raw || '').trim();
+  const match = trimmed.match(/^(.+?)\s*\((.+?)\)$/);
+  if (match) {
+    return { name: match[1].trim(), roleOrDept: match[2].trim() };
+  }
+  if (POSITION_MAP[trimmed]) {
+    return { name: trimmed, roleOrDept: POSITION_MAP[trimmed] };
+  }
+  const contact = directoryContacts.find(
+    (c) =>
+      c.fullName.toLowerCase() === trimmed.toLowerCase() ||
+      (c.penName && c.penName.toLowerCase() === trimmed.toLowerCase())
+  );
+  if (contact) {
+    return {
+      name: contact.fullName,
+      roleOrDept: contact.department || '',
+    };
+  }
+  return { name: trimmed, roleOrDept: '' };
+}
 
 const TICKET_TYPE_ITEMS = [
   {
@@ -101,6 +153,7 @@ export interface CreatePersonalMeetingModalProps {
   initialDate?: Dayjs | null;
   editingEvent?: CalendarEvent | null;
   initialTicketType?: "TASK" | "MEETING" | "EVENT";
+  existingEvents?: CalendarEvent[];
   onClose: () => void;
   onSuccess: (record: CalendarEvent) => void;
 }
@@ -114,39 +167,11 @@ interface TicketFormValues {
   dateTimeRange?: [Dayjs, Dayjs];
   location?: string;
   meetingLink?: string;
-  mode?: "offline" | "online" | "hybrid";
+  mode?: "offline" | "online" | "hybrid" | ("offline" | "online")[];
   participants?: string[] | string;
   executors?: string[];
   watchers?: string[];
   approver?: string[] | string;
-}
-
-
-interface SmartTimePickerProps {
-  value?: Dayjs;
-  onChange?: (val: Dayjs) => void;
-  ticketType?: "TASK" | "MEETING" | "EVENT";
-}
-
-function SmartTimePicker({
-  value,
-  onChange,
-}: SmartTimePickerProps) {
-  return (
-    <DatePicker
-      value={value}
-      onChange={(val) => {
-        if (val) onChange?.(val);
-      }}
-      showTime={{ format: "HH:mm" }}
-      format="HH:mm DD/MM/YYYY"
-      needConfirm
-      allowClear={false}
-      className="jt-modern-picker"
-      style={{ width: "100%", height: 36, borderRadius: 6 }}
-      placeholder="Chọn thời gian..."
-    />
-  );
 }
 
 export function CreatePersonalMeetingModal({
@@ -154,6 +179,7 @@ export function CreatePersonalMeetingModal({
   initialDate,
   editingEvent,
   initialTicketType = "TASK",
+  existingEvents = [],
   onClose,
   onSuccess,
 }: CreatePersonalMeetingModalProps) {
@@ -176,9 +202,11 @@ export function CreatePersonalMeetingModal({
   // Sub-modal states
   const [showParticipantModal, setShowParticipantModal] = useState(false);
   const [modalParticipants, setModalParticipants] = useState<string[]>([]);
+  const isPendingDeployAfterSelection = useRef(false);
 
   const [showApproverModal, setShowApproverModal] = useState(false);
   const [modalApprovers, setModalApprovers] = useState<string[]>([]);
+  const [approverModalError, setApproverModalError] = useState<string>("");
 
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [confirmActionType, setConfirmActionType] = useState<
@@ -186,7 +214,23 @@ export function CreatePersonalMeetingModal({
   >("DEPLOY");
 
   const selectedApprover = Form.useWatch("approver", form);
-  const selectedMode = Form.useWatch("mode", form) || "offline";
+  const watchedMode = Form.useWatch("mode", form);
+  const currentModes: string[] = Array.isArray(watchedMode)
+    ? watchedMode
+    : watchedMode === "hybrid"
+      ? ["offline", "online"]
+      : watchedMode === "online"
+        ? ["online"]
+        : ["offline"];
+  const isOffline = currentModes.includes("offline");
+  const isOnline = currentModes.includes("online");
+  const watchedParticipants = Form.useWatch("participants", form);
+  const watchedLocation = Form.useWatch("location", form);
+  const selectedParticipantsList = useMemo(() => {
+    if (Array.isArray(watchedParticipants)) return watchedParticipants;
+    if (typeof watchedParticipants === "string" && watchedParticipants.trim()) return [watchedParticipants];
+    return [];
+  }, [watchedParticipants]);
   const hasApprover =
     ticketType !== "MEETING" &&
     Boolean(
@@ -236,7 +280,13 @@ export function CreatePersonalMeetingModal({
           startAt: start,
           deadline: end,
           location: editingEvent.location,
-          mode: editingEvent.mode || "offline",
+          meetingLink: editingEvent.meetingUrl,
+          mode:
+            editingEvent.mode === "hybrid"
+              ? ["offline", "online"]
+              : editingEvent.mode === "online"
+                ? ["online"]
+                : ["offline"],
           participants: editingEvent.participants || ["PHAN NGHỆ ĐÔ"],
           executors: editingEvent.executors?.map((e) => e.name) || [
             "Bùi Lê Thế Kiệt",
@@ -246,7 +296,7 @@ export function CreatePersonalMeetingModal({
           ],
           approver: editingEvent.approver?.name
             ? editingEvent.approver.name.split(", ").filter(Boolean)
-            : ["Nguyễn Tấn Đạt (Phó Tổng Biên tập)"],
+            : [],
         });
 
         if (editingEvent.attachments) {
@@ -266,12 +316,26 @@ export function CreatePersonalMeetingModal({
         form.resetFields();
         setFiles([]);
 
-        const baseDate = initialDate || dayjs();
-        const start = baseDate.hour(9).minute(0).second(0);
+        const now = dayjs();
+        const remainder = now.minute() % 5;
+        const roundedNow =
+          remainder === 0
+            ? now.second(0).millisecond(0)
+            : now.add(5 - remainder, "minute").second(0).millisecond(0);
+
+        const baseDate = initialDate
+          ? initialDate.isBefore(roundedNow, "day")
+            ? roundedNow
+            : initialDate
+          : roundedNow;
+
+        const start = baseDate.isSame(roundedNow, "day")
+          ? roundedNow
+          : baseDate.hour(roundedNow.hour()).minute(roundedNow.minute()).second(0);
         const end = start.add(1, "hour");
 
         form.setFieldsValue({
-          mode: "offline",
+          mode: ["offline"],
           time: start,
           startAt: start,
           deadline: end,
@@ -322,6 +386,7 @@ export function CreatePersonalMeetingModal({
 
       if (partsList.length === 0) {
         setModalParticipants([]);
+        isPendingDeployAfterSelection.current = true;
         setShowParticipantModal(true);
       } else {
         setConfirmActionType("DEPLOY");
@@ -332,17 +397,6 @@ export function CreatePersonalMeetingModal({
     }
   };
 
-  // Xác nhận sau khi chọn thành phần từ popup
-  const handleConfirmParticipantModal = () => {
-    if (!modalParticipants || modalParticipants.length === 0) {
-      message.warning("Vui lòng chọn ít nhất một thành phần tham gia / thực hiện");
-      return;
-    }
-    form.setFieldValue("participants", modalParticipants);
-    setShowParticipantModal(false);
-    setConfirmActionType("DEPLOY");
-    setShowConfirmModal(true);
-  };
 
   // Nút "Đề xuất": Mở popup chọn người duyệt (chọn nhiều)
   const handleProposeClick = async () => {
@@ -361,11 +415,8 @@ export function CreatePersonalMeetingModal({
           ? [currentApprovers]
           : [];
 
-      setModalApprovers(
-        apprList.length > 0
-          ? apprList
-          : ["Nguyễn Tấn Đạt (Phó Tổng Biên tập)"],
-      );
+      setModalApprovers(apprList);
+      setApproverModalError("");
       setShowApproverModal(true);
     } catch {
       // Form validation error triggered
@@ -375,9 +426,10 @@ export function CreatePersonalMeetingModal({
   // Xác nhận sau khi chọn người duyệt từ popup
   const handleConfirmApproverModal = () => {
     if (!modalApprovers || modalApprovers.length === 0) {
-      message.warning("Vui lòng chọn ít nhất một người duyệt");
+      setApproverModalError("Vui lòng chọn ít nhất một người duyệt");
       return;
     }
+    setApproverModalError("");
     form.setFieldValue("approver", modalApprovers);
     setShowApproverModal(false);
     setConfirmActionType("PROPOSE");
@@ -392,7 +444,7 @@ export function CreatePersonalMeetingModal({
       setSaving(true);
       setError("");
 
-      const data = form.getFieldsValue();
+      const data = form.getFieldsValue(true);
       const rawContent = (data.content || "").trim();
       if (!rawContent) {
         message.error("Vui lòng nhập nội dung");
@@ -400,37 +452,131 @@ export function CreatePersonalMeetingModal({
         return;
       }
 
+      // Trích xuất thời gian chính xác, bảo đảm không bị mất giờ hay sai lệch
+      const extractTimeRange = (
+        rawTime: unknown,
+        fallbackHour = 9,
+        durationMinutes = 60,
+      ): { startIso: string; endIso: string } => {
+        const defaultBase = (initialDate || dayjs())
+          .hour(fallbackHour)
+          .minute(0)
+          .second(0);
+        let start: Dayjs = defaultBase;
+        let end: Dayjs = defaultBase.add(durationMinutes, "minute");
+
+        if (rawTime) {
+          if (Array.isArray(rawTime) && rawTime.length >= 2) {
+            const s = dayjs(rawTime[0]);
+            const e = dayjs(rawTime[1]);
+            if (s.isValid()) start = s;
+            if (e.isValid()) end = e;
+            else end = start.add(durationMinutes, "minute");
+          } else if (Array.isArray(rawTime) && rawTime.length === 1) {
+            const s = dayjs(rawTime[0]);
+            if (s.isValid()) {
+              start = s;
+              end = s.add(durationMinutes, "minute");
+            }
+          } else if (isDayjs(rawTime)) {
+            if (rawTime.isValid()) {
+              start = rawTime;
+              const customEnd = (rawTime as unknown as { endAt?: unknown })?.endAt;
+              if (customEnd && isDayjs(customEnd) && customEnd.isValid()) {
+                end = customEnd;
+              } else if (customEnd && typeof customEnd === "string" && dayjs(customEnd).isValid()) {
+                end = dayjs(customEnd);
+              } else {
+                end = start.add(durationMinutes, "minute");
+              }
+            }
+          } else if (typeof rawTime === "object" && rawTime !== null) {
+            const obj = rawTime as Record<string, unknown>;
+            const rawStart = obj.startAt || obj[0] || obj.time || obj.date;
+            const rawEnd = obj.endAt || obj[1] || obj.deadline;
+
+            if (rawStart) {
+              const s = dayjs(rawStart as string | number | Date | Dayjs);
+              if (s.isValid()) start = s;
+            }
+            if (rawEnd) {
+              const e = dayjs(rawEnd as string | number | Date | Dayjs);
+              if (e.isValid()) end = e;
+              else end = start.add(durationMinutes, "minute");
+            } else {
+              end = start.add(durationMinutes, "minute");
+            }
+          } else if (typeof rawTime === "string" || typeof rawTime === "number") {
+            const s = dayjs(rawTime);
+            if (s.isValid()) {
+              start = s;
+              end = s.add(durationMinutes, "minute");
+            }
+          }
+        }
+
+        if (end.isBefore(start)) {
+          end = start.add(durationMinutes, "minute");
+        }
+
+        return {
+          startIso: start.toISOString(),
+          endIso: end.toISOString(),
+        };
+      };
+
       let startAtStr = new Date().toISOString();
       let endAtStr = new Date().toISOString();
 
       if (ticketType === "MEETING") {
-        const s = data.startAt
-          ? dayjs(data.startAt)
-          : data.dateTimeRange
-            ? dayjs(data.dateTimeRange[0])
-            : dayjs();
-        startAtStr = s.toISOString();
-        endAtStr = s.add(1, "hour").toISOString();
+        const { startIso, endIso } = extractTimeRange(
+          data.time || data.startAt || data.dateTimeRange,
+          9,
+          60,
+        );
+        startAtStr = startIso;
+        endAtStr = endIso;
+      } else if (ticketType === "TASK") {
+        const { startIso } = extractTimeRange(
+          data.time || data.deadline || data.startAt,
+          17,
+          0,
+        );
+        startAtStr = startIso;
+        endAtStr = startIso;
       } else {
-        const t = data.time
-          ? dayjs(data.time)
-          : data.deadline
-            ? dayjs(data.deadline)
-            : data.startAt
-              ? dayjs(data.startAt)
-              : dayjs();
-        startAtStr = t.toISOString();
-        endAtStr =
-          ticketType === "TASK" ? t.toISOString() : t.add(1, "hour").toISOString();
+        const { startIso, endIso } = extractTimeRange(
+          data.time || data.startAt,
+          9,
+          60,
+        );
+        startAtStr = startIso;
+        endAtStr = endIso;
       }
 
-      const rawLocation = (data.location as string)?.trim() || "";
+            const rawLocation = (data.location as string)?.trim() || "";
       const rawLink = (data.meetingLink as string)?.trim() || "";
+      const rawModes: string[] = Array.isArray(data.mode)
+        ? data.mode
+        : data.mode === "hybrid"
+          ? ["offline", "online"]
+          : data.mode === "online"
+            ? ["online"]
+            : ["offline"];
+      const hasOffline = rawModes.includes("offline");
+      const hasOnline = rawModes.includes("online");
+      const finalMode: "offline" | "online" | "hybrid" =
+        hasOffline && hasOnline
+          ? "hybrid"
+          : hasOnline
+            ? "online"
+            : "offline";
+
       const location =
         ticketType === "MEETING"
-          ? data.mode === "online"
+          ? finalMode === "online"
             ? rawLink || rawLocation || "Trực tuyến"
-            : data.mode === "hybrid"
+            : finalMode === "hybrid"
               ? [rawLocation, rawLink].filter(Boolean).join(" • ") ||
                 "Phòng họp cơ quan"
               : rawLocation || "Phòng họp cơ quan"
@@ -449,11 +595,14 @@ export function CreatePersonalMeetingModal({
         }),
       );
 
-      const rawPartsList = Array.isArray(data.participants)
+      const rawPartsList = (Array.isArray(data.participants)
         ? data.participants
         : typeof data.participants === "string" && data.participants.trim()
           ? [data.participants]
-          : [];
+          : []
+      )
+        .map((p: unknown) => (typeof p === "string" ? p.trim() : typeof (p as { name?: string })?.name === "string" ? ((p as { name?: string }).name || "").trim() : ""))
+        .filter(Boolean);
       const partsList = rawPartsList.length > 0 ? rawPartsList : [currentUserName];
 
       let approverName: string | undefined = undefined;
@@ -461,12 +610,15 @@ export function CreatePersonalMeetingModal({
       let apprListToSave: string[] = [];
 
       if (actionType === "PROPOSE") {
-        const apprList = Array.isArray(data.approver)
-          ? data.approver
-          : typeof data.approver === "string" && data.approver.trim()
-            ? [data.approver]
+        const rawAppr = modalApprovers && modalApprovers.length > 0
+          ? modalApprovers
+          : form.getFieldValue("approver") || data.approver;
+        const apprList = Array.isArray(rawAppr)
+          ? rawAppr
+          : typeof rawAppr === "string" && rawAppr.trim()
+            ? [rawAppr]
             : [];
-        apprListToSave = apprList.length > 0 ? apprList : ["Nguyễn Tấn Đạt (Phó Tổng Biên tập)"];
+        apprListToSave = apprList;
         approverName = apprListToSave.join(", ");
         initialApprovalStatus = "PENDING";
       } else if (actionType === "DEPLOY") {
@@ -474,9 +626,12 @@ export function CreatePersonalMeetingModal({
         initialApprovalStatus = "IN_PROGRESS";
       } else {
         if (hasApprover) {
-          const apprList = Array.isArray(data.approver)
-            ? data.approver
-            : [String(data.approver)];
+          const rawAppr = modalApprovers && modalApprovers.length > 0
+            ? modalApprovers
+            : form.getFieldValue("approver") || data.approver;
+          const apprList = Array.isArray(rawAppr)
+            ? rawAppr
+            : [String(rawAppr)];
           apprListToSave = apprList;
           approverName = apprList.join(", ");
           initialApprovalStatus = isEdit
@@ -485,6 +640,40 @@ export function CreatePersonalMeetingModal({
         } else {
           initialApprovalStatus = (ticketType === "MEETING" || ticketType === "EVENT") ? "SCHEDULED" : "IN_PROGRESS";
         }
+      }
+
+      const isSendingForApproval =
+        actionType === "PROPOSE" ||
+        initialApprovalStatus === "PENDING" ||
+        (Boolean(approverName) && apprListToSave.length > 0);
+
+      // Quy tắc hệ thống theo yêu cầu:
+      // - Khi tạo phiếu/sự kiện gửi duyệt:
+      //   + Thành phần (participants) sẽ là: Người duyệt và Người tạo
+      //   + Thành phần mà người ta nhập ở form (rawPartsList) sẽ chuyển thành: Người theo dõi (watchers)
+      // - Khi không gửi duyệt (triển khai ngay):
+      //   + Thành phần là danh sách nhân sự đã nhập ở form
+      let finalParticipants: string[] = partsList;
+      let finalWatchers: Array<{ id: string | number; name: string }> = [];
+
+      if (isSendingForApproval) {
+        // Thành phần chính thức gồm: Người tạo và Người duyệt
+        finalParticipants = Array.from(
+          new Set([
+            currentUserName,
+            ...apprListToSave,
+          ])
+        ).filter(Boolean) as string[];
+
+        // Thành phần nhập ở form chuyển thành Người theo dõi
+        const rawWatchers = rawPartsList.filter(
+          (name: string) => !finalParticipants.includes(name)
+        );
+        const watcherNames = rawWatchers.length > 0 ? rawWatchers : rawPartsList;
+        finalWatchers = watcherNames.map((name: string, idx: number) => ({
+          id: `watcher-${idx}-${Date.now()}`,
+          name,
+        }));
       }
 
       const firstLine = rawContent.split(/\r?\n/)[0] || currentTypeMeta.name;
@@ -509,12 +698,12 @@ export function CreatePersonalMeetingModal({
         deadline: ticketType === "TASK" ? endAtStr : undefined,
         location,
         meetingUrl: rawLink || undefined,
-        mode: data.mode || "offline",
+        mode: finalMode,
         organizer: currentUserName,
-        leader: currentUserName,
-        participants: partsList,
-        participantText: partsList.join(", "),
-        participantCount: partsList.length,
+        leader: ticketType === "MEETING" ? (editingEvent?.leader || currentUserName) : undefined,
+        participants: finalParticipants,
+        participantText: finalParticipants.join(", "),
+        participantCount: finalParticipants.length,
         isUserParticipant: true,
         notes: data.content,
         description: data.content,
@@ -530,12 +719,20 @@ export function CreatePersonalMeetingModal({
         })),
         approvalStatus: initialApprovalStatus,
         comments: editingEvent?.comments || [],
-        executors: partsList.map((p: string, i: number) => ({
-          id: `exec-${i}`,
-          name: p,
-          status: actionType === "DEPLOY" ? 'IN_PROGRESS' : 'PENDING',
-        })),
-        watchers: [],
+        executors: isSendingForApproval
+          ? [
+              {
+                id: `exec-creator`,
+                name: currentUserName,
+                status: 'PENDING',
+              },
+            ]
+          : partsList.map((p: string, i: number) => ({
+              id: `exec-${i}`,
+              name: p,
+              status: actionType === "DEPLOY" ? 'IN_PROGRESS' : 'PENDING',
+            })),
+        watchers: finalWatchers,
         steps: [
           {
             id: "step-1",
@@ -551,7 +748,11 @@ export function CreatePersonalMeetingModal({
             step_order: 2,
             name: actionType === "PROPOSE" ? "Rà soát / Phê duyệt" : "Phê duyệt",
             status: initialApprovalStatus === "PENDING" ? "PENDING" : "APPROVED",
-            actor_name: approverName || "Tự động duyệt",
+            actor_name:
+              approverName ||
+              (actionType === "DEPLOY"
+                ? "Trực tiếp triển khai"
+                : "Tự động duyệt"),
             role: "APPROVER",
           },
           {
@@ -837,42 +1038,15 @@ export function CreatePersonalMeetingModal({
               </Form.Item>
 
               {files.length > 0 && (
-                <div className="jt-attached-chips-container">
-                  {files.map((file, idx) => {
-                    const cat = getFileCategory(file.name);
-                    return (
-                      <div key={file.uid || idx} className="jt-attached-chip">
-                        <span
-                          className="jt-attached-chip__icon"
-                          style={{ color: cat.color }}
-                        >
-                          {cat.icon}
-                        </span>
-                        <span
-                          className="jt-attached-chip__name"
-                          title={file.name}
-                        >
-                          {file.name}
-                        </span>
-                        <span className="jt-attached-chip__size">
-                          ({formatBytes(file.size)})
-                        </span>
-                        <button
-                          type="button"
-                          className="jt-attached-chip__remove"
-                          onClick={() =>
-                            setFiles((prev) =>
-                              prev.filter((_, i) => i !== idx),
-                            )
-                          }
-                          title="Xóa tệp này"
-                          aria-label="Xóa tệp"
-                        >
-                          <CloseOutlined />
-                        </button>
-                      </div>
-                    );
-                  })}
+                <div style={{ marginBottom: 14 }}>
+                  <AttachedFilesGrid
+                    files={files}
+                    onRemove={(uid) =>
+                      setFiles((prev) =>
+                        prev.filter((f) => (f.uid || f.name) !== uid),
+                      )
+                    }
+                  />
                 </div>
               )}
 
@@ -889,10 +1063,44 @@ export function CreatePersonalMeetingModal({
                     required: true,
                     message: "Vui lòng chọn thời gian",
                   },
+                  {
+                    validator: async (_, val) => {
+                      if (!val || editingEvent) return Promise.resolve();
+                      const now = dayjs();
+                      let startDayjs: Dayjs | null = null;
+                      if (Array.isArray(val) && val[0]) {
+                        startDayjs = dayjs(val[0]);
+                      } else if (isDayjs(val)) {
+                        startDayjs = val;
+                      } else if (typeof val === "object" && val !== null) {
+                        const obj = val as Record<string, unknown>;
+                        const raw = obj.startAt || obj.time;
+                        if (typeof raw === "string" || isDayjs(raw)) startDayjs = dayjs(raw as string | Dayjs);
+                      }
+                      if (
+                        startDayjs &&
+                        startDayjs.isValid() &&
+                        startDayjs.isBefore(now.subtract(1, "minute"))
+                      ) {
+                        return Promise.reject(
+                          new Error("Thời gian không được ở trong quá khứ"),
+                        );
+                      }
+                      return Promise.resolve();
+                    },
+                  },
                 ]}
                 style={{ marginBottom: 14 }}
               >
-                <SmartTimePicker ticketType={ticketType} />
+                <SmartTimePicker
+                  ticketType={ticketType}
+                  allowPast={Boolean(editingEvent)}
+                  existingEvents={existingEvents}
+                  currentUserName={currentUserName}
+                  selectedParticipants={selectedParticipantsList}
+                  selectedLocation={watchedLocation}
+                  excludeEventId={editingEvent?.id}
+                />
               </Form.Item>
 
               <Form.Item
@@ -900,17 +1108,85 @@ export function CreatePersonalMeetingModal({
                 label={<span className="jt-field-label">Chọn thành phần</span>}
                 style={{ marginBottom: 0 }}
               >
-                <Select
-                  mode="multiple"
-                  allowClear
-                  options={SUGGESTED_MEMBERS}
-                  placeholder={
-                    ticketType === "TASK"
-                      ? "Chọn thành phần thực hiện công việc..."
-                      : "Chọn thành phần tham gia sự kiện..."
-                  }
-                  className="jt-modern-select"
-                />
+                <div className="jt-popup-participant-picker">
+                  {selectedParticipantsList.length === 0 ? (
+                    <button
+                      type="button"
+                      className="jt-modern-picker-surface is-empty"
+                      onClick={() => {
+                        isPendingDeployAfterSelection.current = false;
+                        setShowParticipantModal(true);
+                      }}
+                      aria-label="Chọn thành phần"
+                    >
+                      <span className="jt-modern-picker-placeholder">
+                        <TeamOutlined style={{ fontSize: 14, color: "#94a3b8" }} />
+                        <span>
+                          {ticketType === "EVENT"
+                            ? "Chọn thành phần tham gia sự kiện..."
+                            : "Chọn thành phần thực hiện công việc..."}
+                        </span>
+                      </span>
+                    </button>
+                  ) : (
+                    <div
+                      className="jt-modern-picker-surface"
+                      onClick={() => {
+                        isPendingDeployAfterSelection.current = false;
+                        setShowParticipantModal(true);
+                      }}
+                      role="region"
+                      aria-label="Thành phần đã chọn"
+                    >
+                      <div className="jt-modern-picker-tag-list">
+                        {selectedParticipantsList.map((name) => {
+                          const toneClass = avatarTone(name);
+                          const initials = nameInitials(name);
+                          return (
+                            <span
+                              key={name}
+                              className="jt-modern-user-tag"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <span className={`jt-user-tag-avatar ${toneClass}`}>
+                                {initials}
+                              </span>
+                              <span className="jt-user-tag-name">{name}</span>
+                              <button
+                                type="button"
+                                className="jt-user-tag-remove-btn"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  const next = selectedParticipantsList.filter(
+                                    (n) => n !== name,
+                                  );
+                                  form.setFieldValue("participants", next);
+                                }}
+                                aria-label={`Xóa ${name}`}
+                                title={`Xóa ${name}`}
+                              >
+                                <CloseOutlined style={{ fontSize: 9 }} />
+                              </button>
+                            </span>
+                          );
+                        })}
+                        <button
+                          type="button"
+                          className="jt-modern-picker-add-btn"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            isPendingDeployAfterSelection.current = false;
+                            setShowParticipantModal(true);
+                          }}
+                          aria-label="Thêm thành phần"
+                        >
+                          <PlusOutlined style={{ fontSize: 10 }} />
+                          <span>Thêm</span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </Form.Item>
             </div>
           ) : (
@@ -955,42 +1231,15 @@ export function CreatePersonalMeetingModal({
                 </Form.Item>
 
                 {files.length > 0 && (
-                  <div className="jt-attached-chips-container">
-                    {files.map((file, idx) => {
-                      const cat = getFileCategory(file.name);
-                      return (
-                        <div key={file.uid || idx} className="jt-attached-chip">
-                          <span
-                            className="jt-attached-chip__icon"
-                            style={{ color: cat.color }}
-                          >
-                            {cat.icon}
-                          </span>
-                          <span
-                            className="jt-attached-chip__name"
-                            title={file.name}
-                          >
-                            {file.name}
-                          </span>
-                          <span className="jt-attached-chip__size">
-                            ({formatBytes(file.size)})
-                          </span>
-                          <button
-                            type="button"
-                            className="jt-attached-chip__remove"
-                            onClick={() =>
-                              setFiles((prev) =>
-                                prev.filter((_, i) => i !== idx),
-                              )
-                            }
-                            title="Xóa tệp này"
-                            aria-label="Xóa tệp"
-                          >
-                            <CloseOutlined />
-                          </button>
-                        </div>
-                      );
-                    })}
+                  <div style={{ marginBottom: 14 }}>
+                    <AttachedFilesGrid
+                      files={files}
+                      onRemove={(uid) =>
+                        setFiles((prev) =>
+                          prev.filter((f) => (f.uid || f.name) !== uid),
+                        )
+                      }
+                    />
                   </div>
                 )}
 
@@ -999,71 +1248,98 @@ export function CreatePersonalMeetingModal({
                     name="startAt"
                     label={
                       <span className="jt-field-label">
-                        <span style={{ display: "none" }}>Thời gian</span>
-                        Thời gian diễn ra cuộc họp
+                        Thời gian
                       </span>
                     }
                     rules={[
                       {
                         required: true,
-                        message: "Vui lòng chọn thời gian diễn ra cuộc họp",
+                        message: "Vui lòng chọn thời gian",
+                      },
+                      {
+                        validator: async (_, val) => {
+                          if (!val || editingEvent) return Promise.resolve();
+                          const now = dayjs();
+                          let startDayjs: Dayjs | null = null;
+                          if (Array.isArray(val) && val[0]) {
+                            startDayjs = dayjs(val[0]);
+                          } else if (isDayjs(val)) {
+                            startDayjs = val;
+                          } else if (typeof val === "object" && val !== null) {
+                            const obj = val as Record<string, unknown>;
+                            const raw = obj.startAt || obj.time;
+                            if (typeof raw === "string" || isDayjs(raw)) startDayjs = dayjs(raw as string | Dayjs);
+                          }
+                          if (
+                            startDayjs &&
+                            startDayjs.isValid() &&
+                            startDayjs.isBefore(now.subtract(1, "minute"))
+                          ) {
+                            return Promise.reject(
+                              new Error("Thời gian không được ở trong quá khứ"),
+                            );
+                          }
+                          return Promise.resolve();
+                        },
                       },
                     ]}
                     style={{ marginBottom: 14 }}
                   >
-                    <SmartTimePicker ticketType="MEETING" />
+                    <SmartTimePicker
+                      ticketType="MEETING"
+                      allowPast={Boolean(editingEvent)}
+                      existingEvents={existingEvents}
+                      currentUserName={currentUserName}
+                      selectedParticipants={selectedParticipantsList}
+                      selectedLocation={!isOffline ? "" : watchedLocation}
+                      excludeEventId={editingEvent?.id}
+                    />
                   </Form.Item>
 
                   <Form.Item
                     name="mode"
                     label={
                       <span className="jt-field-label">
-                        Hình thức tổ chức họp
+                        Hình thức họp
                       </span>
                     }
-                    initialValue="offline"
+                    initialValue={["offline"]}
+                    rules={[
+                      {
+                        validator: async (_, value) => {
+                          const arr = Array.isArray(value)
+                            ? value
+                            : value
+                              ? [value]
+                              : [];
+                          if (arr.length === 0) {
+                            return Promise.reject(
+                              new Error("Vui lòng chọn ít nhất một hình thức họp"),
+                            );
+                          }
+                          return Promise.resolve();
+                        },
+                      },
+                    ]}
                     style={{ marginBottom: 14 }}
                   >
-                    <Radio.Group
+                    <Checkbox.Group
+                      className="jt-meeting-mode-checkboxes"
                       options={[
-                        { value: "offline", label: "Trực tiếp" },
-                        { value: "online", label: "Trực tuyến" },
-                        { value: "hybrid", label: "Kết hợp" },
+                        { label: "Trực tiếp", value: "offline" },
+                        { label: "Trực tuyến", value: "online" },
                       ]}
-                      optionType="button"
-                      buttonStyle="solid"
-                      className="jt-segmented-radio"
                     />
                   </Form.Item>
                 </div>
 
-                {selectedMode === "online" ? (
-                  <div className="jt-form-grid-1col">
-                    <Form.Item
-                      name="meetingLink"
-                      label={
-                        <span className="jt-field-label">
-                          <span style={{ display: "none" }}>Địa điểm</span>
-                          Đường dẫn họp trực tuyến (Link Online)
-                        </span>
-                      }
-                      style={{ marginBottom: 0 }}
-                    >
-                      <Input
-                        className="jt-modern-input"
-                        prefix={<LinkOutlined style={{ color: "#94a3b8" }} />}
-                        placeholder="Dán link Google Meet, Zoom, MS Teams để người tham dự truy cập..."
-                      />
-                    </Form.Item>
-                  </div>
-                ) : selectedMode === "hybrid" ? (
+                {isOffline && isOnline ? (
                   <div className="jt-form-grid-2col">
                     <Form.Item
                       name="location"
                       label={
                         <span className="jt-field-label">
-                          <span style={{ display: "none" }}>Địa điểm</span>
-                          Phòng họp / Địa điểm
+                          Địa điểm
                         </span>
                       }
                       style={{ marginBottom: 0 }}
@@ -1093,14 +1369,31 @@ export function CreatePersonalMeetingModal({
                       />
                     </Form.Item>
                   </div>
-                ) : (
+                ) : isOnline ? (
+                  <div className="jt-form-grid-1col">
+                    <Form.Item
+                      name="meetingLink"
+                      label={
+                        <span className="jt-field-label">
+                          Link họp trực tuyến
+                        </span>
+                      }
+                      style={{ marginBottom: 0 }}
+                    >
+                      <Input
+                        className="jt-modern-input"
+                        prefix={<LinkOutlined style={{ color: "#94a3b8" }} />}
+                        placeholder="Dán link Google Meet, Zoom, MS Teams để người tham dự truy cập..."
+                      />
+                    </Form.Item>
+                  </div>
+                ) : isOffline ? (
                   <div className="jt-form-grid-1col">
                     <Form.Item
                       name="location"
                       label={
                         <span className="jt-field-label">
-                          <span style={{ display: "none" }}>Địa điểm</span>
-                          Phòng họp / Địa điểm
+                          Địa điểm
                         </span>
                       }
                       style={{ marginBottom: 0 }}
@@ -1114,7 +1407,7 @@ export function CreatePersonalMeetingModal({
                       />
                     </Form.Item>
                   </div>
-                )}
+                ) : null}
               </div>
 
               <div className="jt-form-section jt-form-section--divider">
@@ -1141,11 +1434,10 @@ export function CreatePersonalMeetingModal({
                     ]}
                     style={{ marginBottom: 0 }}
                   >
-                    <Select
-                      mode="multiple"
-                      options={SUGGESTED_MEMBERS}
+                    <SmartParticipantPicker
+                      ticketType="MEETING"
+                      targetRole="participants"
                       placeholder="Chọn nhân sự tham dự cuộc họp..."
-                      className="jt-modern-select"
                     />
                   </Form.Item>
                 </div>
@@ -1156,65 +1448,51 @@ export function CreatePersonalMeetingModal({
         </Form>
       </Modal>
 
-      {/* ─── POPUP CHỌN THÀNH PHẦN (KHI BẤM TRIỂN KHAI MÀ CHƯA CÓ THÀNH PHẦN) ─── */}
-      <Modal
+      {/* ─── POPUP CHỌN THÀNH PHẦN (DÙNG CHO CẢ TẠO PHIẾU VÀ TRIỂN KHAI) ─── */}
+      <UserSelectionModal
         open={showParticipantModal}
         title={
           ticketType === "EVENT"
             ? "Chọn thành phần tham gia"
-            : "Chọn thành phần thực hiện"
+            : ticketType === "TASK"
+              ? "Chọn thành phần thực hiện"
+              : "Chọn thành phần tham dự"
         }
-        centered
-        width={500}
-        destroyOnClose={false}
-        onCancel={() => setShowParticipantModal(false)}
-        footer={
-          <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}>
-            <Button onClick={() => setShowParticipantModal(false)}>
-              Đóng
-            </Button>
-            <Button
-              type="primary"
-              onClick={handleConfirmParticipantModal}
-              style={{
-                backgroundColor: "#059669",
-                borderColor: "#059669",
-                borderRadius: 6,
-                fontWeight: 600,
-              }}
-            >
-              Tiếp tục
-            </Button>
-          </div>
-        }
-      >
-        <p className="jt-modal-helper-text">
-          {ticketType === "EVENT"
-            ? "Vui lòng chọn nhân sự hoặc đơn vị tham gia sự kiện trước khi tiến hành triển khai:"
-            : "Vui lòng chọn ít nhất một nhân sự chịu trách nhiệm thực hiện công việc trước khi tiến hành triển khai:"}
-        </p>
-        <Select
-          mode="multiple"
-          style={{ width: "100%" }}
-          options={SUGGESTED_MEMBERS}
-          value={modalParticipants}
-          onChange={setModalParticipants}
-          placeholder="Chọn nhân sự thực hiện / tham gia..."
-          className="jt-modern-select"
-        />
-      </Modal>
+        initialSelected={selectedParticipantsList}
+        onCancel={() => {
+          isPendingDeployAfterSelection.current = false;
+          setShowParticipantModal(false);
+        }}
+        onOk={(selected) => {
+          form.setFieldValue("participants", selected);
+          setShowParticipantModal(false);
+          if (isPendingDeployAfterSelection.current && selected.length > 0) {
+            isPendingDeployAfterSelection.current = false;
+            setConfirmActionType("DEPLOY");
+            setShowConfirmModal(true);
+          }
+        }}
+      />
 
       {/* ─── POPUP CHỌN NGƯỜI DUYỆT (KHI BẤM ĐỀ XUẤT - CHỌN NHIỀU) ─── */}
       <Modal
         open={showApproverModal}
-        title="Chọn người duyệt phiếu đề xuất"
+        title="Chọn người duyệt phiếu"
         centered
-        width={500}
+        width={540}
         destroyOnClose={false}
-        onCancel={() => setShowApproverModal(false)}
+        onCancel={() => {
+          setShowApproverModal(false);
+          setApproverModalError("");
+        }}
         footer={
           <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}>
-            <Button onClick={() => setShowApproverModal(false)}>
+            <Button
+              onClick={() => {
+                setShowApproverModal(false);
+                setApproverModalError("");
+              }}
+            >
               Đóng
             </Button>
             <Button
@@ -1232,149 +1510,285 @@ export function CreatePersonalMeetingModal({
           </div>
         }
       >
-        <p className="jt-modal-helper-text">
-          Chỉ định một hoặc nhiều lãnh đạo/cấp quản lý để gửi phiếu đề xuất phê duyệt:
-        </p>
-        <Select
-          mode="multiple"
-          style={{ width: "100%" }}
-          options={SUGGESTED_MEMBERS}
-          value={modalApprovers}
-          onChange={setModalApprovers}
-          placeholder="Chọn người duyệt (có thể chọn nhiều)..."
-          className="jt-modern-select"
-        />
+        <div style={{ padding: "4px 0" }}>
+          <SmartParticipantPicker
+            ticketType={ticketType}
+            targetRole="approvers"
+            allowGroups={false}
+            status={approverModalError ? "error" : undefined}
+            value={modalApprovers}
+            onChange={(newVal) => {
+              setModalApprovers(newVal);
+              if (newVal && newVal.length > 0) {
+                setApproverModalError("");
+              }
+            }}
+            placeholder="Chọn người duyệt..."
+          />
+          {approverModalError && (
+            <div
+              style={{
+                marginTop: 6,
+                fontSize: 12.5,
+                color: "#d92d20",
+                fontWeight: 500,
+                display: "flex",
+                alignItems: "center",
+                gap: 5,
+              }}
+            >
+              <ExclamationCircleOutlined />
+              <span>Vui lòng chọn ít nhất một người duyệt</span>
+            </div>
+          )}
+        </div>
       </Modal>
 
       {/* ─── POPUP HỎI XÁC NHẬN THÔNG TIN LẠI (CHO CẢ TRIỂN KHAI VÀ ĐỀ XUẤT) ─── */}
       <Modal
         open={showConfirmModal}
         title={
-          confirmActionType === "DEPLOY"
-            ? `Xác nhận triển khai ${currentTypeMeta.name.toLowerCase()}`
-            : `Xác nhận gửi đề xuất ${currentTypeMeta.name.toLowerCase()}`
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <div
+              style={{
+                width: 32,
+                height: 32,
+                borderRadius: "50%",
+                backgroundColor:
+                  confirmActionType === "DEPLOY" ? "#ecfdf3" : "#eff8ff",
+                color:
+                  confirmActionType === "DEPLOY" ? "#027a48" : "#175cd3",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: 15,
+                flexShrink: 0,
+              }}
+            >
+              {confirmActionType === "DEPLOY" ? (
+                <RocketOutlined />
+              ) : (
+                <SendOutlined />
+              )}
+            </div>
+            <div>
+              <div style={{ fontSize: 16, fontWeight: 600, color: "#1d2939" }}>
+                Xác nhận
+              </div>
+            </div>
+          </div>
         }
         centered
-        width={560}
+        width={480}
         destroyOnClose={false}
         onCancel={() => setShowConfirmModal(false)}
         footer={
-          <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}>
-            <Button onClick={() => setShowConfirmModal(false)}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "flex-end",
+              gap: 8,
+              paddingTop: 12,
+              borderTop: "1px solid #f2f4f7",
+            }}
+          >
+            <Button
+              onClick={() => setShowConfirmModal(false)}
+              style={{
+                borderRadius: 6,
+                fontWeight: 500,
+                color: "#344054",
+                borderColor: "#d0d5dd",
+              }}
+            >
               Quay lại
             </Button>
             <Button
               type="primary"
               loading={saving}
               onClick={() => handleExecuteFinalSubmit(confirmActionType)}
+              icon={
+                confirmActionType === "DEPLOY" ? (
+                  <CheckOutlined />
+                ) : (
+                  <SendOutlined />
+                )
+              }
               style={{
-                backgroundColor: confirmActionType === "DEPLOY" ? "#059669" : "#1d4ed8",
-                borderColor: confirmActionType === "DEPLOY" ? "#059669" : "#1d4ed8",
+                backgroundColor:
+                  confirmActionType === "DEPLOY" ? "#059669" : "#1d4ed8",
+                borderColor:
+                  confirmActionType === "DEPLOY" ? "#059669" : "#1d4ed8",
                 borderRadius: 6,
                 fontWeight: 600,
               }}
             >
-              {confirmActionType === "DEPLOY"
-                ? "Xác nhận triển khai"
-                : "Xác nhận gửi đề xuất"}
+              Xác nhận
             </Button>
           </div>
         }
       >
-        <p className="jt-modal-helper-text">
-          Vui lòng kiểm tra lại toàn bộ thông tin phiếu trước khi xác nhận lưu vào lịch làm việc:
-        </p>
+        {(() => {
+          const rawParticipants =
+            modalParticipants && modalParticipants.length > 0
+              ? modalParticipants
+              : form.getFieldValue("participants");
+          const rawApprovers =
+            modalApprovers && modalApprovers.length > 0
+              ? modalApprovers
+              : form.getFieldValue("approver");
+          const confirmRecipients: string[] =
+            confirmActionType === "DEPLOY"
+              ? Array.isArray(rawParticipants)
+                ? rawParticipants
+                : typeof rawParticipants === "string" && rawParticipants.trim()
+                  ? [rawParticipants]
+                  : []
+              : Array.isArray(rawApprovers)
+                ? rawApprovers
+                : typeof rawApprovers === "string" && rawApprovers.trim()
+                  ? [rawApprovers]
+                  : [];
+          const draftWatchers: string[] =
+            Array.isArray(rawParticipants)
+              ? rawParticipants
+              : typeof rawParticipants === "string" && rawParticipants.trim()
+                ? [rawParticipants]
+                : [];
 
-        <div className="jt-confirm-summary">
-          <div className="jt-confirm-row">
-            <span className="jt-confirm-label">Loại phiếu</span>
-            <span className="jt-confirm-value" style={{ fontWeight: 600, color: "#0f172a" }}>
-              {currentTypeMeta.name}
-            </span>
-          </div>
+          return (
+            <div style={{ padding: "8px 0 4px 0" }}>
+              {/* Header dòng hướng dẫn / số lượng */}
+              <div
+                style={{
+                  fontSize: 13.5,
+                  color: "#475467",
+                  marginBottom: 10,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                }}
+              >
+                <span style={{ fontWeight: 500 }}>
+                  {confirmActionType === "DEPLOY"
+                    ? "Xác nhận triển khai cho:"
+                    : "Xác nhận gửi duyệt cho:"}
+                </span>
+                {confirmRecipients.length > 0 && (
+                  <span
+                    style={{
+                      fontSize: 12,
+                      color: "#667085",
+                      backgroundColor: "#f2f4f7",
+                      padding: "2px 8px",
+                      borderRadius: 10,
+                      fontWeight: 500,
+                    }}
+                  >
+                    {confirmRecipients.length}{" "}
+                    {confirmActionType === "DEPLOY" ? "nhân sự" : "người duyệt"}
+                  </span>
+                )}
+              </div>
 
-          <div className="jt-confirm-row">
-            <span className="jt-confirm-label">Nội dung</span>
-            <span className="jt-confirm-value" style={{ whiteSpace: "pre-wrap" }}>
-              {form.getFieldValue("content") || "—"}
-            </span>
-          </div>
-
-          <div className="jt-confirm-row">
-            <span className="jt-confirm-label">Thời gian</span>
-            <span className="jt-confirm-value" style={{ fontWeight: 500 }}>
-              {form.getFieldValue("time")
-                ? dayjs(form.getFieldValue("time")).format("DD/MM/YYYY HH:mm")
-                : form.getFieldValue("startAt")
-                  ? dayjs(form.getFieldValue("startAt")).format("DD/MM/YYYY HH:mm")
-                  : "Chưa chọn"}
-            </span>
-          </div>
-
-          <div className="jt-confirm-row">
-            <span className="jt-confirm-label">Thành phần</span>
-            <span className="jt-confirm-value">
-              {Array.isArray(form.getFieldValue("participants")) &&
-              form.getFieldValue("participants").length > 0
-                ? form.getFieldValue("participants").join(", ")
-                : "Chưa chọn thành phần"}
-            </span>
-          </div>
-
-          {confirmActionType === "PROPOSE" && (
-            <div className="jt-confirm-row">
-              <span className="jt-confirm-label">Người duyệt</span>
-              <span className="jt-confirm-value" style={{ color: "#b45309", fontWeight: 600 }}>
-                {Array.isArray(form.getFieldValue("approver")) &&
-                form.getFieldValue("approver").length > 0
-                  ? form.getFieldValue("approver").join(", ")
-                  : "Chưa chỉ định người duyệt"}
-              </span>
-            </div>
-          )}
-
-          <div className="jt-confirm-row">
-            <span className="jt-confirm-label">Hình thức xử lý</span>
-            <span className="jt-confirm-value">
-              {confirmActionType === "DEPLOY" ? (
-                <span
+              {/* Danh sách người nhận */}
+              {confirmRecipients.length === 0 ? (
+                <div
                   style={{
-                    color: "#15803d",
-                    backgroundColor: "#f0fdf4",
-                    padding: "2px 8px",
-                    borderRadius: 4,
-                    fontSize: 12,
-                    fontWeight: 600,
+                    padding: "16px",
+                    textAlign: "center",
+                    color: "#98a2b3",
+                    fontSize: 13,
+                    backgroundColor: "#f9fafb",
+                    borderRadius: 8,
+                    border: "1px dashed #d0d5dd",
                   }}
                 >
-                  Triển khai ngay
-                </span>
+                  {confirmActionType === "DEPLOY"
+                    ? "Chưa chọn nhân sự thực hiện"
+                    : "Chưa chọn người duyệt"}
+                </div>
               ) : (
-                <span
+                <div
                   style={{
-                    color: "#b45309",
-                    backgroundColor: "#fffbeb",
-                    padding: "2px 8px",
-                    borderRadius: 4,
-                    fontSize: 12,
-                    fontWeight: 600,
+                    maxHeight: 220,
+                    overflowY: "auto",
+                    border: "1px solid #eaecf0",
+                    borderRadius: 8,
+                    backgroundColor: "#ffffff",
                   }}
                 >
-                  Chờ lãnh đạo duyệt
-                </span>
+                  {confirmRecipients.map((rawName, idx) => {
+                    const info = parsePersonInfo(rawName);
+                    return (
+                      <div
+                        key={`${rawName}-${idx}`}
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 12,
+                          padding: "10px 14px",
+                          borderBottom:
+                            idx < confirmRecipients.length - 1
+                              ? "1px solid #f2f4f7"
+                              : "none",
+                          backgroundColor: "#ffffff",
+                        }}
+                      >
+                        <span
+                          className={`mini-avatar ${avatarTone(info.name)}`}
+                          style={{
+                            width: 32,
+                            height: 32,
+                            borderRadius: "50%",
+                            display: "inline-flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            fontSize: 11,
+                            fontWeight: 700,
+                            flexShrink: 0,
+                          }}
+                        >
+                          {nameInitials(info.name)}
+                        </span>
+                        <div style={{ minWidth: 0, flex: 1 }}>
+                          <div
+                            style={{
+                              fontSize: 13.5,
+                              fontWeight: 600,
+                              color: "#1d2939",
+                              lineHeight: 1.3,
+                              whiteSpace: "nowrap",
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                            }}
+                          >
+                            {info.name}
+                          </div>
+                          {info.roleOrDept && (
+                            <div
+                              style={{
+                                fontSize: 12,
+                                color: "#667085",
+                                lineHeight: 1.3,
+                                marginTop: 2,
+                                whiteSpace: "nowrap",
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                              }}
+                            >
+                              {info.roleOrDept}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
               )}
-            </span>
-          </div>
-
-          {files.length > 0 && (
-            <div className="jt-confirm-row">
-              <span className="jt-confirm-label">Tài liệu kèm theo</span>
-              <span className="jt-confirm-value">
-                {files.length} tệp ({files.map((f) => f.name).join(", ")})
-              </span>
             </div>
-          )}
-        </div>
+          );
+        })()}
       </Modal>
     </>
   );

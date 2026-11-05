@@ -19,9 +19,12 @@ function getInitialCalendarEvents(): CalendarEvent[] {
   const base = calendarEvents.map((item) => ({ ...item, responseStatus: item.responseStatus ?? 'pending' }));
   try {
     if (typeof window !== 'undefined') {
-      try { window.localStorage.removeItem('jt_calendar_events_store'); } catch {}
+      try {
+        window.localStorage.removeItem('jt_calendar_events_store');
+        window.localStorage.removeItem('jt_calendar_events_v4');
+      } catch {}
     }
-    const saved = typeof window !== 'undefined' ? window.localStorage.getItem('jt_calendar_events_v4') : null;
+    const saved = typeof window !== 'undefined' ? window.localStorage.getItem('jt_calendar_events_v8') : null;
     if (saved) {
       const parsed = JSON.parse(saved);
       if (Array.isArray(parsed) && parsed.length > 0) {

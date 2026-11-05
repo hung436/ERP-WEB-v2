@@ -30,7 +30,7 @@ describe('Lịch làm việc theo tuần (Google Calendar style)', () => {
     expect(screen.getByText('Ban biên tập')).toBeInTheDocument();
     expect(screen.getAllByText('Cá nhân').length).toBeGreaterThan(0);
     expect(screen.getByText('Chỉ hiện lịch có mặt tôi')).toBeInTheDocument();
-    expect(screen.getAllByText('Công việc').length).toBeGreaterThan(0);
+    expect((await screen.findAllByText(/Phiếu công việc|Công việc/)).length).toBeGreaterThan(0);
     expect(screen.getAllByText('Lịch họp').length).toBeGreaterThan(0);
 
     // Các ngày trong tuần
@@ -216,7 +216,7 @@ describe('Lịch làm việc theo tuần (Google Calendar style)', () => {
     // Popover hiển thị các bộ lọc bổ sung (Tham gia & Loại mục ghi)
     expect(await screen.findByText('Bộ lọc lịch làm việc')).toBeInTheDocument();
     expect(screen.getAllByText('Tham gia').length).toBeGreaterThan(0);
-    expect(screen.getByText('Loại mục ghi')).toBeInTheDocument();
+    expect(screen.getByText('Loại mục')).toBeInTheDocument();
   }, 45000);
 
   it('phiếu công việc có 3 thành phần chính và 2 nút Triển khai / Đề xuất cùng các popup tương ứng', async () => {

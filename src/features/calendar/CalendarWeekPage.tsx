@@ -166,8 +166,6 @@ export function CalendarWeekPage() {
     MEETING: true,
     EVENT: true,
   });
-  type StatusFilterValue = "ALL" | "PENDING" | "APPROVED" | "IN_PROGRESS" | "COMPLETED" | "REJECTED";
-  const [statusFilter, setStatusFilter] = useState<StatusFilterValue>("ALL");
 
   const [selectedDay, setSelectedDay] = useState<Dayjs | null>(null);
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(
@@ -196,49 +194,26 @@ export function CalendarWeekPage() {
     return `${selected.length} loại đã chọn`;
   }, [ticketTypes]);
 
-  const STATUS_FILTER_LABELS: Record<StatusFilterValue, string> = {
-    ALL: "Tất cả trạng thái",
-    PENDING: "Chờ duyệt",
-    APPROVED: "Đã duyệt",
-    IN_PROGRESS: "Đang thực hiện",
-    COMPLETED: "Hoàn thành",
-    REJECTED: "Không duyệt",
-  };
-
-  const selectedStatusLabel = STATUS_FILTER_LABELS[statusFilter];
-
-  const STATUS_FILTER_OPTIONS: Array<{ key: StatusFilterValue; label: string; dotClass?: string }> = [
-    { key: "ALL", label: "Tất cả trạng thái" },
-    { key: "PENDING", label: "Chờ duyệt", dotClass: "dot-pending" },
-    { key: "APPROVED", label: "Đã duyệt", dotClass: "dot-approved" },
-    { key: "IN_PROGRESS", label: "Đang thực hiện", dotClass: "dot-in_progress" },
-    { key: "COMPLETED", label: "Hoàn thành", dotClass: "dot-completed" },
-    { key: "REJECTED", label: "Không duyệt", dotClass: "dot-rejected" },
-  ];
-
   const isSecondaryFiltered = useMemo(() => {
     return (
       attending ||
       !ticketTypes.MEETING ||
       !ticketTypes.EVENT ||
-      !ticketTypes.TASK ||
-      statusFilter !== "ALL"
+      !ticketTypes.TASK
     );
-  }, [attending, ticketTypes, statusFilter]);
+  }, [attending, ticketTypes]);
 
   const secondaryFilterCount = useMemo(() => {
     let count = 0;
     if (attending) count++;
     if (!ticketTypes.MEETING || !ticketTypes.EVENT || !ticketTypes.TASK)
       count++;
-    if (statusFilter !== "ALL") count++;
     return count;
-  }, [attending, ticketTypes, statusFilter]);
+  }, [attending, ticketTypes]);
 
   const handleResetSecondaryFilters = useCallback(() => {
     setAttending(false);
     setTicketTypes({ TASK: true, MEETING: true, EVENT: true });
-    setStatusFilter("ALL");
   }, []);
 
   const changeDate = (date: Dayjs | null) => {
@@ -295,14 +270,9 @@ export function CalendarWeekPage() {
           ? personal
           : editorial;
       const typeMatch = ticketTypes[event.ticketType || "MEETING"] !== false;
-      let statusMatch = true;
-      if (statusFilter !== "ALL") {
-        const meta = getApprovalStatusMeta(event.approvalStatus, event.ticketType, event.workflowType);
-        statusMatch = meta.value === statusFilter;
-      }
-      return scopeMatch && typeMatch && statusMatch;
+      return scopeMatch && typeMatch;
     });
-  }, [searchedMeetings, attending, personal, editorial, ticketTypes, statusFilter]);
+  }, [searchedMeetings, attending, personal, editorial, ticketTypes]);
 
   const visible = useMemo(
     () => filteredMeetings.filter(isInWeek),
@@ -329,9 +299,10 @@ export function CalendarWeekPage() {
       pending: searchedInWeek.filter(
         (ev) => getApprovalStatusMeta(ev.approvalStatus, ev.ticketType, ev.workflowType).value === "PENDING",
       ).length,
-      approved: searchedInWeek.filter(
-        (ev) => getApprovalStatusMeta(ev.approvalStatus, ev.ticketType, ev.workflowType).value === "APPROVED",
-      ).length,
+      approved: searchedInWeek.filter((ev) => {
+        const m = getApprovalStatusMeta(ev.approvalStatus, ev.ticketType, ev.workflowType).value;
+        return m === "APPROVED" || m === "SCHEDULED";
+      }).length,
       inProgress: searchedInWeek.filter(
         (ev) => getApprovalStatusMeta(ev.approvalStatus, ev.ticketType, ev.workflowType).value === "IN_PROGRESS",
       ).length,
@@ -369,9 +340,15 @@ export function CalendarWeekPage() {
       const raw = event.raw || allEvents.find((e) => e.id === event.id);
       if (!raw) return;
       const updated: CalendarEvent = { ...raw, isInterested: nextState };
-      handleUpdateEvent(updated);
+      const updatedList = [
+        ...userCreatedEvents.filter((item) => item.id !== updated.id),
+        updated,
+      ];
+      saveUserEvents(updatedList);
+      // Chỉ cập nhật selectedEvent nếu drawer đang mở cho sự kiện này, không tự ý mở drawer
+      setSelectedEvent((current) => (current?.id === updated.id ? updated : current));
     },
-    [allEvents, handleUpdateEvent],
+    [allEvents, userCreatedEvents, saveUserEvents],
   );
 
   const handleDeleteEvent = (eventId: string) => {
@@ -552,7 +529,7 @@ export function CalendarWeekPage() {
           >
             <button
               type="button"
-              className={`booking-week-source-btn ${editorial ? "is-active" : ""}`}
+              className={`booking-week-source-btn is-editorial ${editorial ? "is-active" : ""}`}
               aria-pressed={editorial}
               aria-label="Ban biên tập"
               onClick={() => setEditorial((value) => !value)}
@@ -622,7 +599,7 @@ export function CalendarWeekPage() {
               content={
                 <div className="booking-week-type-menu">
                   <div className="booking-week-type-menu-head">
-                    <span>Loại mục ghi trên lịch</span>
+                    <span>Loại mục trên lịch</span>
                     {(!ticketTypes.MEETING ||
                       !ticketTypes.EVENT ||
                       !ticketTypes.TASK) && (
@@ -707,7 +684,7 @@ export function CalendarWeekPage() {
               <button
                 type="button"
                 className={`booking-week-type-dropdown-btn ${!ticketTypes.MEETING || !ticketTypes.EVENT || !ticketTypes.TASK ? "is-filtered" : ""}`}
-                aria-label="Lọc theo loại mục ghi"
+                aria-label="Lọc theo loại mục"
               >
                 <span className="booking-week-type-prefix">Loại:</span>
                 <span className="booking-week-type-value">
@@ -716,82 +693,9 @@ export function CalendarWeekPage() {
                 <DownOutlined className="booking-week-type-arrow" />
               </button>
             </Popover>
-
-            <Popover
-              trigger="click"
-              placement="bottomLeft"
-              overlayClassName="booking-week-type-popover"
-              content={
-                <div className="booking-week-type-menu">
-                  <div className="booking-week-type-menu-head">
-                    <span>Trạng thái mục ghi</span>
-                    {statusFilter !== "ALL" && (
-                      <button
-                        type="button"
-                        className="booking-week-type-reset"
-                        onClick={() => setStatusFilter("ALL")}
-                      >
-                        Tất cả
-                      </button>
-                    )}
-                  </div>
-                  {STATUS_FILTER_OPTIONS.map((item) => {
-                    const count =
-                      item.key === "ALL"
-                        ? stats.allStatus
-                        : item.key === "PENDING"
-                          ? stats.pending
-                          : item.key === "APPROVED"
-                            ? stats.approved
-                            : item.key === "IN_PROGRESS"
-                              ? stats.inProgress
-                              : item.key === "COMPLETED"
-                                ? stats.completed
-                                : stats.rejected;
-                    return (
-                      <button
-                        key={item.key}
-                        type="button"
-                        className={`booking-week-type-menu-item ${statusFilter === item.key ? "is-checked" : ""}`}
-                        aria-pressed={statusFilter === item.key}
-                        onClick={() => setStatusFilter(item.key)}
-                      >
-                        <span className="booking-week-type-menu-left">
-                          <span className="booking-week-type-checkbox">
-                            {statusFilter === item.key && <CheckOutlined />}
-                          </span>
-                          {item.dotClass && (
-                            <span
-                              className={`booking-week-type-dot ${item.dotClass}`}
-                              aria-hidden="true"
-                            />
-                          )}
-                          <span>{item.label}</span>
-                        </span>
-                        <span className="booking-week-type-menu-count">
-                          {count}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-              }
-            >
-              <button
-                type="button"
-                className={`booking-week-type-dropdown-btn ${statusFilter !== "ALL" ? "is-filtered" : ""}`}
-                aria-label="Lọc theo trạng thái"
-              >
-                <span className="booking-week-type-prefix">Trạng thái:</span>
-                <span className="booking-week-type-value">
-                  {selectedStatusLabel}
-                </span>
-                <DownOutlined className="booking-week-type-arrow" />
-              </button>
-            </Popover>
           </div>
 
-          {/* Cụm nút Bộ lọc thu gọn — Hiển thị trên laptop/tablet (< 1680px) chứa Chỉ có mặt tôi & Loại mục ghi */}
+          {/* Cụm nút Bộ lọc thu gọn — Hiển thị trên laptop/tablet (< 1680px) chứa Chỉ có mặt tôi & Loại mục */}
           <div className="booking-week-filters-compact">
             <Popover
               trigger="click"
@@ -854,7 +758,7 @@ export function CalendarWeekPage() {
                       }}
                     >
                       <span className="booking-week-compact-filter-group-title">
-                        Loại mục ghi
+                        Loại mục
                       </span>
                       {(!ticketTypes.MEETING ||
                         !ticketTypes.EVENT ||
@@ -938,73 +842,6 @@ export function CalendarWeekPage() {
                           {stats.task}
                         </span>
                       </button>
-                    </div>
-                  </div>
-
-                  <div className="booking-week-compact-filter-group">
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                      }}
-                    >
-                      <span className="booking-week-compact-filter-group-title">
-                        Trạng thái
-                      </span>
-                      {statusFilter !== "ALL" && (
-                        <button
-                          type="button"
-                          className="booking-week-type-reset"
-                          onClick={() => setStatusFilter("ALL")}
-                        >
-                          Tất cả
-                        </button>
-                      )}
-                    </div>
-                    <div
-                      className="booking-week-type-menu"
-                      style={{ width: "100%" }}
-                    >
-                      {STATUS_FILTER_OPTIONS.map((item) => {
-                        const count =
-                          item.key === "ALL"
-                            ? stats.allStatus
-                            : item.key === "PENDING"
-                              ? stats.pending
-                              : item.key === "APPROVED"
-                                ? stats.approved
-                                : item.key === "IN_PROGRESS"
-                                  ? stats.inProgress
-                                  : item.key === "COMPLETED"
-                                    ? stats.completed
-                                    : stats.rejected;
-                        return (
-                          <button
-                            key={item.key}
-                            type="button"
-                            className={`booking-week-type-menu-item ${statusFilter === item.key ? "is-checked" : ""}`}
-                            aria-pressed={statusFilter === item.key}
-                            onClick={() => setStatusFilter(item.key)}
-                          >
-                            <span className="booking-week-type-menu-left">
-                              <span className="booking-week-type-checkbox">
-                                {statusFilter === item.key && <CheckOutlined />}
-                              </span>
-                              {item.dotClass && (
-                                <span
-                                  className={`booking-week-type-dot ${item.dotClass}`}
-                                  aria-hidden="true"
-                                />
-                              )}
-                              <span>{item.label}</span>
-                            </span>
-                            <span className="booking-week-type-menu-count">
-                              {count}
-                            </span>
-                          </button>
-                        );
-                      })}
                     </div>
                   </div>
                 </div>
@@ -1169,6 +1006,7 @@ export function CalendarWeekPage() {
             open={Boolean(createDate || editingEvent)}
             initialDate={createDate}
             editingEvent={editingEvent}
+            existingEvents={allEvents}
             onClose={() => {
               setCreateDate(null);
               setEditingEvent(null);

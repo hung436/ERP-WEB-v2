@@ -22,7 +22,6 @@ import {
   Download,
   Edit3,
   ExternalLink,
-  FileText,
   LogOut,
   MapPin,
   MessageSquare,
@@ -47,7 +46,8 @@ import { avatarTone, nameInitials } from '@/utils/avatar';
 import { getApprovalStatusMeta } from '../calendarWeekUtils';
 
 import { formatBytes, getFileCategory } from './AttachedFilesList';
-import { SUGGESTED_MEMBERS } from './CreatePersonalMeetingModal';
+import { MeetingDetailDrawer } from './MeetingDetailDrawer';
+import { UserSelectionModal } from './UserSelectionModal';
 import './JobTicketDetailDrawer.css';
 
 export type DetailRoleType = 'CREATOR' | 'APPROVER' | 'CONSULTEE' | 'EXECUTOR' | 'WATCHER';
@@ -203,8 +203,7 @@ export function CalendarEventDetailModal({
     );
 
     const isUserExecutor = Boolean(
-      (event.executors && event.executors.some((e) => isMe(e.name))) ||
-      (!event.approver?.name && (!event.approvers || event.approvers.length === 0) && isMe(resolvedCreator))
+      event.executors && event.executors.some((e) => isMe(e.name))
     );
 
     if (!isMeetingEvent) {
@@ -212,10 +211,10 @@ export function CalendarEventDetailModal({
         setActiveRole('APPROVER');
       } else if (isUserConsultee && currentStatus === 'CONSULTING') {
         setActiveRole('CONSULTEE');
-      } else if (isUserExecutor && (currentStatus === 'APPROVED' || currentStatus === 'ACTIVE')) {
-        setActiveRole('EXECUTOR');
       } else if (isMe(resolvedCreator)) {
         setActiveRole('CREATOR');
+      } else if (isUserExecutor && (currentStatus === 'APPROVED' || currentStatus === 'ACTIVE')) {
+        setActiveRole('EXECUTOR');
       } else if (isUserExecutor) {
         setActiveRole('EXECUTOR');
       } else if ((event.watchers || []).some((w) => isMe(w.name))) {
@@ -298,18 +297,22 @@ export function CalendarEventDetailModal({
 
     if (event.executors && event.executors.length > 0) {
       event.executors.forEach((e) => {
-        if (!seen.has(e.name)) {
-          seen.add(e.name);
-          list.push({ name: e.name, role: e.role });
+        const rawName = typeof e === 'string' ? e : e?.name;
+        const n = typeof rawName === 'string' ? rawName.trim() : '';
+        if (n && !seen.has(n)) {
+          seen.add(n);
+          list.push({ name: n, role: typeof e === 'object' ? e?.role : undefined });
         }
       });
     }
 
     if (event.participants && event.participants.length > 0) {
       event.participants.forEach((name) => {
-        if (!seen.has(name)) {
-          seen.add(name);
-          list.push({ name });
+        const rawName = typeof name === 'string' ? name : (name as { name?: string })?.name;
+        const n = typeof rawName === 'string' ? rawName.trim() : '';
+        if (n && !seen.has(n)) {
+          seen.add(n);
+          list.push({ name: n });
         }
       });
     }
@@ -321,6 +324,19 @@ export function CalendarEventDetailModal({
 
   const isTask = event.ticketType === 'TASK' || (!event.ticketType && event.type === 'task');
   const isMeeting = !isTask && (event.ticketType === 'MEETING' || event.type === 'meeting' || event.scope === 'editorial');
+
+  // Đối với lịch họp: Render bản Drawer tinh gọn, hiện đại tham khảo từ branch feature/hang
+  if (isMeeting) {
+    return (
+      <MeetingDetailDrawer
+        event={event}
+        open={open}
+        onClose={onClose}
+        onUpdateEvent={onUpdateEvent}
+        onDeleteEvent={onDeleteEvent}
+      />
+    );
+  }
   const isPersonal = event.scope === 'personal';
   const isEditorial = event.scope === 'editorial';
   const isUserAttending = Boolean(event.isUserParticipant);
@@ -328,12 +344,28 @@ export function CalendarEventDetailModal({
   const rawCreator = event.leader || event.organizer || currentUser;
   const creatorName = rawCreator === 'Bùi Lê Thế Kiệt' ? currentUser : rawCreator;
   const isCreatorMe = isMe(creatorName) || isMe(event.organizer);
-  const timeDisplay = dayjs(event.deadline || event.startAt).format('HH:mm DD/MM/YYYY');
+  let timeDisplay = '';
+  if (isMeeting && event.startAt && event.endAt) {
+    const s = dayjs(event.startAt);
+    const e = dayjs(event.endAt);
+    if (s.isValid() && e.isValid()) {
+      timeDisplay = s.isSame(e, 'day')
+        ? `${s.format('HH:mm')} - ${e.format('HH:mm')} ${s.format('DD/MM/YYYY')}`
+        : `${s.format('HH:mm DD/MM/YYYY')} - ${e.format('HH:mm DD/MM/YYYY')}`;
+    }
+  }
+  if (!timeDisplay) {
+    const target = event.deadline || event.startAt;
+    timeDisplay = target && dayjs(target).isValid()
+      ? dayjs(target).format('HH:mm DD/MM/YYYY')
+      : '';
+  }
 
   const rawDesc = (event.notes || event.agenda || event.description || '').trim();
   const hasAttachments = Boolean(event.attachments && event.attachments.length > 0);
 
   const step1 = (event.steps || []).find((s) => s.step_order === 1 || s.role === 'CREATOR');
+  const step2 = (event.steps || []).find((s) => s.step_order === 2 || s.role === 'APPROVER');
   const createdTime = step1?.completed_at || event.createdAt || event.startAt || new Date().toISOString();
   const createdTimeFormatted = dayjs(createdTime).format('DD/MM HH:mm');
 
@@ -382,9 +414,12 @@ export function CalendarEventDetailModal({
       event.executors.some((e) => isMe(e.name)) &&
       event.executors.filter((e) => isMe(e.name)).every((e) => e.status === 'COMPLETED')
   );
+  const isCreatorOfTicket = Boolean(isMe(creatorName) || isMe(event.organizer) || activeRole === 'CREATOR');
+
   const isUserAnExecutor = Boolean(
-    ((event.executors && event.executors.some((e) => isMe(e.name))) ||
-      (!isProposal && !isMeeting && isMe(creatorName))) &&
+    event.executors &&
+      event.executors.some((e) => isMe(e.name)) &&
+      !isCreatorOfTicket &&
       !isUserExecutorDone
   );
 
@@ -403,27 +438,33 @@ export function CalendarEventDetailModal({
   const showConsulteeReplyBtn =
     !isMeeting && isUserAConsultee && hasPendingConsultants;
 
-  // Người thực hiện: Khi là Phiếu Triển khai đang thực hiện -> Hoàn thành (Phiếu Đề xuất không có nút Hoàn thành)
+  // Người thực hiện: Khi là Phiếu Triển khai đang thực hiện -> Hoàn thành (Người tạo triển khai và Phiếu Đề xuất không có nút Hoàn thành)
   const showExecutorCompleteBtn =
     !isMeeting &&
     !isProposal &&
-    isUserAnExecutor &&
+    !isCreatorOfTicket &&
+    (activeRole === 'EXECUTOR' || isUserAnExecutor) &&
     statusKey === 'IN_PROGRESS' &&
     !isFinishedOrCancelled;
 
-  // Lịch họp: Tham gia họp trực tuyến & Hoàn thành / Kết thúc cuộc họp
-  const showMeetingJoinBtn = isMeeting && Boolean(event.meetingUrl) && !isFinishedOrCancelled;
-  const showMeetingCompleteBtn =
-    isMeeting && (isCreatorMe || activeRole === 'CREATOR') && !isFinishedOrCancelled;
+  // Người theo dõi: Khi người dùng hiện tại đang theo dõi và không phải người tạo
+  const isUserCurrentlyWatching = Boolean(
+    watchers.some((w) => isMe(w.name)) || event.isUserWatcher
+  );
+  const showWatcherUnfollowBtn =
+    !isMeeting &&
+    isUserCurrentlyWatching &&
+    !isCreatorMe &&
+    !isFinishedOrCancelled;
 
+  // Lịch họp: Không có các action Kết thúc cuộc họp và Tham gia cuộc họp
   const hasAnyWorkflowAction =
     showApproverApproveBtn ||
     showApproverConsultBtn ||
     showApproverRejectBtn ||
     showConsulteeReplyBtn ||
     showExecutorCompleteBtn ||
-    showMeetingJoinBtn ||
-    showMeetingCompleteBtn;
+    showWatcherUnfollowBtn;
 
   const handleToggleMute = () => {
     const nextState = !isMuted;
@@ -550,15 +591,16 @@ export function CalendarEventDetailModal({
   };
 
   // Action: Thêm thành phần thực hiện / tham gia
-  const handleConfirmAddParticipants = () => {
-    if (!selectedNewParticipants || selectedNewParticipants.length === 0) {
+  const handleConfirmAddParticipants = (membersToUse?: string[]) => {
+    const members = membersToUse || selectedNewParticipants;
+    if (!members || members.length === 0) {
       message.warning('Vui lòng chọn ít nhất 1 nhân sự');
       return;
     }
     const currentParts = event.participants || [];
-    const mergedParts = Array.from(new Set([...currentParts, ...selectedNewParticipants]));
+    const mergedParts = Array.from(new Set([...currentParts, ...members]));
     const currentExecs = event.executors || [];
-    const newExecsToAdd = selectedNewParticipants
+    const newExecsToAdd = members
       .filter((p) => !currentExecs.some((e) => e.name === p))
       .map((p, idx) => ({
         id: `exec-${Date.now()}-${idx}`,
@@ -566,7 +608,7 @@ export function CalendarEventDetailModal({
         status: 'IN_PROGRESS' as const,
       }));
     const updatedExecutors = [...currentExecs, ...newExecsToAdd];
-    const logMsg = `[Thành phần] Đã thêm thành phần: ${selectedNewParticipants.join(', ')}`;
+    const logMsg = `[Thành phần] Đã thêm thành phần: ${members.join(', ')}`;
     appendSystemLogAndUpdate(event.approvalStatus || 'APPROVED', logMsg, event.steps, {
       participants: mergedParts,
       participantText: mergedParts.join(', '),
@@ -579,17 +621,18 @@ export function CalendarEventDetailModal({
   };
 
   // Action: Quản lý / Thêm người theo dõi
-  const handleConfirmSaveFollowers = () => {
-    if (!selectedNewWatchers || selectedNewWatchers.length === 0) {
+  const handleConfirmSaveFollowers = (watchersToUse?: string[]) => {
+    const watchersList = watchersToUse || selectedNewWatchers;
+    if (!watchersList || watchersList.length === 0) {
       message.warning('Vui lòng chọn ít nhất 1 người theo dõi');
       return;
     }
     const currentW = watchers.length > 0 ? watchers : event.watchers || [];
-    const newWToAdd = selectedNewWatchers
+    const newWToAdd = watchersList
       .filter((w) => !currentW.some((item) => item.name === w))
       .map((w, idx) => ({ id: `w-${Date.now()}-${idx}`, name: w }));
     const mergedWatchers = [...currentW, ...newWToAdd];
-    const logMsg = `[Người theo dõi] Đã thêm người theo dõi: ${selectedNewWatchers.join(', ')}`;
+    const logMsg = `[Người theo dõi] Đã thêm người theo dõi: ${watchersList.join(', ')}`;
     appendSystemLogAndUpdate(event.approvalStatus, logMsg, event.steps, {
       watchers: mergedWatchers,
     });
@@ -597,6 +640,30 @@ export function CalendarEventDetailModal({
     setSelectedNewWatchers([]);
     setFollowerModalOpen(false);
     message.success('Đã thêm người theo dõi');
+  };
+
+  // Action: Xóa / Bỏ người theo dõi
+  const handleRemoveWatcher = (targetWatcherName: string) => {
+    if (!targetWatcherName) return;
+    const currentW = watchers.length > 0 ? watchers : event.watchers || [];
+    const updatedWatchers = currentW.filter((w) => w.name !== targetWatcherName);
+    const isRemovingSelf = isMe(targetWatcherName);
+
+    const logMsg = isRemovingSelf
+      ? `[Người theo dõi] ${currentUser} đã bỏ theo dõi phiếu.`
+      : `[Người theo dõi] Đã xóa người theo dõi: ${targetWatcherName}`;
+
+    appendSystemLogAndUpdate(event.approvalStatus, logMsg, event.steps, {
+      watchers: updatedWatchers,
+      ...(isRemovingSelf ? { isUserWatcher: false } : {}),
+    });
+
+    setWatchers(updatedWatchers);
+    if (isRemovingSelf) {
+      message.success('Đã bỏ theo dõi phiếu thành công');
+    } else {
+      message.success(`Đã xóa người theo dõi "${targetWatcherName}"`);
+    }
   };
 
   // Action: Người duyệt bấm Duyệt phiếu
@@ -924,16 +991,12 @@ export function CalendarEventDetailModal({
                   Đã điều chỉnh
                 </Tag>
               )}
-              {isEditorial ? (
+              {isMeeting && isEditorial && (
                 <Tag color="error" style={{ fontSize: 12, padding: '2px 8px' }}>
                   Lịch Ban biên tập
                 </Tag>
-              ) : isPersonal ? (
-                <Tag color="blue" style={{ fontSize: 12, padding: '2px 8px' }}>
-                  Lịch cá nhân
-                </Tag>
-              ) : null}
-              {isEditorial && isUserAttending && (
+              )}
+              {isMeeting && isEditorial && isUserAttending && (
                 <Tag color="error" style={{ fontSize: 12, padding: '2px 8px', fontWeight: 600 }}>
                   Bạn tham gia
                 </Tag>
@@ -945,8 +1008,8 @@ export function CalendarEventDetailModal({
               )}
             </div>
             <div className="jt-document-drawer__header-actions">
-              {/* Lịch cá nhân: Cho phép Chỉnh sửa và Xóa */}
-              {isPersonal && (
+              {/* Lịch cá nhân cuộc họp: Cho phép Chỉnh sửa và Xóa */}
+              {isMeeting && isPersonal && (
                 <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
                   <Button
                     icon={<Edit3 size={14} />}
@@ -1072,6 +1135,25 @@ export function CalendarEventDetailModal({
                     <div className="jt-pinned-hero-card__text">
                       {event.title || rawDesc}
                     </div>
+                    {cardCollapsed && hasAttachments && (
+                      <span
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: 4,
+                          fontSize: 12,
+                          color: '#64748b',
+                          background: '#f1f5f9',
+                          padding: '2px 8px',
+                          borderRadius: 12,
+                          flexShrink: 0,
+                          fontWeight: 500,
+                        }}
+                      >
+                        <Paperclip size={12} />
+                        {event.attachments!.length} tệp
+                      </span>
+                    )}
                     <button
                       type="button"
                       className="jt-pinned-hero-card__chevron-btn"
@@ -1136,7 +1218,7 @@ export function CalendarEventDetailModal({
                               <Video size={16} />
                             </div>
                             <div style={{ minWidth: 0, flex: 1 }}>
-                              <div style={{ fontSize: 12.5, fontWeight: 600, color: '#0369a1', lineHeight: 1.3 }}>
+                              <div style={{ fontSize: 13, fontWeight: 600, color: '#0369a1', lineHeight: 1.3 }}>
                                 Phòng họp trực tuyến
                               </div>
                               <a
@@ -1193,7 +1275,7 @@ export function CalendarEventDetailModal({
                             border: '1px solid #fecaca',
                             padding: '8px 12px',
                             borderRadius: 8,
-                            fontSize: 12.5,
+                            fontSize: 13,
                             color: '#991b1b',
                             display: 'flex',
                             alignItems: 'center',
@@ -1209,13 +1291,54 @@ export function CalendarEventDetailModal({
 
                       {hasAttachments && (
                         <div className="jt-pinned-attachments-list">
-                          {event.attachments!.map((att) => (
-                            <span key={att.id} className="jt-pinned-attachment-chip" title={att.name}>
-                              <Paperclip size={12} />
-                              <span className="jt-pinned-attachment-chip__name">{att.name}</span>
-                              <small className="jt-pinned-attachment-chip__size">({formatBytes(att.size)})</small>
-                            </span>
-                          ))}
+                          <div className="jt-pinned-attachments-label">
+                            Tài liệu đính kèm ({event.attachments!.length})
+                          </div>
+                          {event.attachments!.map((att) => {
+                            const cat = getFileCategory(att.name);
+                            return (
+                              <div
+                                key={att.id}
+                                className="jt-hero-file-card"
+                                onClick={() => message.info(`Đang mở tệp: ${att.name}`)}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter' || e.key === ' ') {
+                                    e.preventDefault();
+                                    message.info(`Đang mở tệp: ${att.name}`);
+                                  }
+                                }}
+                                title={`Xem hoặc tải về ${att.name}`}
+                                role="button"
+                                tabIndex={0}
+                              >
+                                <div
+                                  className="jt-hero-file-card__badge"
+                                  style={{ background: cat.bg, color: cat.color }}
+                                >
+                                  <span className="jt-hero-file-card__icon">{cat.icon}</span>
+                                  <span className="jt-hero-file-card__ext">{cat.label}</span>
+                                </div>
+                                <div className="jt-hero-file-card__info">
+                                  <span className="jt-hero-file-card__name">{att.name}</span>
+                                  <span className="jt-hero-file-card__meta">
+                                    {formatBytes(att.size)}
+                                    {att.uploadedBy ? ` • ${att.uploadedBy}` : ''}
+                                  </span>
+                                </div>
+                                <button
+                                  type="button"
+                                  className="jt-hero-file-card__download"
+                                  title="Tải về"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    message.success(`Đang tải về: ${att.name}`);
+                                  }}
+                                >
+                                  <Download size={13} />
+                                </button>
+                              </div>
+                            );
+                          })}
                         </div>
                       )}
                     </>
@@ -1225,88 +1348,6 @@ export function CalendarEventDetailModal({
 
               {/* 3. CHAT STREAM & ACTIVITY TIMELINE */}
               <div className="jt-chat-stream__timeline">
-                <div className="jt-chat-system-event">
-                  <div className="jt-chat-system-event__badge">
-                    <FileText size={13} style={{ color: '#2563eb' }} />
-                    <span className="jt-chat-system-event__text">
-                      <strong>{creatorName}</strong> đã tạo{' '}
-                      {isTask ? 'phiếu Công việc' : isMeeting ? 'lịch họp' : 'sự kiện'}
-                    </span>
-                    <span className="jt-chat-system-event__time">{createdTimeFormatted}</span>
-                  </div>
-                </div>
-
-                {/* ĐÍNH KÈM TỆP THEO PHIẾU TRÊN TIMELINE TRAO ĐỔI */}
-                {(() => {
-                  const commentAttachmentNames = new Set(
-                    (event.comments || []).flatMap((c) => (c.attachments || []).map((a) => a.name))
-                  );
-                  const ticketAttachments = (event.attachments || []).filter(
-                    (att) => !commentAttachmentNames.has(att.name)
-                  );
-
-                  if (ticketAttachments.length === 0) return null;
-
-                  return (
-                    <div className="jt-chat-system-event jt-chat-system-event--attachment">
-                      <div className="jt-chat-system-event__badge">
-                        <Paperclip size={12} style={{ color: '#475467' }} />
-                        <span className="jt-chat-system-event__text">
-                          <strong>{creatorName}</strong> đã đính kèm {ticketAttachments.length} tệp tài liệu
-                        </span>
-                        <span className="jt-chat-system-event__time">{createdTimeFormatted}</span>
-                      </div>
-                      <div className="jt-timeline-attachment-grid">
-                        {ticketAttachments.map((att) => {
-                          const cat = getFileCategory(att.name);
-                          return (
-                            <div
-                              key={att.id}
-                              className="jt-timeline-file-card"
-                              onClick={() => message.info(`Đang mở tệp: ${att.name}`)}
-                              onKeyDown={(e) => {
-                                if (e.key === 'Enter' || e.key === ' ') {
-                                  e.preventDefault();
-                                  message.info(`Đang mở tệp: ${att.name}`);
-                                }
-                              }}
-                              title={`Xem hoặc tải về ${att.name}`}
-                              role="button"
-                              tabIndex={0}
-                            >
-                              <div
-                                className="jt-timeline-file-card__badge"
-                                style={{ background: cat.bg, color: cat.color, borderColor: cat.border }}
-                              >
-                                <span className="jt-timeline-file-card__icon">{cat.icon}</span>
-                                <span className="jt-timeline-file-card__ext">{cat.label}</span>
-                              </div>
-                              <div className="jt-timeline-file-card__info">
-                                <span className="jt-timeline-file-card__name">{att.name}</span>
-                                <span className="jt-timeline-file-card__meta">
-                                  {formatBytes(att.size)}
-                                  {att.uploadedBy && att.uploadedBy !== creatorName ? ` • ${att.uploadedBy}` : ''}
-                                </span>
-                              </div>
-                              <button
-                                type="button"
-                                className="jt-timeline-file-card__download"
-                                title="Tải về"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  message.success(`Đang tải về: ${att.name}`);
-                                }}
-                              >
-                                <Download size={13} />
-                              </button>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  );
-                })()}
-
                 {chatMessages.length === 0 ? (
                   <div className="jt-chat-empty-state">
                     Chưa có trao đổi nào. Hãy nhập tin nhắn bên dưới để bắt đầu trao đổi.
@@ -1482,7 +1523,7 @@ export function CalendarEventDetailModal({
                   <div className="jt-doc-info-item">
                     <span className="jt-doc-info-item__label">
                       <span className="jt-doc-info-icon">
-                        <Calendar size={14} />
+                        <Calendar size={15} />
                       </span>
                       Thời gian
                     </span>
@@ -1494,7 +1535,7 @@ export function CalendarEventDetailModal({
                     <div className="jt-doc-info-item">
                       <span className="jt-doc-info-item__label">
                         <span className="jt-doc-info-icon">
-                          <MapPin size={14} />
+                          <MapPin size={15} />
                         </span>
                         Địa điểm
                       </span>
@@ -1502,12 +1543,12 @@ export function CalendarEventDetailModal({
                     </div>
                   )}
 
-                  {/* Chủ trì cuộc họp (nếu có) */}
-                  {Boolean((event.leader || event.organizer)?.trim()) && (
+                  {/* Chủ trì cuộc họp (chỉ hiển thị khi là Lịch họp) */}
+                  {isMeeting && Boolean((event.leader || event.organizer)?.trim()) && (
                     <div className="jt-doc-info-item">
                       <span className="jt-doc-info-item__label">
                         <span className="jt-doc-info-icon">
-                          <User size={14} />
+                          <User size={15} />
                         </span>
                         Chủ trì
                       </span>
@@ -1521,7 +1562,7 @@ export function CalendarEventDetailModal({
                   <div className="jt-doc-info-item jt-doc-info-item--block">
                     <div className="jt-person-sec-header">
                       <span className="jt-person-sec-title">
-                        <Users size={13} style={{ color: '#64748b' }} />
+                        <Users size={14} style={{ color: '#475467' }} />
                         <span>Thành phần</span>
                         <span className="jt-person-sec-count">
                           ({event.participantCount || participantsList.length})
@@ -1529,22 +1570,26 @@ export function CalendarEventDetailModal({
                       </span>
                     </div>
 
-                    {Boolean(event.participantText?.trim()) && (
-                      <div style={{ fontSize: 12.5, color: '#334155', lineHeight: '1.5', marginBottom: 8, padding: '4px 6px', background: '#f8fafc', borderRadius: 6, border: '1px solid #f1f5f9' }}>
+                    {participantsList.length === 0 && Boolean(event.participantText?.trim()) && (
+                      <div style={{ fontSize: 13, color: '#334155', fontWeight: 500, lineHeight: '1.5', marginBottom: 8, padding: '6px 10px', background: '#f8fafc', borderRadius: 6, border: 'none' }}>
                         {highlightCurrentUserName(event.participantText || '')}
                       </div>
                     )}
 
                     <div className="jt-person-avatar-row">
-                      {participantsList.map((p: { name: string; role?: string }, idx: number) => (
-                        <span className="jt-person-chip" key={idx} title={p.role ? `${p.name} (${p.role})` : p.name}>
-                          <span className="jt-person-chip__avatar">
-                            {p.name.charAt(0).toUpperCase()}
+                      {participantsList.map((p: { name: string; role?: string }, idx: number) => {
+                        const personName = typeof p?.name === 'string' ? p.name : String(p?.name || '');
+                        const initial = personName ? personName.charAt(0).toUpperCase() : '?';
+                        return (
+                          <span className="jt-person-chip" key={idx} title={p.role ? `${personName} (${p.role})` : personName}>
+                            <span className="jt-person-chip__avatar">
+                              {initial}
+                            </span>
+                            <span className="jt-person-chip__name">{personName}</span>
+                            {isMe(personName) && <span className="jt-person-chip__me-tag">Bạn</span>}
                           </span>
-                          <span className="jt-person-chip__name">{p.name}</span>
-                          {isMe(p.name) && <span className="jt-person-chip__me-tag">Bạn</span>}
-                        </span>
-                      ))}
+                        );
+                      })}
                       {!isEditorial && (
                         <button
                           type="button"
@@ -1555,7 +1600,7 @@ export function CalendarEventDetailModal({
                           }}
                           aria-label="Thêm thành phần"
                         >
-                          <Plus size={12} strokeWidth={2.2} />
+                          <Plus size={13} strokeWidth={2.2} />
                           <span>Thêm thành phần</span>
                         </button>
                       )}
@@ -1567,22 +1612,52 @@ export function CalendarEventDetailModal({
                     <div className="jt-doc-info-item jt-doc-info-item--block">
                       <div className="jt-person-sec-header">
                         <span className="jt-person-sec-title">
-                          <Users size={13} style={{ color: '#64748b' }} />
+                          <Users size={14} style={{ color: '#475467' }} />
                           <span>Người theo dõi</span>
                           <span className="jt-person-sec-count">({watchers.length})</span>
                         </span>
                       </div>
 
                       <div className="jt-person-avatar-row">
-                        {watchers.map((u: { name: string }, idx: number) => (
-                          <span className="jt-person-chip" key={idx} title={u.name}>
-                            <span className="jt-person-chip__avatar" style={{ background: '#fef3c7', color: '#b45309' }}>
-                              {u.name.charAt(0).toUpperCase()}
+                        {watchers.map((u: { name: string }, idx: number) => {
+                          const wName = typeof u?.name === 'string' ? u.name : String(u?.name || '');
+                          const initial = wName ? wName.charAt(0).toUpperCase() : '?';
+                          const isSelfWatcher = isMe(wName);
+                          const canRemoveWatcher = isSelfWatcher || isCreatorMe || !isFinishedOrCancelled;
+
+                          return (
+                            <span className="jt-person-chip" key={idx} title={wName}>
+                              <span className="jt-person-chip__avatar" style={{ background: '#fef3c7', color: '#b45309' }}>
+                                {initial}
+                              </span>
+                              <span className="jt-person-chip__name">{wName}</span>
+                              {isSelfWatcher && <span className="jt-person-chip__me-tag">Bạn</span>}
+                              {canRemoveWatcher && (
+                                <Popconfirm
+                                  title={isSelfWatcher ? "Bỏ theo dõi phiếu?" : `Xóa người theo dõi?`}
+                                  description={
+                                    isSelfWatcher
+                                      ? "Bạn sẽ không còn nhận các thông báo và thảo luận mới của phiếu này."
+                                      : `Xác nhận xóa "${wName}" khỏi danh sách người theo dõi phiếu này.`
+                                  }
+                                  onConfirm={() => handleRemoveWatcher(wName)}
+                                  okText={isSelfWatcher ? "Bỏ theo dõi" : "Xóa"}
+                                  cancelText="Hủy"
+                                  okButtonProps={isSelfWatcher ? { danger: true } : undefined}
+                                >
+                                  <button
+                                    type="button"
+                                    className="jt-person-chip__remove-btn"
+                                    title={isSelfWatcher ? "Bỏ theo dõi phiếu" : `Xóa ${wName}`}
+                                    aria-label={isSelfWatcher ? "Bỏ theo dõi phiếu" : `Xóa ${wName}`}
+                                  >
+                                    <X size={11} strokeWidth={2.4} />
+                                  </button>
+                                </Popconfirm>
+                              )}
                             </span>
-                            <span className="jt-person-chip__name">{u.name}</span>
-                            {isMe(u.name) && <span className="jt-person-chip__me-tag">Bạn</span>}
-                          </span>
-                        ))}
+                          );
+                        })}
                         <button
                           type="button"
                           className="jt-person-add-tag-chip"
@@ -1592,7 +1667,7 @@ export function CalendarEventDetailModal({
                           }}
                           aria-label="Thêm người theo dõi"
                         >
-                          <Plus size={12} strokeWidth={2.2} />
+                          <Plus size={13} strokeWidth={2.2} />
                           <span>Thêm người theo dõi</span>
                         </button>
                       </div>
@@ -1757,70 +1832,86 @@ export function CalendarEventDetailModal({
                               Duyệt phiếu
                             </div>
                           )}
-                          {(event.approvers && event.approvers.length > 0
-                            ? event.approvers
-                            : approver?.name
-                              ? [{
-                                  id: 'appr-1',
-                                  name: approver.name,
-                                  status: (statusKey === 'APPROVED' || statusKey === 'COMPLETED'
-                                    ? 'APPROVED'
-                                    : statusKey === 'REJECTED'
-                                      ? 'REJECTED'
-                                      : 'PENDING') as 'PENDING' | 'APPROVED' | 'REJECTED' | 'COMPLETED',
-                                  completed_at: event.startAt,
-                                  note: undefined as string | undefined,
-                                }]
-                              : [{
-                                  id: 'appr-default',
-                                  name: 'Đ/c Đinh Minh Trung',
-                                  status: (statusKey === 'APPROVED' || statusKey === 'COMPLETED'
-                                    ? 'APPROVED'
-                                    : statusKey === 'REJECTED'
-                                      ? 'REJECTED'
-                                      : 'PENDING') as 'PENDING' | 'APPROVED' | 'REJECTED' | 'COMPLETED',
-                                  completed_at: event.startAt,
-                                  note: undefined as string | undefined,
-                                }]
-                          ).map((a, idx) => {
-                            const isApproved =
-                              a.status === 'APPROVED' ||
-                              (a.status as string) === 'COMPLETED' ||
-                              statusKey === 'APPROVED' ||
-                              statusKey === 'COMPLETED';
-                            const isRejected = a.status === 'REJECTED' || statusKey === 'REJECTED';
-                            const isProcessed = isApproved || isRejected;
-                            return (
-                              <div key={idx}>
-                                <div className="jt-step-person-row">
-                                  <div className="jt-step-person-left">
-                                    <CheckCircle
-                                      size={13}
-                                      style={{
-                                        color: isApproved ? '#16a34a' : isRejected ? '#dc2626' : '#f59e0b',
-                                      }}
-                                    />
-                                    <span className="jt-step-person-name">
-                                      {a.name}{isMe(a.name) ? ' (Bạn)' : ''}
-                                    </span>
-                                    {isProcessed && (a.completed_at || event.startAt) && (
-                                      <span className="jt-step-person-time">
-                                        - {dayjs(a.completed_at || event.startAt).format('DD/MM HH:mm')}
-                                      </span>
-                                    )}
-                                  </div>
-                                  <Tag color={isApproved ? 'success' : isRejected ? 'error' : 'warning'}>
-                                    {isApproved ? 'Đã duyệt' : isRejected ? 'Không duyệt' : 'Chờ xử lý'}
-                                  </Tag>
+                          {(() => {
+                            const approverList =
+                              event.approvers && event.approvers.length > 0
+                                ? event.approvers
+                                : approver?.name
+                                  ? approver.name.split(', ').map((name, i) => ({
+                                      id: `appr-${i + 1}`,
+                                      name: name.trim(),
+                                      status: (statusKey === 'APPROVED' || statusKey === 'COMPLETED'
+                                        ? 'APPROVED'
+                                        : statusKey === 'REJECTED'
+                                          ? 'REJECTED'
+                                          : 'PENDING') as 'PENDING' | 'APPROVED' | 'REJECTED' | 'COMPLETED',
+                                      completed_at: event.startAt,
+                                      note: undefined as string | undefined,
+                                    }))
+                                  : step2?.actor_name &&
+                                    step2.actor_name !== 'Tự động duyệt' &&
+                                    step2.actor_name !== 'Trực tiếp triển khai'
+                                    ? [{
+                                        id: 'appr-step',
+                                        name: step2.actor_name,
+                                        status: (statusKey === 'APPROVED' || statusKey === 'COMPLETED'
+                                          ? 'APPROVED'
+                                          : statusKey === 'REJECTED'
+                                            ? 'REJECTED'
+                                            : 'PENDING') as 'PENDING' | 'APPROVED' | 'REJECTED' | 'COMPLETED',
+                                        completed_at: event.startAt,
+                                        note: undefined as string | undefined,
+                                      }]
+                                    : [];
+
+                            if (approverList.length === 0) {
+                              return (
+                                <div style={{ fontSize: 13, color: '#98a2b3', fontStyle: 'italic', padding: '6px 0' }}>
+                                  {isProposal ? 'Chưa chỉ định người duyệt' : 'Duyệt tự động theo quy trình'}
                                 </div>
-                                {a.note && (
-                                  <div style={{ fontSize: 12, color: '#475569', marginTop: 3, paddingLeft: 19, fontStyle: 'italic', lineHeight: '1.4' }}>
-                                    &ldquo;{a.note}&rdquo;
+                              );
+                            }
+
+                            return approverList.map((a, idx) => {
+                              const isApproved =
+                                a.status === 'APPROVED' ||
+                                (a.status as string) === 'COMPLETED' ||
+                                statusKey === 'APPROVED' ||
+                                statusKey === 'COMPLETED';
+                              const isRejected = a.status === 'REJECTED' || statusKey === 'REJECTED';
+                              const isProcessed = isApproved || isRejected;
+                              return (
+                                <div key={idx}>
+                                  <div className="jt-step-person-row">
+                                    <div className="jt-step-person-left">
+                                      <CheckCircle
+                                        size={13}
+                                        style={{
+                                          color: isApproved ? '#16a34a' : isRejected ? '#dc2626' : '#f59e0b',
+                                        }}
+                                      />
+                                      <span className="jt-step-person-name">
+                                        {a.name}{isMe(a.name) ? ' (Bạn)' : ''}
+                                      </span>
+                                      {isProcessed && (a.completed_at || event.startAt) && (
+                                        <span className="jt-step-person-time">
+                                          - {dayjs(a.completed_at || event.startAt).format('DD/MM HH:mm')}
+                                        </span>
+                                      )}
+                                    </div>
+                                    <Tag color={isApproved ? 'success' : isRejected ? 'error' : 'warning'}>
+                                      {isApproved ? 'Đã duyệt' : isRejected ? 'Không duyệt' : 'Chờ xử lý'}
+                                    </Tag>
                                   </div>
-                                )}
-                              </div>
-                            );
-                          })}
+                                  {a.note && (
+                                    <div style={{ fontSize: 12, color: '#475569', marginTop: 3, paddingLeft: 19, fontStyle: 'italic', lineHeight: '1.4' }}>
+                                      &ldquo;{a.note}&rdquo;
+                                    </div>
+                                  )}
+                                </div>
+                              );
+                            });
+                          })()}
                         </div>
                       </div>
                     </div>
@@ -1934,17 +2025,17 @@ export function CalendarEventDetailModal({
                     </div>
                   )}
 
-                  {/* Row 3: Nút Hoàn thành (Primary Emerald) */}
-                  {(showExecutorCompleteBtn || showMeetingCompleteBtn) && (
+                  {/* Row 3: Nút Hoàn thành (Dành cho Người thực hiện) */}
+                  {showExecutorCompleteBtn && (
                     <div className="jt-action-row--full">
                       <Button
                         type="primary"
                         className="jt-action-btn--complete-modern"
                         icon={<CheckCircle size={14} />}
-                        onClick={showMeetingCompleteBtn ? handleConfirmComplete : () => setCompleteModalOpen(true)}
+                        onClick={() => setCompleteModalOpen(true)}
                         block
                       >
-                        {isMeeting ? 'Kết thúc cuộc họp' : 'Hoàn thành'}
+                        Hoàn thành
                       </Button>
                     </div>
                   )}
@@ -1964,16 +2055,25 @@ export function CalendarEventDetailModal({
                     </div>
                   )}
 
-                  {showMeetingJoinBtn && (
+                  {/* Nút Bỏ theo dõi phiếu (Khi người dùng hiện tại đang theo dõi và không phải người tạo) */}
+                  {showWatcherUnfollowBtn && (
                     <div className="jt-action-row--full">
-                      <Button
-                        type="primary"
-                        icon={<ExternalLink size={14} />}
-                        onClick={() => window.open(event.meetingUrl, '_blank', 'noopener,noreferrer')}
-                        block
+                      <Popconfirm
+                        title="Bỏ theo dõi phiếu?"
+                        description="Bạn có chắc chắn muốn bỏ theo dõi phiếu này? Bạn sẽ không còn nhận thông báo tiến độ mới."
+                        onConfirm={() => handleRemoveWatcher(currentUser)}
+                        okText="Bỏ theo dõi"
+                        cancelText="Đóng"
+                        okButtonProps={{ danger: true }}
                       >
-                        Tham gia họp trực tuyến
-                      </Button>
+                        <Button
+                          className="jt-action-btn--unfollow-subtle"
+                          icon={<BellOff size={14} />}
+                          block
+                        >
+                          Bỏ theo dõi phiếu
+                        </Button>
+                      </Popconfirm>
                     </div>
                   )}
                 </div>
@@ -1984,56 +2084,30 @@ export function CalendarEventDetailModal({
       </Drawer>
 
       {/* Modal Thêm thành phần */}
-      <Modal
-        cancelText="Hủy"
-        destroyOnClose
-        okText="Thêm"
+      <UserSelectionModal
+        open={addParticipantModalOpen}
         onCancel={() => {
           setAddParticipantModalOpen(false);
           setSelectedNewParticipants([]);
         }}
         onOk={handleConfirmAddParticipants}
-        open={addParticipantModalOpen}
         title="Thêm thành phần"
-      >
-        <p style={{ color: '#475569', fontSize: 13, marginBottom: 12 }}>
-          Chọn thêm nhân sự tham gia hoặc thực hiện mục ghi nhận này.
-        </p>
-        <Select
-          mode="multiple"
-          onChange={setSelectedNewParticipants}
-          options={SUGGESTED_MEMBERS}
-          placeholder="Chọn thành phần..."
-          style={{ width: '100%' }}
-          value={selectedNewParticipants}
-        />
-      </Modal>
+        initialSelected={selectedNewParticipants}
+        excludeNames={event.participants || []}
+      />
 
       {/* Modal Thêm người theo dõi */}
-      <Modal
-        cancelText="Hủy"
-        destroyOnClose
-        okText="Thêm"
+      <UserSelectionModal
+        open={followerModalOpen}
         onCancel={() => {
           setFollowerModalOpen(false);
           setSelectedNewWatchers([]);
         }}
         onOk={handleConfirmSaveFollowers}
-        open={followerModalOpen}
         title="Thêm người theo dõi"
-      >
-        <p style={{ color: '#475569', fontSize: 13, marginBottom: 12 }}>
-          Chọn thêm nhân sự theo dõi tiến độ và trao đổi của mục này.
-        </p>
-        <Select
-          mode="multiple"
-          onChange={setSelectedNewWatchers}
-          options={SUGGESTED_MEMBERS.filter((m) => !watchers.some((w) => w.name === m.value))}
-          placeholder="Chọn người theo dõi mới..."
-          style={{ width: '100%' }}
-          value={selectedNewWatchers}
-        />
-      </Modal>
+        initialSelected={selectedNewWatchers}
+        excludeNames={watchers.map((w) => w.name)}
+      />
 
 
       {/* Modal Duyệt phiếu (Người duyệt) */}
@@ -2150,21 +2224,17 @@ export function CalendarEventDetailModal({
         }}
         onOk={handleConfirmComplete}
         open={completeModalOpen}
-        title={isMeeting ? 'Kết thúc cuộc họp' : 'Báo cáo hoàn thành công việc'}
+        title="Báo cáo hoàn thành công việc"
       >
         <p style={{ color: '#475569', fontSize: 13, marginBottom: 12 }}>
-          {isMeeting
-            ? 'Xác nhận cuộc họp đã kết thúc và ghi nhận vào nhật ký tiến độ.'
-            : 'Xác nhận công việc đã được hoàn thành. Bạn có thể ghi chú kết quả đạt được.'}
+          Xác nhận công việc đã được hoàn thành. Bạn có thể ghi chú kết quả đạt được.
         </p>
-        {!isMeeting && (
-          <Input.TextArea
-            autoSize={{ minRows: 3, maxRows: 5 }}
-            onChange={(e) => setCompleteReportText(e.target.value)}
-            placeholder="Ghi chú kết quả hoàn thành công việc... (tùy chọn)"
-            value={completeReportText}
-          />
-        )}
+        <Input.TextArea
+          autoSize={{ minRows: 3, maxRows: 5 }}
+          onChange={(e) => setCompleteReportText(e.target.value)}
+          placeholder="Ghi chú kết quả hoàn thành công việc... (tùy chọn)"
+          value={completeReportText}
+        />
       </Modal>
 
       {/* Modal Chỉnh sửa thông tin (Người tạo) */}

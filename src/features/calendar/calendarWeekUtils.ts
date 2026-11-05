@@ -8,26 +8,35 @@ dayjs.extend(isoWeek);
 export const vietnamNow = (): Dayjs => dayjs();
 
 export const TICKET_TYPES = {
-  TASK: {
-    value: 'TASK',
-    label: 'Công việc',
-    fullLabel: 'Công việc',
-    tone: 'task',
-    color: 'blue',
-  },
   MEETING: {
     value: 'MEETING',
     label: 'Lịch họp',
     fullLabel: 'Lịch họp',
     tone: 'meeting',
     color: 'red',
+    textColor: '#C8161D',
+    bgColor: '#FFEEEE',
+    baseColor: '#EC1C24',
+  },
+  TASK: {
+    value: 'TASK',
+    label: 'Phiếu công việc',
+    fullLabel: 'Phiếu công việc',
+    tone: 'task',
+    color: 'blue',
+    textColor: '#1D4ED8',
+    bgColor: '#E9F0FE',
+    baseColor: '#2563EB',
   },
   EVENT: {
     value: 'EVENT',
     label: 'Sự kiện',
     fullLabel: 'Sự kiện',
     tone: 'event',
-    color: 'purple',
+    color: 'green',
+    textColor: '#0F766E',
+    bgColor: '#E6F7F5',
+    baseColor: '#0D9488',
   },
 } as const;
 
@@ -187,10 +196,15 @@ export function normalizeMeeting(record: CalendarEvent | any, userId = 'nhanvien
   if (!start || !start.isValid()) return null;
 
   const scope: 'editorial' | 'personal' = record.scope === 'personal' || record.category === 'personal' ? 'personal' : 'editorial';
-  const isTask = scope !== 'editorial' && (record.ticketType || record.ticket_type) === 'TASK';
-  const isMeeting = scope === 'editorial' || (record.ticketType || record.ticket_type || 'MEETING') === 'MEETING';
+  const rawTicketType = String(
+    record.ticketType ||
+    record.ticket_type ||
+    (record.type === 'meeting' ? 'MEETING' : record.type === 'event' ? 'EVENT' : record.type === 'work' ? 'TASK' : 'MEETING')
+  ).toUpperCase();
   const ticketType: 'TASK' | 'MEETING' | 'EVENT' =
-    scope === 'editorial' ? 'MEETING' : isTask ? 'TASK' : (record.ticketType || record.ticket_type || 'MEETING');
+    rawTicketType === 'TASK' ? 'TASK' : rawTicketType === 'EVENT' ? 'EVENT' : 'MEETING';
+  const isTask = ticketType === 'TASK';
+  const isMeeting = ticketType === 'MEETING';
 
   const endObj = rawEnd ? dayjs(rawEnd) : null;
   const end = isTask ? null : (endObj && endObj.isValid() && endObj.isAfter(start) ? endObj : null);

@@ -17,6 +17,7 @@ import {
 import type { CalendarEvent } from '@/types/domain';
 
 import { getDayDutyInfo } from '../dutySchedule';
+import { getApprovalStatusMeta } from '../calendarWeekUtils';
 
 import './DayScheduleDrawer.css';
 
@@ -204,18 +205,34 @@ export function DayScheduleDrawer({
                   const start = dayjs(event.startAt);
                   const isEditorial = event.scope === 'editorial';
                   const isPersonal = event.scope === 'personal';
-                  const isUserAttending = Boolean(event.isUserParticipant);
+                  const isTaskTicket = event.ticketType === 'TASK';
+                  const isEventTicket = event.ticketType === 'EVENT';
+                  const isAttendingMeeting =
+                    event.ticketType === 'MEETING' &&
+                    (Boolean(event.isUserParticipant) || Boolean(event.isUserWatcher) || isPersonal);
+                  const isUserAttending = isAttendingMeeting || isTaskTicket || isPersonal;
 
-                  // Màu sắc thẻ theo 3 theme chuẩn Anti-AI (không dùng border-left):
+                  // Màu sắc thẻ đồng bộ tuyệt đối với WeekTimeline:
                   // - Lịch BBT có tham gia: theme-red (nền phớt đỏ nhạt, viền đỏ nhạt)
-                  // - Lịch Cá nhân: theme-blue (nền phớt xanh nhạt, viền xanh nhạt)
-                  // - Lịch BBT không tham gia: theme-gray (nền trắng/xám phẳng, viền xám nhạt)
+                  // - Lịch Cá nhân / Phiếu công việc: theme-blue (nền phớt xanh nhạt, viền xanh nhạt)
+                  // - Sự kiện: theme-green (nền phớt xanh ngọc nhạt, viền xanh ngọc nhạt)
+                  // - Lịch không tham gia: theme-gray (nền trắng/xám phẳng, viền xám nhạt)
                   let cardColorClass = 'theme-gray';
-                  if (isEditorial) {
-                    cardColorClass = isUserAttending ? 'theme-red' : 'theme-gray';
-                  } else if (isPersonal) {
+                  if (isTaskTicket || isPersonal) {
                     cardColorClass = 'theme-blue';
+                  } else if (isAttendingMeeting) {
+                    cardColorClass = 'theme-red';
+                  } else if (isEventTicket) {
+                    cardColorClass = 'theme-green';
                   }
+
+                  const approvalMeta = getApprovalStatusMeta(event.approvalStatus, event.ticketType, event.workflowType);
+                  const hasStatus = Boolean(
+                    approvalMeta &&
+                    approvalMeta.label &&
+                    (!isEditorial || (event.approvalStatus && event.approvalStatus !== 'SCHEDULED')) &&
+                    approvalMeta.value !== 'SCHEDULED'
+                  );
 
                   const canOpen = isPersonal || isUserAttending;
 
@@ -250,25 +267,29 @@ export function DayScheduleDrawer({
 
                       {/* Cột nội dung chi tiết */}
                       <div className="day-event-content-col">
-                        {((isEditorial && isUserAttending) || isPersonal || event.isAdjusted) && (
-                          <div className="day-event-tags-row">
-                            {isEditorial && isUserAttending && (
-                              <Tag className="event-badge-attending-red">
-                                Tham gia
-                              </Tag>
-                            )}
-                            {isPersonal && (
-                              <Tag className="event-scope-badge scope-blue">
-                                Cá nhân
-                              </Tag>
-                            )}
-                            {event.isAdjusted && (
-                              <Tag className="event-badge-adjusted" color="gold">
-                                Đã điều chỉnh
-                              </Tag>
-                            )}
-                          </div>
-                        )}
+                        <div className="day-event-tags-row">
+                          {event.ticketType === 'MEETING' && (
+                            <Tag className={isAttendingMeeting ? 'event-badge-type-meeting' : 'event-badge-type-meeting-gray'}>
+                              Lịch họp
+                            </Tag>
+                          )}
+                          {event.ticketType === 'TASK' && (
+                            <Tag className="event-badge-type-task">Phiếu công việc</Tag>
+                          )}
+                          {event.ticketType === 'EVENT' && (
+                            <Tag className="event-badge-type-event">Sự kiện</Tag>
+                          )}
+                          {hasStatus && (
+                            <span className={`booking-week-status-badge booking-week-status-${approvalMeta.tone}`}>
+                              {approvalMeta.label}
+                            </span>
+                          )}
+                          {event.isAdjusted && (
+                            <Tag className="event-badge-adjusted" color="gold">
+                              Đã điều chỉnh
+                            </Tag>
+                          )}
+                        </div>
 
                         <h4 className="day-event-title">{event.title}</h4>
 

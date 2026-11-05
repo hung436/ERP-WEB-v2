@@ -195,6 +195,7 @@
   color: #475569;
   font-weight: 600;
   margin-right: 4px;
+  font-size: 13px;
 }
 
 .duty-banner-shifts-list {
@@ -210,14 +211,15 @@
   display: flex;
   align-items: flex-start;
   gap: 8px;
-  font-size: 12px;
-  line-height: 1.4;
+  font-size: 13px;
+  line-height: 1.45;
 }
 
 .shift-badge-text {
   font-weight: 600;
   color: #334155;
   flex-shrink: 0;
+  font-size: 13px;
 }
 
 .shift-body-text {
@@ -226,11 +228,13 @@
   gap: 6px;
   flex-wrap: wrap;
   color: #475569;
+  font-size: 13px;
 }
 
 .sub-lbl {
   font-weight: 600;
   color: #334155;
+  font-size: 12px;
 }
 
 .shift-dot {
@@ -268,38 +272,80 @@
   box-sizing: border-box;
 }
 
-/* Theme màu thẻ: Không border-left, không viền, dùng background êm dịu */
+/* Theme màu thẻ: Hoàn toàn không viền, nền màu sắc rõ nét êm dịu */
 .day-event-card.theme-red {
-  background: #fffafa;
-  border: 1px solid transparent;
+  background: #fef2f2;
+  border: none;
 }
 
 .day-event-card.theme-red:hover {
-  background: #fef2f2;
-  border-color: transparent;
-  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.06);
+  background: #fee2e2;
+  border: none;
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.08);
 }
 
 .day-event-card.theme-blue {
-  background: #fbfdff;
-  border: 1px solid transparent;
+  background: #f0f9ff;
+  border: none;
 }
 
 .day-event-card.theme-blue:hover {
-  background: #f0f7ff;
-  border-color: transparent;
-  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.06);
+  background: #e0f2fe;
+  border: none;
+  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.08);
 }
 
 .day-event-card.theme-gray {
   background: #f8fafc;
-  border: 1px solid transparent;
+  border: none;
 }
 
 .day-event-card.theme-gray:hover {
   background: #f1f5f9;
-  border-color: transparent;
+  border: none;
   box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+}
+
+.day-event-card.theme-green {
+  background: #f6fdf8;
+  border: 1px solid #bbf7d0;
+}
+
+.day-event-card.theme-green:hover {
+  background: #dcfce7;
+  border-color: #86efac;
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.1);
+}
+
+.event-badge-type-meeting-gray {
+  background: #F4F4F5 !important;
+  border: 1px solid #E4E4E7 !important;
+  color: #52525B !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+}
+.event-badge-type-meeting {
+  background: #FFEEEE !important;
+  border: none !important;
+  color: #C8161D !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+}
+
+.event-badge-type-task {
+  background: #E9F0FE !important;
+  border: none !important;
+  color: #1D4ED8 !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+}
+
+.event-badge-type-event {
+  background: #E6F7F5 !important;
+  border: none !important;
+  color: #0F766E !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
 }
 
 /* Cột mốc thời gian */
@@ -343,11 +389,11 @@
 }
 
 .event-badge-attending-red {
-  background: #fef2f2 !important;
-  border: 1px solid #fecaca !important;
-  color: #b91c1c !important;
+  background: #fecaca !important;
+  border: none !important;
+  color: #991b1b !important;
   font-size: 11px !important;
-  font-weight: 600 !important;
+  font-weight: 700 !important;
   border-radius: 4px !important;
   margin: 0 !important;
   padding: 1px 6px !important;
@@ -356,11 +402,11 @@
 }
 
 .event-scope-badge.scope-blue {
-  background: #eff6ff !important;
-  border: 1px solid #bfdbfe !important;
-  color: #1d4ed8 !important;
+  background: #bae6fd !important;
+  border: none !important;
+  color: #075985 !important;
   font-size: 11px !important;
-  font-weight: 600 !important;
+  font-weight: 700 !important;
   border-radius: 4px !important;
   margin: 0 !important;
   padding: 1px 6px !important;
@@ -369,11 +415,11 @@
 }
 
 .event-badge-adjusted {
-  background: #fffbeb !important;
-  border: 1px solid #fde68a !important;
-  color: #b45309 !important;
+  background: #fef3c7 !important;
+  border: none !important;
+  color: #92400e !important;
   font-size: 11px !important;
-  font-weight: 600 !important;
+  font-weight: 700 !important;
   border-radius: 4px !important;
   margin: 0 !important;
   padding: 1px 6px !important;

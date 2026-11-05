@@ -118,7 +118,7 @@ export function RoleSimulationBar({
                     borderRadius: 20,
                     fontSize: 12,
                     fontWeight: isActive ? 600 : 500,
-                    border: isActive ? '1.5px solid #dc2626' : '1px solid #e2e8f0',
+                    border: isActive ? '2px solid #dc2626' : '1px solid #e2e8f0',
                     background: isActive ? '#fef2f2' : '#ffffff',
                     color: isActive ? '#dc2626' : '#334155',
                     cursor: 'pointer',

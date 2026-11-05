@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import type { TooltipPlacement } from 'antd/es/tooltip';
 import type { Dayjs } from 'dayjs';
 import { Button, Popover, Skeleton, message } from 'antd';
 import {
@@ -89,6 +90,58 @@ export function EventCard({
   disabledHover = false,
 }: EventCardProps) {
   const [expanded, setExpanded] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  const getInitialPlacement = (): TooltipPlacement => {
+    if (vertical) {
+      return expandLeft ? 'leftTop' : 'rightTop';
+    }
+    return upward ? 'top' : 'bottom';
+  };
+
+  const [placement, setPlacement] = useState<TooltipPlacement>(getInitialPlacement);
+
+  const updatePlacement = useCallback(() => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+
+    const POPOVER_WIDTH = 340;
+    const POPOVER_HEIGHT = 280;
+
+    if (vertical) {
+      const spaceRight = vw - rect.right;
+      const spaceLeft = rect.left;
+
+      // Card horizontal center - nếu nằm ở nửa phải màn hình hoặc bên phải không đủ rộng thì mở sang trái
+      const cardCenterX = rect.left + rect.width / 2;
+      const goLeft = spaceRight < POPOVER_WIDTH || cardCenterX > vw / 2 || (expandLeft && spaceLeft >= POPOVER_WIDTH);
+
+      // Căn chỉnh trục dọc:
+      // Khi căn top (*Top), đỉnh popover nằm ở rect.top (không bao giờ âm nếu rect.top >= 0).
+      // Chỉ căn bottom (*Bottom) khi khoảng trống phía dưới không đủ VÀ rect.bottom đủ cao để không bị tràn ngược lên đỉnh màn hình!
+      const spaceBelow = vh - rect.top;
+      const canFitBelow = spaceBelow >= POPOVER_HEIGHT;
+      const canFitAbove = rect.bottom >= POPOVER_HEIGHT + 20;
+      const goUpward = !canFitBelow && canFitAbove;
+
+      if (goLeft) {
+        setPlacement(goUpward ? 'leftBottom' : 'leftTop');
+      } else {
+        setPlacement(goUpward ? 'rightBottom' : 'rightTop');
+      }
+    } else {
+      const spaceBelow = vh - rect.bottom;
+      const spaceAbove = rect.top;
+      const goUpward = spaceBelow < POPOVER_HEIGHT && spaceAbove >= POPOVER_HEIGHT + 20;
+      setPlacement(goUpward ? 'top' : 'bottom');
+    }
+  }, [vertical, expandLeft]);
+
+  useEffect(() => {
+    setPlacement(getInitialPlacement());
+  }, [vertical, expandLeft, upward]);
   const [starred, setStarred] = useState(Boolean(event.isInterested));
 
   useEffect(() => {
@@ -103,14 +156,43 @@ export function EventCard({
 
   const isEditorial = event.scope === 'editorial';
   const isPersonal = event.scope === 'personal';
-  const isUserAttending = Boolean(event.isUserParticipant);
+  const isTaskTicket = event.ticketType === 'TASK';
+
+  // Lịch có tôi tham gia (kể cả họp MEETING hay sự kiện EVENT, hoặc do tôi tạo / cá nhân / theo dõi)
+  const isUserAttending =
+    Boolean(event.isUserParticipant || event.isUserWatcher) || isPersonal || isTaskTicket;
   const canOpenDrawer = isPersonal || isUserAttending;
 
-  const badge = isPersonal ? 'Cá nhân' : isUserAttending ? 'Tham gia' : '';
   const typeMeta = getTicketTypeMeta(event.ticketType);
   const approvalMeta = getApprovalStatusMeta(event.approvalStatus, event.ticketType, event.workflowType);
   const typeKey = String(event.ticketType || 'MEETING').toLowerCase();
   const statusKey = approvalMeta.tone;
+
+  // Chỉ dùng 2 màu đánh dấu theo yêu cầu:
+  // 1. Phiếu cá nhân / việc cá nhân: Xanh dương (booking-week-personal)
+  // 2. Ban biên tập có tôi tham gia: Đỏ (booking-week-attending)
+  // 3. Toàn bộ còn lại: Trung tính xám / trắng (booking-week-non-attending)
+  const isMyPersonal = isPersonal || isTaskTicket;
+  const isMyEditorial = isEditorial && (Boolean(event.isUserParticipant) || Boolean(event.isUserWatcher));
+
+  const cardColorClass = isMyPersonal
+    ? 'booking-week-personal'
+    : isMyEditorial
+    ? 'booking-week-attending'
+    : 'booking-week-non-attending';
+
+  const typeBadgeClass = isMyPersonal
+    ? 'booking-week-type-badge booking-week-type-task'
+    : isMyEditorial
+    ? 'booking-week-type-badge booking-week-type-meeting'
+    : 'booking-week-type-badge booking-week-type-neutral';
+
+  const hasStatus = Boolean(
+    approvalMeta &&
+    approvalMeta.label &&
+    (!isEditorial || (event.approvalStatus && event.approvalStatus !== 'SCHEDULED')) &&
+    approvalMeta.value !== 'SCHEDULED'
+  );
   const past = Boolean(
     now &&
       event.end &&
@@ -136,13 +218,10 @@ export function EventCard({
   const popoverContent = (
     <div className="booking-week-card-expanded-content">
       <div className="booking-week-card-expanded-badges">
-        {!isEditorial && (
-          <>
-            <span className={`booking-week-type-badge booking-week-type-${typeKey}`}>{typeMeta.label}</span>
-            <span className={`booking-week-status-badge booking-week-status-${statusKey}`}>{approvalMeta.label}</span>
-          </>
+        <span className={typeBadgeClass}>{typeMeta.label}</span>
+        {hasStatus && (
+          <span className={`booking-week-status-badge booking-week-status-${statusKey}`}>{approvalMeta.label}</span>
         )}
-        {badge && <span className="booking-week-badge">{badge}</span>}
       </div>
       <strong className="booking-week-popover-title">{event.title}</strong>
 
@@ -152,75 +231,72 @@ export function EventCard({
         </div>
       )}
 
-      <p>
-        <ClockCircleOutlined /> <span><b>Thời gian:</b> {eventTime(event)}</span>
-      </p>
+      <div className="booking-week-popover-row">
+        <span className="booking-week-popover-icon"><ClockCircleOutlined /></span>
+        <span className="booking-week-popover-text"><b>Thời gian:</b> {eventTime(event)}</span>
+      </div>
       {(event.location || (!isEditorial && event.ticketType !== 'TASK')) && (
-        <p>
-          <EnvironmentOutlined /> <span><b>Địa điểm:</b> {event.location || 'Chưa có địa điểm'}</span>
-        </p>
+        <div className="booking-week-popover-row">
+          <span className="booking-week-popover-icon"><EnvironmentOutlined /></span>
+          <span className="booking-week-popover-text"><b>Địa điểm:</b> {event.location || 'Chưa có địa điểm'}</span>
+        </div>
       )}
-      {Boolean(event.leader?.trim()) && (
-        <p>
-          <UserOutlined /> <span><b>Chủ trì:</b> {event.leader}</span>
-        </p>
+      {event.ticketType === 'MEETING' && Boolean(event.leader?.trim()) && (
+        <div className="booking-week-popover-row">
+          <span className="booking-week-popover-icon"><UserOutlined /></span>
+          <span className="booking-week-popover-text"><b>Chủ trì:</b> {event.leader}</span>
+        </div>
       )}
       {isEditorial ? (
         Boolean(event.participantText) && (
-          <p>
-            <TeamOutlined />
-            <span>
+          <div className="booking-week-popover-row">
+            <span className="booking-week-popover-icon"><TeamOutlined /></span>
+            <span className="booking-week-popover-text">
               <b>Thành phần:</b> <ParticipantList text={event.participantText} scrollExpanded />
             </span>
-          </p>
+          </div>
         )
       ) : (
         event.ticketType !== 'TASK' && (
-          <p>
-            <TeamOutlined />
-            <ParticipantList
-              text={
-                event.participantText ||
-                (event.participantCount ? `${event.participantCount} người tham gia · Xem trong chi tiết` : 'Chưa có thông tin thành phần')
-              }
-              scrollExpanded
-            />
-          </p>
+          <div className="booking-week-popover-row">
+            <span className="booking-week-popover-icon"><TeamOutlined /></span>
+            <span className="booking-week-popover-text">
+              <ParticipantList
+                text={
+                  event.participantText ||
+                  (event.participantCount ? `${event.participantCount} người tham gia · Xem trong chi tiết` : 'Chưa có thông tin thành phần')
+                }
+                scrollExpanded
+              />
+            </span>
+          </div>
         )
       )}
       {Boolean(event.dutyInfo) && (
-        <p>
-          <ClockCircleOutlined /> <span><b>Trực ban:</b> {event.dutyInfo}</span>
-        </p>
-      )}
-      {!isEditorial && event.ticketType !== 'MEETING' && event.executorText && (
-        <p>
-          <UserOutlined /> <span>Triển khai: {event.executorText}</span>
-        </p>
-      )}
-      {!isEditorial && event.ticketType !== 'MEETING' && event.approver && (
-        <p>
-          <UserOutlined /> <span>Người duyệt: {event.approver.display_name || event.approver.name}</span>
-        </p>
-      )}
-      {!isEditorial && event.ticketType !== 'MEETING' && event.watcherText && (
-        <p>
-          <EyeOutlined /> <span>Theo dõi: {event.watcherText}</span>
-        </p>
-      )}
-
-      {isEditorial && !isUserAttending && !past && (
-        <div className="booking-week-card-interest-row">
-          <button
-            type="button"
-            className={`booking-week-card-interest-btn ${starred ? 'is-active' : ''}`}
-            onClick={handleToggleStar}
-          >
-            <StarOutlined />
-            <span>{starred ? 'Đang quan tâm (Nhắc trước 15p)' : 'Quan tâm (Nhắc trước 15p)'}</span>
-          </button>
+        <div className="booking-week-popover-row">
+          <span className="booking-week-popover-icon"><ClockCircleOutlined /></span>
+          <span className="booking-week-popover-text"><b>Trực ban:</b> {event.dutyInfo}</span>
         </div>
       )}
+      {!isEditorial && event.ticketType !== 'MEETING' && event.executorText && (
+        <div className="booking-week-popover-row">
+          <span className="booking-week-popover-icon"><UserOutlined /></span>
+          <span className="booking-week-popover-text">Triển khai: {event.executorText}</span>
+        </div>
+      )}
+      {!isEditorial && event.ticketType !== 'MEETING' && event.approver && (
+        <div className="booking-week-popover-row">
+          <span className="booking-week-popover-icon"><UserOutlined /></span>
+          <span className="booking-week-popover-text">Người duyệt: {event.approver.display_name || event.approver.name}</span>
+        </div>
+      )}
+      {!isEditorial && event.ticketType !== 'MEETING' && event.watcherText && (
+        <div className="booking-week-popover-row">
+          <span className="booking-week-popover-icon"><EyeOutlined /></span>
+          <span className="booking-week-popover-text">Theo dõi: {event.watcherText}</span>
+        </div>
+      )}
+
 
       {(canOpenDrawer || attachmentTotal > 0 || commentTotal > 0) && (
         <div className="booking-week-card-footer">
@@ -245,19 +321,23 @@ export function EventCard({
     </div>
   );
 
-  const placement = vertical
-    ? expandLeft
-      ? (upward ? 'leftBottom' : 'leftTop')
-      : (upward ? 'rightBottom' : 'rightTop')
-    : (upward ? 'top' : 'bottom');
+  // dynamic placement
+
+
+
+
 
   return (
     <div
+      ref={cardRef}
+      onMouseEnter={() => {
+        if (!disabledHover) {
+          updatePlacement();
+        }
+      }}
       className={`booking-week-event booking-week-ticket-${typeKey} ${vertical ? 'booking-week-feed-card' : ''} ${
         compact ? 'booking-week-out-hours-card' : ''
-      } ${past ? 'booking-week-past-event' : ''} ${
-        isPersonal ? 'booking-week-personal' : isUserAttending ? 'booking-week-attending' : ''
-      } ${expanded && !disabledHover ? 'booking-week-expanded' : ''}`}
+      } ${past ? 'booking-week-past-event' : ''} ${cardColorClass} ${expanded && !disabledHover ? 'booking-week-expanded' : ''}`}
       style={
         vertical || compact
           ? undefined
@@ -276,6 +356,9 @@ export function EventCard({
             setExpanded(false);
             return;
           }
+          if (visible) {
+            updatePlacement();
+          }
           setExpanded(visible);
         }}
         trigger="hover"
@@ -283,7 +366,8 @@ export function EventCard({
         mouseLeaveDelay={0.16}
         placement={placement}
         overlayClassName="booking-week-card-popover"
-        destroyTooltipOnHide
+        autoAdjustOverflow={{ adjustX: 1, adjustY: 1 }}
+        destroyOnHidden
         arrow={false}
       >
         <button
@@ -298,16 +382,11 @@ export function EventCard({
           style={{ cursor: canOpenDrawer ? 'pointer' : 'default' }}
         >
           <div className="booking-week-card-top">
-            <span className="booking-week-card-time-group">
-              <span className="booking-week-card-time">{eventTime(event)}</span>
-            </span>
+            <span className="booking-week-card-time">{eventTime(event)}</span>
             <span className="booking-week-card-badges">
-              {badge && <span className="booking-week-badge">{badge}</span>}
-              {!isEditorial && (
-                <span className={`booking-week-type-badge booking-week-type-${typeKey}`}>
-                  {typeMeta.label}
-                </span>
-              )}
+              <span className={typeBadgeClass}>
+                {typeMeta.label}
+              </span>
               {isEditorial && !isUserAttending && !past && (
                 <span
                   role="button"
@@ -340,18 +419,26 @@ export function EventCard({
             </small>
           )}
 
+          {hasStatus && (
+            <div className="booking-week-card-status-row">
+              <span className={`booking-week-status-badge booking-week-status-${statusKey}`}>
+                {approvalMeta.label}
+              </span>
+            </div>
+          )}
+
           <div className="booking-week-card-title">{event.title}</div>
 
           {event.isAdjusted && <span className="booking-week-adjusted">Đã điều chỉnh</span>}
 
-          {(event.location || Boolean(event.leader?.trim())) && (
-            <div className="booking-week-card-location" title={event.location || event.leader}>
+          {(event.location || (event.ticketType === 'MEETING' && Boolean(event.leader?.trim()))) && (
+            <div className="booking-week-card-location" title={event.location || (event.ticketType === 'MEETING' ? event.leader : '')}>
               {event.location ? (
                 <EnvironmentOutlined className="booking-week-card-loc-icon" aria-hidden="true" />
               ) : (
                 <TeamOutlined className="booking-week-card-loc-icon" aria-hidden="true" />
               )}
-              <span>{event.location || event.leader}</span>
+              <span>{event.location || (event.ticketType === 'MEETING' ? event.leader : '')}</span>
             </div>
           )}
         </button>
