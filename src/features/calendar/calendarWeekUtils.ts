@@ -245,8 +245,10 @@ export function normalizeMeeting(record: CalendarEvent | any, userId = 'nhanvien
     (record.organizer && String(record.organizer).includes('Nguyễn Minh Anh'))
   );
 
+  const isDeclined = Boolean((record as any).isDeclined || (record as any).declined);
+
   const isUserWatcher =
-    scope === 'editorial'
+    scope === 'editorial' || isDeclined
       ? false
       : Boolean(
           record.isUserWatcher ||
@@ -258,23 +260,25 @@ export function normalizeMeeting(record: CalendarEvent | any, userId = 'nhanvien
             )),
         );
 
-  const isUserParticipant =
-    scope === 'editorial'
+  const isUserParticipant = isDeclined
+    ? false
+    : record.isUserParticipant !== undefined
       ? Boolean(record.isUserParticipant)
-      : Boolean(
-          record.isUserParticipant ||
-          isUserExecutor ||
-          isUserApprover ||
-          isUserConsultant ||
-          isUserLeader ||
-          (scope === 'personal' && !isTask) ||
-          (Array.isArray(record.participants) &&
-            record.participants.some(
-              (p: any) =>
-                String(p.id || p.user_id || p) === String(userId) ||
-                String(p.name || p).includes('Nguyễn Minh Anh'),
-            )),
-        );
+      : scope === 'editorial'
+        ? false
+        : Boolean(
+            isUserExecutor ||
+            isUserApprover ||
+            isUserConsultant ||
+            isUserLeader ||
+            (scope === 'personal' && !isTask) ||
+            (Array.isArray(record.participants) &&
+              record.participants.some(
+                (p: any) =>
+                  String(p.id || p.user_id || p) === String(userId) ||
+                  String(p.name || p).includes('Nguyễn Minh Anh'),
+              )),
+          );
 
   const participantText = record.participantText || record.attendees_text || (Array.isArray(record.participants) ? record.participants.map((p: any) => p.display_name || p.name || p).join(', ') : '');
 

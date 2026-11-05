@@ -207,18 +207,19 @@ export function DayScheduleDrawer({
                   const isPersonal = event.scope === 'personal';
                   const isTaskTicket = event.ticketType === 'TASK';
                   const isEventTicket = event.ticketType === 'EVENT';
+                  const isUserAttending = Boolean(event.isUserParticipant || event.isUserWatcher);
                   const isAttendingMeeting =
-                    event.ticketType === 'MEETING' &&
-                    (Boolean(event.isUserParticipant) || Boolean(event.isUserWatcher) || isPersonal);
-                  const isUserAttending = isAttendingMeeting || isTaskTicket || isPersonal;
+                    event.ticketType === 'MEETING' && isUserAttending;
 
                   // Màu sắc thẻ đồng bộ tuyệt đối với WeekTimeline:
                   // - Lịch BBT có tham gia: theme-red (nền phớt đỏ nhạt, viền đỏ nhạt)
-                  // - Lịch Cá nhân / Phiếu công việc: theme-blue (nền phớt xanh nhạt, viền xanh nhạt)
-                  // - Sự kiện: theme-green (nền phớt xanh ngọc nhạt, viền xanh ngọc nhạt)
+                  // - Lịch Cá nhân / Phiếu công việc có tham gia: theme-blue (nền phớt xanh nhạt, viền xanh nhạt)
+                  // - Sự kiện có tham gia: theme-green (nền phớt xanh ngọc nhạt, viền xanh ngọc nhạt)
                   // - Lịch không tham gia: theme-gray (nền trắng/xám phẳng, viền xám nhạt)
                   let cardColorClass = 'theme-gray';
-                  if (isTaskTicket || isPersonal) {
+                  if (!isUserAttending) {
+                    cardColorClass = 'theme-gray';
+                  } else if (isTaskTicket || isPersonal) {
                     cardColorClass = 'theme-blue';
                   } else if (isAttendingMeeting) {
                     cardColorClass = 'theme-red';
@@ -234,7 +235,7 @@ export function DayScheduleDrawer({
                     approvalMeta.value !== 'SCHEDULED'
                   );
 
-                  const canOpen = isPersonal || isUserAttending;
+                  const canOpen = isUserAttending;
 
                   // Danh sách tham gia
                   const participantsText =

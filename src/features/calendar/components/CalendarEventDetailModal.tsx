@@ -528,6 +528,11 @@ export function CalendarEventDetailModal({
   const isCreatorOnly = Boolean(
     (isMe(creatorName) || isMe(event.organizer)) && !isUserAnExecutor,
   );
+  const isWatcherMe = Boolean(
+    (watchers.length > 0 ? watchers : event.watchers || []).some((w) =>
+      isMe(w.name),
+    ),
+  );
 
   // Đang lấy ý kiến tham vấn từ người khác
   const isConsultingInProgress = Boolean(
@@ -607,7 +612,16 @@ export function CalendarEventDetailModal({
     setTimeout(() => {
       setActionLoading(false);
       message.success("Bạn đã chọn không tham gia mục này");
-      onDeleteEvent?.(event.id);
+      const updatedEvent: CalendarEvent = {
+        ...event,
+        isUserParticipant: false,
+        isUserWatcher: false,
+        isDeclined: true,
+        executors: (event.executors || []).filter((e) => !isMe(e.name)),
+        watchers: (event.watchers || []).filter((w) => !isMe(w.name)),
+        participants: (event.participants || []).filter((p) => !isMe(p)),
+      };
+      onUpdateEvent(updatedEvent);
       onClose();
     }, 400);
   };
@@ -632,7 +646,7 @@ export function CalendarEventDetailModal({
     Modal.confirm({
       title: "Không tham gia?",
       content:
-        "Bạn sẽ không còn nhận thông báo và mục này sẽ được gỡ khỏi danh sách cá nhân.",
+        "Bạn sẽ không còn nhận thông báo và không mở chi tiết được mục này trên lịch.",
       okText: "Không tham gia",
       okType: "danger",
       cancelText: "Hủy",
@@ -1283,8 +1297,8 @@ export function CalendarEventDetailModal({
                 />
               </Tooltip>
 
-              {/* 2. Không tham gia (chỉ dành cho Task) */}
-              {isTask && (
+              {/* 2. Không tham gia (chỉ dành cho Task, ngoại trừ Người theo dõi) */}
+              {isTask && activeRole !== "WATCHER" && !isWatcherMe && (
                 <Tooltip title="Không tham gia">
                   <Button
                     aria-label="Không tham gia"
@@ -1946,10 +1960,10 @@ export function CalendarEventDetailModal({
                               ? wName.charAt(0).toUpperCase()
                               : "?";
                             const isSelfWatcher = isMe(wName);
+                            // Người theo dõi ở Chi tiết phiếu sẽ không có nút bỏ theo dõi chính mình
                             const canRemoveWatcher =
-                              isSelfWatcher ||
-                              isCreatorMe ||
-                              !isFinishedOrCancelled;
+                              !isSelfWatcher &&
+                              (isCreatorMe || !isFinishedOrCancelled);
 
                             return (
                               <span
@@ -1976,40 +1990,17 @@ export function CalendarEventDetailModal({
                                 )}
                                 {canRemoveWatcher && (
                                   <Popconfirm
-                                    title={
-                                      isSelfWatcher
-                                        ? "Bỏ theo dõi phiếu?"
-                                        : `Xóa người theo dõi?`
-                                    }
-                                    description={
-                                      isSelfWatcher
-                                        ? "Bạn sẽ không còn nhận các thông báo và thảo luận mới của phiếu này."
-                                        : `Xác nhận xóa "${wName}" khỏi danh sách người theo dõi phiếu này.`
-                                    }
+                                    title="Xóa người theo dõi?"
+                                    description={`Xác nhận xóa "${wName}" khỏi danh sách người theo dõi phiếu này.`}
                                     onConfirm={() => handleRemoveWatcher(wName)}
-                                    okText={
-                                      isSelfWatcher ? "Bỏ theo dõi" : "Xóa"
-                                    }
+                                    okText="Xóa"
                                     cancelText="Hủy"
-                                    okButtonProps={
-                                      isSelfWatcher
-                                        ? { danger: true }
-                                        : undefined
-                                    }
                                   >
                                     <button
                                       type="button"
                                       className="jt-person-chip__remove-btn"
-                                      title={
-                                        isSelfWatcher
-                                          ? "Bỏ theo dõi phiếu"
-                                          : `Xóa ${wName}`
-                                      }
-                                      aria-label={
-                                        isSelfWatcher
-                                          ? "Bỏ theo dõi phiếu"
-                                          : `Xóa ${wName}`
-                                      }
+                                      title={`Xóa ${wName}`}
+                                      aria-label={`Xóa ${wName}`}
                                     >
                                       <X size={11} strokeWidth={2.4} />
                                     </button>

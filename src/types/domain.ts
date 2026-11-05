@@ -111,6 +111,7 @@ export interface CalendarEvent {
   participantText?: string;
   participantCount?: number;
   isUserParticipant?: boolean;
+  isDeclined?: boolean;
   responseStatus?: 'pending' | 'accepted' | 'declined';
   meetingId?: string;
   platform?: string;

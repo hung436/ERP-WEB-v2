@@ -126,7 +126,7 @@ export function CalendarEventCard({ event, onSelectEvent, onHoverChange, style, 
     }
   };
 
-  const canOpenDrawer = isPersonal || isUserAttending;
+  const canOpenDrawer = isUserAttending;
 
   const now = dayjs();
   const isCurrentWeek = start.isSame(now, 'isoWeek') || end.isSame(now, 'isoWeek');
@@ -136,8 +136,10 @@ export function CalendarEventCard({ event, onSelectEvent, onHoverChange, style, 
   if (isPast) {
     cardClass += ' is-past-event';
   }
-  if (isEditorial) {
-    cardClass += isUserAttending ? ' card-editorial-user' : ' card-editorial-other';
+  if (!isUserAttending) {
+    cardClass += ' card-editorial-other';
+  } else if (isEditorial) {
+    cardClass += ' card-editorial-user';
   } else if (isPersonal) {
     cardClass += ' card-personal';
   }
@@ -174,7 +176,7 @@ export function CalendarEventCard({ event, onSelectEvent, onHoverChange, style, 
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       role={canOpenDrawer ? 'button' : undefined}
-      style={style}
+      style={{ ...style, cursor: canOpenDrawer ? 'pointer' : 'default' }}
       tabIndex={canOpenDrawer ? 0 : undefined}
     >
       {/* 1. Trạng thái mặc định (khi không hover) */}

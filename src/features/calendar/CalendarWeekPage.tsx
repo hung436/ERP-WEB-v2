@@ -315,9 +315,10 @@ export function CalendarWeekPage() {
     };
   }, [searchedInWeek]);
 
-  // Selection handler - Logic từ feature/hang: Sự kiện Ban biên tập mà user KHÔNG tham gia thì không mở drawer chi tiết
+  // Selection handler: Sự kiện/lịch mà user KHÔNG tham gia thì không mở drawer/modal chi tiết
   const handleSelectNormalizedEvent = (normalized: NormalizedMeetingEvent) => {
-    if (normalized.scope === "editorial" && !normalized.isUserParticipant) {
+    const isAttending = Boolean(normalized.isUserParticipant || normalized.isUserWatcher);
+    if (!isAttending) {
       return;
     }
     const raw = normalized.raw || allEvents.find((e) => e.id === normalized.id);
@@ -969,7 +970,8 @@ export function CalendarWeekPage() {
             events={allEvents}
             onClose={() => setSelectedDay(null)}
             onSelectEvent={(ev) => {
-              if (ev.scope === "editorial" && !ev.isUserParticipant) {
+              const isAttending = Boolean(ev.isUserParticipant || ev.isUserWatcher);
+              if (!isAttending) {
                 return;
               }
               setSelectedEvent(ev);

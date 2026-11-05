@@ -125,7 +125,7 @@
 
 - [x] Bật / Tắt thông báo
 - [ ] Thêm / Quản lý Người theo dõi
-- [x] Rời phiếu (ngừng theo dõi)
+- [ ] Rời phiếu (ngừng theo dõi)
 
 **Nút xử lý trạng thái (Trong nội dung):**
 

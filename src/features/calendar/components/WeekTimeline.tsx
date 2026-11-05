@@ -159,9 +159,8 @@ export function EventCard({
   const isTaskTicket = event.ticketType === 'TASK';
 
   // Lịch có tôi tham gia (kể cả họp MEETING hay sự kiện EVENT, hoặc do tôi tạo / cá nhân / theo dõi)
-  const isUserAttending =
-    Boolean(event.isUserParticipant || event.isUserWatcher) || isPersonal || isTaskTicket;
-  const canOpenDrawer = isPersonal || isUserAttending;
+  const isUserAttending = Boolean(event.isUserParticipant || event.isUserWatcher);
+  const canOpenDrawer = isUserAttending;
 
   const typeMeta = getTicketTypeMeta(event.ticketType);
   const approvalMeta = getApprovalStatusMeta(event.approvalStatus, event.ticketType, event.workflowType);
@@ -171,21 +170,21 @@ export function EventCard({
   // Chỉ dùng 2 màu đánh dấu theo yêu cầu:
   // 1. Phiếu cá nhân / việc cá nhân: Xanh dương (booking-week-personal)
   // 2. Ban biên tập có tôi tham gia: Đỏ (booking-week-attending)
-  // 3. Toàn bộ còn lại: Trung tính xám / trắng (booking-week-non-attending)
+  // 3. Toàn bộ còn lại (không tham gia): Trung tính xám / trắng (booking-week-non-attending)
   const isMyPersonal = isPersonal || isTaskTicket;
-  const isMyEditorial = isEditorial && (Boolean(event.isUserParticipant) || Boolean(event.isUserWatcher));
+  const isMyEditorial = isEditorial && isUserAttending;
 
-  const cardColorClass = isMyPersonal
+  const cardColorClass = !isUserAttending
+    ? 'booking-week-non-attending'
+    : isMyPersonal
     ? 'booking-week-personal'
-    : isMyEditorial
-    ? 'booking-week-attending'
-    : 'booking-week-non-attending';
+    : 'booking-week-attending';
 
-  const typeBadgeClass = isMyPersonal
+  const typeBadgeClass = !isUserAttending
+    ? 'booking-week-type-badge booking-week-type-neutral'
+    : isMyPersonal
     ? 'booking-week-type-badge booking-week-type-task'
-    : isMyEditorial
-    ? 'booking-week-type-badge booking-week-type-meeting'
-    : 'booking-week-type-badge booking-week-type-neutral';
+    : 'booking-week-type-badge booking-week-type-meeting';
 
   const hasStatus = Boolean(
     approvalMeta &&

@@ -9,9 +9,9 @@ import {
   Tooltip,
   Upload,
   message,
-} from 'antd';
-import type { UploadFile } from 'antd/es/upload/interface';
-import dayjs from 'dayjs';
+} from "antd";
+import type { UploadFile } from "antd/es/upload/interface";
+import dayjs from "dayjs";
 import {
   AlertCircle,
   Calendar,
@@ -31,30 +31,30 @@ import {
   Users,
   Video,
   XCircle,
-} from 'lucide-react';
-import React, { useRef, useState } from 'react';
+} from "lucide-react";
+import React, { useRef, useState } from "react";
 
-import { useAuth } from '@/features/auth/AuthContext';
-import { calendarApi } from '@/services/api';
-import type { CalendarAttachmentItem, CalendarEvent } from '@/types/domain';
+import { useAuth } from "@/features/auth/AuthContext";
+import { calendarApi } from "@/services/api";
+import type { CalendarAttachmentItem, CalendarEvent } from "@/types/domain";
 
-import { formatBytes, getFileCategory } from './AttachedFilesList';
-import { CreatePersonalMeetingModal } from './CreatePersonalMeetingModal';
+import { formatBytes, getFileCategory } from "./AttachedFilesList";
+import { CreatePersonalMeetingModal } from "./CreatePersonalMeetingModal";
 
-import './MeetingDetailDrawer.css';
+import "./MeetingDetailDrawer.css";
 
 const VI_DAY_NAMES = [
-  'Chủ Nhật',
-  'Thứ Hai',
-  'Thứ Ba',
-  'Thứ Tư',
-  'Thứ Năm',
-  'Thứ Sáu',
-  'Thứ Bảy',
+  "Chủ Nhật",
+  "Thứ Hai",
+  "Thứ Ba",
+  "Thứ Tư",
+  "Thứ Năm",
+  "Thứ Sáu",
+  "Thứ Bảy",
 ];
 
 function getInitials(name: string) {
-  if (!name) return 'U';
+  if (!name) return "U";
   const parts = name.trim().split(/\s+/);
   if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
   return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
@@ -62,13 +62,13 @@ function getInitials(name: string) {
 
 function getAvatarColor(name: string) {
   const colors = [
-    '#1877f2',
-    '#e11d48',
-    '#0284c7',
-    '#16a34a',
-    '#d97706',
-    '#7c3aed',
-    '#0891b2',
+    "#1877f2",
+    "#e11d48",
+    "#0284c7",
+    "#16a34a",
+    "#d97706",
+    "#7c3aed",
+    "#0891b2",
   ];
   let hash = 0;
   for (let i = 0; i < name.length; i++) {
@@ -79,15 +79,15 @@ function getAvatarColor(name: string) {
 
 function highlightCurrentUserName(
   text: string,
-  currentUserName = 'Nguyễn Minh Anh',
+  currentUserName = "Nguyễn Minh Anh",
 ) {
-  if (!text) return 'Chưa cập nhật';
-  const regex = new RegExp(`(${currentUserName})`, 'gi');
+  if (!text) return "Chưa cập nhật";
+  const regex = new RegExp(`(${currentUserName})`, "gi");
   const parts = text.split(regex);
   return parts.map((part, idx) => {
     if (part.toLowerCase() === currentUserName.toLowerCase()) {
       return (
-        <span key={idx} style={{ fontWeight: 700, color: '#0f172a' }}>
+        <span key={idx} style={{ fontWeight: 700, color: "#0f172a" }}>
           {part}
         </span>
       );
@@ -112,54 +112,56 @@ export const MeetingDetailDrawer: React.FC<MeetingDetailDrawerProps> = ({
   onDeleteEvent,
 }) => {
   const { user } = useAuth();
-  const currentUserName = user?.fullName || 'Nguyễn Minh Anh';
+  const currentUserName = user?.fullName || "Nguyễn Minh Anh";
 
-  const [commentText, setCommentText] = useState('');
+  const [commentText, setCommentText] = useState("");
   const [submittingComment, setSubmittingComment] = useState(false);
   const [fileList] = useState<UploadFile[]>([]);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [rejectModalOpen, setRejectModalOpen] = useState(false);
-  const [rejectReason, setRejectReason] = useState('');
+  const [rejectReason, setRejectReason] = useState("");
 
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   if (!event) return null;
 
-  const isEditorial = event.scope === 'editorial';
-  const isPersonal = event.scope === 'personal';
+  const isEditorial = event.scope === "editorial";
+  const isPersonal = event.scope === "personal";
   const isUserAttending = Boolean(event.isUserParticipant);
   const start = dayjs(event.startAt);
   const end = dayjs(event.endAt);
 
   const isProposal =
-    event.workflowType === 'PROPOSAL' ||
+    event.workflowType === "PROPOSAL" ||
     Boolean(event.approver?.name) ||
     (event.approvers && event.approvers.length > 0) ||
-    event.approvalStatus === 'PENDING' ||
-    event.approvalStatus === 'REJECTED';
+    event.approvalStatus === "PENDING" ||
+    event.approvalStatus === "REJECTED";
 
   const isUserAnApprover = Boolean(
     (event.approver?.name &&
-      event.approver.name.toLowerCase().includes(currentUserName.toLowerCase())) ||
-      (event.approvers &&
-        event.approvers.some((a) =>
-          a.name.toLowerCase().includes(currentUserName.toLowerCase()),
-        )),
+      event.approver.name
+        .toLowerCase()
+        .includes(currentUserName.toLowerCase())) ||
+    (event.approvers &&
+      event.approvers.some((a) =>
+        a.name.toLowerCase().includes(currentUserName.toLowerCase()),
+      )),
   );
 
   // Gửi bình luận thảo luận
   const handleSendComment = async () => {
     if (!commentText.trim()) {
-      message.warning('Vui lòng nhập nội dung bình luận.');
+      message.warning("Vui lòng nhập nội dung bình luận.");
       return;
     }
 
     try {
       setSubmittingComment(true);
       const res = await calendarApi.addComment(event.id, commentText.trim());
-      message.success('Đã gửi bình luận thành công.');
-      setCommentText('');
+      message.success("Đã gửi bình luận thành công.");
+      setCommentText("");
       onUpdateEvent(res.data);
     } catch {
       // Fallback local persistence
@@ -174,8 +176,8 @@ export const MeetingDetailDrawer: React.FC<MeetingDetailDrawerProps> = ({
         comments: [...(event.comments || []), newCmt],
       };
       onUpdateEvent(updatedEvent);
-      message.success('Đã gửi bình luận thành công.');
-      setCommentText('');
+      message.success("Đã gửi bình luận thành công.");
+      setCommentText("");
     } finally {
       setSubmittingComment(false);
     }
@@ -187,7 +189,7 @@ export const MeetingDetailDrawer: React.FC<MeetingDetailDrawerProps> = ({
       id: `att-${Date.now()}`,
       name: file.name,
       size: file.size,
-      type: file.name.split('.').pop() || 'file',
+      type: file.name.split(".").pop() || "file",
       uploadedAt: new Date().toISOString(),
       uploadedBy: currentUserName,
     };
@@ -231,7 +233,7 @@ export const MeetingDetailDrawer: React.FC<MeetingDetailDrawerProps> = ({
       onDeleteEvent?.(event.id);
       onClose();
     } catch {
-      message.error('Không thể xóa lịch làm việc. Vui lòng thử lại.');
+      message.error("Không thể xóa lịch làm việc. Vui lòng thử lại.");
     } finally {
       setDeleting(false);
     }
@@ -247,23 +249,23 @@ export const MeetingDetailDrawer: React.FC<MeetingDetailDrawerProps> = ({
   const handleCopyMeetingLink = () => {
     if (!event?.meetingUrl) return;
     navigator.clipboard.writeText(event.meetingUrl);
-    message.success('Đã sao chép liên kết phòng họp!');
+    message.success("Đã sao chép liên kết phòng họp!");
   };
 
   // Phê duyệt phiếu đề xuất họp
   const handleApproveProposal = async () => {
     const updatedEvent: CalendarEvent = {
       ...event,
-      approvalStatus: 'APPROVED',
+      approvalStatus: "APPROVED",
       approvers: (event.approvers || []).map((a) => ({
         ...a,
-        status: 'APPROVED',
+        status: "APPROVED",
       })),
       steps: (event.steps || []).map((st) =>
-        st.step_order === 2 || st.role === 'APPROVER'
+        st.step_order === 2 || st.role === "APPROVER"
           ? {
               ...st,
-              status: 'APPROVED' as const,
+              status: "APPROVED" as const,
               completed_at: new Date().toISOString(),
             }
           : st,
@@ -275,24 +277,24 @@ export const MeetingDetailDrawer: React.FC<MeetingDetailDrawerProps> = ({
       // Local fallback
     }
     onUpdateEvent(updatedEvent);
-    message.success('Đã phê duyệt lịch họp thành công!');
+    message.success("Đã phê duyệt lịch họp thành công!");
   };
 
   // Từ chối duyệt phiếu đề xuất họp
   const handleRejectProposal = async () => {
     const updatedEvent: CalendarEvent = {
       ...event,
-      approvalStatus: 'REJECTED',
+      approvalStatus: "REJECTED",
       approvers: (event.approvers || []).map((a) => ({
         ...a,
-        status: 'REJECTED',
+        status: "REJECTED",
         note: rejectReason.trim() || undefined,
       })),
       steps: (event.steps || []).map((st) =>
-        st.step_order === 2 || st.role === 'APPROVER'
+        st.step_order === 2 || st.role === "APPROVER"
           ? {
               ...st,
-              status: 'REJECTED' as const,
+              status: "REJECTED" as const,
               completed_at: new Date().toISOString(),
             }
           : st,
@@ -304,9 +306,9 @@ export const MeetingDetailDrawer: React.FC<MeetingDetailDrawerProps> = ({
       // Local fallback
     }
     onUpdateEvent(updatedEvent);
-    message.info('Đã từ chối duyệt lịch họp.');
+    message.info("Đã từ chối duyệt lịch họp.");
     setRejectModalOpen(false);
-    setRejectReason('');
+    setRejectReason("");
   };
 
   return (
@@ -317,7 +319,7 @@ export const MeetingDetailDrawer: React.FC<MeetingDetailDrawerProps> = ({
         destroyOnClose
         extra={
           isPersonal ? (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <Button
                 icon={<Edit3 size={14} />}
                 onClick={() => setEditModalOpen(true)}
@@ -349,12 +351,12 @@ export const MeetingDetailDrawer: React.FC<MeetingDetailDrawerProps> = ({
             !dayjs(event.endAt).isBefore(dayjs()) ? (
             <Button
               aria-label={
-                event.isInterested ? 'Bỏ quan tâm' : 'Quan tâm lịch họp'
+                event.isInterested ? "Bỏ quan tâm" : "Quan tâm lịch họp"
               }
               icon={
                 <Star
-                  color={event.isInterested ? '#d97706' : '#64748b'}
-                  fill={event.isInterested ? '#f59e0b' : 'none'}
+                  color={event.isInterested ? "#d97706" : "#64748b"}
+                  fill={event.isInterested ? "#f59e0b" : "none"}
                   size={14}
                 />
               }
@@ -363,14 +365,14 @@ export const MeetingDetailDrawer: React.FC<MeetingDetailDrawerProps> = ({
               style={
                 event.isInterested
                   ? {
-                      borderColor: '#fcd34d',
-                      background: '#fffbeb',
-                      color: '#b45309',
+                      borderColor: "#fcd34d",
+                      background: "#fffbeb",
+                      color: "#b45309",
                     }
                   : undefined
               }
             >
-              {event.isInterested ? 'Đang quan tâm' : 'Quan tâm'}
+              {event.isInterested ? "Đang quan tâm" : "Quan tâm"}
             </Button>
           ) : null
         }
@@ -388,22 +390,22 @@ export const MeetingDetailDrawer: React.FC<MeetingDetailDrawerProps> = ({
               <Tag
                 bordered={false}
                 color="warning"
-                style={{ fontSize: 12, padding: '2px 8px', fontWeight: 600 }}
+                style={{ fontSize: 12, padding: "2px 8px", fontWeight: 600 }}
               >
                 Đã điều chỉnh
               </Tag>
             )}
 
             {isEditorial ? (
-              <Tag color="error" style={{ fontSize: 12, padding: '2px 8px' }}>
+              <Tag color="error" style={{ fontSize: 12, padding: "2px 8px" }}>
                 Lịch Ban biên tập
               </Tag>
             ) : isPersonal ? (
-              <Tag color="blue" style={{ fontSize: 12, padding: '2px 8px' }}>
+              <Tag color="blue" style={{ fontSize: 12, padding: "2px 8px" }}>
                 Lịch cá nhân
               </Tag>
             ) : (
-              <Tag color="purple" style={{ fontSize: 12, padding: '2px 8px' }}>
+              <Tag color="purple" style={{ fontSize: 12, padding: "2px 8px" }}>
                 Lịch họp
               </Tag>
             )}
@@ -411,19 +413,19 @@ export const MeetingDetailDrawer: React.FC<MeetingDetailDrawerProps> = ({
             {isProposal && (
               <Tag
                 color={
-                  event.approvalStatus === 'APPROVED'
-                    ? 'success'
-                    : event.approvalStatus === 'REJECTED'
-                      ? 'error'
-                      : 'warning'
+                  event.approvalStatus === "APPROVED"
+                    ? "success"
+                    : event.approvalStatus === "REJECTED"
+                      ? "error"
+                      : "warning"
                 }
-                style={{ fontSize: 12, padding: '2px 8px', fontWeight: 600 }}
+                style={{ fontSize: 12, padding: "2px 8px", fontWeight: 600 }}
               >
-                {event.approvalStatus === 'APPROVED'
-                  ? 'Đã duyệt'
-                  : event.approvalStatus === 'REJECTED'
-                    ? 'Từ chối'
-                    : 'Chờ duyệt'}
+                {event.approvalStatus === "APPROVED"
+                  ? "Đã duyệt"
+                  : event.approvalStatus === "REJECTED"
+                    ? "Từ chối"
+                    : "Chờ duyệt"}
               </Tag>
             )}
           </div>
@@ -449,8 +451,8 @@ export const MeetingDetailDrawer: React.FC<MeetingDetailDrawerProps> = ({
             </span>
             <span className="meeting-info-value">
               {start.isValid() && end.isValid()
-                ? `${start.format('HH:mm')} - ${end.format('HH:mm')} (${VI_DAY_NAMES[start.day()]}, ${start.format('DD/MM/YYYY')})`
-                : 'Chưa xác định'}
+                ? `${start.format("HH:mm")} (${VI_DAY_NAMES[start.day()]}, ${start.format("DD/MM/YYYY")})`
+                : "Chưa xác định"}
             </span>
           </div>
 
@@ -462,8 +464,8 @@ export const MeetingDetailDrawer: React.FC<MeetingDetailDrawerProps> = ({
             <span className="meeting-info-value">
               {event.location ||
                 (event.meetingUrl
-                  ? 'Phòng họp trực tuyến'
-                  : 'Tòa soạn Tuổi Trẻ')}
+                  ? "Phòng họp trực tuyến"
+                  : "Tòa soạn Tuổi Trẻ")}
             </span>
           </div>
 
@@ -486,12 +488,9 @@ export const MeetingDetailDrawer: React.FC<MeetingDetailDrawerProps> = ({
             </span>
             <span className="meeting-info-value">
               {highlightCurrentUserName(
-                event.participantText ||
-                  event.participants?.join(', ') ||
-                  '',
+                event.participantText || event.participants?.join(", ") || "",
                 currentUserName,
               )}
-              {event.participantCount ? ` (SL: ${event.participantCount})` : ''}
             </span>
           </div>
         </div>
@@ -500,21 +499,21 @@ export const MeetingDetailDrawer: React.FC<MeetingDetailDrawerProps> = ({
         {event.meetingUrl && (
           <div
             style={{
-              background: '#f0f9ff',
-              border: '1px solid #bae6fd',
+              background: "#f0f9ff",
+              border: "1px solid #bae6fd",
               borderRadius: 10,
-              padding: '12px 14px',
+              padding: "12px 14px",
               marginBottom: 16,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
               gap: 12,
             }}
           >
             <div
               style={{
-                display: 'flex',
-                alignItems: 'center',
+                display: "flex",
+                alignItems: "center",
                 gap: 10,
                 minWidth: 0,
                 flex: 1,
@@ -525,11 +524,11 @@ export const MeetingDetailDrawer: React.FC<MeetingDetailDrawerProps> = ({
                   width: 36,
                   height: 36,
                   borderRadius: 8,
-                  background: '#e0f2fe',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#0284c7',
+                  background: "#e0f2fe",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "#0284c7",
                   flexShrink: 0,
                 }}
               >
@@ -540,7 +539,7 @@ export const MeetingDetailDrawer: React.FC<MeetingDetailDrawerProps> = ({
                   style={{
                     fontSize: 13,
                     fontWeight: 600,
-                    color: '#0369a1',
+                    color: "#0369a1",
                     lineHeight: 1.3,
                   }}
                 >
@@ -551,12 +550,12 @@ export const MeetingDetailDrawer: React.FC<MeetingDetailDrawerProps> = ({
                   rel="noopener noreferrer"
                   style={{
                     fontSize: 12,
-                    color: '#475569',
-                    display: 'block',
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    textDecoration: 'none',
+                    color: "#475569",
+                    display: "block",
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    textDecoration: "none",
                     marginTop: 2,
                   }}
                   target="_blank"
@@ -569,8 +568,8 @@ export const MeetingDetailDrawer: React.FC<MeetingDetailDrawerProps> = ({
 
             <div
               style={{
-                display: 'flex',
-                alignItems: 'center',
+                display: "flex",
+                alignItems: "center",
                 gap: 8,
                 flexShrink: 0,
               }}
@@ -580,7 +579,7 @@ export const MeetingDetailDrawer: React.FC<MeetingDetailDrawerProps> = ({
                   aria-label="Sao chép liên kết"
                   icon={<Copy size={15} />}
                   onClick={handleCopyMeetingLink}
-                  style={{ color: '#0284c7' }}
+                  style={{ color: "#0284c7" }}
                   type="text"
                 />
               </Tooltip>
@@ -602,15 +601,15 @@ export const MeetingDetailDrawer: React.FC<MeetingDetailDrawerProps> = ({
           <div
             style={{
               marginBottom: 16,
-              background: '#fef2f2',
-              border: '1px solid #fecaca',
-              padding: '8px 12px',
+              background: "#fef2f2",
+              border: "1px solid #fecaca",
+              padding: "8px 12px",
               borderRadius: 6,
               fontSize: 12.5,
-              color: '#991b1b',
+              color: "#991b1b",
             }}
           >
-            <Calendar size={14} style={{ display: 'inline', marginRight: 6 }} />
+            <Calendar size={14} style={{ display: "inline", marginRight: 6 }} />
             <strong>Lịch trực tòa soạn:</strong> {event.dutyInfo}
           </div>
         )}
@@ -619,18 +618,18 @@ export const MeetingDetailDrawer: React.FC<MeetingDetailDrawerProps> = ({
         {isProposal && (
           <div
             style={{
-              background: '#ffffff',
-              border: '1px solid #e2e8f0',
+              background: "#ffffff",
+              border: "1px solid #e2e8f0",
               borderRadius: 8,
-              padding: '12px 14px',
+              padding: "12px 14px",
               marginBottom: 16,
             }}
           >
             <div
               style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
                 marginBottom: 8,
               }}
             >
@@ -638,50 +637,50 @@ export const MeetingDetailDrawer: React.FC<MeetingDetailDrawerProps> = ({
                 style={{
                   fontSize: 13,
                   fontWeight: 600,
-                  color: '#1e293b',
-                  display: 'flex',
-                  alignItems: 'center',
+                  color: "#1e293b",
+                  display: "flex",
+                  alignItems: "center",
                   gap: 6,
                 }}
               >
-                <CheckCircle2 size={15} style={{ color: '#059669' }} />
+                <CheckCircle2 size={15} style={{ color: "#059669" }} />
                 Thông tin phê duyệt
               </span>
               <Tag
                 color={
-                  event.approvalStatus === 'APPROVED'
-                    ? 'success'
-                    : event.approvalStatus === 'REJECTED'
-                      ? 'error'
-                      : 'warning'
+                  event.approvalStatus === "APPROVED"
+                    ? "success"
+                    : event.approvalStatus === "REJECTED"
+                      ? "error"
+                      : "warning"
                 }
               >
-                {event.approvalStatus === 'APPROVED'
-                  ? 'Đã duyệt'
-                  : event.approvalStatus === 'REJECTED'
-                    ? 'Từ chối'
-                    : 'Chờ duyệt'}
+                {event.approvalStatus === "APPROVED"
+                  ? "Đã duyệt"
+                  : event.approvalStatus === "REJECTED"
+                    ? "Từ chối"
+                    : "Chờ duyệt"}
               </Tag>
             </div>
 
-            <div style={{ fontSize: 13, color: '#475467', lineHeight: 1.5 }}>
-              <span style={{ fontWeight: 500, color: '#1d2939' }}>
-                Người duyệt:{' '}
+            <div style={{ fontSize: 13, color: "#475467", lineHeight: 1.5 }}>
+              <span style={{ fontWeight: 500, color: "#1d2939" }}>
+                Người duyệt:{" "}
               </span>
               {event.approvers && event.approvers.length > 0
-                ? event.approvers.map((a) => a.name).join(', ')
-                : event.approver?.name || 'Chưa chỉ định'}
+                ? event.approvers.map((a) => a.name).join(", ")
+                : event.approver?.name || "Chưa chỉ định"}
             </div>
 
             {/* Thao tác duyệt dành cho Người duyệt */}
-            {isUserAnApprover && event.approvalStatus === 'PENDING' && (
+            {isUserAnApprover && event.approvalStatus === "PENDING" && (
               <div
                 style={{
-                  display: 'flex',
+                  display: "flex",
                   gap: 8,
                   marginTop: 12,
                   paddingTop: 10,
-                  borderTop: '1px solid #f1f5f9',
+                  borderTop: "1px solid #f1f5f9",
                 }}
               >
                 <Button
@@ -689,8 +688,8 @@ export const MeetingDetailDrawer: React.FC<MeetingDetailDrawerProps> = ({
                   icon={<CheckCircle2 size={14} />}
                   onClick={handleApproveProposal}
                   style={{
-                    backgroundColor: '#059669',
-                    borderColor: '#059669',
+                    backgroundColor: "#059669",
+                    borderColor: "#059669",
                     fontWeight: 600,
                     borderRadius: 6,
                   }}
@@ -714,9 +713,9 @@ export const MeetingDetailDrawer: React.FC<MeetingDetailDrawerProps> = ({
         <div style={{ marginTop: 16, marginBottom: 18 }}>
           <div
             className="meeting-section-title"
-            style={{ justifyContent: 'space-between' }}
+            style={{ justifyContent: "space-between" }}
           >
-            <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
               <Paperclip size={15} />
               Tài liệu ({event.attachments?.length || 0})
             </span>
@@ -734,8 +733,8 @@ export const MeetingDetailDrawer: React.FC<MeetingDetailDrawerProps> = ({
           {event.attachments && event.attachments.length > 0 ? (
             <div
               style={{
-                display: 'grid',
-                gridTemplateColumns: '1fr 1fr',
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
                 gap: 8,
               }}
             >
@@ -745,12 +744,12 @@ export const MeetingDetailDrawer: React.FC<MeetingDetailDrawerProps> = ({
                   <div
                     key={att.id}
                     style={{
-                      display: 'flex',
-                      alignItems: 'center',
+                      display: "flex",
+                      alignItems: "center",
                       gap: 10,
-                      padding: '8px 10px',
-                      background: '#f8fafc',
-                      border: '1px solid #eaecf0',
+                      padding: "8px 10px",
+                      background: "#f8fafc",
+                      border: "1px solid #eaecf0",
                       borderRadius: 8,
                     }}
                   >
@@ -761,8 +760,8 @@ export const MeetingDetailDrawer: React.FC<MeetingDetailDrawerProps> = ({
                         borderRadius: 6,
                         background: cat.bg,
                         color: cat.color,
-                        display: 'grid',
-                        placeItems: 'center',
+                        display: "grid",
+                        placeItems: "center",
                         fontSize: 16,
                         flexShrink: 0,
                       }}
@@ -774,18 +773,18 @@ export const MeetingDetailDrawer: React.FC<MeetingDetailDrawerProps> = ({
                         style={{
                           fontSize: 12.5,
                           fontWeight: 600,
-                          color: '#1e293b',
-                          whiteSpace: 'nowrap',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
+                          color: "#1e293b",
+                          whiteSpace: "nowrap",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
                         }}
                         title={att.name}
                       >
                         {att.name}
                       </div>
-                      <div style={{ fontSize: 11, color: '#64748b' }}>
-                        {formatBytes(att.size)} ·{' '}
-                        {att.uploadedBy || 'Người tham dự'}
+                      <div style={{ fontSize: 11, color: "#64748b" }}>
+                        {formatBytes(att.size)} ·{" "}
+                        {att.uploadedBy || "Người tham dự"}
                       </div>
                     </div>
                     <Tooltip title="Tải xuống tệp">
@@ -805,13 +804,13 @@ export const MeetingDetailDrawer: React.FC<MeetingDetailDrawerProps> = ({
           ) : (
             <div
               style={{
-                padding: '12px',
-                textAlign: 'center',
-                background: '#f8fafc',
-                border: '1px dashed #cbd5e1',
+                padding: "12px",
+                textAlign: "center",
+                background: "#f8fafc",
+                border: "1px dashed #cbd5e1",
                 borderRadius: 8,
                 fontSize: 12.5,
-                color: '#64748b',
+                color: "#64748b",
               }}
             >
               Chưa có tài liệu đính kèm. Nhấp vào &ldquo;Đính kèm&rdquo; để thêm
@@ -836,7 +835,7 @@ export const MeetingDetailDrawer: React.FC<MeetingDetailDrawerProps> = ({
                     size={32}
                     style={{
                       backgroundColor: getAvatarColor(cmt.author),
-                      color: '#fff',
+                      color: "#fff",
                     }}
                   >
                     {getInitials(cmt.author)}
@@ -848,7 +847,7 @@ export const MeetingDetailDrawer: React.FC<MeetingDetailDrawerProps> = ({
                         {cmt.author}
                       </span>
                       <span className="meeting-fb-comment-time">
-                        {dayjs(cmt.createdAt).format('HH:mm · DD/MM/YYYY')}
+                        {dayjs(cmt.createdAt).format("HH:mm · DD/MM/YYYY")}
                       </span>
                     </div>
                     <div className="meeting-fb-comment-text">{cmt.content}</div>
@@ -858,12 +857,12 @@ export const MeetingDetailDrawer: React.FC<MeetingDetailDrawerProps> = ({
             ) : (
               <div
                 style={{
-                  padding: '16px',
-                  textAlign: 'center',
-                  background: '#f8fafc',
+                  padding: "16px",
+                  textAlign: "center",
+                  background: "#f8fafc",
                   borderRadius: 12,
                   fontSize: 12.5,
-                  color: '#65676b',
+                  color: "#65676b",
                 }}
               >
                 Chưa có bình luận nào. Hãy là người đầu tiên để lại ý kiến thảo
@@ -877,7 +876,7 @@ export const MeetingDetailDrawer: React.FC<MeetingDetailDrawerProps> = ({
             <Avatar
               className="meeting-fb-comment-avatar"
               size={32}
-              style={{ backgroundColor: '#1877f2', color: '#fff' }}
+              style={{ backgroundColor: "#1877f2", color: "#fff" }}
             >
               {getInitials(currentUserName)}
             </Avatar>
@@ -887,7 +886,7 @@ export const MeetingDetailDrawer: React.FC<MeetingDetailDrawerProps> = ({
                   autoSize={{ minRows: 1, maxRows: 4 }}
                   onChange={(e) => setCommentText(e.target.value)}
                   onKeyDown={(e) => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
+                    if (e.key === "Enter" && !e.shiftKey) {
                       e.preventDefault();
                       handleSendComment();
                     }
@@ -907,8 +906,8 @@ export const MeetingDetailDrawer: React.FC<MeetingDetailDrawerProps> = ({
                 </button>
               </div>
               <div className="meeting-fb-composer-hint">
-                Nhấn <strong>Enter</strong> để gửi, <strong>Shift + Enter</strong>{' '}
-                để xuống dòng
+                Nhấn <strong>Enter</strong> để gửi,{" "}
+                <strong>Shift + Enter</strong> để xuống dòng
               </div>
             </div>
           </div>
@@ -934,14 +933,14 @@ export const MeetingDetailDrawer: React.FC<MeetingDetailDrawerProps> = ({
         okText="Xác nhận không duyệt"
         onCancel={() => {
           setRejectModalOpen(false);
-          setRejectReason('');
+          setRejectReason("");
         }}
         onOk={handleRejectProposal}
         open={rejectModalOpen}
         title="Lý do không duyệt lịch họp"
       >
-        <div style={{ padding: '8px 0' }}>
-          <div style={{ fontSize: 13, color: '#475467', marginBottom: 8 }}>
+        <div style={{ padding: "8px 0" }}>
+          <div style={{ fontSize: 13, color: "#475467", marginBottom: 8 }}>
             Vui lòng nhập lý do hoặc ý kiến chỉ đạo để người đề xuất nắm thông
             tin:
           </div>
