@@ -36,7 +36,7 @@ describe('CreatePersonalMeetingModal Person Selection Flow', () => {
     await user.click(trigger);
 
     // Popup UserSelectionModal mở ra
-    expect(await screen.findByText('Chọn thành phần thực hiện')).toBeInTheDocument();
+    expect(await screen.findByText('Chọn thành phần', { selector: '.jt-user-selection-modal-root span' })).toBeInTheDocument();
 
     // Tìm danh sách checkbox nhân sự
     const checkboxes = document.querySelectorAll('.jt-user-item-checkbox input');

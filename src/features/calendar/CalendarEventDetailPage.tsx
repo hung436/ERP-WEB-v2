@@ -23,8 +23,6 @@ import {
   ExternalLink,
   MapPin,
   MessageSquare,
-  PanelRightClose,
-  PanelRightOpen,
   Paperclip,
   Send,
   Star,
@@ -37,7 +35,7 @@ import {
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
-import { ContentSkeleton, EmptyState, ErrorState } from "@/components/AsyncState";
+import { ContentSkeleton, ErrorState } from "@/components/AsyncState";
 import { useAuth } from "@/features/auth/AuthContext";
 import { calendarApi } from "@/services/api";
 import type { CalendarAttachmentItem, CalendarEvent } from "@/types/domain";
@@ -82,6 +80,25 @@ function getAvatarColor(name: string) {
   return colors[Math.abs(hash) % colors.length];
 }
 
+function highlightCurrentUserName(
+  text: string,
+  currentUserName = "Nguyễn Minh Anh",
+) {
+  if (!text) return "Chưa cập nhật";
+  const regex = new RegExp(`(${currentUserName})`, "gi");
+  const parts = text.split(regex);
+  return parts.map((part, idx) => {
+    if (part.toLowerCase() === currentUserName.toLowerCase()) {
+      return (
+        <span key={idx} style={{ fontWeight: 700, color: "#0f172a" }}>
+          {part}
+        </span>
+      );
+    }
+    return <span key={idx}>{part}</span>;
+  });
+}
+
 export function CalendarEventDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -91,9 +108,6 @@ export function CalendarEventDetailPage() {
   const [event, setEvent] = useState<CalendarEvent | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  // Panel Right toggle state (mặc định mở trên desktop)
-  const [rightPanelOpen, setRightPanelOpen] = useState(true);
 
   // Comment & attachments states
   const [commentText, setCommentText] = useState("");
@@ -122,7 +136,7 @@ export function CalendarEventDetailPage() {
           const targetDate = dateMatch
             ? dayjs(`${dateMatch[1]}-${dateMatch[2]}-${dateMatch[3]}`)
             : dayjs();
-          const weekEvents = getEventsForWeek(targetDate.startOf('isoWeek'));
+          const weekEvents = getEventsForWeek(targetDate.startOf("isoWeek"));
           found = weekEvents.find((e) => e.id === id) || null;
         } catch {
           // ignore
@@ -133,7 +147,9 @@ export function CalendarEventDetailPage() {
       }
       setEvent(found);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Không thể tải thông tin sự kiện");
+      setError(
+        err instanceof Error ? err.message : "Không thể tải thông tin sự kiện",
+      );
     } finally {
       setLoading(false);
     }
@@ -146,7 +162,9 @@ export function CalendarEventDetailPage() {
   if (loading) {
     return (
       <div className="event-detail-page">
-        <ContentSkeleton rows={8} />
+        <div className="event-detail-container">
+          <ContentSkeleton rows={8} />
+        </div>
       </div>
     );
   }
@@ -154,11 +172,19 @@ export function CalendarEventDetailPage() {
   if (error || !event) {
     return (
       <div className="event-detail-page">
-        <ErrorState message={error || "Không tìm thấy sự kiện"} onRetry={fetchEvent} />
-        <div style={{ marginTop: 16 }}>
-          <Button icon={<ArrowLeft size={14} />} onClick={() => navigate("/calendar/week")}>
-            Quay lại Lịch làm việc
-          </Button>
+        <div className="event-detail-container">
+          <ErrorState
+            message={error || "Không tìm thấy sự kiện"}
+            onRetry={fetchEvent}
+          />
+          <div style={{ marginTop: 16 }}>
+            <Button
+              icon={<ArrowLeft size={14} />}
+              onClick={() => navigate("/calendar/week")}
+            >
+              Quay lại Lịch làm việc
+            </Button>
+          </div>
         </div>
       </div>
     );
@@ -166,7 +192,9 @@ export function CalendarEventDetailPage() {
 
   const isEditorial = event.scope === "editorial";
   const isPersonal = event.scope === "personal";
-  const isUserAttending = Boolean(event.isUserParticipant || event.isUserWatcher);
+  const isUserAttending = Boolean(
+    event.isUserParticipant || event.isUserWatcher,
+  );
   const start = dayjs(event.startAt);
   const end = dayjs(event.endAt);
 
@@ -179,9 +207,13 @@ export function CalendarEventDetailPage() {
 
   const isUserAnApprover = Boolean(
     (event.approver?.name &&
-      event.approver.name.toLowerCase().includes(currentUserName.toLowerCase())) ||
-    (event.approvers &&
-      event.approvers.some((a) => a.name.toLowerCase().includes(currentUserName.toLowerCase()))),
+      event.approver.name
+        .toLowerCase()
+        .includes(currentUserName.toLowerCase())) ||
+      (event.approvers &&
+        event.approvers.some((a) =>
+          a.name.toLowerCase().includes(currentUserName.toLowerCase()),
+        )),
   );
 
   // Thao tác gửi thảo luận
@@ -200,7 +232,9 @@ export function CalendarEventDetailPage() {
         content: commentText.trim(),
         createdAt: new Date().toISOString(),
       };
-      setEvent((prev) => (prev ? { ...prev, comments: [...(prev.comments || []), newCmt] } : null));
+      setEvent((prev) =>
+        prev ? { ...prev, comments: [...(prev.comments || []), newCmt] } : null,
+      );
       setCommentText("");
       message.success("Đã gửi ý kiến trao đổi");
     } finally {
@@ -223,7 +257,11 @@ export function CalendarEventDetailPage() {
       setEvent(res.data);
       message.success(`Đã đính kèm tệp: ${file.name}`);
     } catch {
-      setEvent((prev) => (prev ? { ...prev, attachments: [...(prev.attachments || []), newAtt] } : null));
+      setEvent((prev) =>
+        prev
+          ? { ...prev, attachments: [...(prev.attachments || []), newAtt] }
+          : null,
+      );
       message.success(`Đã đính kèm tệp: ${file.name}`);
     }
     return false;
@@ -235,7 +273,9 @@ export function CalendarEventDetailPage() {
     const updated = { ...event, isInterested: nextState };
     setEvent(updated);
     if (nextState) {
-      message.success(`Đã quan tâm: "${event.title}". Bạn sẽ được nhắc trước 15 phút!`);
+      message.success(
+        `Đã quan tâm: "${event.title}". Bạn sẽ được nhắc trước 15 phút!`,
+      );
     } else {
       message.info(`Đã hủy nhắc nhở lịch "${event.title}"`);
     }
@@ -267,7 +307,10 @@ export function CalendarEventDetailPage() {
     const updatedEvent: CalendarEvent = {
       ...event,
       approvalStatus: "APPROVED",
-      approvers: (event.approvers || []).map((a) => ({ ...a, status: "APPROVED" })),
+      approvers: (event.approvers || []).map((a) => ({
+        ...a,
+        status: "APPROVED",
+      })),
     };
     try {
       await calendarApi.update(event.id, updatedEvent);
@@ -302,227 +345,247 @@ export function CalendarEventDetailPage() {
 
   return (
     <div className="event-detail-page">
-      {/* TOP NAVIGATION / BREADCRUMB */}
-      <div className="event-detail-top-nav">
-        <button
-          className="event-detail-back-btn"
-          onClick={() => navigate("/calendar/week")}
-          type="button"
-        >
-          <ArrowLeft size={16} />
-          <span>Quay lại Lịch làm việc tuần</span>
-        </button>
-
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <Button
-            icon={rightPanelOpen ? <PanelRightClose size={15} /> : <PanelRightOpen size={15} />}
-            onClick={() => setRightPanelOpen(!rightPanelOpen)}
+      <div className="event-detail-container">
+        {/* TOP NAVIGATION / QUAY LẠI */}
+        <div className="event-detail-top-nav">
+          <button
+            className="event-detail-back-btn"
+            onClick={() => navigate("/calendar/week")}
+            type="button"
           >
-            {rightPanelOpen ? "Thu gọn bảng phụ" : "Mở rộng bảng phụ"}
-          </Button>
-        </div>
-      </div>
-
-      {/* HEADER CARD CHÍNH */}
-      <div className="event-detail-header-card">
-        <div className="event-detail-badges-row">
-          {event.isAdjusted && (
-            <Tag
-              bordered={false}
-              color="warning"
-              style={{ fontSize: 12, padding: "2px 8px", fontWeight: 600 }}
-            >
-              Đã điều chỉnh
-            </Tag>
-          )}
-
-          {isEditorial ? (
-            <Tag color="error" style={{ fontSize: 12, padding: "2px 8px" }}>
-              Lịch chung
-            </Tag>
-          ) : isPersonal ? (
-            <Tag color="blue" style={{ fontSize: 12, padding: "2px 8px" }}>
-              Lịch cá nhân
-            </Tag>
-          ) : (
-            <Tag color="purple" style={{ fontSize: 12, padding: "2px 8px" }}>
-              Lịch họp
-            </Tag>
-          )}
-
-          {isProposal && (
-            <Tag
-              color={
-                event.approvalStatus === "APPROVED"
-                  ? "success"
-                  : event.approvalStatus === "REJECTED"
-                    ? "error"
-                    : "warning"
-              }
-              style={{ fontSize: 12, padding: "2px 8px", fontWeight: 600 }}
-            >
-              {event.approvalStatus === "APPROVED"
-                ? "Đã duyệt"
-                : event.approvalStatus === "REJECTED"
-                  ? "Từ chối"
-                  : "Chờ duyệt"}
-            </Tag>
-          )}
+            <ArrowLeft size={16} />
+            <span>Quay lại Lịch làm việc tuần</span>
+          </button>
         </div>
 
-        <div className="event-detail-title-wrap">
-          {/* TÊN SỰ KIỆN: Hiển thị trọn vẹn, không cắt dấu 3 chấm (Task 4) */}
-          <h1 className="event-detail-title-text">{event.title}</h1>
+        {/* BỀ MẶT THÔNG TIN DUY NHẤT (THEO PHONG CÁCH DRAWER GỐC, HẠN CHẾ ĐÓNG KHUNG) */}
+        <div className="event-detail-surface">
+          {/* HEADER: BADGES + ACTIONS + TITLE */}
+          <div className="event-detail-header">
+            <div className="event-detail-header-top">
+              <div className="event-detail-badges">
+                {event.isAdjusted && (
+                  <Tag
+                    bordered={false}
+                    color="warning"
+                    style={{ fontSize: 12, padding: "2px 8px", fontWeight: 600 }}
+                  >
+                    Đã điều chỉnh
+                  </Tag>
+                )}
 
-          {/* Action buttons tường minh, không dùng menu 3 chấm */}
-          <div className="event-detail-header-actions">
-            {isPersonal ? (
-              <>
-                <Button
-                  icon={<Edit3 size={14} />}
-                  onClick={() => setEditModalOpen(true)}
-                >
-                  Chỉnh sửa
-                </Button>
-                <Popconfirm
-                  cancelText="Hủy"
-                  description="Bạn có chắc chắn muốn xóa lịch làm việc này không?"
-                  okButtonProps={{ danger: true }}
-                  okText="Xóa"
-                  onConfirm={handleDelete}
-                  title="Xóa lịch làm việc"
-                >
-                  <Button danger icon={<Trash2 size={14} />} loading={deleting}>
-                    Xóa
+                {isEditorial ? (
+                  <Tag color="error" style={{ fontSize: 12, padding: "2px 8px" }}>
+                    Lịch chung
+                  </Tag>
+                ) : isPersonal ? (
+                  <Tag color="blue" style={{ fontSize: 12, padding: "2px 8px" }}>
+                    Lịch cá nhân
+                  </Tag>
+                ) : (
+                  <Tag
+                    color="purple"
+                    style={{ fontSize: 12, padding: "2px 8px" }}
+                  >
+                    Lịch họp
+                  </Tag>
+                )}
+
+                {isProposal && (
+                  <Tag
+                    color={
+                      event.approvalStatus === "APPROVED"
+                        ? "success"
+                        : event.approvalStatus === "REJECTED"
+                          ? "error"
+                          : "warning"
+                    }
+                    style={{ fontSize: 12, padding: "2px 8px", fontWeight: 600 }}
+                  >
+                    {event.approvalStatus === "APPROVED"
+                      ? "Đã duyệt"
+                      : event.approvalStatus === "REJECTED"
+                        ? "Từ chối"
+                        : "Chờ duyệt"}
+                  </Tag>
+                )}
+              </div>
+
+              {/* Action buttons tường minh, tinh gọn */}
+              <div className="event-detail-actions">
+                {isPersonal ? (
+                  <>
+                    <Button
+                      icon={<Edit3 size={14} />}
+                      onClick={() => setEditModalOpen(true)}
+                      size="small"
+                    >
+                      Chỉnh sửa
+                    </Button>
+                    <Popconfirm
+                      cancelText="Hủy"
+                      description="Bạn có chắc chắn muốn xóa lịch làm việc này không?"
+                      okButtonProps={{ danger: true }}
+                      okText="Xóa"
+                      onConfirm={handleDelete}
+                      placement="bottomRight"
+                      title="Xóa lịch làm việc"
+                    >
+                      <Button
+                        danger
+                        icon={<Trash2 size={14} />}
+                        loading={deleting}
+                        size="small"
+                      >
+                        Xóa
+                      </Button>
+                    </Popconfirm>
+                  </>
+                ) : isEditorial &&
+                  !isUserAttending &&
+                  !dayjs(event.endAt).isBefore(dayjs()) ? (
+                  <Button
+                    aria-label={
+                      event.isInterested ? "Bỏ quan tâm" : "Quan tâm lịch họp"
+                    }
+                    icon={
+                      <Star
+                        color={event.isInterested ? "#d97706" : "#64748b"}
+                        fill={event.isInterested ? "#f59e0b" : "none"}
+                        size={14}
+                      />
+                    }
+                    onClick={handleToggleInterest}
+                    size="small"
+                    style={
+                      event.isInterested
+                        ? {
+                            borderColor: "#fcd34d",
+                            background: "#fffbeb",
+                            color: "#b45309",
+                          }
+                        : undefined
+                    }
+                  >
+                    {event.isInterested ? "Đang quan tâm" : "Quan tâm"}
                   </Button>
-                </Popconfirm>
-              </>
-            ) : isEditorial && !isUserAttending ? (
-              <Button
-                icon={
-                  <Star
-                    color={event.isInterested ? "#d97706" : "#64748b"}
-                    fill={event.isInterested ? "#f59e0b" : "none"}
-                    size={14}
-                  />
-                }
-                onClick={handleToggleInterest}
-              >
-                {event.isInterested ? "Đang quan tâm" : "Quan tâm"}
-              </Button>
-            ) : null}
+                ) : null}
+              </div>
+            </div>
+
+            {/* TÊN SỰ KIỆN: Hiển thị trọn vẹn, không cắt dấu 3 chấm */}
+            <h1 className="event-detail-title">{event.title}</h1>
+
+            {/* Banner lưu ý điều chỉnh (nếu có) */}
+            {event.isAdjusted && event.adjustedNote && (
+              <div className="event-detail-adjusted-banner">
+                <AlertCircle size={15} style={{ flexShrink: 0, marginTop: 1 }} />
+                <span>
+                  <strong>Lưu ý điều chỉnh:</strong> {event.adjustedNote}
+                </span>
+              </div>
+            )}
           </div>
-        </div>
 
-        {event.isAdjusted && event.adjustedNote && (
-          <div className="event-detail-adjusted-banner">
-            <AlertCircle size={16} style={{ flexShrink: 0 }} />
-            <span>
-              <strong>Lưu ý điều chỉnh:</strong> {event.adjustedNote}
-            </span>
-          </div>
-        )}
-      </div>
+          {/* GRID THÔNG TIN CHUNG (THEO GỐC DRAWER: PHẲNG, GỌN, KHÔNG BỌC PILL TỪNG NGƯỜI) */}
+          <div className="event-detail-grid">
+            <div className="event-info-item">
+              <span className="event-info-label">
+                <Clock size={12} />
+                Thời gian
+              </span>
+              <span className="event-info-value">
+                {start.isValid()
+                  ? `${start.format("HH:mm")} (${VI_DAY_NAMES[start.day()]}, ${start.format("DD/MM/YYYY")})`
+                  : "Chưa xác định"}
+              </span>
+            </div>
 
-      {/* BỐ CỤC 2 CỘT LINH HOẠT (GỐC LỊCH HỌP + COLLAPSIBLE RIGHT PANEL) */}
-      <div
-        className={`event-detail-layout-grid ${!rightPanelOpen ? "is-right-collapsed" : ""}`}
-      >
-        {/* CỘT CHÍNH (MAIN CONTENT) */}
-        <div className="event-detail-main-pane">
-          {/* 1. Thông tin chung */}
-          <div className="event-detail-card-section">
-            <h2 className="event-detail-section-heading">
-              <Clock size={16} />
-              Thông tin chung
-            </h2>
+            <div className="event-info-item">
+              <span className="event-info-label">
+                <MapPin size={12} />
+                Địa điểm
+              </span>
+              <span className="event-info-value">
+                {event.location ||
+                  (event.meetingUrl
+                    ? "Phòng họp trực tuyến"
+                    : "Tòa soạn Tuổi Trẻ")}
+              </span>
+            </div>
 
-            <div className="event-detail-info-grid">
-              <div className="event-detail-info-item">
-                <span className="event-detail-info-label">
-                  <Clock size={13} />
-                  Thời gian
+            {Boolean((event.leader || event.organizer)?.trim()) && (
+              <div className="event-info-item">
+                <span className="event-info-label">
+                  <Users size={12} />
+                  Người chủ trì
                 </span>
-                <span className="event-detail-info-value">
-                  {start.isValid()
-                    ? `${start.format("HH:mm")} (${VI_DAY_NAMES[start.day()]}, ${start.format("DD/MM/YYYY")})`
-                    : "Chưa xác định"}
-                </span>
-              </div>
-
-              <div className="event-detail-info-item">
-                <span className="event-detail-info-label">
-                  <MapPin size={13} />
-                  Địa điểm
-                </span>
-                <span className="event-detail-info-value">
-                  {event.location || (event.meetingUrl ? "Phòng họp trực tuyến" : "Tòa soạn Tuổi Trẻ")}
+                <span className="event-info-value">
+                  {event.leader || event.organizer}
                 </span>
               </div>
+            )}
 
-              {Boolean((event.leader || event.organizer)?.trim()) && (
-                <div className="event-detail-info-item">
-                  <span className="event-detail-info-label">
-                    <Users size={13} />
-                    Người chủ trì
-                  </span>
-                  {/* Tên người chủ trì hiển thị trọn vẹn không cắt 3 chấm */}
-                  <span className="event-detail-info-value">
-                    {event.leader || event.organizer}
-                  </span>
-                </div>
-              )}
-
-              <div className="event-detail-info-item">
-                <span className="event-detail-info-label">
-                  <Users size={13} />
-                  Thành phần tham gia
-                </span>
-                <span className="event-detail-info-value">
-                  {event.participantText || event.participants?.join(", ") || "Toàn thể thành viên được mời"}
-                </span>
-              </div>
+            <div className="event-info-item">
+              <span className="event-info-label">
+                <Users size={12} />
+                Thành phần tham gia
+              </span>
+              <span className="event-info-value">
+                {highlightCurrentUserName(
+                  event.participantText ||
+                    event.participants?.join(", ") ||
+                    "Toàn thể thành viên được mời",
+                  currentUserName,
+                )}
+              </span>
             </div>
           </div>
 
-          {/* 2. Phòng họp trực tuyến (nếu có meetingUrl) */}
+          {/* KHUNG PHÒNG HỌP TRỰC TUYẾN (NẾU CÓ) */}
           {event.meetingUrl && (
             <div className="event-detail-video-banner">
               <div className="event-detail-video-left">
                 <div className="event-detail-video-icon">
-                  <Video size={20} />
+                  <Video size={18} />
                 </div>
                 <div style={{ minWidth: 0, flex: 1 }}>
-                  <div style={{ fontSize: 14, fontWeight: 700, color: "#0369a1" }}>
+                  <div className="event-detail-video-title">
                     Phòng họp video trực tuyến
                   </div>
                   <a
+                    className="event-detail-video-link"
                     href={event.meetingUrl}
                     rel="noopener noreferrer"
-                    style={{
-                      fontSize: 13,
-                      color: "#475569",
-                      display: "block",
-                      marginTop: 2,
-                    }}
                     target="_blank"
+                    title={event.meetingUrl}
                   >
                     {event.meetingUrl}
                   </a>
                 </div>
               </div>
 
-              <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                  flexShrink: 0,
+                }}
+              >
                 <Tooltip title="Sao chép liên kết">
                   <Button
                     aria-label="Sao chép liên kết"
                     icon={<Copy size={15} />}
                     onClick={handleCopyMeetingLink}
+                    style={{ color: "#0284c7" }}
+                    type="text"
                   />
                 </Tooltip>
                 <Button
                   href={event.meetingUrl}
-                  icon={<ExternalLink size={14} />}
+                  icon={<ExternalLink size={13} />}
+                  size="small"
                   target="_blank"
                   type="primary"
                 >
@@ -532,37 +595,28 @@ export function CalendarEventDetailPage() {
             </div>
           )}
 
-          {/* 3. Lịch trực tòa soạn (nếu có) */}
+          {/* LỊCH TRỰC BAN TÒA SOẠN (NẾU CÓ) */}
           {event.dutyInfo && (
-            <div
-              style={{
-                background: "#fef2f2",
-                border: "1px solid #fecaca",
-                borderRadius: 8,
-                padding: "10px 14px",
-                fontSize: 13,
-                color: "#991b1b",
-              }}
-            >
-              <Calendar size={15} style={{ display: "inline", marginRight: 6 }} />
+            <div className="event-detail-duty-banner">
+              <Calendar size={14} style={{ display: "inline", marginRight: 6 }} />
               <strong>Lịch trực tòa soạn:</strong> {event.dutyInfo}
             </div>
           )}
 
-          {/* 4. Quy trình phê duyệt (nếu là phiếu đề xuất họp hoặc có quy trình duyệt) */}
+          {/* THÔNG TIN PHÊ DUYỆT (NẾU CÓ) */}
           {isProposal && (
-            <div className="event-detail-card-section">
+            <div className="event-detail-approval-box">
               <div
                 style={{
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "space-between",
-                  marginBottom: 12,
+                  marginBottom: 8,
                 }}
               >
                 <span
                   style={{
-                    fontSize: 14.5,
+                    fontSize: 13,
                     fontWeight: 600,
                     color: "#1e293b",
                     display: "flex",
@@ -570,7 +624,7 @@ export function CalendarEventDetailPage() {
                     gap: 6,
                   }}
                 >
-                  <CheckCircle2 size={16} style={{ color: "#059669" }} />
+                  <CheckCircle2 size={15} style={{ color: "#059669" }} />
                   Thông tin phê duyệt
                 </span>
                 <Tag
@@ -590,8 +644,10 @@ export function CalendarEventDetailPage() {
                 </Tag>
               </div>
 
-              <div style={{ fontSize: 13.5, color: "#475467", lineHeight: 1.6 }}>
-                <strong>Người duyệt: </strong>
+              <div style={{ fontSize: 13, color: "#475467", lineHeight: 1.5 }}>
+                <span style={{ fontWeight: 500, color: "#1d2939" }}>
+                  Người duyệt:{" "}
+                </span>
                 {event.approvers && event.approvers.length > 0
                   ? event.approvers.map((a) => a.name).join(", ")
                   : event.approver?.name || "Chưa chỉ định"}
@@ -601,24 +657,30 @@ export function CalendarEventDetailPage() {
                 <div
                   style={{
                     display: "flex",
-                    gap: 10,
-                    marginTop: 14,
-                    paddingTop: 12,
+                    gap: 8,
+                    marginTop: 12,
+                    paddingTop: 10,
                     borderTop: "1px solid #f1f5f9",
                   }}
                 >
                   <Button
-                    icon={<CheckCircle2 size={15} />}
+                    icon={<CheckCircle2 size={14} />}
                     onClick={handleApproveProposal}
-                    style={{ backgroundColor: "#059669", borderColor: "#059669" }}
+                    style={{
+                      backgroundColor: "#059669",
+                      borderColor: "#059669",
+                      fontWeight: 600,
+                      borderRadius: 6,
+                    }}
                     type="primary"
                   >
                     Phê duyệt
                   </Button>
                   <Button
                     danger
-                    icon={<XCircle size={15} />}
+                    icon={<XCircle size={14} />}
                     onClick={() => setRejectModalOpen(true)}
+                    style={{ borderRadius: 6, fontWeight: 500 }}
                   >
                     Không duyệt
                   </Button>
@@ -627,27 +689,20 @@ export function CalendarEventDetailPage() {
             </div>
           )}
 
-          {/* 5. Tài liệu đính kèm */}
-          <div className="event-detail-card-section">
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                marginBottom: 16,
-              }}
-            >
-              <h2 className="event-detail-section-heading" style={{ margin: 0, border: 0, padding: 0 }}>
-                <Paperclip size={16} />
-                Tài liệu đính kèm ({event.attachments?.length || 0})
-              </h2>
+          {/* PHẦN: TÀI LIỆU ĐÍNH KÈM (PHẲNG, KHÔNG HỘP LỒNG HỘP) */}
+          <div className="event-detail-section">
+            <div className="event-detail-section-title">
+              <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                <Paperclip size={15} />
+                Tài liệu ({event.attachments?.length || 0})
+              </span>
               <Upload
                 beforeUpload={handleUploadAttachment}
                 fileList={fileList}
                 showUploadList={false}
               >
                 <Button icon={<UploadCloud size={14} />} size="small">
-                  Đính kèm tệp
+                  Đính kèm
                 </Button>
               </Upload>
             </div>
@@ -657,11 +712,11 @@ export function CalendarEventDetailPage() {
                 {event.attachments.map((att) => {
                   const cat = getFileCategory(att.name);
                   return (
-                    <div className="event-detail-att-card" key={att.id}>
+                    <div className="event-detail-att-item" key={att.id}>
                       <div
                         style={{
-                          width: 34,
-                          height: 34,
+                          width: 32,
+                          height: 32,
                           borderRadius: 6,
                           background: cat.bg,
                           color: cat.color,
@@ -676,22 +731,29 @@ export function CalendarEventDetailPage() {
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div
                           style={{
-                            fontSize: 13,
+                            fontSize: 12.5,
                             fontWeight: 600,
                             color: "#1e293b",
-                            wordBreak: "break-all",
+                            whiteSpace: "nowrap",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
                           }}
+                          title={att.name}
                         >
                           {att.name}
                         </div>
-                        <div style={{ fontSize: 11.5, color: "#64748b" }}>
-                          {formatBytes(att.size)} · {att.uploadedBy || "Đính kèm"}
+                        <div style={{ fontSize: 11, color: "#64748b" }}>
+                          {formatBytes(att.size)} ·{" "}
+                          {att.uploadedBy || "Người tham dự"}
                         </div>
                       </div>
                       <Tooltip title="Tải xuống tệp">
                         <Button
-                          icon={<Download size={14} />}
-                          onClick={() => message.info(`Đang tải xuống tệp: ${att.name}`)}
+                          icon={<Download size={13} />}
+                          onClick={() =>
+                            message.info(`Đang tải xuống tệp: ${att.name}`)
+                          }
+                          size="small"
                           type="text"
                         />
                       </Tooltip>
@@ -700,84 +762,77 @@ export function CalendarEventDetailPage() {
                 })}
               </div>
             ) : (
-              <EmptyState description="Chưa có tài liệu đính kèm" />
+              <div className="event-detail-empty-box">
+                Chưa có tài liệu đính kèm. Nhấp vào &ldquo;Đính kèm&rdquo; để
+                thêm tài liệu cho buổi làm việc.
+              </div>
             )}
           </div>
 
-          {/* 6. Thảo luận trao đổi (Facebook style) */}
-          <div className="event-detail-card-section">
-            <h2 className="event-detail-section-heading">
-              <MessageSquare size={16} />
-              Ý kiến trao đổi ({event.comments?.length || 0})
-            </h2>
+          {/* PHẦN: THẢO LUẬN / Ý KIẾN TRAO ĐỔI (FACEBOOK STYLE NHƯ GỐC DRAWER) */}
+          <div className="event-detail-section">
+            <div className="event-detail-section-title">
+              <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                <MessageSquare size={15} />
+                Thảo luận ({event.comments?.length || 0})
+              </span>
+            </div>
 
-            <div style={{ display: "flex", flexDirection: "column", gap: 14, marginBottom: 16 }}>
+            <div className="event-detail-comments-list">
               {event.comments && event.comments.length > 0 ? (
                 event.comments.map((cmt) => (
-                  <div
-                    key={cmt.id}
-                    style={{
-                      display: "flex",
-                      gap: 12,
-                      alignItems: "flex-start",
-                    }}
-                  >
+                  <div className="event-detail-comment-row" key={cmt.id}>
                     <Avatar
-                      size={36}
+                      className="event-detail-comment-avatar"
+                      size={32}
                       style={{
                         backgroundColor: getAvatarColor(cmt.author),
                         color: "#fff",
-                        flexShrink: 0,
                       }}
                     >
                       {getInitials(cmt.author)}
                     </Avatar>
-                    <div
-                      style={{
-                        flex: 1,
-                        background: "#f8fafc",
-                        border: "1px solid #eaecf0",
-                        borderRadius: 10,
-                        padding: "10px 14px",
-                      }}
-                    >
-                      <div
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "space-between",
-                          marginBottom: 4,
-                        }}
-                      >
-                        <span style={{ fontSize: 13.5, fontWeight: 700, color: "#0f172a" }}>
+
+                    <div className="event-detail-comment-body">
+                      <div className="event-detail-comment-meta">
+                        <span className="event-detail-comment-author">
                           {cmt.author}
                         </span>
-                        <span style={{ fontSize: 11.5, color: "#64748b" }}>
-                          {dayjs(cmt.createdAt).format("HH:mm · DD/MM/YYYY")}
+                        <span className="event-detail-comment-time">
+                          {dayjs(cmt.createdAt).isValid()
+                            ? dayjs(cmt.createdAt).format("HH:mm · DD/MM/YYYY")
+                            : "Vừa xong"}
                         </span>
                       </div>
-                      <div style={{ fontSize: 13.5, color: "#334155", lineHeight: 1.5 }}>
+                      <div className="event-detail-comment-text">
                         {cmt.content}
                       </div>
                     </div>
                   </div>
                 ))
               ) : (
-                <EmptyState description="Chưa có trao đổi nào. Hãy là người đầu tiên để lại ý kiến thảo luận!" />
+                <div className="event-detail-empty-box">
+                  Chưa có trao đổi nào. Hãy là người đầu tiên để lại ý kiến thảo
+                  luận!
+                </div>
               )}
             </div>
 
-            {/* Khung soạn thảo thảo luận */}
-            <div style={{ display: "flex", gap: 12, alignItems: "flex-start", marginTop: 12 }}>
+            {/* Ô nhập trao đổi thảo luận dạng Facebook Composer */}
+            <div className="event-detail-composer-wrapper">
               <Avatar
-                size={36}
-                style={{ backgroundColor: "#1877f2", color: "#fff", flexShrink: 0 }}
+                size={32}
+                style={{
+                  backgroundColor: getAvatarColor(currentUserName),
+                  color: "#fff",
+                  flexShrink: 0,
+                }}
               >
                 {getInitials(currentUserName)}
               </Avatar>
-              <div style={{ flex: 1 }}>
-                <Input.TextArea
-                  autoSize={{ minRows: 2, maxRows: 6 }}
+
+              <div className="event-detail-composer-box">
+                <textarea
                   onChange={(e) => setCommentText(e.target.value)}
                   onKeyDown={(e) => {
                     if (e.key === "Enter" && !e.shiftKey) {
@@ -785,174 +840,26 @@ export function CalendarEventDetailPage() {
                       handleSendComment();
                     }
                   }}
-                  placeholder="Nhập nội dung trao đổi"
+                  placeholder="Nhập nội dung trao đổi... (Enter để gửi, Shift + Enter xuống dòng)"
                   ref={inputRef}
+                  rows={1}
                   value={commentText}
                 />
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    marginTop: 8,
-                  }}
-                >
-                  <small style={{ color: "#64748b", fontSize: 12 }}>
-                    Nhấn <strong>Enter</strong> để gửi, <strong>Shift + Enter</strong> để xuống dòng
-                  </small>
-                  <Button
-                    disabled={submittingComment || !commentText.trim()}
-                    icon={<Send size={14} />}
-                    loading={submittingComment}
+                <Tooltip title="Gửi ý kiến (Enter)">
+                  <button
+                    aria-label="Gửi ý kiến"
+                    className="event-detail-send-btn"
+                    disabled={!commentText.trim() || submittingComment}
                     onClick={handleSendComment}
-                    type="primary"
+                    type="button"
                   >
-                    Gửi
-                  </Button>
-                </div>
+                    <Send size={14} />
+                  </button>
+                </Tooltip>
               </div>
             </div>
           </div>
         </div>
-
-        {/* CỘT PHẢI (COLLAPSIBLE RIGHT PANEL - TASK 6) */}
-        {rightPanelOpen && (
-          <aside className="event-detail-right-pane">
-            <div className="event-detail-right-header">
-              <span className="event-detail-right-title">
-                <Users size={16} />
-                Nhân sự & Vai trò
-              </span>
-              <Button
-                icon={<PanelRightClose size={14} />}
-                onClick={() => setRightPanelOpen(false)}
-                size="small"
-                type="text"
-              >
-                Thu gọn
-              </Button>
-            </div>
-
-            <div className="event-detail-role-group">
-              {/* Người tổ chức */}
-              <div className="event-detail-role-item">
-                <span className="event-detail-role-label">Người tổ chức / Tạo</span>
-                <div className="event-detail-person-chip">
-                  <Avatar size={22} style={{ backgroundColor: getAvatarColor(event.organizer || "Bùi Lê Thế Kiệt") }}>
-                    {getInitials(event.organizer || "Bùi Lê Thế Kiệt")}
-                  </Avatar>
-                  <span>{event.organizer || "Bùi Lê Thế Kiệt"}</span>
-                </div>
-              </div>
-
-              {/* Người chủ trì */}
-              {Boolean(event.leader) && (
-                <div className="event-detail-role-item">
-                  <span className="event-detail-role-label">Chủ trì</span>
-                  <div className="event-detail-person-chip">
-                    <Avatar size={22} style={{ backgroundColor: getAvatarColor(event.leader!) }}>
-                      {getInitials(event.leader!)}
-                    </Avatar>
-                    <span>{event.leader}</span>
-                  </div>
-                </div>
-              )}
-
-              {/* Người duyệt */}
-              {isProposal && (
-                <div className="event-detail-role-item">
-                  <span className="event-detail-role-label">Người phê duyệt</span>
-                  <div className="event-detail-person-chip">
-                    <Avatar size={22} style={{ backgroundColor: "#059669" }}>
-                      {getInitials(event.approver?.name || "Ban Biên tập")}
-                    </Avatar>
-                    <span>{event.approver?.name || "Ban Biên tập"}</span>
-                  </div>
-                </div>
-              )}
-
-              {/* Người thực hiện / Triển khai */}
-              {Boolean(event.executors?.length) && (
-                <div className="event-detail-role-item">
-                  <span className="event-detail-role-label">Người thực hiện</span>
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-                    {event.executors!.map((u) => {
-                      const isSelf = u.name.toLowerCase().includes(currentUserName.toLowerCase());
-                      return (
-                        <div
-                          className={`event-detail-person-chip ${isSelf ? "is-self" : ""}`}
-                          key={u.id || u.name}
-                        >
-                          <Avatar size={20} style={{ backgroundColor: getAvatarColor(u.name) }}>
-                            {getInitials(u.name)}
-                          </Avatar>
-                          <span>{u.name}</span>
-                          {isSelf && <span className="event-detail-self-tag">Bạn</span>}
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-
-              {/* Người theo dõi (Tuân thủ rule: không có nút tự hủy theo dõi) */}
-              {Boolean(event.watchers?.length) && (
-                <div className="event-detail-role-item">
-                  <span className="event-detail-role-label">
-                    Người theo dõi ({event.watchers!.length})
-                  </span>
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-                    {event.watchers!.map((w) => {
-                      const isSelf = w.name.toLowerCase().includes(currentUserName.toLowerCase());
-                      return (
-                        <div
-                          className={`event-detail-person-chip ${isSelf ? "is-self" : ""}`}
-                          key={w.id || w.name}
-                        >
-                          <Avatar size={20} style={{ backgroundColor: getAvatarColor(w.name) }}>
-                            {getInitials(w.name)}
-                          </Avatar>
-                          <span>{w.name}</span>
-                          {isSelf && <span className="event-detail-self-tag">Bạn</span>}
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Tiến độ & Quy trình */}
-            <div style={{ borderTop: "1px solid #f1f5f9", paddingTop: 16 }}>
-              <span className="event-detail-right-title" style={{ marginBottom: 12 }}>
-                <CheckCircle2 size={16} />
-                Tiến độ & Quy trình
-              </span>
-
-              <div className="event-detail-workflow-list">
-                {event.steps && event.steps.length > 0 ? (
-                  event.steps.map((st) => (
-                    <div className="event-detail-workflow-step" key={st.step_order}>
-                      <span
-                        className={`event-detail-step-badge ${st.status === "APPROVED" || st.status === "DONE" ? "is-done" : ""}`}
-                      >
-                        {st.step_order}
-                      </span>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontWeight: 600, color: "#1e293b" }}>{st.name}</div>
-                        <div style={{ fontSize: 11.5, color: "#64748b" }}>{st.role}</div>
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <div style={{ fontSize: 13, color: "#64748b" }}>
-                    Chưa có quy trình các bước riêng biệt
-                  </div>
-                )}
-              </div>
-            </div>
-          </aside>
-        )}
       </div>
 
       {/* Modal Chỉnh sửa nếu là lịch cá nhân */}

@@ -468,3 +468,30 @@ export function positionEvents(events: NormalizedMeetingEvent[]) {
       };
     });
 }
+
+/**
+ * Kiểm tra xem một sự kiện đã diễn ra trong quá khứ hay chưa
+ * (so sánh thời điểm kết thúc/bắt đầu của sự kiện với thời điểm hiện tại/mốc tham chiếu)
+ */
+export function isPastEvent(
+  event: { start?: Dayjs; end?: Dayjs | null; startAt?: string; endAt?: string; deadline?: string },
+  referenceTime?: Dayjs,
+): boolean {
+  const current = referenceTime || dayjs();
+  if (event.end) {
+    return current.isAfter(event.end);
+  }
+  if (event.start) {
+    return current.isAfter(event.start);
+  }
+  const endAt = event.endAt || event.deadline;
+  if (endAt) {
+    const endDayjs = dayjs(endAt);
+    if (endDayjs.isValid()) return current.isAfter(endDayjs);
+  }
+  if (event.startAt) {
+    const startDayjs = dayjs(event.startAt);
+    if (startDayjs.isValid()) return current.isAfter(startDayjs);
+  }
+  return false;
+}

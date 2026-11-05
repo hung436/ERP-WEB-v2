@@ -15,6 +15,7 @@ import {
   eventTime,
   eventTimeRange,
   getApprovalStatusMeta,
+  isPastEvent,
   positionEvents,
   type DutyShiftData,
   type NormalizedMeetingEvent,
@@ -95,12 +96,7 @@ export const EventCard = memo(function EventCard({
   const typeKey = String(event.ticketType || 'MEETING').toLowerCase();
   const statusKey = approvalMeta.tone;
 
-  const past = Boolean(
-    now &&
-      event.end &&
-      event.end.isBefore(now) &&
-      (event.start.isSame(now, 'isoWeek') || event.end.isSame(now, 'isoWeek'))
-  );
+  const past = isPastEvent(event, now);
 
   const handleToggleStar = (e: React.MouseEvent | React.KeyboardEvent) => {
     e.stopPropagation();
@@ -119,14 +115,16 @@ export const EventCard = memo(function EventCard({
       ref={cardRef}
       className={`booking-week-event booking-week-flat-card booking-week-ticket-${typeKey} ${isUserAttending ? 'booking-week-attending' : 'booking-week-non-attending'} ${vertical ? 'booking-week-feed-card' : ''} ${
         compact ? 'booking-week-out-hours-card' : ''
-      } ${past ? 'booking-week-past-event' : ''}`}
+      } ${past ? 'booking-week-past-event is-past-event' : ''}`}
       style={
         vertical || compact
-          ? undefined
+          ? ({ border: 'none', ...(past ? { opacity: 0.65 } : {}) } as React.CSSProperties)
           : ({
+              border: 'none',
               left: `${left}%`,
               width: `calc(${width}% - 4px)`,
               ['--booking-week-right']: `${100 - left - width}%`,
+              ...(past ? { opacity: 0.65 } : {}),
             } as React.CSSProperties)
       }
     >
@@ -198,19 +196,19 @@ export const EventCard = memo(function EventCard({
         <div className="booking-week-card-meta-list">
           {Boolean(event.location) && (
             <div className="booking-week-card-location" title={event.location}>
-              <EnvironmentOutlined className="booking-week-card-loc-icon" aria-hidden="true" />
+              <EnvironmentOutlined className="booking-week-card-loc-icon" aria-hidden="true" style={{ color: '#667085' }} />
               <span>{event.location}</span>
             </div>
           )}
           {event.ticketType === 'MEETING' && Boolean(event.leader?.trim()) && (
             <div className="booking-week-card-leader" title={`Chủ trì: ${event.leader}`}>
-              <UserOutlined className="booking-week-card-loc-icon" aria-hidden="true" />
+              <UserOutlined className="booking-week-card-loc-icon" aria-hidden="true" style={{ color: '#667085' }} />
               <span>Chủ trì: <strong>{event.leader}</strong></span>
             </div>
           )}
           {event.ticketType === 'TASK' && Boolean(event.executorText) && (
             <div className="booking-week-card-leader" title={`Thực hiện: ${event.executorText}`}>
-              <UserOutlined className="booking-week-card-loc-icon" aria-hidden="true" />
+              <UserOutlined className="booking-week-card-loc-icon" aria-hidden="true" style={{ color: '#667085' }} />
               <span>{event.executorText}</span>
             </div>
           )}

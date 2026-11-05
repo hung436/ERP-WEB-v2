@@ -1,8 +1,11 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import dayjs from 'dayjs';
 import { describe, expect, it, vi } from 'vitest';
 
 import { App } from '@/App';
+import type { CalendarEvent } from '@/types/domain';
+import { CalendarEventCard } from '../components/CalendarEventCard';
 
 function renderCalendarWeek(path = '/calendar/week?date=2026-10-05') {
   window.sessionStorage.clear();
@@ -141,5 +144,111 @@ describe('Tái cấu trúc UX/UI Lịch làm việc tuần (7 Tasks Overhaul)', 
       expect(text).not.toContain('–');
       expect(text).not.toContain('-');
     });
+  });
+
+  it('Không đóng khung thẻ card: Bỏ viền khung bao quanh thẻ card (border: none)', async () => {
+    renderCalendarWeek();
+    await screen.findByText(/Tuần 41/i);
+
+    const cards = document.querySelectorAll('.booking-week-flat-card');
+    expect(cards.length).toBeGreaterThan(0);
+    cards.forEach((card) => {
+      const el = card as HTMLElement;
+      expect(el.style.border).toBe('none');
+    });
+  });
+
+  it('Chỉ tô đỏ thời gian nếu có tôi tham gia chứ không tô đỏ các icon khác', async () => {
+    renderCalendarWeek();
+    await screen.findByText(/Tuần 41/i);
+
+    // Tìm thẻ sự kiện có user tham gia
+    const attendingCards = document.querySelectorAll('.booking-week-attending, .card-attending');
+    expect(attendingCards.length).toBeGreaterThan(0);
+
+    const attendingCard = attendingCards[0] as HTMLElement;
+    // Thời gian phải màu đỏ #D92D20 (rgb(217, 45, 32))
+    const timeEl = attendingCard.querySelector('.booking-week-card-time, .card-time-tag') as HTMLElement;
+    expect(timeEl).not.toBeNull();
+    expect(timeEl.style.color).toBe('rgb(217, 45, 32)');
+
+    // Các icon trong thẻ (như icon địa điểm, chủ trì, ghim...) tuyệt đối không được mang màu đỏ
+    const icons = attendingCard.querySelectorAll('.booking-week-card-loc-icon, .anticon, svg:not(.calendar-star-icon)');
+    icons.forEach((icon) => {
+      const iconEl = icon as HTMLElement;
+      const color = iconEl.style.color;
+      expect(color).not.toBe('rgb(217, 45, 32)');
+      expect(color).not.toBe('rgb(220, 38, 38)'); // #dc2626
+      if (color) {
+        expect(['rgb(102, 112, 133)', 'rgb(100, 116, 139)', 'rgb(71, 84, 103)']).toContain(color);
+      }
+    });
+  });
+
+  it('Nếu ở quá khứ, màu tổng thể của card sẽ mờ đi chút (opacity: 0.65), cho dù có tôi tham gia hay không', () => {
+    const now = dayjs('2026-11-05T12:00:00Z');
+
+    const pastAttendingEvent: CalendarEvent = {
+      id: 'past-attending-1',
+      title: 'Họp giao ban đã kết thúc (Có tham gia)',
+      startAt: '2026-11-04T08:00:00Z',
+      endAt: '2026-11-04T09:00:00Z',
+      type: 'meeting',
+      ticketType: 'MEETING',
+      scope: 'editorial',
+      organizer: 'Ban Biên tập',
+      isUserParticipant: true,
+      approvalStatus: 'APPROVED',
+    };
+
+    const pastNonAttendingEvent: CalendarEvent = {
+      id: 'past-non-attending-1',
+      title: 'Họp phòng ban đã kết thúc (Không tham gia)',
+      startAt: '2026-11-04T10:00:00Z',
+      endAt: '2026-11-04T11:00:00Z',
+      type: 'meeting',
+      ticketType: 'MEETING',
+      scope: 'editorial',
+      organizer: 'Ban Biên tập',
+      isUserParticipant: false,
+      approvalStatus: 'APPROVED',
+    };
+
+    const futureEvent: CalendarEvent = {
+      id: 'future-event-1',
+      title: 'Họp ban biên tập tương lai',
+      startAt: '2026-11-06T08:00:00Z',
+      endAt: '2026-11-06T09:00:00Z',
+      type: 'meeting',
+      ticketType: 'MEETING',
+      scope: 'editorial',
+      organizer: 'Ban Biên tập',
+      isUserParticipant: true,
+      approvalStatus: 'SCHEDULED',
+    };
+
+    // Sự kiện quá khứ CÓ user tham gia -> có class is-past-event, opacity 0.65, border none, thời gian vẫn màu đỏ
+    const { rerender } = render(<CalendarEventCard event={pastAttendingEvent} now={now} />);
+    const cardPastAttending = screen.getByRole('button', { name: /Họp giao ban đã kết thúc/i });
+    expect(cardPastAttending).toHaveClass('is-past-event');
+    expect(cardPastAttending.style.opacity).toBe('0.65');
+    expect(cardPastAttending.style.border).toBe('none');
+
+    // Thời gian của sự kiện tham gia vẫn đỏ
+    const attendingTimeTag = cardPastAttending.querySelector('.card-time-tag') as HTMLElement;
+    expect(attendingTimeTag.style.color).toBe('rgb(217, 45, 32)');
+
+    // Sự kiện quá khứ KHÔNG CÓ user tham gia -> cũng mờ (opacity 0.65), có class is-past-event, border none
+    rerender(<CalendarEventCard event={pastNonAttendingEvent} now={now} />);
+    const cardPastNonAttending = screen.getByRole('button', { name: /Họp phòng ban đã kết thúc/i });
+    expect(cardPastNonAttending).toHaveClass('is-past-event');
+    expect(cardPastNonAttending.style.opacity).toBe('0.65');
+    expect(cardPastNonAttending.style.border).toBe('none');
+
+    // Sự kiện tương lai -> không bị mờ (không có class is-past-event, opacity khác 0.65)
+    rerender(<CalendarEventCard event={futureEvent} now={now} />);
+    const cardFuture = screen.getByRole('button', { name: /Họp ban biên tập tương lai/i });
+    expect(cardFuture).not.toHaveClass('is-past-event');
+    expect(cardFuture.style.opacity).not.toBe('0.65');
   });
 });

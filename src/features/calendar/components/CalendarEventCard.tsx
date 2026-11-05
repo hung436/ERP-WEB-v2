@@ -1,12 +1,12 @@
 import { message } from 'antd';
-import dayjs, { extend } from 'dayjs';
+import dayjs, { extend, type Dayjs } from 'dayjs';
 import isoWeek from 'dayjs/plugin/isoWeek';
 import { MapPin, Star, Users } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
 import type { CalendarEvent } from '@/types/domain';
 
-import { getApprovalStatusMeta } from '../calendarWeekUtils';
+import { getApprovalStatusMeta, isPastEvent } from '../calendarWeekUtils';
 
 extend(isoWeek);
 
@@ -17,9 +17,10 @@ interface CalendarEventCardProps {
   style?: React.CSSProperties;
   className?: string;
   disabledHover?: boolean;
+  now?: Dayjs;
 }
 
-export function CalendarEventCard({ event, onSelectEvent, onHoverChange, style, className, disabledHover }: CalendarEventCardProps) {
+export function CalendarEventCard({ event, onSelectEvent, onHoverChange, style, className, disabledHover, now }: CalendarEventCardProps) {
   const start = dayjs(event.startAt);
   const end = dayjs(event.endAt);
 
@@ -100,13 +101,11 @@ export function CalendarEventCard({ event, onSelectEvent, onHoverChange, style, 
 
   const canOpenDrawer = isUserAttending;
 
-  const now = dayjs();
-  const isCurrentWeek = start.isSame(now, 'isoWeek') || end.isSame(now, 'isoWeek');
-  const isPast = isCurrentWeek && end.isBefore(now);
+  const isPast = isPastEvent(event, now);
 
   let cardClass = `calendar-list-card booking-week-flat-card ${isUserAttending ? 'card-attending' : 'card-non-attending'} ${className || ''}`;
   if (isPast) {
-    cardClass += ' is-past-event';
+    cardClass += ' is-past-event booking-week-past-event';
   }
 
   const handleClick = () => {
@@ -135,7 +134,13 @@ export function CalendarEventCard({ event, onSelectEvent, onHoverChange, style, 
       onClick={handleClick}
       onKeyDown={handleKeyDown}
       role="button"
-      style={{ ...style, cursor: canOpenDrawer ? 'pointer' : 'default', position: 'relative' }}
+      style={{
+        border: 'none',
+        ...style,
+        cursor: canOpenDrawer ? 'pointer' : 'default',
+        position: 'relative',
+        ...(isPast ? { opacity: 0.65 } : {}),
+      }}
       tabIndex={canOpenDrawer ? 0 : -1}
     >
       {/* Chấm tròn vàng ở góc phải nếu lịch đã điều chỉnh (Task 7) */}
@@ -172,7 +177,7 @@ export function CalendarEventCard({ event, onSelectEvent, onHoverChange, style, 
                 title={isInterested ? 'Bỏ quan tâm' : 'Quan tâm lịch họp'}
                 aria-label={isInterested ? 'Bỏ quan tâm lịch họp' : 'Quan tâm lịch họp'}
               >
-                <Star size={13} fill={isInterested ? '#f59e0b' : 'none'} color={isInterested ? '#f59e0b' : '#94a3b8'} />
+                <Star size={13} fill={isInterested ? '#f59e0b' : 'none'} color={isInterested ? '#f59e0b' : '#667085'} />
               </button>
             )}
           </div>
@@ -185,12 +190,12 @@ export function CalendarEventCard({ event, onSelectEvent, onHoverChange, style, 
           <div className="card-location-row">
             {event.location ? (
               <div className="card-location-info" title={event.location}>
-                <MapPin size={12} style={{ flexShrink: 0 }} />
+                <MapPin size={12} color="#667085" style={{ flexShrink: 0 }} />
                 <span>{event.location}</span>
               </div>
             ) : (event.ticketType === 'MEETING' && event.leader?.trim()) ? (
               <div className="card-location-info" title={event.leader}>
-                <Users size={12} style={{ flexShrink: 0 }} />
+                <Users size={12} color="#667085" style={{ flexShrink: 0 }} />
                 <span>{event.leader}</span>
               </div>
             ) : null}

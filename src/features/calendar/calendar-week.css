@@ -966,7 +966,7 @@ html:has(.booking-week-page), body:has(.booking-week-page) { height: 100%; overf
   font-weight: 500 !important;
 }
 .booking-week-feed-card.booking-week-event.booking-week-attending .booking-week-card-location .anticon {
-  color: #dc2626 !important;
+  color: #64748b !important;
 }
 
 /* 3. Lịch Cá nhân (Personal Card - Hoàn toàn không viền, nền xanh dương rõ nét êm dịu) */
@@ -1060,7 +1060,7 @@ html:has(.booking-week-page), body:has(.booking-week-page) { height: 100%; overf
 
 /* Lịch quá khứ: Giữ nguyên nền không trong suốt để tránh lộ vạch kẻ mặt lưới phía sau */
 .booking-week-feed-card.booking-week-event.booking-week-past-event {
-  opacity: 1 !important;
+  opacity: 0.65 !important;
 }
 
 .booking-week-feed-card .booking-week-card-button {
@@ -1342,7 +1342,7 @@ html:has(.booking-week-page), body:has(.booking-week-page) { height: 100%; overf
 .booking-week-selected-day .booking-week-out-hours-slot.booking-week-out-late { background: #f1f5f9; }
 .booking-week-out-hours-slot:has(.booking-week-expanded), .booking-week-out-hours-slot:focus-within { z-index: 600; }
 .booking-week-out-hours-empty { display: flex; align-items: center; justify-content: center; flex: 1; color: #cbd5e1; font-size: 14px; user-select: none; }
-.booking-week-out-hours-card.booking-week-event { position: relative; top: auto; width: 100%; min-width: 0; height: 32px; flex-shrink: 0; border-radius: 5px; background: #ffffff; border: 1px solid #e2e8f0; }
+.booking-week-out-hours-card.booking-week-event { position: relative; top: auto; width: 100%; min-width: 0; height: 32px; flex-shrink: 0; border-radius: 5px; background: #ffffff; border: none !important; }
 .booking-week-out-hours-card.booking-week-event:hover { background: #f8fafc; }
 .booking-week-out-hours-card.booking-week-event .booking-week-card-top { color: #0f172a; }
 .booking-week-out-hours-card .booking-week-card-button { justify-content: center; padding: 2px 6px; gap: 0; }
@@ -1363,11 +1363,25 @@ html:has(.booking-week-page), body:has(.booking-week-page) { height: 100%; overf
 .booking-week-now-pill { display: inline-flex; position: absolute; top: -14px; left: 50%; transform: translateX(-50%); align-items: center; gap: 4px; padding: 1px 6px; border-radius: 10px; background: #dc2626; color: white; font-size: 11px; font-weight: 600; white-space: nowrap; box-shadow: 0 2px 5px #dc262659; }
 .booking-week-now-pill > span { width: 5px; height: 5px; border-radius: 50%; background: white; }
 .booking-week-now-line { position: absolute; top: -6px; bottom: 0; width: 2px; background: #ef4444; box-shadow: 0 0 6px #ef444473; }
-/* Lịch quá khứ: Giữ nền thẻ đặc (opaque) 100%, chỉ giảm nhẹ độ đậm của phần chữ bên trong */
-.booking-week-past-event { opacity: 1 !important; }
-.booking-week-past-event > .booking-week-card-button { opacity: 0.82; transition: opacity 0.15s ease; }
+/* Lịch quá khứ: Màu tổng thể của card sẽ mờ đi chút (opacity: 0.65), cho dù có tôi tham gia hay không */
+.booking-week-past-event,
+.is-past-event {
+  opacity: 0.65 !important;
+  transition: opacity 0.15s ease;
+}
+.booking-week-past-event > .booking-week-card-button,
+.is-past-event > .booking-week-card-button {
+  opacity: 1 !important;
+}
 .booking-week-past-duty { opacity: .9; transition: opacity .15s ease; }
-.booking-week-past-event:hover > .booking-week-card-button, .booking-week-past-event:focus-within > .booking-week-card-button, .booking-week-past-event.booking-week-expanded > .booking-week-card-button, .booking-week-past-duty:hover { opacity: 1 !important; }
+.booking-week-past-event:hover,
+.booking-week-past-event:focus-within,
+.booking-week-past-event.booking-week-expanded,
+.is-past-event:hover,
+.is-past-event:focus-within,
+.booking-week-past-duty:hover {
+  opacity: 0.9 !important;
+}
 .booking-week-selected-day { background: white; }
 .booking-week-selected-day .booking-week-day-header { background: #f0fdf4; border-bottom-color: #86efac; }
 .booking-week-selected-day .booking-week-date-pill { background: #dcfce7; color: #15803d; }
@@ -1379,7 +1393,7 @@ html:has(.booking-week-page), body:has(.booking-week-page) { height: 100%; overf
   border-radius: 8px;
   box-sizing: border-box;
   background: #ffffff;
-  border: 1px solid #e2e8f0;
+  border: none !important;
   color: #0f172a;
   box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
@@ -1403,7 +1417,7 @@ html:has(.booking-week-page), body:has(.booking-week-page) { height: 100%; overf
   box-shadow: 0 4px 12px rgba(220, 38, 38, 0.12) !important;
 }
 .booking-week-event:not(.booking-week-feed-card).booking-week-attending .booking-week-card-location .anticon {
-  color: #dc2626 !important;
+  color: #64748b !important;
 }
 
 /* 2. Lịch Cá nhân / Phiếu công việc ở chế độ ngang */
@@ -1427,7 +1441,7 @@ html:has(.booking-week-page), body:has(.booking-week-page) { height: 100%; overf
 .booking-week-event:not(.booking-week-feed-card).booking-week-non-attending,
 .booking-week-event:not(.booking-week-feed-card):not(.booking-week-attending):not(.booking-week-personal) {
   background: #ffffff !important;
-  border: 1px solid #e2e8f0 !important;
+  border: none !important;
   box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03) !important;
 }
 .booking-week-event:not(.booking-week-feed-card).booking-week-card-event:hover,
@@ -1437,7 +1451,7 @@ html:has(.booking-week-page), body:has(.booking-week-page) { height: 100%; overf
 .booking-week-event:not(.booking-week-feed-card).booking-week-non-attending.booking-week-expanded,
 .booking-week-event:not(.booking-week-feed-card):not(.booking-week-attending):not(.booking-week-personal).booking-week-expanded {
   background: #f8fafc !important;
-  border: 1px solid #cbd5e1 !important;
+  border: none !important;
   box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08) !important;
 }
 .booking-week-event:not(.booking-week-feed-card).booking-week-card-event .booking-week-card-location .anticon,
@@ -2299,7 +2313,7 @@ html:has(.booking-week-page), body:has(.booking-week-page) { height: 100%; overf
 }
 
 .booking-week-feed-card.booking-week-event.booking-week-attending .booking-week-card-leader .anticon {
-  color: #dc2626 !important;
+  color: #64748b !important;
 }
 
 .booking-week-feed-card.booking-week-event.booking-week-personal .booking-week-card-leader .anticon {
@@ -2361,12 +2375,12 @@ html:has(.booking-week-page), body:has(.booking-week-page) { height: 100%; overf
   z-index: 3;
 }
 
-/* 3. Bỏ toàn bộ background màu, chuyển sang card phẳng chuẩn Anti-AI UI */
+/* 3. Bỏ viền khung bao quanh thẻ card (border: none) và bỏ background màu - chuẩn Anti-AI UI */
 .booking-week-event,
 .booking-week-flat-card,
 .calendar-list-card {
   background: #ffffff !important;
-  border: 1px solid #E4E7EC !important;
+  border: none !important;
   border-radius: 8px !important;
   box-shadow: 0 1px 2px rgba(16, 24, 40, 0.03) !important;
   transition: all 0.15s ease !important;
@@ -2376,7 +2390,7 @@ html:has(.booking-week-page), body:has(.booking-week-page) { height: 100%; overf
 .booking-week-flat-card:hover,
 .calendar-list-card:hover {
   background: #ffffff !important;
-  border-color: #D0D5DD !important;
+  border: none !important;
   box-shadow: 0 2px 6px rgba(16, 24, 40, 0.07) !important;
 }
 
@@ -2384,14 +2398,30 @@ html:has(.booking-week-page), body:has(.booking-week-page) { height: 100%; overf
 .booking-week-feed-card.booking-week-event.booking-week-personal,
 .booking-week-feed-card.booking-week-event.booking-week-non-attending {
   background: #ffffff !important;
-  border: 1px solid #E4E7EC !important;
+  border: none !important;
 }
 
 .booking-week-feed-card.booking-week-event.booking-week-attending:hover,
 .booking-week-feed-card.booking-week-event.booking-week-personal:hover,
 .booking-week-feed-card.booking-week-event.booking-week-non-attending:hover {
   background: #ffffff !important;
-  border-color: #D0D5DD !important;
+  border: none !important;
+}
+
+/* Chỉ tô đỏ thời gian nếu có tôi tham gia, các icon khác tuyệt đối giữ màu trung tính chuẩn (#667085 / #64748b) */
+.booking-week-event .anticon,
+.booking-week-event .booking-week-card-loc-icon,
+.booking-week-event .booking-week-card-location .anticon,
+.booking-week-event .booking-week-card-leader .anticon,
+.booking-week-event.booking-week-attending .anticon,
+.booking-week-event.booking-week-attending .booking-week-card-loc-icon,
+.booking-week-event.booking-week-attending .booking-week-card-location .anticon,
+.booking-week-event.booking-week-attending .booking-week-card-leader .anticon,
+.calendar-list-card .card-location-info svg,
+.calendar-list-card.card-attending .card-location-info svg,
+.calendar-list-card.card-attending svg.lucide:not(.calendar-star-icon) {
+  color: #667085 !important;
+  stroke: #667085 !important;
 }
 
 /* 4. Task 4: Tên hiển thị đầy đủ, không cắt 3 chấm */
