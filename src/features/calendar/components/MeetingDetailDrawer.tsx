@@ -132,13 +132,6 @@ export const MeetingDetailDrawer: React.FC<MeetingDetailDrawerProps> = ({
   const start = dayjs(event.startAt);
   const end = dayjs(event.endAt);
 
-  const rawDesc = (
-    event.notes ||
-    event.agenda ||
-    event.description ||
-    ''
-  ).trim();
-
   const isProposal =
     event.workflowType === 'PROPOSAL' ||
     Boolean(event.approver?.name) ||
@@ -714,27 +707,6 @@ export const MeetingDetailDrawer: React.FC<MeetingDetailDrawerProps> = ({
                 </Button>
               </div>
             )}
-          </div>
-        )}
-
-        {/* Nội dung / Ghi chú cuộc họp */}
-        {rawDesc && (
-          <div style={{ marginBottom: 16 }}>
-            <div className="meeting-section-title">Nội dung cuộc họp</div>
-            <div
-              style={{
-                fontSize: 13.5,
-                color: '#334155',
-                lineHeight: 1.55,
-                whiteSpace: 'pre-wrap',
-                background: '#f8fafc',
-                padding: '12px 14px',
-                borderRadius: 8,
-                border: '1px solid #f1f5f9',
-              }}
-            >
-              {rawDesc}
-            </div>
           </div>
         )}
 

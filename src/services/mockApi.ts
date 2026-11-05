@@ -317,24 +317,28 @@ export async function mockRequest<T>(path: string, options?: { method?: string; 
   else if (pathname === '/api/calendar/events') {
     if (options?.method === 'POST') {
       const body = options.body as Partial<CalendarEvent>;
+      const isTask = body.ticketType === 'TASK';
+      const isEvent = body.ticketType === 'EVENT';
+      const isMeeting = !isTask && !isEvent;
       const meetingCode = `${Math.floor(100 + Math.random() * 900)}-${Math.floor(100 + Math.random() * 900)}`;
       const newEvent: CalendarEvent = {
         ...body,
         id: body.id || `event-${Date.now()}`,
-        title: body.title ?? 'Cuộc họp trực tuyến mới',
+        title: body.title ?? (isTask ? 'Phiếu công việc mới' : isEvent ? 'Sự kiện mới' : 'Cuộc họp trực tuyến mới'),
         startAt: body.startAt ?? new Date().toISOString(),
         endAt: body.endAt ?? new Date(Date.now() + 3600000).toISOString(),
-        location: body.location ?? 'https://meeting.tuoitre.vn/room-123',
-        meetingUrl: body.meetingUrl ?? `https://meeting.tuoitre.vn/phong-${meetingCode}`,
-        type: body.type ?? 'meeting',
+        location: isTask ? '' : (body.location ?? (isMeeting ? 'https://meeting.tuoitre.vn/room-123' : '')),
+        meetingUrl: isMeeting ? (body.meetingUrl ?? `https://meeting.tuoitre.vn/phong-${meetingCode}`) : undefined,
+        type: body.type ?? (isTask ? 'work' : isEvent ? 'event' : 'meeting'),
         scope: body.scope ?? 'personal',
         organizer: activeUser.fullName,
-        leader: body.leader ?? activeUser.fullName,
+        leader: isMeeting ? (body.leader ?? activeUser.fullName) : undefined,
         responseStatus: 'accepted',
-        meetingId: `TT-${meetingCode}`,
-        platform: body.platform ?? 'meeting.tuoitre.vn',
-        agenda: body.agenda ?? 'Trao đổi nội dung công việc trực tuyến',
+        meetingId: isMeeting ? `TT-${meetingCode}` : undefined,
+        platform: isMeeting ? (body.platform ?? 'meeting.tuoitre.vn') : undefined,
+        agenda: body.agenda ?? (isTask ? 'Nội dung công việc' : 'Trao đổi nội dung công việc trực tuyến'),
         notes: body.notes,
+        ticketType: body.ticketType ?? 'MEETING',
         participantText: body.participantText ?? (body.participants?.join(', ') || activeUser.fullName),
         participants: body.participants?.length ? body.participants : [activeUser.fullName],
         participantCount: body.participantCount ?? (body.participants?.length || 1),
@@ -377,6 +381,8 @@ export async function mockRequest<T>(path: string, options?: { method?: string; 
     };
     const updated: CalendarEvent = {
       ...event,
+      meetingUrl: (event.ticketType === 'TASK' || event.ticketType === 'EVENT') ? undefined : event.meetingUrl,
+      leader: (event.ticketType === 'TASK' || event.ticketType === 'EVENT') ? undefined : event.leader,
       comments: [...(event.comments || []), newComment],
       attachments: body.attachments
         ? [...(event.attachments || []), ...body.attachments]

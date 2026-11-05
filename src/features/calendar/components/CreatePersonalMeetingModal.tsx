@@ -697,7 +697,7 @@ export function CreatePersonalMeetingModal({
         createdAt: editingEvent?.createdAt || new Date().toISOString(),
         deadline: ticketType === "TASK" ? endAtStr : undefined,
         location,
-        meetingUrl: rawLink || undefined,
+        meetingUrl: ticketType === "MEETING" ? (rawLink || undefined) : undefined,
         mode: finalMode,
         organizer: currentUserName,
         leader: ticketType === "MEETING" ? (editingEvent?.leader || currentUserName) : undefined,
@@ -1294,6 +1294,8 @@ export function CreatePersonalMeetingModal({
                   >
                     <SmartTimePicker
                       ticketType="MEETING"
+                      mode="single"
+                      placeholder="Chọn thời gian họp..."
                       allowPast={Boolean(editingEvent)}
                       existingEvents={existingEvents}
                       currentUserName={currentUserName}

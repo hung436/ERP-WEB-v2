@@ -1186,8 +1186,8 @@ export function CalendarEventDetailModal({
                         </div>
                       )}
 
-                      {/* Khung phòng họp trực tuyến Google Meet / Zoom */}
-                      {event.meetingUrl && (
+                      {/* Khung phòng họp trực tuyến Google Meet / Zoom (Chỉ hiển thị khi là Lịch họp) */}
+                      {isMeeting && Boolean(event.meetingUrl) && (
                         <div
                           style={{
                             background: '#f0f9ff',

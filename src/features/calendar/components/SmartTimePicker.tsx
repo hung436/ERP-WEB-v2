@@ -42,7 +42,7 @@ export const SmartTimePicker: React.FC<SmartTimePickerProps> = ({
   mode,
   allowPast = false,
 }) => {
-  const isRangeMode = mode === 'range' || (!mode && ticketType === 'MEETING');
+  const isRangeMode = mode === 'range';
 
   // Parse initial values: Mặc định là thời gian hiện tại (làm tròn lên mốc 5 phút gần nhất)
   const initialValues = useMemo(() => {
@@ -154,15 +154,16 @@ export const SmartTimePicker: React.FC<SmartTimePickerProps> = ({
       // TUYỆT ĐỐI KHÔNG đè thuộc tính 'date' lên Dayjs vì Dayjs.prototype.date là function getter/setter ngày trong tháng!
       // Việc đè 'date' bằng Object sẽ làm rc-picker ném lỗi: date4.date is not a function
       const payload = dayjs(cleanDate.valueOf());
+      const defaultDuration = ticketType === 'TASK' ? 0 : 60;
       (payload as unknown as { startAt?: Dayjs; endAt?: Dayjs; durationMinutes?: number; isAllDay?: boolean; slotDate?: Dayjs }).startAt = cleanDate;
-      (payload as unknown as { startAt?: Dayjs; endAt?: Dayjs; durationMinutes?: number; isAllDay?: boolean; slotDate?: Dayjs }).endAt = cleanDate;
-      (payload as unknown as { startAt?: Dayjs; endAt?: Dayjs; durationMinutes?: number; isAllDay?: boolean; slotDate?: Dayjs }).durationMinutes = 0;
+      (payload as unknown as { startAt?: Dayjs; endAt?: Dayjs; durationMinutes?: number; isAllDay?: boolean; slotDate?: Dayjs }).endAt = cleanDate.add(defaultDuration, 'minute');
+      (payload as unknown as { startAt?: Dayjs; endAt?: Dayjs; durationMinutes?: number; isAllDay?: boolean; slotDate?: Dayjs }).durationMinutes = defaultDuration;
       (payload as unknown as { startAt?: Dayjs; endAt?: Dayjs; durationMinutes?: number; isAllDay?: boolean; slotDate?: Dayjs }).isAllDay = false;
       (payload as unknown as { startAt?: Dayjs; endAt?: Dayjs; durationMinutes?: number; isAllDay?: boolean; slotDate?: Dayjs }).slotDate = cleanDate.startOf('day');
 
       onChange(payload);
     },
-    [onChange],
+    [onChange, ticketType],
   );
 
   // Range mode handler
@@ -339,7 +340,11 @@ export const SmartTimePicker: React.FC<SmartTimePickerProps> = ({
           format="HH:mm DD/MM/YYYY"
           placeholder={
             placeholder ||
-            (ticketType === 'TASK' ? 'Chọn thời gian hạn chót...' : 'Chọn thời gian diễn ra...')
+            (ticketType === 'TASK'
+              ? 'Chọn thời gian hạn chót...'
+              : ticketType === 'MEETING'
+                ? 'Chọn thời gian họp...'
+                : 'Chọn thời gian diễn ra...')
           }
           allowClear={false}
           disabled={disabled}
