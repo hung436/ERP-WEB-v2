@@ -405,6 +405,9 @@ export const eventTime = (event: NormalizedMeetingEvent): string => {
  * - Lịch họp / Sự kiện: 08:30 – 10:00 (hoặc 08:30 nếu không có giờ kết thúc)
  * - Phiếu công việc (TASK): Hạn: 17:30
  */
+/**
+ * Chuẩn hóa thời gian sự kiện: Chỉ hiển thị 1 mốc thời gian duy nhất (HH:mm)
+ */
 export const eventTimeRange = (event: NormalizedMeetingEvent): string => {
   if (event.ticketType === 'TASK') {
     const target = event.end || event.start;

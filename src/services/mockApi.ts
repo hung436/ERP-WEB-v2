@@ -5,6 +5,8 @@ import { followerOptions, workTicketSubmissions, workTicketTemplates } from '@/m
 import { evaluationPeriods, evaluationSheets } from '@/mocks/evaluationFixtures';
 import { initialChangeRequests, initialPersonnelList, initialPositionTitles, initialResignedEmployees, initialSpecialties, initialUnitPositionMappings, initialWorkUnits, personalProfile } from '@/mocks/personnelFixtures';
 import { initialCalendarNotifications, initialRecipientGroups } from '@/mocks/calendarNotificationFixtures';
+import dayjs from 'dayjs';
+import { getEventsForWeek } from '@/features/calendar/mockCalendarData';
 import type { Announcement, ApiResponse, ApiState, CalendarAttachmentItem, CalendarEvent, ChatAttachment, ChatConversation, ChatMessage, CustomDocumentTemplateItem, DashboardSummary, DirectoryContact, DocumentSubmission, DocumentWorkflowStep, MailComposePayload, MailItem, MailReply, MeetingEvent, Task, User, WorkTicketAttachment, WorkTicketFollower, WorkTicketSubmission } from '@/types/domain';
 import type { CalendarNotificationItem, CalendarRecipientGroup, CreateCalendarNotificationPayload, CreateRecipientGroupPayload } from '@/types/calendar';
 import type { EvaluationSheet, EvaluationSummary } from '@/types/evaluation';
@@ -40,6 +42,44 @@ function getInitialCalendarEvents(): CalendarEvent[] {
   return base;
 }
 let calendarEventStore: CalendarEvent[] = getInitialCalendarEvents();
+
+function findCalendarEvent(id: string): CalendarEvent | undefined {
+  let event = calendarEventStore.find((item) => item.id === id);
+  if (event) return event;
+
+  try {
+    // 1. Trích xuất ngày dạng YYYYMMDD nếu có trong ID (ví dụ: bbt-sat-0830-taphuan-20261107)
+    const dateMatch = id.match(/\b(20\d{2})(\d{2})(\d{2})\b/);
+    if (dateMatch) {
+      const targetDate = dayjs(`${dateMatch[1]}-${dateMatch[2]}-${dateMatch[3]}`);
+      if (targetDate.isValid()) {
+        const weekEvents = getEventsForWeek(targetDate.startOf('isoWeek'), calendarEventStore);
+        event = weekEvents.find((item) => item.id === id);
+        if (event) {
+          calendarEventStore = [...calendarEventStore, event];
+          return event;
+        }
+      }
+    }
+
+    // 2. Tìm trong các tuần lân cận (hiện tại, trước, sau)
+    const now = dayjs();
+    for (const offset of [0, 1, -1, 2, -2, 3, 4, -3, -4]) {
+      const weekDate = now.add(offset, 'week').startOf('isoWeek');
+      const weekEvents = getEventsForWeek(weekDate, calendarEventStore);
+      event = weekEvents.find((item) => item.id === id);
+      if (event) {
+        calendarEventStore = [...calendarEventStore, event];
+        return event;
+      }
+    }
+  } catch {
+    // ignore
+  }
+
+  return undefined;
+}
+
 let calendarNotificationStore: CalendarNotificationItem[] = [...initialCalendarNotifications];
 let recipientGroupStore: CalendarRecipientGroup[] = [...initialRecipientGroups];
 let mailStore: MailItem[] = mails.map((item) => ({ ...item }));
@@ -361,7 +401,7 @@ export async function mockRequest<T>(path: string, options?: { method?: string; 
   else if (/^\/api\/calendar\/events\/[^/]+\/respond$/.test(pathname) && options?.method === 'POST') {
     const eventId = pathname.split('/')[4];
     const body = options.body as { responseStatus?: CalendarEvent['responseStatus'] };
-    const event = calendarEventStore.find((item) => item.id === eventId);
+    const event = findCalendarEvent(eventId);
     if (!event || !body.responseStatus) throw new Error('Không thể cập nhật phản hồi lịch.');
     const updated = { ...event, responseStatus: body.responseStatus };
     calendarEventStore = calendarEventStore.map((item) => item.id === eventId ? updated : item);
@@ -370,7 +410,7 @@ export async function mockRequest<T>(path: string, options?: { method?: string; 
   else if (/^\/api\/calendar\/events\/[^/]+\/comments$/.test(pathname) && options?.method === 'POST') {
     const eventId = pathname.split('/')[4];
     const body = options.body as { content: string; attachments?: CalendarAttachmentItem[] };
-    const event = calendarEventStore.find((item) => item.id === eventId);
+    const event = findCalendarEvent(eventId);
     if (!event) throw new Error('Không tìm thấy sự kiện để bình luận.');
     const newComment = {
       id: `cmt-${Date.now()}`,
@@ -394,7 +434,7 @@ export async function mockRequest<T>(path: string, options?: { method?: string; 
   else if (/^\/api\/calendar\/events\/[^/]+\/attachments$/.test(pathname) && options?.method === 'POST') {
     const eventId = pathname.split('/')[4];
     const body = options.body as { attachment: CalendarAttachmentItem };
-    const event = calendarEventStore.find((item) => item.id === eventId);
+    const event = findCalendarEvent(eventId);
     if (!event) throw new Error('Không tìm thấy sự kiện để thêm tệp đính kèm.');
     const updated: CalendarEvent = {
       ...event,
@@ -410,13 +450,13 @@ export async function mockRequest<T>(path: string, options?: { method?: string; 
       data = { success: true };
     } else if (options?.method === 'PUT' || options?.method === 'PATCH') {
       const body = options.body as Partial<CalendarEvent>;
-      const existing = calendarEventStore.find((item) => item.id === id);
+      const existing = findCalendarEvent(id);
       if (!existing) throw new Error('Không tìm thấy sự kiện');
       const updated = { ...existing, ...body };
       calendarEventStore = calendarEventStore.map((item) => item.id === id ? updated : item);
       data = updated;
     } else {
-      const event = calendarEventStore.find((item) => item.id === id);
+      const event = findCalendarEvent(id);
       if (!event) throw new Error('Không tìm thấy sự kiện');
       data = event;
     }
