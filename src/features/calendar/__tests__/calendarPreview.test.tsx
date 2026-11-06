@@ -89,9 +89,9 @@ describe('Drawer thông tin lịch tóm tắt', () => {
     },
   );
 
-  it('lịch chung không có chấm trạng thái kể cả khi phiếu có trạng thái Đã duyệt', () => {
+  it('lịch chung không có chấm trạng thái kể cả khi phiếu có trạng thái Đồng ý', () => {
     render(<CalendarEventPreviewDrawer event={{ ...previewMeeting, approvalStatus: 'APPROVED' }} onClose={vi.fn()} />);
-    expect(screen.queryByLabelText('Trạng thái: Đã duyệt')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('Trạng thái: Đồng ý')).not.toBeInTheDocument();
     expect(document.querySelector('.calendar-preview-status .booking-week-status-dot')).toBeNull();
   });
 
@@ -120,7 +120,7 @@ describe('Drawer thông tin lịch tóm tắt', () => {
     render(<CalendarEventPreviewDrawer event={event} onClose={vi.fn()} />);
     const drawer = within(screen.getByRole('dialog', { name: event.title }));
     expect(drawer.getByText(ticketType === 'TASK' ? 'Phiếu công việc' : 'Sự kiện')).toBeInTheDocument();
-    expect(drawer.getByText('Không duyệt')).toBeInTheDocument();
+    expect(drawer.getByText('Không đồng ý')).toBeInTheDocument();
     expect(drawer.getByText('Theo dõi').closest('dt')?.nextElementSibling).toHaveTextContent('Bùi Anh Tú');
     expect(drawer.getByText('1 tài liệu · 1 thảo luận')).toBeInTheDocument();
     if (ticketType === 'EVENT') {

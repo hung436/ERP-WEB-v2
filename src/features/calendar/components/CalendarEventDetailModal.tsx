@@ -1019,7 +1019,7 @@ export function CalendarEventDetailModal({
       return;
     setRejectReason("");
     setRejectModalOpen(false);
-    message.success("Đã cập nhật trạng thái: Không duyệt");
+    message.success("Đã cập nhật trạng thái: Không đồng ý");
   };
 
   // Action: Người được lấy ý kiến bấm "Gửi phản hồi ý kiến"
@@ -1682,7 +1682,7 @@ export function CalendarEventDetailModal({
                 <Paperclip size={13} style={{ color: "#64748b" }} />
                 <span>Tài liệu đính kèm ({event.attachments!.length})</span>
               </div>
-              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+              <div className="jt-pinned-attachments-items">
                 {event.attachments!.map((att) => {
                   const cat = getFileCategory(att.name);
                   return (
@@ -2477,9 +2477,9 @@ export function CalendarEventDetailModal({
                                           }
                                         >
                                           {isApproved
-                                            ? "Đã duyệt"
+                                            ? "Đồng ý"
                                             : isRejected
-                                              ? "Không duyệt"
+                                              ? "Không đồng ý"
                                               : "Chờ xử lý"}
                                         </Tag>
                                       </div>

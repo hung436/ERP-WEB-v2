@@ -1,3 +1,4 @@
+import { getDayDutyInfo } from '../dutySchedule';
 import { memo, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import type { Dayjs } from 'dayjs';
 import { Skeleton, message } from 'antd';
@@ -313,6 +314,7 @@ export function WeekTimeline({
         {dayNames.map((name, index) => {
           const day = week.add(index, 'day');
           const date = day.format('YYYY-MM-DD');
+          const dutyLeader = getDayDutyInfo(day)?.leader;
           const selected = date === selectedDate?.format('YYYY-MM-DD');
           const dayEvents = eventsByDay.get(date) || [];
           const earlyEvents = dayEvents
@@ -342,6 +344,7 @@ export function WeekTimeline({
                     <b>{name}</b>
                     <span className="booking-week-date-pill">{day.format('DD/MM')}</span>
                   </span>
+                  {dutyLeader && <span className="booking-week-day-duty-leader">Trực: <strong>{dutyLeader}</strong></span>}
                   <span className="booking-week-day-count">
                     {loading ? (
                       <Skeleton.Input active size="small" style={{ width: 65, height: 14, minWidth: 0 }} />

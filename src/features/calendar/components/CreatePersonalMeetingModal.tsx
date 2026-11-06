@@ -35,7 +35,7 @@ import { calendarApi } from "@/services/api";
 import type { CalendarAttachmentItem, CalendarEvent } from "@/types/domain";
 import { avatarTone, nameInitials } from "@/utils/avatar";
 
-import { getMeetingPhysicalLocation } from "../calendarWeekUtils";
+import { getMeetingPhysicalLocation, normalizeCalendarMeetingUrl } from "../calendarWeekUtils";
 import { AttachedFilesGrid } from "./AttachedFilesList";
 import { SmartTimePicker } from "./SmartTimePicker";
 import { SmartParticipantPicker } from "./SmartParticipantPicker";
@@ -585,6 +585,13 @@ export function CreatePersonalMeetingModal({
             ? "online"
             : "offline";
 
+      const meetingUrl = normalizeCalendarMeetingUrl(rawLink);
+      if (ticketType === "MEETING" && hasOnline && rawLink && !meetingUrl) {
+        message.error("Link họp trực tuyến không hợp lệ.");
+        setSaving(false);
+        return;
+      }
+
       const location = ticketType === "MEETING" && hasOffline ? rawLocation : "";
 
       const attachedItems: CalendarAttachmentItem[] = await Promise.all(files.map(async (file) => {
@@ -694,7 +701,7 @@ export function CreatePersonalMeetingModal({
         createdAt: editingEvent?.createdAt || new Date().toISOString(),
         deadline: ticketType === "TASK" ? endAtStr : undefined,
         location,
-        meetingUrl: ticketType === "MEETING" && hasOnline ? (rawLink || undefined) : undefined,
+        meetingUrl: ticketType === "MEETING" && hasOnline ? meetingUrl : undefined,
         mode: finalMode,
         organizer: organizerName,
         leader: ticketType === "MEETING" ? (editingEvent?.leader || currentUserName) : undefined,

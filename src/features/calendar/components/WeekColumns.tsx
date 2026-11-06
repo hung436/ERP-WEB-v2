@@ -1,3 +1,4 @@
+import { getDayDutyInfo } from '../dutySchedule';
 import { useMemo } from 'react';
 import type { Dayjs } from 'dayjs';
 import { Skeleton } from 'antd';
@@ -56,6 +57,7 @@ export function WeekColumns({
         {dayNames.map((name, index) => {
           const day = week.add(index, 'day');
           const date = day.format('YYYY-MM-DD');
+          const dutyLeader = getDayDutyInfo(day)?.leader;
 
           const selected = date === selectedDate?.format('YYYY-MM-DD');
           const isToday = day.isSame(now, 'day');
@@ -87,6 +89,7 @@ export function WeekColumns({
                   </button>
                 </div>
 
+                {dutyLeader && <div className="booking-week-day-duty-leader">Trực: <strong>{dutyLeader}</strong></div>}
               </div>
 
               <div className="booking-week-column-events">

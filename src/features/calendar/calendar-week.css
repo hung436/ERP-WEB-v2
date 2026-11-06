@@ -120,55 +120,26 @@ html:has(.booking-week-page), body:has(.booking-week-page) { height: 100%; overf
   color: #0f172a;
 }
 .booking-week-source-btn.is-active {
-  background: #ffffff;
+  background: #f2f4f7;
   color: #0f172a;
   font-weight: 600;
   border-color: #cbd5e1;
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+  box-shadow: none;
 }
 .booking-week-source-check {
+  display: inline-grid;
+  place-items: center;
   width: 14px;
   height: 14px;
-  border-radius: 4px;
-  border: 1.5px solid #cbd5e1;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 11px;
-  color: transparent;
-  background: #ffffff;
   flex-shrink: 0;
-  transition: all 0.15s ease;
+  color: #475467;
+  font-size: 12px;
 }
-.booking-week-source-btn.is-active .booking-week-source-check,
-.booking-week-source-btn.is-editorial.is-active .booking-week-source-check {
-  background: #dc2626;
-  border-color: #dc2626;
-  color: #ffffff;
-}
-.booking-week-source-btn.is-personal.is-active .booking-week-source-check {
-  background: #2563eb;
-  border-color: #2563eb;
-  color: #ffffff;
-}
+
 .booking-week-source-count {
-  font-size: 11px;
-  font-weight: 600;
-  padding: 0 6px;
-  height: 18px;
-  line-height: 18px;
-  border-radius: 999px;
-  background: #e2e8f0;
-  color: #475569;
-}
-.booking-week-source-btn.is-active .booking-week-source-count,
-.booking-week-source-btn.is-editorial.is-active .booking-week-source-count {
-  background: #fee2e2;
-  color: #b91c1c;
-}
-.booking-week-source-btn.is-personal.is-active .booking-week-source-count {
-  background: #e0f2fe;
-  color: #0369a1;
+  color: #667085;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
 }
 .booking-week-count-loading {
   opacity: 0.5;
@@ -182,13 +153,8 @@ html:has(.booking-week-page), body:has(.booking-week-page) { height: 100%; overf
   flex-shrink: 0;
   transition: all 0.15s ease;
 }
-.dot-editorial {
-  background-color: #dc2626;
-  box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.2);
-}
-.dot-personal {
-  background-color: #2563eb;
-  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+.booking-week-source-btn .booking-week-semantic-dot {
+  background-color: #667085;
 }
 .booking-week-source-btn:not(.is-active) .booking-week-semantic-dot {
   opacity: 0.35;
@@ -531,7 +497,7 @@ html:has(.booking-week-page), body:has(.booking-week-page) { height: 100%; overf
   border: 1px solid #e2e8f0;
 }
 .booking-week-compact-source-group .booking-week-source-btn.is-active {
-  background: #ffffff;
+  background: #f2f4f7;
   border-color: #94a3b8;
 }
 
@@ -1608,7 +1574,10 @@ html:has(.booking-week-page), body:has(.booking-week-page) { height: 100%; overf
 .booking-week-day-duty-panel { display: flex; flex-direction: column; gap: 7px; flex-shrink: 0; padding: 11px 13px; border: 1px solid #e2e8f0; border-radius: 8px; background: #f8fafc; }
 .booking-week-day-duty-leader { display: flex; align-items: center; gap: 7px; color: #0f172a; font-size: 13px; font-weight: 600; line-height: 20px; }
 .booking-week-day-duty-leader > svg { flex-shrink: 0; color: #2563eb; }
-.booking-week-day-duty-leader strong { color: #475569; font-weight: 600; font-size: 13px; }
+.booking-week-day-duty-leader strong {
+  color: #1d2939;
+  font-weight: 700;
+}
 .booking-week-day-duty-shifts { display: flex; flex-direction: column; gap: 4px; padding-top: 5px; border-top: 1px dashed #e2e8f0; }
 .booking-week-day-duty-shift { display: flex; align-items: flex-start; gap: 6px; font-size: 13px; line-height: 1.45; }
 .booking-week-day-duty-shift > b { flex-shrink: 0; color: #0f172a; font-weight: 600; font-size: 13px; }
@@ -2899,4 +2868,19 @@ html:has(.booking-week-page), body:has(.booking-week-page) { height: 100%; overf
 
 .booking-week-day-track > .booking-week-event.is-past-event:not(:hover):not(:focus-within) > .booking-week-card-button {
   opacity: 0.88 !important;
+}
+
+.booking-week-day-duty-leader {
+  display: block;
+  margin-top: 4px;
+  color: #475467;
+  font-size: 13px;
+  line-height: 1.45;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.booking-week-day-duty-leader strong {
+  color: #1d2939;
+  font-weight: 700;
 }

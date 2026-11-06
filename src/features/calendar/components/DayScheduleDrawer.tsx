@@ -124,7 +124,7 @@ export function DayScheduleDrawer({
               <div className="duty-banner-header">
                 <ShieldCheck className="duty-banner-icon" size={18} />
                 <span className="duty-banner-inline-leader">
-                  <strong>Trực:</strong> {duty.leader}
+                  Trực: <strong>{duty.leader}</strong>
                 </span>
               </div>
 

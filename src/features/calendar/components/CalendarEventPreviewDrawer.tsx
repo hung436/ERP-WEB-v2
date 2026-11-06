@@ -21,7 +21,7 @@ import { useOptionalAuth } from '@/features/auth/AuthContext';
 import { filterCalendarPeople, getCalendarMembership } from '../calendarMembership';
 import type { CalendarEvent } from '@/types/domain';
 
-import { calendarDetailHref, dayNames, getApprovalStatusMeta, getCalendarStatusDotTone, getEffectiveCalendarApprovalStatus, getTicketTypeMeta } from '../calendarWeekUtils';
+import { calendarDetailHref, dayNames, getApprovalStatusMeta, getCalendarStatusDotTone, getEffectiveCalendarApprovalStatus, getTicketTypeMeta, normalizeCalendarMeetingUrl } from '../calendarWeekUtils';
 
 interface CalendarEventPreviewDrawerProps {
   event: CalendarEvent | null;
@@ -33,7 +33,9 @@ export function CalendarEventPreviewDrawer({ event, onClose, afterOpenChange }: 
   const titleId = useId();
   const user = useOptionalAuth()?.user;
   const ticketType = event?.ticketType || (['task', 'work', 'deadline'].includes(event?.type || '') ? 'TASK' : event?.type === 'event' ? 'EVENT' : 'MEETING');
-  const meetingUrl = event?.meetingUrl?.trim();
+  const meetingUrl = normalizeCalendarMeetingUrl(event?.meetingUrl);
+  const hasOnlineMeeting = event?.mode === 'online' || event?.mode === 'hybrid' || Boolean(event?.meetingUrl?.trim());
+  const meetingMode = event?.mode ?? (hasOnlineMeeting ? (event?.location?.trim() ? 'hybrid' : 'online') : 'offline');
   const isMeeting = ticketType === 'MEETING';
   const startAt = ticketType === 'TASK' && event?.deadline ? event.deadline : event?.startAt;
   const start = dayjs(startAt);
@@ -174,7 +176,7 @@ export function CalendarEventPreviewDrawer({ event, onClose, afterOpenChange }: 
                 </div>
               )}
 
-              {isMeeting && meetingUrl && /^https?:\/\//i.test(meetingUrl) && (
+              {isMeeting && meetingUrl && (
                 <div className="calendar-preview-location">
                   <dt>
                     <Video size={16} aria-hidden="true" />
@@ -204,13 +206,20 @@ export function CalendarEventPreviewDrawer({ event, onClose, afterOpenChange }: 
                 </div>
               )}
 
-              {isMeeting && (event.location?.trim() || event.meetingUrl?.trim()) && (
+              {isMeeting && hasOnlineMeeting && !meetingUrl && (
+                <div className="calendar-preview-location">
+                  <dt><Video size={16} aria-hidden="true" /><span>Kênh họp</span></dt>
+                  <dd>{event.meetingUrl?.trim() ? 'Đường dẫn không hợp lệ' : 'Chưa có đường dẫn'}</dd>
+                </div>
+              )}
+
+              {isMeeting && (event.location?.trim() || hasOnlineMeeting) && (
                 <div className="calendar-preview-mode">
                   <dt>
                     <Radio size={16} aria-hidden="true" />
                     <span>Hình thức</span>
                   </dt>
-                  <dd>{event.meetingUrl ? 'Trực tuyến kết hợp' : 'Trực tiếp tại cơ quan'}</dd>
+                  <dd>{meetingMode === 'hybrid' ? 'Trực tuyến kết hợp' : meetingMode === 'online' ? 'Trực tuyến' : 'Trực tiếp tại cơ quan'}</dd>
                 </div>
               )}
             </dl>

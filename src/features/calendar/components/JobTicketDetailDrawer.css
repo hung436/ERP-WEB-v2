@@ -1021,6 +1021,13 @@
   align-self: stretch;
 }
 
+.jt-pinned-attachments-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-width: 0;
+}
+
 /* Compact Hero Pinned File Card (Anti-AI clean, compact design) */
 .jt-hero-file-card {
   display: flex;
@@ -1417,6 +1424,15 @@
 .jt-chat-message__bubble--outgoing {
   background: #fef3f2;
   border-radius: 10px 6px 10px 10px;
+}
+
+.jt-chat-message__bubble:has(> .jt-chat-bubble-attachments:only-child) {
+  padding: 0;
+  background: transparent;
+}
+
+.jt-chat-bubble-attachments:only-child {
+  margin-top: 0;
 }
 
 .jt-chat-message__meta {

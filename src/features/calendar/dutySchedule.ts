@@ -14,7 +14,7 @@ export interface DayDutyInfo {
 export const WEEKLY_DUTY_SCHEDULE: Record<number, DayDutyInfo> = {
   // 1: Thứ Hai (02-11-2026)
   1: {
-    leader: 'Anh Nguyễn Hoàng Nguyên',
+    leader: 'Nguyễn Hoàng Nguyên',
     shifts: [
       { name: 'Ca 0', tkts: 'Nguyễn Văn Hải' },
       { name: 'Ca 1', tkts: 'Nguyễn Viễn Sự, Lê Thanh Liêm', btv: 'Võ Thị Kim Nhung, Đỗ Thị Hồng Điệp' },
@@ -81,7 +81,7 @@ export const WEEKLY_DUTY_SCHEDULE: Record<number, DayDutyInfo> = {
 export const DATE_DUTY_SCHEDULE: Record<string, DayDutyInfo> = {
   // Tuần 05/10/2026 - 11/10/2026 (Tuần 41)
   '2026-10-05': {
-    leader: 'Anh Hoàng Nguyên',
+    leader: 'Nguyễn Hoàng Nguyên',
     shifts: [
       { name: 'Ca 0', tkts: 'Đà Trang' },
       { name: 'Ca 1', tkts: 'Viễn Sự, N.V.Hải', btv: 'Lan Anh, H.Điệp' },
@@ -89,7 +89,7 @@ export const DATE_DUTY_SCHEDULE: Record<string, DayDutyInfo> = {
     ],
   },
   '2026-10-06': {
-    leader: 'Anh Lê Xuân Trung',
+    leader: 'Lê Xuân Trung',
     shifts: [
       { name: 'Ca 0', tkts: 'Quốc Thắng' },
       { name: 'Ca 1', tkts: 'Đức Thọ, Minh Cường', btv: 'Hải Triều, Văn Nam' },
@@ -97,7 +97,7 @@ export const DATE_DUTY_SCHEDULE: Record<string, DayDutyInfo> = {
     ],
   },
   '2026-10-07': {
-    leader: 'Chị Đinh Thị Thảo',
+    leader: 'Đinh Thị Thảo',
     shifts: [
       { name: 'Ca 0', tkts: 'Quang Định' },
       { name: 'Ca 1', tkts: 'Đà Trang, Hoài Nam', btv: 'Lan Anh, Thu Hà' },
@@ -105,7 +105,7 @@ export const DATE_DUTY_SCHEDULE: Record<string, DayDutyInfo> = {
     ],
   },
   '2026-10-08': {
-    leader: 'Anh Bùi Thanh Liêm',
+    leader: 'Bùi Thanh Liêm',
     shifts: [
       { name: 'Ca 0', tkts: 'Viễn Sự' },
       { name: 'Ca 1', tkts: 'N.V.Hải, M.Luận', btv: 'Văn Nam, Bích Ngọc' },
@@ -113,7 +113,7 @@ export const DATE_DUTY_SCHEDULE: Record<string, DayDutyInfo> = {
     ],
   },
   '2026-10-09': {
-    leader: 'Anh Trần Xuân Toàn',
+    leader: 'Trần Xuân Toàn',
     shifts: [
       { name: 'Ca 0', tkts: 'M.Luận' },
       { name: 'Ca 1', tkts: 'Thành Luân, Đà Trang', btv: 'H.Điệp, Lan Anh' },
@@ -121,7 +121,7 @@ export const DATE_DUTY_SCHEDULE: Record<string, DayDutyInfo> = {
     ],
   },
   '2026-10-10': {
-    leader: 'Anh Đức Thọ',
+    leader: 'Đinh Đức Thọ',
     shifts: [
       { name: 'Ca 0', tkts: 'Hoài Nam' },
       { name: 'Ca 1', tkts: 'Quang Định, N.V.Hải', btv: 'Văn Nam, Hải Triều' },
@@ -129,7 +129,7 @@ export const DATE_DUTY_SCHEDULE: Record<string, DayDutyInfo> = {
     ],
   },
   '2026-10-11': {
-    leader: 'Anh Xuân Trung',
+    leader: 'Lê Xuân Trung',
     shifts: [
       { name: 'Ca 0', tkts: 'Đà Trang' },
       { name: 'Ca 1', tkts: 'Quốc Thắng, M.Luận', btv: 'Lan Anh, H.Điệp' },

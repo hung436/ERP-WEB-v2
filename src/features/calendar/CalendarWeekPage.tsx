@@ -511,10 +511,9 @@ export function CalendarWeekPage() {
               aria-label="Lịch chung"
               onClick={() => setEditorial((value) => !value)}
             >
-              <span
-                className="booking-week-semantic-dot dot-editorial"
-                aria-hidden="true"
-              />
+              <span className="booking-week-source-check" aria-hidden="true">
+                {editorial && <CheckOutlined />}
+              </span>
               <span className="booking-week-source-label">Lịch chung</span>
               <span
                 className={`booking-week-source-count ${state.loading ? "booking-week-count-loading" : ""}`}
@@ -530,10 +529,9 @@ export function CalendarWeekPage() {
               aria-label="Lịch cá nhân"
               onClick={() => setPersonal((value) => !value)}
             >
-              <span
-                className="booking-week-semantic-dot dot-personal"
-                aria-hidden="true"
-              />
+              <span className="booking-week-source-check" aria-hidden="true">
+                {personal && <CheckOutlined />}
+              </span>
               <span className="booking-week-source-label">Lịch cá nhân</span>
               <span
                 className={`booking-week-source-count ${state.loading ? "booking-week-count-loading" : ""}`}

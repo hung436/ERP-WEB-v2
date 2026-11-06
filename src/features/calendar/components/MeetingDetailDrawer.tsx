@@ -414,9 +414,9 @@ export const MeetingDetailDrawer: React.FC<MeetingDetailDrawerProps> = ({
                   style={{ fontSize: 12, padding: "2px 8px", fontWeight: 600 }}
                 >
                   {event.approvalStatus === "APPROVED"
-                    ? "Đã duyệt"
+                    ? "Đồng ý"
                     : event.approvalStatus === "REJECTED"
-                      ? "Từ chối"
+                      ? "Không đồng ý"
                       : "Chờ duyệt"}
                 </Tag>
               )}
@@ -709,9 +709,9 @@ export const MeetingDetailDrawer: React.FC<MeetingDetailDrawerProps> = ({
                 }
               >
                 {event.approvalStatus === "APPROVED"
-                  ? "Đã duyệt"
+                  ? "Đồng ý"
                   : event.approvalStatus === "REJECTED"
-                    ? "Từ chối"
+                    ? "Không đồng ý"
                     : "Chờ duyệt"}
               </Tag>
             </div>

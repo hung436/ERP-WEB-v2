@@ -70,8 +70,8 @@ export function getCalendarStatusDotTone(status?: string, scope?: CalendarEvent[
 
 export const APPROVAL_STATUS_META = {
   PENDING: { value: 'PENDING', label: 'Chờ duyệt', color: 'gold', tone: 'pending' },
-  APPROVED: { value: 'APPROVED', label: 'Đã duyệt', color: 'success', tone: 'approved' },
-  REJECTED: { value: 'REJECTED', label: 'Không duyệt', color: 'error', tone: 'rejected' },
+  APPROVED: { value: 'APPROVED', label: 'Đồng ý', color: 'success', tone: 'approved' },
+  REJECTED: { value: 'REJECTED', label: 'Không đồng ý', color: 'error', tone: 'rejected' },
   IN_PROGRESS: { value: 'IN_PROGRESS', label: 'Đang thực hiện', color: 'processing', tone: 'in_progress' },
   COMPLETED: { value: 'COMPLETED', label: 'Hoàn thành', color: 'success', tone: 'completed' },
   SCHEDULED: { value: 'SCHEDULED', label: 'Đã lên lịch', color: 'default', tone: 'scheduled' },
@@ -558,4 +558,19 @@ export function getEffectiveCalendarApprovalStatus<T extends string | undefined>
     return 'PENDING';
   }
   return status;
+}
+
+export function normalizeCalendarMeetingUrl(value?: string) {
+  const raw = value?.trim();
+  if (!raw || /\s/.test(raw)) return undefined;
+  const candidate = /^https?:\/\//i.test(raw)
+    ? raw
+    : /^[\w-]+(?:\.[\w-]+)+(?:[/:?#]|$)/u.test(raw) ? `https://${raw}` : '';
+  if (!candidate) return undefined;
+  try {
+    const url = new URL(candidate);
+    return url.hostname && !url.username && !url.password ? candidate : undefined;
+  } catch {
+    return undefined;
+  }
 }
