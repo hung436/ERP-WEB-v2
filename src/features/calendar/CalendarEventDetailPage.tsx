@@ -2,7 +2,7 @@ import { Button } from 'antd';
 import dayjs from 'dayjs';
 import { ArrowLeft } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
 import { ContentSkeleton, ErrorState } from '@/components/AsyncState';
 import { useOptionalAuth } from '@/features/auth/AuthContext';
@@ -18,6 +18,7 @@ import './CalendarEventDetailPage.css';
 export function CalendarEventDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { search } = useLocation();
   const user = useOptionalAuth()?.user;
   const [event, setEvent] = useState<CalendarEvent | null>(null);
   const [loading, setLoading] = useState(true);
@@ -53,7 +54,11 @@ export function CalendarEventDetailPage() {
   }, [id]);
 
   useEffect(() => { void fetchEvent(); }, [fetchEvent]);
-  const goBack = () => navigate('/calendar/week');
+  const goBack = () => {
+    const date = new URLSearchParams(search).get('date') ||
+      (event?.startAt && dayjs(event.startAt).format('YYYY-MM-DD'));
+    navigate({ pathname: '/calendar/week', search: date ? `?${new URLSearchParams({ date })}` : '' }, { replace: true });
+  };
   const membership = event && user ? getCalendarMembership(event, user) : null;
   const canViewDetail = !membership || membership.isUserParticipant || membership.isUserWatcher;
 

@@ -157,6 +157,7 @@ export interface CalendarEvent {
   consultants?: Array<{
     id: string | number;
     name: string;
+    requestedById?: string;
     status?: 'PENDING' | 'COMPLETED';
     completed_at?: string;
     reply?: string;

@@ -741,8 +741,15 @@
   text-transform: uppercase;
 }
 
+.jt-doc-step__top > div {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+}
+
 .jt-doc-step__top h4 {
-  margin: 2px 0 0;
+  margin: 0;
   color: #0f172a;
   font-size: 13px;
   font-weight: 600;
@@ -3344,11 +3351,15 @@
 }
 
 .jt-step-person-name {
-  font-weight: 600;
+  font-weight: 400;
   color: #1e293b;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.jt-step-person-name.is-self {
+  font-weight: 600;
 }
 
 .jt-step-person-time {
@@ -4201,10 +4212,15 @@
   gap: 8px;
 }
 
+.jt-step-person-row .jt-workflow-status {
+  flex-shrink: 0;
+  margin-inline-end: 0;
+}
+
 .jt-step-person-row--workflow-action .jt-workflow-status {
   grid-column: 2;
   grid-row: 1;
-  margin-inline-end: 0;
+  justify-self: end;
 }
 
 .jt-step-person-row--workflow-action .jt-workflow-actions {
@@ -4214,7 +4230,7 @@
 
 .jt-workflow-actions {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   justify-content: flex-end;
   gap: 6px;
 }
@@ -4222,7 +4238,129 @@
 .jt-workflow-actions .ant-btn {
   width: auto !important;
   height: 32px !important;
-  padding-inline: 12px;
+  padding-inline: 8px;
   font-size: 14px !important;
   box-shadow: none;
+}
+.jt-workflow-actions[role="group"] {
+  overflow-x: auto;
+}
+
+.jt-workflow-actions[role="group"] .ant-btn {
+  flex-shrink: 0;
+}
+.jt-approver-consultations {
+  margin: 4px 8px 12px 24px;
+  padding: 8px 12px;
+  background: #f9fafb;
+  border-radius: 6px;
+}
+
+.jt-approver-consultations > .jt-step-subheading {
+  margin: 0 0 4px;
+  color: #475467;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.jt-approver-consultations .jt-step-person-row {
+  padding-inline: 0 !important;
+  border-bottom-color: #eaecf0 !important;
+}
+.jt-consultation-reply {
+  width: calc(100% - 21px);
+  max-width: none;
+  margin: 8px 0 8px 21px;
+}
+/* Nhánh tham vấn trong quy trình, mỗi đường ngang nối tới một người được hỏi. */
+.jt-consultation-node {
+  display: flow-root;
+  position: relative;
+  padding-inline-start: 16px;
+}
+
+.jt-consultation-node::before,
+.jt-consultation-node::after {
+  position: absolute;
+  inset-inline-start: 4px;
+  background: #d0d5dd;
+  content: "";
+  pointer-events: none;
+}
+
+.jt-consultation-node::before {
+  inset-block: 0;
+  width: 1px;
+}
+
+.jt-consultation-node:last-child::before {
+  inset-block-end: auto;
+  height: 16px;
+}
+
+.jt-consultation-node::after {
+  inset-block-start: 16px;
+  width: 12px;
+  height: 1px;
+}
+.jt-consultation-node .jt-step-person-left {
+  align-items: flex-start;
+}
+
+.jt-consultation-node .jt-step-person-left > svg {
+  flex-shrink: 0;
+  margin-block-start: 3px;
+}
+
+.jt-consultation-identity {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.jt-consultation-identity .jt-step-person-name {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.jt-consultation-identity .jt-step-person-time {
+  margin-inline-start: 0;
+  padding-inline-end: 0;
+}
+.jt-consultation-node .jt-step-person-row {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 4px 8px;
+}
+
+.jt-consultation-node .jt-step-person-left {
+  grid-column: 1 / -1;
+  grid-row: 1;
+}
+
+.jt-consultation-node .jt-consultation-time {
+  display: block;
+  margin: 0 0 8px 21px;
+  color: #64748b;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.jt-consultation-reply + .jt-consultation-time {
+  margin-block-start: -4px;
+}
+
+.jt-consultation-node .jt-step-person-row--workflow-action .jt-step-person-left {
+  grid-column: 1;
+}
+
+.jt-consultation-node .jt-workflow-actions {
+  grid-column: 2;
+  grid-row: 1;
+  justify-self: end;
+}
+.jt-consultation-node .jt-consultation-status {
+  grid-column: 2;
+  grid-row: 1;
+  justify-self: end;
 }

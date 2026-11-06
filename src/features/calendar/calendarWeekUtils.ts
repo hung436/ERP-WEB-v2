@@ -271,7 +271,7 @@ export function normalizeMeeting(record: CalendarRecord, userId = 'nhanvien'): N
     defaultStatus = 'SCHEDULED';
   }
 
-  const approvalStatus = record.approvalStatus || record.approval_status || defaultStatus;
+  const approvalStatus = getEffectiveCalendarApprovalStatus(record.approvalStatus || record.approval_status || defaultStatus, record.approvers);
 
   const executors = record.executors || [];
   const executorText = executors.map((e) => e.display_name || e.name).filter(Boolean).join(', ');
@@ -542,4 +542,20 @@ export function getMeetingPhysicalLocation(event: Pick<CalendarEvent, 'location'
     .map((part) => part.trim())
     .filter((part) => part && part !== event.meetingUrl?.trim() && !/^https?:\/\//i.test(part) && part !== 'Trực tuyến')
     .join(' • ') ?? '';
+}
+export function calendarDetailHref(eventId: string) {
+  const date = typeof window === 'undefined' ? null : new URLSearchParams(window.location.search).get('date');
+  const path = `/calendar/events/${encodeURIComponent(eventId)}`;
+  return date ? `${path}?${new URLSearchParams({ date })}` : path;
+}
+
+export function getEffectiveCalendarApprovalStatus<T extends string | undefined>(
+  status: T,
+  approvers?: CalendarEvent['approvers'],
+): T | 'PENDING' {
+  if (status === 'APPROVED' && approvers && approvers.length > 1 &&
+    approvers.some((person) => person.status === 'PENDING')) {
+    return 'PENDING';
+  }
+  return status;
 }

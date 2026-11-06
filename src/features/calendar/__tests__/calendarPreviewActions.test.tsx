@@ -12,7 +12,7 @@ describe('Thao tác xem chi tiết ở đầu Drawer', () => {
     const header = screen.getByRole('heading', { name: previewMeeting.title }).closest('.ant-drawer-header')!;
     const link = within(header as HTMLElement).getByRole('link', { name: 'Xem chi tiết' });
     expect(link).toHaveAttribute('href', '/calendar/events/preview-meeting');
-    expect(link).toHaveAttribute('target', '_blank');
+    expect(link).not.toHaveAttribute('target');
     expect(document.querySelector('.ant-drawer-footer')).toBeNull();
     if (ticketType !== 'MEETING') expect(within(header as HTMLElement).getByText('0 tài liệu · 0 thảo luận')).toBeInTheDocument();
   });

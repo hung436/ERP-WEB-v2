@@ -21,7 +21,7 @@ import { useOptionalAuth } from '@/features/auth/AuthContext';
 import { filterCalendarPeople, getCalendarMembership } from '../calendarMembership';
 import type { CalendarEvent } from '@/types/domain';
 
-import { dayNames, getApprovalStatusMeta, getCalendarStatusDotTone, getTicketTypeMeta } from '../calendarWeekUtils';
+import { calendarDetailHref, dayNames, getApprovalStatusMeta, getCalendarStatusDotTone, getEffectiveCalendarApprovalStatus, getTicketTypeMeta } from '../calendarWeekUtils';
 
 interface CalendarEventPreviewDrawerProps {
   event: CalendarEvent | null;
@@ -37,7 +37,7 @@ export function CalendarEventPreviewDrawer({ event, onClose, afterOpenChange }: 
   const isMeeting = ticketType === 'MEETING';
   const startAt = ticketType === 'TASK' && event?.deadline ? event.deadline : event?.startAt;
   const start = dayjs(startAt);
-  const status = event?.approvalStatus;
+  const status = getEffectiveCalendarApprovalStatus(event?.approvalStatus, event?.approvers);
   const statusMeta = getApprovalStatusMeta(status, event?.ticketType, event?.workflowType);
   const statusLabel = status === 'CANCELLED' ? 'Đã hủy' : statusMeta.label;
   const statusDotTone = getCalendarStatusDotTone(status, event?.scope);
@@ -280,9 +280,7 @@ export function CalendarEventPreviewDrawer({ event, onClose, afterOpenChange }: 
             <Button
               type="primary"
               className="calendar-preview-detail-btn"
-              href={`/calendar/events/${encodeURIComponent(event?.id || '')}`}
-              target="_blank"
-              rel="noopener noreferrer"
+              href={calendarDetailHref(event?.id || '')}
               icon={<ExternalLink size={13} aria-hidden="true" />}
             >
               Xem chi tiết

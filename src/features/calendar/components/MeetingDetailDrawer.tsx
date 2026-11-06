@@ -1,3 +1,4 @@
+import { calendarDetailHref } from '../calendarWeekUtils';
 import {
   Avatar,
   Button,
@@ -424,9 +425,7 @@ export const MeetingDetailDrawer: React.FC<MeetingDetailDrawerProps> = ({
             <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
               <Button
                 icon={<ExternalLink size={13} />}
-                onClick={() => {
-                  window.open(`/calendar/events/${event.id}`, '_blank');
-                }}
+                href={calendarDetailHref(event.id)}
                 size="small"
                 type="primary"
               >

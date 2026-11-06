@@ -26,7 +26,7 @@ beforeEach(() => {
 });
 
 describe('Drawer thông tin lịch tóm tắt', () => {
-  it('đưa tên lịch lên header, chỉ một mốc giờ và liên kết chi tiết an toàn ở tab mới', () => {
+  it('đưa tên lịch lên header, chỉ một mốc giờ và liên kết chi tiết trong cùng tab', () => {
     render(<CalendarEventPreviewDrawer event={previewMeeting} onClose={vi.fn()} />);
     const drawer = screen.getByRole('dialog', { name: previewMeeting.title });
     const content = within(drawer);
@@ -44,8 +44,7 @@ describe('Drawer thông tin lịch tóm tắt', () => {
     expect(content.getByText('Thành phần').closest('dt')?.nextElementSibling).toHaveTextContent('Nguyễn Minh Anh, Lê Thanh Liêm');
     const detail = content.getByRole('link', { name: 'Xem chi tiết' });
     expect(detail).toHaveAttribute('href', '/calendar/events/preview-meeting');
-    expect(detail).toHaveAttribute('target', '_blank');
-    expect(detail).toHaveAttribute('rel', 'noopener noreferrer');
+    expect(detail).not.toHaveAttribute('target');
     expect(content.queryByText(previewMeeting.description!)).not.toBeInTheDocument();
     expect(content.queryByText('Ke-hoach-xuat-ban.pdf')).not.toBeInTheDocument();
     expect(content.queryByText('Bình luận chỉ xem tại trang chi tiết.')).not.toBeInTheDocument();
