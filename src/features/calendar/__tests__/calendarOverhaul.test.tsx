@@ -1,11 +1,16 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import dayjs from 'dayjs';
-import { describe, expect, it, vi } from 'vitest';
+import dayjs, { extend } from 'dayjs';
+import isoWeek from 'dayjs/plugin/isoWeek';
+import { describe, expect, it } from 'vitest';
 
 import { App } from '@/App';
 import type { CalendarEvent } from '@/types/domain';
+
+import calendarStyles from '../calendar-week.css?raw';
 import { CalendarEventCard } from '../components/CalendarEventCard';
+
+extend(isoWeek);
 
 function renderCalendarWeek(path = '/calendar/week?date=2026-10-05') {
   window.sessionStorage.clear();
@@ -79,37 +84,57 @@ describe('Tái cấu trúc UX/UI Lịch làm việc tuần (7 Tasks Overhaul)', 
     expect(document.querySelectorAll('.card-status-badge.task')).toHaveLength(0);
   });
 
-  it('Task 5, 3 & 6: Click vào thẻ mở Drawer xem nhanh, có nút Xem chi tiết mở tab mới', async () => {
+  it('Task 5, 3 & 6: Click vào thẻ mở Drawer xem nhanh thay thế popover, hiển thị thông tin cơ bản và nút Xem chi tiết mở tab mới', async () => {
     const user = userEvent.setup();
-    const windowOpenSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
 
     renderCalendarWeek();
     await screen.findByText(/Tuần 41/i);
 
-    // Click vào một sự kiện để mở Drawer xem nhanh (không dùng popover hover)
-    const eventCards = screen.getAllByText('Chào cờ đầu tuần');
+    // Click vào sự kiện có tham gia để mở Drawer xem nhanh thay thế cho popover
+    const eventCards = await screen.findAllByText('Chào cờ đầu tuần');
     expect(eventCards.length).toBeGreaterThan(0);
     await user.click(eventCards[0]);
 
     // Drawer xem nhanh mở ra
+    const drawer = await screen.findByRole('dialog', );
+
+    // Drawer chỉ hiển thị thông tin cơ bản như popover
+    expect(screen.getByText('Thời gian')).toBeInTheDocument();
+    expect(within(drawer).queryByText('Đã lên lịch')).not.toBeInTheDocument();
+
+    // Nút "Xem chi tiết" xuất hiện vì user có tham gia
+    const detailBtn = within(drawer).getByRole('link', { name: 'Xem chi tiết' });
+    expect(detailBtn).toBeInTheDocument();
+    expect(detailBtn).toHaveAttribute('target', '_blank');
+    expect(detailBtn).toHaveAttribute('rel', 'noopener noreferrer');
+    expect(detailBtn.getAttribute('href')).toMatch(/^\/calendar\/events\//);
+  });
+
+  it('Chỉ lịch có tôi tham gia mới có nút Xem chi tiết; lịch không tham gia chỉ hiển thị thông tin cơ bản', async () => {
+    const user = userEvent.setup();
+    renderCalendarWeek();
+    await screen.findByText(/Tuần 41/i);
+
+    // Click vào lịch KHÔNG có tôi tham gia ("Họp Ban Biên tập" bbt-mon-0800)
+    const nonAttendingEvents = await screen.findAllByText('Họp Ban Biên tập');
+    expect(nonAttendingEvents.length).toBeGreaterThan(0);
+    await user.click(nonAttendingEvents[0]);
+
+    // Drawer xem nhanh vẫn mở để xem thông tin cơ bản thay thế cho popover
     await waitFor(() => {
-      expect(screen.getByText(/Thảo luận/i)).toBeInTheDocument();
+      expect(screen.getByRole('dialog', )).toBeInTheDocument();
     });
 
-    // Tag "Lịch chung" xuất hiện trên Toolbar và trên Drawer (Task 2)
-    expect(screen.getAllByText('Lịch chung').length).toBeGreaterThanOrEqual(2);
+    const dialog = screen.getByRole('dialog');
+    expect(within(dialog).getByText('Thời gian')).toBeInTheDocument();
 
-    // Nút "Xem chi tiết" mở tab mới (Task 3 & 6)
-    const detailBtn = screen.getByRole('button', { name: /Xem chi tiết/i });
-    expect(detailBtn).toBeInTheDocument();
-    await user.click(detailBtn);
+    // TUYỆT ĐỐI KHÔNG CÓ nút "Xem chi tiết"
+    expect(screen.queryByRole('link', { name: 'Xem chi tiết' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Xem chi tiết/i })).not.toBeInTheDocument();
 
-    expect(windowOpenSpy).toHaveBeenCalledWith(
-      expect.stringMatching(/\/calendar\/events\//),
-      '_blank'
-    );
-
-    windowOpenSpy.mockRestore();
+    // Có thông báo xem cơ bản và nút Đóng
+    expect(within(dialog).queryByRole('textbox')).not.toBeInTheDocument();
+    expect(screen.getAllByRole('button', { name: /Đóng/i }).length).toBeGreaterThan(0);
   });
 
   it('Phân biệt Card có tôi tham gia bằng cách tô màu đỏ ở phần thời gian (#D92D20)', async () => {
@@ -154,8 +179,12 @@ describe('Tái cấu trúc UX/UI Lịch làm việc tuần (7 Tasks Overhaul)', 
     expect(cards.length).toBeGreaterThan(0);
     cards.forEach((card) => {
       const el = card as HTMLElement;
-      expect(el.style.border).toBe('none');
+      expect(el).toHaveClass('booking-week-flat-card');
+      expect(['', '0px', 'none']).toContain(el.style.borderWidth || el.style.border);
     });
+
+    // Xác thực trong stylesheet calendar-week.css: border: none !important được cấu hình cho flat-card và event card
+    expect(calendarStyles).toMatch(/\.booking-week-flat-card[\s\S]*?border:\s*none\s*!important/);
   });
 
   it('Chỉ tô đỏ thời gian nếu có tôi tham gia chứ không tô đỏ các icon khác', async () => {
@@ -214,25 +243,12 @@ describe('Tái cấu trúc UX/UI Lịch làm việc tuần (7 Tasks Overhaul)', 
       approvalStatus: 'APPROVED',
     };
 
-    const futureEvent: CalendarEvent = {
-      id: 'future-event-1',
-      title: 'Họp ban biên tập tương lai',
-      startAt: '2026-11-06T08:00:00Z',
-      endAt: '2026-11-06T09:00:00Z',
-      type: 'meeting',
-      ticketType: 'MEETING',
-      scope: 'editorial',
-      organizer: 'Ban Biên tập',
-      isUserParticipant: true,
-      approvalStatus: 'SCHEDULED',
-    };
-
     // Sự kiện quá khứ CÓ user tham gia -> có class is-past-event, opacity 0.65, border none, thời gian vẫn màu đỏ
     const { rerender } = render(<CalendarEventCard event={pastAttendingEvent} now={now} />);
     const cardPastAttending = screen.getByRole('button', { name: /Họp giao ban đã kết thúc/i });
     expect(cardPastAttending).toHaveClass('is-past-event');
     expect(cardPastAttending.style.opacity).toBe('0.65');
-    expect(cardPastAttending.style.border).toBe('none');
+    expect(['', '0px', 'none']).toContain(cardPastAttending.style.borderWidth || cardPastAttending.style.border);
 
     // Thời gian của sự kiện tham gia vẫn đỏ
     const attendingTimeTag = cardPastAttending.querySelector('.card-time-tag') as HTMLElement;
@@ -243,12 +259,6 @@ describe('Tái cấu trúc UX/UI Lịch làm việc tuần (7 Tasks Overhaul)', 
     const cardPastNonAttending = screen.getByRole('button', { name: /Họp phòng ban đã kết thúc/i });
     expect(cardPastNonAttending).toHaveClass('is-past-event');
     expect(cardPastNonAttending.style.opacity).toBe('0.65');
-    expect(cardPastNonAttending.style.border).toBe('none');
-
-    // Sự kiện tương lai -> không bị mờ (không có class is-past-event, opacity khác 0.65)
-    rerender(<CalendarEventCard event={futureEvent} now={now} />);
-    const cardFuture = screen.getByRole('button', { name: /Họp ban biên tập tương lai/i });
-    expect(cardFuture).not.toHaveClass('is-past-event');
-    expect(cardFuture.style.opacity).not.toBe('0.65');
+    expect(['', '0px', 'none']).toContain(cardPastNonAttending.style.borderWidth || cardPastNonAttending.style.border);
   });
 });

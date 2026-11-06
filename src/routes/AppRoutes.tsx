@@ -62,6 +62,7 @@ export function AppRoutes() {
           <Route path="calendar/week" element={<CalendarWeekPage />} />
           <Route path="calendar/events/:id" element={<CalendarEventDetailPage />} />
           <Route path="calendar/detail/:id" element={<CalendarEventDetailPage />} />
+          <Route path="calendar/:id" element={<CalendarEventDetailPage />} />
           <Route element={<AdminRoute fallback="/calendar/week" />}>
             <Route path="calendar/notifications" element={<CalendarNotificationsPage />} />
             <Route path="calendar/groups" element={<CalendarGroupsPage />} />

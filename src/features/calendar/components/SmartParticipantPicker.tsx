@@ -3,7 +3,9 @@ import { Select } from 'antd';
 import type { DefaultOptionType } from 'antd/es/select';
 
 import { avatarTone, nameInitials } from '@/utils/avatar';
-import { directoryContacts } from '@/mocks/fixtures';
+import { useOptionalAuth } from '@/features/auth/AuthContext';
+import { demoUsers } from '@/mocks/usersFixtures';
+import { calendarPersonKey } from '../calendarMembership';
 
 import type {
   ParticipantItem,
@@ -13,26 +15,27 @@ import type {
 import './smartPickers.css';
 
 const POSITION_MAP: Record<string, string> = {
-  'Nguyễn Minh Anh': 'Phóng viên',
-  'Trần Thu Hà': 'Phó Trưởng ban',
-  'Phạm Đức Long': 'Quản trị viên hệ thống',
-  'Nguyễn Hoài Nam': 'Phóng viên chuyên đề',
-  'Lê Thanh Vân': 'Thư ký điều phối',
-  'Đỗ Quang Huy': 'Trưởng ban',
-  'Mai Phương Thảo': 'Chuyên viên lưu trữ',
-  'Vũ Minh Khôi': 'Chuyên viên',
-  'Hoàng Tuấn Anh': 'Thư ký biên tập',
-  'Ngô Mỹ Linh': 'Chuyên viên văn thư',
-  'Bùi Anh Tú': 'Phóng viên thời sự',
-  'Phan Thùy Dung': 'Chuyên viên tư liệu',
-  'Đặng Quốc Bảo': 'Kỹ sư phần mềm',
-  'Tạ Minh Châu': 'Kỹ sư hệ thống',
-  'Đinh Gia Hân': 'Phóng viên',
-  'Lương Hải Đăng': 'Phóng viên',
-  'Cao Thanh Tâm': 'Kế toán viên',
-  'Trịnh Khánh Vy': 'Chuyên viên nhân sự',
-  'Nguyễn Tấn Đạt': 'Phó Tổng Biên tập',
-  'Lê Văn Tuấn': 'Trưởng ban Thư ký',
+  'Lê Thế Chữ': 'Tổng Biên tập',
+  'Lê Xuân Trung': 'Phó Tổng Biên tập',
+  'Trần Xuân Toàn': 'Phó Tổng Biên tập',
+  'Nguyễn Hoàng Nguyên': 'Phó Tổng Biên tập',
+  'Đinh Đức Thọ': 'Trưởng ban Thư ký Tòa soạn',
+  'Lê Ngọc Hiển': 'Phó Trưởng ban Thư ký Tòa soạn',
+  'Dương Đức Đà Trang': 'Trưởng ca 0 / Biên tập viên chính',
+  'Nguyễn Viễn Sự': 'Trưởng Ban Thời sự',
+  'Nguyễn Minh Anh': 'Phóng viên Điều tra & Đô thị',
+  'Bùi Anh Tú': 'Phóng viên Chính trị - Xã hội',
+  'Lê Cao Cường': 'Trưởng Ban Kinh tế',
+  'Trần Thu Hà': 'Phóng viên Kinh tế / Thị trường',
+  'Nguyễn Hoài Nam': 'Trưởng Ban Quốc tế',
+  'Đinh Gia Hân': 'Trưởng Ban Văn hóa - Giải trí',
+  'Lương Hải Đăng': 'Trưởng Ban Thể thao',
+  'Hoàng Điệp': 'Trưởng Ban Bạn đọc & Pháp luật',
+  'Võ Hùng Thuật': 'Giám đốc Trung tâm Media & Podcast',
+  'Đỗ Quang Huy': 'Chuyên viên Dựng hình & Kỹ thuật số',
+  'Trịnh Khánh Vy': 'Trưởng phòng Tổ chức - Cán bộ',
+  'Phạm Đức Long (Admin)': 'Quản trị viên Hệ thống IT',
+  'Phạm Đức Long': 'Quản trị viên Hệ thống IT',
 };
 
 // Helper: remove diacritics for flexible search
@@ -65,6 +68,7 @@ export const SmartParticipantPicker: React.FC<SmartParticipantPickerProps> = ({
   onChange,
   placeholder = 'Chọn hoặc tìm kiếm nhân sự tham gia...',
   maxCount,
+  excludeNames,
   maxSelected,
   targetRole = 'participants',
   role,
@@ -73,6 +77,7 @@ export const SmartParticipantPicker: React.FC<SmartParticipantPickerProps> = ({
   className = '',
   style,
 }) => {
+  const currentUserId = useOptionalAuth()?.user?.id;
   const effectiveMax = maxCount || maxSelected;
   const effectiveRole = role || targetRole;
 
@@ -87,7 +92,7 @@ export const SmartParticipantPicker: React.FC<SmartParticipantPickerProps> = ({
         if (!item) return '';
         if (typeof item === 'string') return item.trim();
         if (typeof item === 'object') {
-          return String((item as any).name || (item as any).value || (item as any).id || '').trim();
+          return String((item as { name?: string; value?: string; id?: string | number }).name || (item as { name?: string; value?: string; id?: string | number }).value || (item as { name?: string; value?: string; id?: string | number }).id || '').trim();
         }
         return String(item).trim();
       })
@@ -96,12 +101,13 @@ export const SmartParticipantPicker: React.FC<SmartParticipantPickerProps> = ({
 
   // Build directory contacts items (chỉ cá nhân, không có nhóm)
   const contactOptions = useMemo<CustomOptionType[]>(() => {
-    const contacts: CustomOptionType[] = directoryContacts.map((c) => {
+    const excluded = new Set(excludeNames?.map(calendarPersonKey));
+    const contacts: CustomOptionType[] = demoUsers.filter((user) => user.id !== currentUserId && !excluded.has(user.id)).map((c) => {
       const fullName = c.fullName;
       const penName = c.penName;
       const department = c.department;
       const email = c.email;
-      const position = POSITION_MAP[fullName] || 'Cán bộ / Phóng viên';
+      const position = c.position || POSITION_MAP[fullName] || 'Cán bộ / Phóng viên';
 
       return {
         value: fullName,
@@ -132,11 +138,11 @@ export const SmartParticipantPicker: React.FC<SmartParticipantPickerProps> = ({
     }
 
     return contacts;
-  }, [effectiveRole]);
+  }, [effectiveRole, excludeNames, currentUserId]);
 
   // Handle Select Change
   const handleChange = useCallback(
-    (newVals: any[]) => {
+    (newVals: Array<string | number | { value?: string; name?: string; label?: string; id?: string | number }>) => {
       if (!onChange) return;
 
       const cleanNames: string[] = (newVals || [])
@@ -220,8 +226,8 @@ export const SmartParticipantPicker: React.FC<SmartParticipantPickerProps> = ({
         }}
         filterOption={(input, option) => {
           if (!input) return true;
-          const opt = (option as any)?.data || option || {};
-          const searchStr = opt.searchStr || `${opt.label || ''} ${opt.value || ''}`.toLowerCase();
+          const opt = option as CustomOptionType | undefined;
+          const searchStr = opt?.searchStr || `${opt?.label || ''} ${opt?.value || ''}`.toLowerCase();
           const cleanInput = input.trim().toLowerCase();
           const cleanInputNoDiacritics = removeDiacritics(cleanInput);
           return searchStr.includes(cleanInput) || searchStr.includes(cleanInputNoDiacritics);
@@ -255,21 +261,20 @@ export const SmartParticipantPicker: React.FC<SmartParticipantPickerProps> = ({
               </span>
               <span className="jt-tag-label">{typeof label === 'string' || typeof label === 'number' ? label : rawStr}</span>
               {closable && (
-                <span
-                  role="button"
-                  tabIndex={0}
+                <button
+                  type="button"
                   className="jt-tag-close-btn"
                   onClick={handleClose}
                   aria-label={`Xóa ${rawStr}`}
                 >
                   ✕
-                </span>
+                </button>
               )}
             </span>
           );
         }}
         optionRender={(option) => {
-          const data = ((option && (option as any).data) || option || {}) as CustomOptionType;
+          const data = option.data as CustomOptionType;
           const labelStr = String(data.label || data.value || '');
           const initials = nameInitials(labelStr);
           const toneClass = avatarTone(labelStr);

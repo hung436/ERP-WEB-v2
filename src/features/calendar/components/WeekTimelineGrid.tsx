@@ -427,7 +427,7 @@ export function WeekTimelineGrid({
                           left: `${leftPct}%`,
                           width: `calc(${widthPct}% - 4px)`,
                           zIndex: idx + 2,
-                          ['--card-right-offset' as any]: `max(8px, calc(${rightOffsetPct}% + 2px))`,
+                          ['--card-right-offset' as '--card-right-offset' & keyof React.CSSProperties]: `max(8px, calc(${rightOffsetPct}% + 2px))`,
                         }}
                       />
                     ))}

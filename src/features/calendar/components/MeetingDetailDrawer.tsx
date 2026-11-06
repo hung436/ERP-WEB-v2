@@ -4,7 +4,6 @@ import {
   Drawer,
   Input,
   Modal,
-  Popconfirm,
   Tag,
   Tooltip,
   Upload,
@@ -40,6 +39,10 @@ import type { CalendarAttachmentItem, CalendarEvent } from "@/types/domain";
 
 import { formatBytes, getFileCategory } from "./AttachedFilesList";
 import { CreatePersonalMeetingModal } from "./CreatePersonalMeetingModal";
+
+import { canDownloadAttachment, downloadAttachment, readAttachment } from "../attachmentUtils";
+import { canManagePersonalMeeting, matchesCalendarPerson } from "../calendarMembership";
+import { useCalendarConfirmation } from '../useCalendarConfirmation';
 
 import "./MeetingDetailDrawer.css";
 
@@ -111,6 +114,7 @@ export const MeetingDetailDrawer: React.FC<MeetingDetailDrawerProps> = ({
   onUpdateEvent,
   onDeleteEvent,
 }) => {
+  const { confirm, confirmationHolder } = useCalendarConfirmation();
   const { user } = useAuth();
   const currentUserName = user?.fullName || "Nguyễn Minh Anh";
 
@@ -127,6 +131,7 @@ export const MeetingDetailDrawer: React.FC<MeetingDetailDrawerProps> = ({
   if (!event) return null;
 
   const isEditorial = event.scope === "editorial";
+  const canManageMeeting = canManagePersonalMeeting(event, user);
   const isPersonal = event.scope === "personal";
   const isUserAttending = Boolean(event.isUserParticipant);
   const start = dayjs(event.startAt);
@@ -140,14 +145,11 @@ export const MeetingDetailDrawer: React.FC<MeetingDetailDrawerProps> = ({
     event.approvalStatus === "REJECTED";
 
   const isUserAnApprover = Boolean(
-    (event.approver?.name &&
-      event.approver.name
-        .toLowerCase()
-        .includes(currentUserName.toLowerCase())) ||
-    (event.approvers &&
-      event.approvers.some((a) =>
-        a.name.toLowerCase().includes(currentUserName.toLowerCase()),
-      )),
+    user && (
+      event.approvers?.length
+        ? event.approvers.some((person) => matchesCalendarPerson(person, user))
+        : event.approver && matchesCalendarPerson(event.approver, user)
+    ),
   );
 
   // Gửi bình luận thảo luận
@@ -164,20 +166,7 @@ export const MeetingDetailDrawer: React.FC<MeetingDetailDrawerProps> = ({
       setCommentText("");
       onUpdateEvent(res.data);
     } catch {
-      // Fallback local persistence
-      const newCmt = {
-        id: `cmt-${Date.now()}`,
-        author: currentUserName,
-        content: commentText.trim(),
-        createdAt: new Date().toISOString(),
-      };
-      const updatedEvent: CalendarEvent = {
-        ...event,
-        comments: [...(event.comments || []), newCmt],
-      };
-      onUpdateEvent(updatedEvent);
-      message.success("Đã gửi bình luận thành công.");
-      setCommentText("");
+      message.error("Không thể lưu bình luận. Vui lòng thử lại.");
     } finally {
       setSubmittingComment(false);
     }
@@ -195,16 +184,11 @@ export const MeetingDetailDrawer: React.FC<MeetingDetailDrawerProps> = ({
     };
 
     try {
-      const res = await calendarApi.addAttachment(event.id, newAtt);
+      const res = await calendarApi.addAttachment(event.id, { ...newAtt, url: await readAttachment(file) });
       message.success(`Đã đính kèm tệp: ${file.name}`);
       onUpdateEvent(res.data);
     } catch {
-      const updatedEvent: CalendarEvent = {
-        ...event,
-        attachments: [...(event.attachments || []), newAtt],
-      };
-      onUpdateEvent(updatedEvent);
-      message.success(`Đã đính kèm tệp: ${file.name}`);
+      message.error("Không thể lưu tệp đính kèm. Vui lòng thử lại.");
     }
     return false;
   };
@@ -212,11 +196,15 @@ export const MeetingDetailDrawer: React.FC<MeetingDetailDrawerProps> = ({
   // Bật/tắt quan tâm lịch họp
   const handleToggleInterest = () => {
     const nextState = !event.isInterested;
-    const updated = { ...event, isInterested: nextState };
-    onUpdateEvent(updated);
+    try {
+      onUpdateEvent(calendarApi.saveDemoChanges(event, { isInterested: nextState }));
+    } catch {
+      message.error("Không thể lưu thay đổi. Vui lòng thử lại.");
+      return;
+    }
     if (nextState) {
       message.success(
-        `Đã quan tâm: "${event.title}". Bạn sẽ được nhắc nhở trước 15 phút!`,
+        'Đã quan tâm',
       );
     } else {
       message.info(`Đã hủy nhắc nhở lịch "${event.title}".`);
@@ -225,19 +213,27 @@ export const MeetingDetailDrawer: React.FC<MeetingDetailDrawerProps> = ({
 
   // Xóa lịch làm việc cá nhân
   const handleDelete = async () => {
-    if (!event) return;
+    if (!canManageMeeting) return;
     try {
       setDeleting(true);
       await calendarApi.delete(event.id);
       message.success(`Đã xóa lịch làm việc "${event.title}" thành công!`);
       onDeleteEvent?.(event.id);
       onClose();
-    } catch {
+    } catch (error) {
       message.error("Không thể xóa lịch làm việc. Vui lòng thử lại.");
+      throw error;
     } finally {
       setDeleting(false);
     }
   };
+
+  const confirmDelete = () => confirm({
+    title: "Xóa lịch làm việc?",
+    content: `Bạn có muốn xóa lịch “${event.title}” không?`,
+    onConfirm: handleDelete,
+  });
+
 
   // Cập nhật sau khi chỉnh sửa
   const handleEditSuccess = (updated: CalendarEvent) => {
@@ -259,7 +255,7 @@ export const MeetingDetailDrawer: React.FC<MeetingDetailDrawerProps> = ({
       approvalStatus: "APPROVED",
       approvers: (event.approvers || []).map((a) => ({
         ...a,
-        status: "APPROVED",
+        status: user && matchesCalendarPerson(a, user) ? "APPROVED" : a.status,
       })),
       steps: (event.steps || []).map((st) =>
         st.step_order === 2 || st.role === "APPROVER"
@@ -272,11 +268,12 @@ export const MeetingDetailDrawer: React.FC<MeetingDetailDrawerProps> = ({
       ),
     };
     try {
-      await calendarApi.update(event.id, updatedEvent);
+      const response = await calendarApi.update(event.id, { approvalStatus: updatedEvent.approvalStatus, approvers: updatedEvent.approvers, steps: updatedEvent.steps });
+      onUpdateEvent(response.data);
     } catch {
-      // Local fallback
+      message.error("Không thể lưu trạng thái lịch. Vui lòng thử lại.");
+      return;
     }
-    onUpdateEvent(updatedEvent);
     message.success("Đã phê duyệt lịch họp thành công!");
   };
 
@@ -301,11 +298,12 @@ export const MeetingDetailDrawer: React.FC<MeetingDetailDrawerProps> = ({
       ),
     };
     try {
-      await calendarApi.update(event.id, updatedEvent);
+      const response = await calendarApi.update(event.id, { approvalStatus: updatedEvent.approvalStatus, approvers: updatedEvent.approvers, steps: updatedEvent.steps });
+      onUpdateEvent(response.data);
     } catch {
-      // Local fallback
+      message.error("Không thể lưu trạng thái lịch. Vui lòng thử lại.");
+      return;
     }
-    onUpdateEvent(updatedEvent);
     message.info("Đã từ chối duyệt lịch họp.");
     setRejectModalOpen(false);
     setRejectReason("");
@@ -313,12 +311,13 @@ export const MeetingDetailDrawer: React.FC<MeetingDetailDrawerProps> = ({
 
   return (
     <>
+      {confirmationHolder}
       <Drawer
         aria-label="Chi tiết cuộc họp"
         className="calendar-detail-drawer"
         destroyOnClose
         extra={
-          isPersonal ? (
+          canManageMeeting ? (
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <Button
                 icon={<Edit3 size={14} />}
@@ -327,24 +326,15 @@ export const MeetingDetailDrawer: React.FC<MeetingDetailDrawerProps> = ({
               >
                 Chỉnh sửa
               </Button>
-              <Popconfirm
-                cancelText="Hủy"
-                description="Bạn có chắc chắn muốn xóa lịch làm việc cá nhân này không?"
-                okButtonProps={{ danger: true }}
-                okText="Xóa"
-                onConfirm={handleDelete}
-                placement="bottomRight"
-                title="Xóa lịch làm việc"
+              <Button
+                onClick={confirmDelete}
+                danger
+                icon={<Trash2 size={14} />}
+                loading={deleting}
+                size="small"
               >
-                <Button
-                  danger
-                  icon={<Trash2 size={14} />}
-                  loading={deleting}
-                  size="small"
-                >
-                  Xóa
-                </Button>
-              </Popconfirm>
+                Xóa
+              </Button>
             </div>
           ) : isEditorial &&
             !isUserAttending &&
@@ -442,7 +432,7 @@ export const MeetingDetailDrawer: React.FC<MeetingDetailDrawerProps> = ({
               >
                 Xem chi tiết
               </Button>
-              {isPersonal && (
+              {canManageMeeting && (
                 <>
                   <Button
                     icon={<Edit3 size={14} />}
@@ -451,24 +441,15 @@ export const MeetingDetailDrawer: React.FC<MeetingDetailDrawerProps> = ({
                   >
                     Chỉnh sửa
                   </Button>
-                  <Popconfirm
-                    cancelText="Hủy"
-                    description="Bạn có chắc chắn muốn xóa lịch làm việc cá nhân này không?"
-                    okButtonProps={{ danger: true }}
-                    okText="Xóa"
-                    onConfirm={handleDelete}
-                    placement="bottomRight"
-                    title="Xóa lịch làm việc"
+                  <Button
+                    onClick={confirmDelete}
+                    danger
+                    icon={<Trash2 size={14} />}
+                    loading={deleting}
+                    size="small"
                   >
-                    <Button
-                      danger
-                      icon={<Trash2 size={14} />}
-                      loading={deleting}
-                      size="small"
-                    >
-                      Xóa
-                    </Button>
-                  </Popconfirm>
+                    Xóa
+                  </Button>
                 </>
               )}
               {isEditorial &&
@@ -863,9 +844,8 @@ export const MeetingDetailDrawer: React.FC<MeetingDetailDrawerProps> = ({
                     <Tooltip title="Tải xuống tệp">
                       <Button
                         icon={<Download size={13} />}
-                        onClick={() =>
-                          message.info(`Đang tải xuống tệp: ${att.name}`)
-                        }
+                        disabled={!canDownloadAttachment(att.url)}
+                        onClick={() => downloadAttachment(att)}
                         size="small"
                         type="text"
                       />
@@ -988,7 +968,7 @@ export const MeetingDetailDrawer: React.FC<MeetingDetailDrawerProps> = ({
       </Drawer>
 
       {/* Modal Chỉnh sửa cuộc họp cá nhân */}
-      {isPersonal && (
+      {canManageMeeting && (
         <CreatePersonalMeetingModal
           editingEvent={event}
           initialTicketType="MEETING"

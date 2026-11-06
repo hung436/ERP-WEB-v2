@@ -93,9 +93,7 @@ export const TimePickerStabilizer: React.FC<{ children: React.ReactNode }> = ({ 
         col.removeEventListener('mousedown', handlePointerDown as EventListener, { capture: true });
         col.removeEventListener('wheel', handleWheel);
         if (unlockTimer) clearTimeout(unlockTimer);
-        try {
-          delete (col as any).scrollTop;
-        } catch {}
+        Reflect.deleteProperty(col, 'scrollTop');
       });
     };
 

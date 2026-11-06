@@ -1,5 +1,5 @@
 import React from 'react';
-import { Tooltip, message } from 'antd';
+import { Tooltip } from 'antd';
 import type { UploadFile } from 'antd/es/upload/interface';
 import {
   FileText,
@@ -11,6 +11,8 @@ import {
 } from 'lucide-react';
 
 import type { CalendarAttachment } from '@/types/calendar';
+
+import { canDownloadAttachment, downloadAttachment } from '../attachmentUtils';
 
 export interface FileCategoryMeta {
   type: string;
@@ -157,8 +159,9 @@ export function ReadonlyAttachmentsGrid({
             <button
               type="button"
               className="btn-download-file-card"
-              onClick={() => message.info(`Đang tải xuống tệp: ${att.name}`)}
-              title="Tải về"
+              disabled={!canDownloadAttachment(att.url)}
+              onClick={() => downloadAttachment(att)}
+              title={canDownloadAttachment(att.url) ? "Tải về" : "Tệp mẫu chưa có nội dung để tải"}
               aria-label={`Tải về ${att.name}`}
             >
               <Download size={13} strokeWidth={2} />

@@ -15,9 +15,10 @@ extend(isoWeek);
  * Clean and normalize a member or attendee name for comparison.
  * Removes parenthesized titles like "(Ban Nội dung)", "(Phóng viên)", extra spaces, and diacritic casing.
  */
-export function normalizeName(name?: any): string {
+export function normalizeName(name?: unknown): string {
   if (!name) return '';
-  const str = typeof name === 'string' ? name : String(name?.name || name?.label || name?.value || '');
+  const object = typeof name === 'object' && name !== null ? name as Record<string, unknown> : {};
+  const str = typeof name === 'string' ? name : String(object.name || object.label || object.value || '');
   return str
     .replace(/\(.*?\)/g, '')
     .trim()
@@ -119,7 +120,7 @@ export function detectEventConflicts({
     }
 
     const evParticipants = (ev.participants || [])
-      .map((p) => (typeof p === 'string' ? p.trim() : typeof (p as any)?.name === 'string' ? (p as any).name.trim() : ''))
+      .map((p) => p.trim())
       .filter(Boolean);
     const isEditorialScope = ev.scope === 'editorial';
     const evLocationNorm = normalizeLocation(ev.location);

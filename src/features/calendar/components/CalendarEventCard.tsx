@@ -1,12 +1,12 @@
 import { message } from 'antd';
 import dayjs, { extend, type Dayjs } from 'dayjs';
 import isoWeek from 'dayjs/plugin/isoWeek';
-import { MapPin, Star, Users } from 'lucide-react';
+import { MapPin, Star } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
 import type { CalendarEvent } from '@/types/domain';
 
-import { getApprovalStatusMeta, isPastEvent } from '../calendarWeekUtils';
+import { getApprovalStatusMeta, getCalendarStatusDotTone, isPastEvent } from '../calendarWeekUtils';
 
 extend(isoWeek);
 
@@ -31,6 +31,7 @@ export function CalendarEventCard({ event, onSelectEvent, onHoverChange, style, 
   const [isHoverExpanded, setIsHoverExpanded] = useState(false);
 
   const approvalMeta = getApprovalStatusMeta(event.approvalStatus, event.ticketType, event.workflowType);
+  const statusDotTone = getCalendarStatusDotTone(event.approvalStatus, event.scope);
 
   const enterTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const leaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -90,7 +91,7 @@ export function CalendarEventCard({ event, onSelectEvent, onHoverChange, style, 
     setIsInterested(nextState);
     if (nextState) {
       message.success({
-        content: `Đã quan tâm: "${event.title}". Bạn sẽ được nhắc nhở trước 15 phút!`,
+        content: 'Đã quan tâm',
         icon: <Star color="#f59e0b" fill="#f59e0b" size={16} style={{ marginRight: 6 }} />,
         duration: 3,
       });
@@ -99,7 +100,7 @@ export function CalendarEventCard({ event, onSelectEvent, onHoverChange, style, 
     }
   };
 
-  const canOpenDrawer = isUserAttending;
+  const canOpenDrawer = true;
 
   const isPast = isPastEvent(event, now);
 
@@ -120,6 +121,7 @@ export function CalendarEventCard({ event, onSelectEvent, onHoverChange, style, 
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.target !== e.currentTarget) return;
     if (!canOpenDrawer) return;
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
@@ -135,8 +137,8 @@ export function CalendarEventCard({ event, onSelectEvent, onHoverChange, style, 
       onKeyDown={handleKeyDown}
       role="button"
       style={{
-        border: 'none',
         ...style,
+        border: 'none',
         cursor: canOpenDrawer ? 'pointer' : 'default',
         position: 'relative',
         ...(isPast ? { opacity: 0.65 } : {}),
@@ -144,7 +146,7 @@ export function CalendarEventCard({ event, onSelectEvent, onHoverChange, style, 
       tabIndex={canOpenDrawer ? 0 : -1}
     >
       {/* Chấm tròn vàng ở góc phải nếu lịch đã điều chỉnh (Task 7) */}
-      {event.isAdjusted && (
+      {isEditorial && event.isAdjusted && (
         <span
           className="booking-week-adjusted-dot"
           aria-label="Đã điều chỉnh"
@@ -156,10 +158,12 @@ export function CalendarEventCard({ event, onSelectEvent, onHoverChange, style, 
         <div className="card-header-row">
           <div className="card-time-group" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
             {/* Chấm tròn trạng thái trước giờ (Task 7) */}
-            <span
-              className={`booking-week-status-dot dot-${(approvalMeta.tone || 'scheduled').toLowerCase()}`}
-              title={`Trạng thái: ${approvalMeta.label}`}
-            />
+            {statusDotTone && (
+              <span
+                className={`booking-week-status-dot dot-${statusDotTone}`}
+                title={`Trạng thái: ${approvalMeta.label}`}
+              />
+            )}
             <span
               className={`card-time-tag ${isUserAttending ? 'is-attending-time' : ''}`}
               style={isUserAttending ? { color: '#D92D20', fontWeight: 600 } : { color: '#475467', fontWeight: 500 }}
@@ -169,15 +173,16 @@ export function CalendarEventCard({ event, onSelectEvent, onHoverChange, style, 
           </div>
 
           <div className="card-header-actions">
-            {isEditorial && !isUserAttending && !isPast && (
+            {isEditorial && !isUserAttending && (
               <button
                 type="button"
                 className={`calendar-star-btn ${isInterested ? 'active' : ''}`}
                 onClick={handleToggleInterest}
                 title={isInterested ? 'Bỏ quan tâm' : 'Quan tâm lịch họp'}
                 aria-label={isInterested ? 'Bỏ quan tâm lịch họp' : 'Quan tâm lịch họp'}
+                aria-pressed={isInterested}
               >
-                <Star size={13} fill={isInterested ? '#f59e0b' : 'none'} color={isInterested ? '#f59e0b' : '#667085'} />
+                <Star className="calendar-star-icon" size={13} fill={isInterested ? '#f59e0b' : 'none'} color={isInterested ? '#f59e0b' : '#667085'} />
               </button>
             )}
           </div>
@@ -186,17 +191,12 @@ export function CalendarEventCard({ event, onSelectEvent, onHoverChange, style, 
         {/* Tên sự kiện: Hiển thị đầy đủ, không cắt 3 chấm (Task 4) */}
         <div className="card-title">{event.title}</div>
 
-        {(event.location || (event.ticketType === 'MEETING' && Boolean(event.leader?.trim()))) && (
+        {!(event.scope === 'personal' && event.ticketType === 'EVENT') && event.location && (
           <div className="card-location-row">
             {event.location ? (
               <div className="card-location-info" title={event.location}>
                 <MapPin size={12} color="#667085" style={{ flexShrink: 0 }} />
                 <span>{event.location}</span>
-              </div>
-            ) : (event.ticketType === 'MEETING' && event.leader?.trim()) ? (
-              <div className="card-location-info" title={event.leader}>
-                <Users size={12} color="#667085" style={{ flexShrink: 0 }} />
-                <span>{event.leader}</span>
               </div>
             ) : null}
           </div>

@@ -101,6 +101,7 @@ export interface DepartmentGroup {
 }
 
 export interface SmartParticipantPickerProps {
+  excludeNames?: string[];
   value?: string[]; // Array of selected participant names or IDs
   onChange?: (selected: string[], items?: ParticipantItem[]) => void;
   placeholder?: string;

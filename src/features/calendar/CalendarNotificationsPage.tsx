@@ -186,7 +186,7 @@ export function CalendarNotificationsPage() {
           <div className="toolbar-right-search">
             <DatePicker.RangePicker
               format="DD/MM/YYYY"
-              onChange={(dates) => setDateRange(dates as any)}
+              onChange={(dates) => setDateRange(dates)}
               placeholder={['Từ ngày', 'Đến ngày']}
               style={{ width: 230 }}
             />

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState, useDeferredValue } from "react";
+import { useCallback, useEffect, useMemo, useState, useDeferredValue, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import dayjs, { extend, type Dayjs } from "dayjs";
 import isoWeek from "dayjs/plugin/isoWeek";
@@ -30,17 +30,18 @@ import { calendarApi } from "@/services/api";
 import type { CalendarEvent } from "@/types/domain";
 
 import {
-  collectDuty,
   normalizeMeeting,
   searchText,
   vietnamNow,
   getApprovalStatusMeta,
   type NormalizedMeetingEvent,
 } from "./calendarWeekUtils";
+import { useOptionalAuth } from "@/features/auth/AuthContext";
+import { getCalendarMembership } from "./calendarMembership";
 import { getEventsForWeek } from "./mockCalendarData";
+import { CalendarEventPreviewDrawer } from "./components/CalendarEventPreviewDrawer";
 import { WeekColumns } from "./components/WeekColumns";
 import { WeekTimeline } from "./components/WeekTimeline";
-import { CalendarEventDetailModal } from "./components/CalendarEventDetailModal";
 import { CreatePersonalMeetingModal } from "./components/CreatePersonalMeetingModal";
 import { DayScheduleDrawer } from "./components/DayScheduleDrawer";
 import "./components/DayScheduleDrawer.css";
@@ -48,7 +49,7 @@ import "./calendar-week.css";
 
 extend(isoWeek);
 
-const EVENTS_STORAGE_KEY = "jt_calendar_events_v8";
+const EVENTS_STORAGE_KEY = "jt_calendar_events_v9";
 
 function ViewIcon({ vertical = false }: { vertical?: boolean }) {
   return (
@@ -69,6 +70,7 @@ function ViewIcon({ vertical = false }: { vertical?: boolean }) {
 }
 
 export function CalendarWeekPage() {
+  const user = useOptionalAuth()?.user;
   const [now, setNow] = useState<Dayjs>(vietnamNow);
   useEffect(() => {
     const timer = setInterval(() => setNow(vietnamNow()), 30000);
@@ -93,29 +95,7 @@ export function CalendarWeekPage() {
 
   // Fetch dữ liệu từ API
   const state = useAsyncData(async () => (await calendarApi.list()).data);
-  const [userCreatedEvents, setUserCreatedEvents] = useState<CalendarEvent[]>(
-    () => {
-      try {
-        // Dọn dẹp triệt để dữ liệu mẫu cũ nếu còn tồn tại trong trình duyệt
-        if (typeof window !== "undefined") {
-          window.localStorage.removeItem("jt_calendar_events_store");
-        }
-        const saved = localStorage.getItem(EVENTS_STORAGE_KEY);
-        if (saved) {
-          const parsed = JSON.parse(saved);
-          if (Array.isArray(parsed)) {
-            const filtered = parsed.filter(
-              (ev) => !/^(ádasd|đâsdasd|sdasd|abcdefgh|Phiếu công việc ngày.*)$/i.test((ev.title || '').trim())
-            );
-            return filtered;
-          }
-        }
-      } catch {
-        // ignore
-      }
-      return [];
-    },
-  );
+  const [userCreatedEvents, setUserCreatedEvents] = useState<CalendarEvent[]>([]);
 
   const [deletedEventIds, setDeletedEventIds] = useState<string[]>(() => {
     try {
@@ -132,11 +112,6 @@ export function CalendarWeekPage() {
 
   const saveUserEvents = useCallback((events: CalendarEvent[]) => {
     setUserCreatedEvents(events);
-    try {
-      localStorage.setItem(EVENTS_STORAGE_KEY, JSON.stringify(events));
-    } catch {
-      // ignore
-    }
   }, []);
 
   const rawEvents = useMemo(() => {
@@ -227,11 +202,12 @@ export function CalendarWeekPage() {
   // Chuẩn hóa meetings
   const meetings: NormalizedMeetingEvent[] = useMemo(() => {
     return allEvents
-      .map((record) => normalizeMeeting(record, "nhanvien"))
+      .map((record) => {
+        const normalized = normalizeMeeting(record, user?.id ?? "nhanvien");
+        return normalized && user ? { ...normalized, ...getCalendarMembership(record, user) } : normalized;
+      })
       .filter((ev): ev is NormalizedMeetingEvent => ev !== null);
-  }, [allEvents]);
-
-  const duties = useMemo(() => collectDuty(allEvents), [allEvents]);
+  }, [allEvents, user]);
 
   const isInWeek = useCallback(
     (event: NormalizedMeetingEvent) =>
@@ -263,13 +239,10 @@ export function CalendarWeekPage() {
 
   const filteredMeetings = useMemo(() => {
     return searchedMeetings.filter((event) => {
-      const scopeMatch = attending
-        ? event.isUserParticipant || event.isUserWatcher
-        : event.scope === "personal"
-          ? personal
-          : editorial;
+      const scopeMatch = event.scope === "personal" ? personal : editorial;
+      const attendanceMatch = !attending || event.isUserParticipant || event.isUserWatcher;
       const typeMatch = ticketTypes[event.ticketType || "MEETING"] !== false;
-      return scopeMatch && typeMatch;
+      return scopeMatch && attendanceMatch && typeMatch;
     });
   }, [searchedMeetings, attending, personal, editorial, ticketTypes]);
 
@@ -314,10 +287,26 @@ export function CalendarWeekPage() {
     };
   }, [searchedInWeek]);
 
+  const pageRef = useRef<HTMLElement>(null);
+  const drawerTriggerRef = useRef<HTMLElement | null>(null);
+  const rememberDrawerTrigger = () => {
+    drawerTriggerRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+  };
+  const handleDrawerOpenChange = (open: boolean) => {
+    if (open) return;
+    const trigger = drawerTriggerRef.current;
+    const fallback = pageRef.current?.querySelector<HTMLButtonElement>(
+      `[data-calendar-day="${selectedDate.format('YYYY-MM-DD')}"]`,
+    );
+    (trigger?.isConnected ? trigger : fallback)?.focus({ preventScroll: true });
+  };
+
   // Selection handler: Mọi sự kiện trên lịch khi click đều mở Drawer xem nhanh (Task 5)
   const handleSelectNormalizedEvent = (normalized: NormalizedMeetingEvent) => {
     const raw = normalized.raw || allEvents.find((e) => e.id === normalized.id);
     if (raw) {
+      rememberDrawerTrigger();
+      setSelectedDay(null);
       setSelectedEvent(raw);
     }
   };
@@ -335,7 +324,13 @@ export function CalendarWeekPage() {
     (event: NormalizedMeetingEvent, nextState: boolean) => {
       const raw = event.raw || allEvents.find((e) => e.id === event.id);
       if (!raw) return;
-      const updated: CalendarEvent = { ...raw, isInterested: nextState };
+      let updated: CalendarEvent;
+      try {
+        updated = calendarApi.saveDemoChanges(raw, { isInterested: nextState });
+      } catch {
+        message.error("Không thể lưu thay đổi. Vui lòng thử lại.");
+        return;
+      }
       const updatedList = [
         ...userCreatedEvents.filter((item) => item.id !== updated.id),
         updated,
@@ -346,21 +341,6 @@ export function CalendarWeekPage() {
     },
     [allEvents, userCreatedEvents, saveUserEvents],
   );
-
-  const handleDeleteEvent = (eventId: string) => {
-    const updatedList = userCreatedEvents.filter((item) => item.id !== eventId);
-    saveUserEvents(updatedList);
-    setDeletedEventIds((prev) => {
-      const next = Array.from(new Set([...prev, eventId]));
-      try {
-        localStorage.setItem("jt_calendar_deleted_ids_v8", JSON.stringify(next));
-      } catch {
-        // ignore
-      }
-      return next;
-    });
-    setSelectedEvent(null);
-  };
 
   const handleCreateSuccess = (newEvent: CalendarEvent) => {
     const updatedList = [
@@ -386,19 +366,26 @@ export function CalendarWeekPage() {
     ) {
       changeDate(evDate);
     }
-    setSelectedEvent(newEvent);
+    setSelectedEvent(null);
     setCreateDate(null);
     setEditingEvent(null);
   };
 
+  const reloadCalendar = state.reload;
   const handleResetData = useCallback(() => {
     localStorage.removeItem(EVENTS_STORAGE_KEY);
     localStorage.removeItem("jt_calendar_events_store");
+    localStorage.removeItem("jt_calendar_events_v8");
     localStorage.removeItem("jt_calendar_deleted_ids_v8");
+    for (const key of Object.keys(localStorage)) {
+      if (key.startsWith("erp:calendar-discussion:")) localStorage.removeItem(key);
+    }
+    setSelectedEvent(null);
     setUserCreatedEvents([]);
     setDeletedEventIds([]);
+    reloadCalendar();
     message.success("Đã khôi phục dữ liệu gốc thành công!");
-  }, []);
+  }, [reloadCalendar]);
 
   useEffect(() => {
     (
@@ -422,7 +409,7 @@ export function CalendarWeekPage() {
         },
       }}
     >
-      <main className="booking-week-page" aria-label="Lịch họp tuần">
+      <main ref={pageRef} className="booking-week-page" aria-label="Lịch họp tuần">
         <header className="booking-week-toolbar">
           <div className="booking-week-nav-group">
             {searchOpen ? (
@@ -506,7 +493,6 @@ export function CalendarWeekPage() {
                 onClick={() => changeDate(selectedDate.add(7, "day"))}
               />
             </div>
-
 
           </div>
 
@@ -934,10 +920,9 @@ export function CalendarWeekPage() {
             key={`${viewMode}-${fromDate}`}
             week={week}
             now={now}
-            selectedDate={selectedDate}
+            selectedDate={selectedDay}
             events={visible}
-            duties={duties}
-            showDuty={editorial}
+
             loading={
               state.loading &&
               (location.search.includes("state=loading") ||
@@ -945,6 +930,8 @@ export function CalendarWeekPage() {
             }
             disabledHover={Boolean(selectedDay || selectedEvent || createDate)}
             onSelectDay={(day) => {
+              rememberDrawerTrigger();
+              setSelectedEvent(null);
               setSelectedDay(day);
               changeDate(day);
             }}
@@ -953,42 +940,29 @@ export function CalendarWeekPage() {
           />
         </div>
 
-        {selectedDay && (
-          <DayScheduleDrawer
-            open={Boolean(selectedDay)}
-            day={selectedDay}
-            events={allEvents}
-            onClose={() => setSelectedDay(null)}
-            onSelectEvent={(ev) => {
-              setSelectedEvent(ev);
-            }}
-            onCreateEvent={(day) => {
-              setCreateDate(day);
-            }}
-            onPrevDay={() => {
-              const prev = selectedDay.subtract(1, "day");
-              setSelectedDay(prev);
-              changeDate(prev);
-            }}
-            onNextDay={() => {
-              const next = selectedDay.add(1, "day");
-              setSelectedDay(next);
-              changeDate(next);
-            }}
-          />
-        )}
-
-        {selectedEvent && (
-          <CalendarEventDetailModal
-            key={selectedEvent.id}
-            event={selectedEvent}
-            open={Boolean(selectedEvent)}
-            onClose={() => setSelectedEvent(null)}
-            onUpdateEvent={handleUpdateEvent}
-            onDeleteEvent={handleDeleteEvent}
-          />
-        )}
-
+        <DayScheduleDrawer
+          open={Boolean(selectedDay)}
+          day={selectedDay}
+          onClose={() => setSelectedDay(null)}
+          afterOpenChange={handleDrawerOpenChange}
+          onPrevDay={() => {
+            if (!selectedDay) return;
+            const prev = selectedDay.subtract(1, "day");
+            setSelectedDay(prev);
+            changeDate(prev);
+          }}
+          onNextDay={() => {
+            if (!selectedDay) return;
+            const next = selectedDay.add(1, "day");
+            setSelectedDay(next);
+            changeDate(next);
+          }}
+        />
+        <CalendarEventPreviewDrawer
+          event={selectedEvent}
+          onClose={() => setSelectedEvent(null)}
+          afterOpenChange={handleDrawerOpenChange}
+        />
         {(createDate || editingEvent) && (
           <CreatePersonalMeetingModal
             open={Boolean(createDate || editingEvent)}

@@ -163,7 +163,7 @@ export function ChatPage() {
           <div><h2>Tin nhắn</h2></div>
           <div className="chat-heading-actions" style={{ display: 'flex', gap: 6 }}>
             <Tooltip title="Đoạn chat mới"><Button aria-label="Đoạn chat mới" icon={<UserPlus size={16} />} onClick={() => setDirectChatOpen(true)} /></Tooltip>
-            <Tooltip title="Nhóm mới"><Button aria-label="Nhóm mới" icon={<Users size={16} />} onClick={() => setGroupOpen(true)} type="primary" /></Tooltip>
+            <Tooltip title="Tạo nhóm"><Button aria-label="Tạo nhóm" icon={<Users size={16} />} onClick={() => setGroupOpen(true)} type="primary" /></Tooltip>
           </div>
         </div>
         <div className="chat-list-tools">

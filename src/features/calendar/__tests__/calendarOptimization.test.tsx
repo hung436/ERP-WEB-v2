@@ -26,22 +26,22 @@ describe('Tối ưu hóa Calendar & Trải nghiệm đọc nhanh', () => {
   });
 
   it('eventTimeRange: hiển thị khung giờ đầy đủ để người đọc quét nhanh', () => {
-    const meetingWithEnd: any = {
-      ticketType: 'MEETING',
+    const meetingWithEnd = {
+      ticketType: 'MEETING' as const,
       start: dayjs('2026-11-05 08:30:00'),
       end: dayjs('2026-11-05 10:00:00'),
     };
     expect(eventTimeRange(meetingWithEnd)).toBe('08:30 – 10:00');
 
-    const meetingWithoutEnd: any = {
-      ticketType: 'MEETING',
+    const meetingWithoutEnd = {
+      ticketType: 'MEETING' as const,
       start: dayjs('2026-11-05 08:30:00'),
       end: null,
     };
     expect(eventTimeRange(meetingWithoutEnd)).toBe('08:30');
 
-    const taskEvent: any = {
-      ticketType: 'TASK',
+    const taskEvent = {
+      ticketType: 'TASK' as const,
       start: dayjs('2026-11-05 08:00:00'),
       end: dayjs('2026-11-05 17:30:00'),
     };
@@ -49,19 +49,19 @@ describe('Tối ưu hóa Calendar & Trải nghiệm đọc nhanh', () => {
   });
 
   it('eventDurationText: tính toán thời lượng dễ đọc bằng tiếng Việt', () => {
-    const event90m: any = {
+    const event90m = {
       start: dayjs('2026-11-05 08:30:00'),
       end: dayjs('2026-11-05 10:00:00'),
     };
     expect(eventDurationText(event90m)).toBe('1 giờ 30 phút');
 
-    const event45m: any = {
+    const event45m = {
       start: dayjs('2026-11-05 08:30:00'),
       end: dayjs('2026-11-05 09:15:00'),
     };
     expect(eventDurationText(event45m)).toBe('45 phút');
 
-    const event2h: any = {
+    const event2h = {
       start: dayjs('2026-11-05 08:00:00'),
       end: dayjs('2026-11-05 10:00:00'),
     };

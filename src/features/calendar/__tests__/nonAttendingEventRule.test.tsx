@@ -73,7 +73,7 @@ describe('Quy tắc sự kiện không tham gia (Không tham gia vẫn còn ở 
     expect(updatedArg.executors?.some((e) => e.name === 'Nguyễn Minh Anh')).toBe(false);
   });
 
-  it('Thẻ sự kiện không tham gia: Vẫn hiển thị trên lịch nhưng click KHÔNG mở chi tiết (cursor default, không gọi onSelectEvent)', () => {
+  it('Thẻ không tham gia vẫn mở xem nhanh và giữ nguyên cờ không tham gia', () => {
     const handleSelect = vi.fn();
 
     const nonAttendingEvent: CalendarEvent = {
@@ -102,13 +102,13 @@ describe('Quy tắc sự kiện không tham gia (Không tham gia vẫn còn ở 
     expect(cardTitles.length).toBeGreaterThan(0);
 
     const cardElement = screen.getByLabelText('Họp ban biên tập chuyên đề số hóa');
-    expect(cardElement).toHaveStyle({ cursor: 'default' });
+    expect(cardElement).toHaveStyle({ cursor: 'pointer' });
 
     // Click vào thẻ
     fireEvent.click(cardElement);
 
-    // KHÔNG được mở chi tiết
-    expect(handleSelect).not.toHaveBeenCalled();
+    // Mở xem nhanh mà không nâng quyền tham gia.
+    expect(handleSelect).toHaveBeenCalledWith(expect.objectContaining({ id: nonAttendingEvent.id, isUserParticipant: false }));
   });
 
   it('normalizeMeeting nhận diện đúng trạng thái isDeclined và isUserParticipant: false', () => {

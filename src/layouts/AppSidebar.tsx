@@ -177,7 +177,7 @@ export function AppSidebar({ collapsed, onCollapse }: { collapsed: boolean; onCo
                     </button>
                   ) : (
                     <NavLink
-                      aria-label={`${item.label}${count ? `, ${count} mục cần chú ý` : ''}`}
+                      aria-label={item.label}
                       className={`sidebar-nav-link${isParentActive ? ' active' : ''}`}
                       end={item.path === '/'}
                       onClick={handleNavClick}

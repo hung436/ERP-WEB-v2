@@ -13,7 +13,7 @@ export function CreateGroupModal({ open, creating, onClose, onCreate }: { open: 
   };
 
   return (
-    <Modal className="create-group-modal" footer={null} onCancel={close} open={open} title="Nhóm mới">
+    <Modal className="create-group-modal" footer={null} onCancel={close} open={open} title="Tạo nhóm mới">
       <Form
         form={form}
         layout="vertical"

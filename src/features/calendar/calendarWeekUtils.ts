@@ -42,6 +42,32 @@ export const TICKET_TYPES = {
 
 export type TicketTypeKey = keyof typeof TICKET_TYPES;
 
+export function getCalendarStatusDotTone(status?: string, scope?: CalendarEvent['scope']) {
+  if (scope !== 'personal') return null;
+  const key = String(status || '').toUpperCase();
+  switch (key) {
+    case 'APPROVED':
+      return 'approved';
+    case 'PENDING':
+    case 'PENDING_APPROVAL':
+    case 'WAITING':
+    case 'CONSULTING':
+    case 'CONSULT':
+      return 'pending';
+    case 'REJECTED':
+    case 'NOT_APPROVED':
+      return 'rejected';
+    case 'IN_PROGRESS':
+    case 'DEPLOYING':
+      return 'in_progress';
+    case 'COMPLETED':
+    case 'DONE':
+      return 'completed';
+    default:
+      return null;
+  }
+}
+
 export const APPROVAL_STATUS_META = {
   PENDING: { value: 'PENDING', label: 'Chờ duyệt', color: 'gold', tone: 'pending' },
   APPROVED: { value: 'APPROVED', label: 'Đã duyệt', color: 'success', tone: 'approved' },
@@ -144,9 +170,29 @@ export const dayNames = [
   'Chủ Nhật',
 ];
 
+interface CalendarPerson { id?: string | number; user_id?: string | number; name?: string; display_name?: string }
+type DutyShifts = Record<string, string | Record<string, string>>;
+type CalendarRecord = Omit<Partial<CalendarEvent>, 'participants' | 'dutyInfo' | 'executors' | 'watchers' | 'scope' | 'ticketType'> & {
+  scope?: string; ticketType?: string;
+  continuesFromPreviousDay?: boolean; continuesToNextDay?: boolean;
+  participants?: Array<string | CalendarPerson>;
+  executors?: Array<CalendarPerson>; watchers?: Array<CalendarPerson>;
+  dutyInfo?: string | false; declined?: boolean;
+  start_at?: string; end_at?: string; meeting_datetime?: string; meeting_date?: string; time_end?: string;
+  category?: string; ticket_type?: string; workflow_type?: 'PROPOSAL' | 'DISPATCH'; approval_status?: string;
+  attendees_text?: string; file_attachments?: CalendarEvent['attachments']; content?: string;
+  date?: string; calendar_date?: string; host?: CalendarPerson; approvalSteps?: CalendarEvent['steps'];
+  is_adjusted?: boolean; adjusted_at?: string; adjusted_note?: string;
+  meeting_url?: string; attachmentCount?: number; commentCount?: number;
+  continues_from_previous_day?: boolean; continues_to_next_day?: boolean; is_interested?: boolean;
+  deleted_at?: string; dutyLeader?: string; shifts?: DutyShifts;
+  metadata?: { office_child_category?: string; date_block_text?: string; duty_schedule?: DutyShifts };
+};
+const personName = (person: string | CalendarPerson): string => typeof person === 'string' ? person : person.display_name || person.name || '';
+
 export interface DutyShiftData {
   leader?: string;
-  shifts?: Record<string, any>;
+  shifts?: DutyShifts;
 }
 
 export interface NormalizedMeetingEvent {
@@ -163,21 +209,21 @@ export interface NormalizedMeetingEvent {
   location: string;
   leader?: string;
   participantText: string;
-  participants?: any[];
-  executors?: any[];
+  participants?: Array<string | CalendarPerson>;
+  executors?: CalendarPerson[];
   executorText?: string;
-  watchers?: any[];
+  watchers?: CalendarPerson[];
   watcherText?: string;
   isUserWatcher?: boolean;
-  approver?: any;
-  approvalSteps?: any[];
+  approver?: CalendarEvent['approver'];
+  approvalSteps?: CalendarEvent['steps'];
   isUserParticipant: boolean;
   isAdjusted?: boolean;
   adjustedNote?: string;
   dutyInfo?: string;
   meetingUrl?: string;
   mode?: string | null;
-  attachments: any[];
+  attachments: NonNullable<CalendarEvent['attachments']>;
   attachmentCount: number;
   commentCount: number;
   participantCount: number;
@@ -185,10 +231,10 @@ export interface NormalizedMeetingEvent {
   continuesToNextDay?: boolean;
   isInterested?: boolean;
   searchIndex: string;
-  raw: any;
+  raw: CalendarEvent;
 }
 
-export function normalizeMeeting(record: CalendarEvent | any, userId = 'nhanvien'): NormalizedMeetingEvent | null {
+export function normalizeMeeting(record: CalendarRecord, userId = 'nhanvien'): NormalizedMeetingEvent | null {
   if (!record) return null;
 
   const rawStart = record.startAt || record.start_at || record.meeting_datetime || record.meeting_date;
@@ -228,12 +274,12 @@ export function normalizeMeeting(record: CalendarEvent | any, userId = 'nhanvien
   const approvalStatus = record.approvalStatus || record.approval_status || defaultStatus;
 
   const executors = record.executors || [];
-  const executorText = executors.map((e: any) => e.display_name || e.name).filter(Boolean).join(', ');
+  const executorText = executors.map((e) => e.display_name || e.name).filter(Boolean).join(', ');
 
   const watchers = record.watchers || [];
-  const watcherText = watchers.map((w: any) => w.display_name || w.name).filter(Boolean).join(', ');
+  const watcherText = watchers.map((w) => w.display_name || w.name).filter(Boolean).join(', ');
 
-  const isUserExecutor = Array.isArray(executors) && executors.some((e: any) =>
+  const isUserExecutor = Array.isArray(executors) && executors.some((e) =>
     String(e.id || e.user_id) === String(userId) || String(e.name || '').includes('Nguyễn Minh Anh')
   );
   const isUserApprover = Boolean(
@@ -247,7 +293,7 @@ export function normalizeMeeting(record: CalendarEvent | any, userId = 'nhanvien
     (record.organizer && String(record.organizer).includes('Nguyễn Minh Anh'))
   );
 
-  const isDeclined = Boolean((record as any).isDeclined || (record as any).declined);
+  const isDeclined = Boolean(record.isDeclined || record.declined);
 
   const isUserWatcher =
     scope === 'editorial' || isDeclined
@@ -256,7 +302,7 @@ export function normalizeMeeting(record: CalendarEvent | any, userId = 'nhanvien
           record.isUserWatcher ||
           (Array.isArray(watchers) &&
             watchers.some(
-              (w: any) =>
+              (w) =>
                 String(w.id || w.user_id) === String(userId) ||
                 String(w.name || '').includes('Nguyễn Minh Anh'),
             )),
@@ -276,13 +322,13 @@ export function normalizeMeeting(record: CalendarEvent | any, userId = 'nhanvien
             (scope === 'personal' && !isTask) ||
             (Array.isArray(record.participants) &&
               record.participants.some(
-                (p: any) =>
-                  String(p.id || p.user_id || p) === String(userId) ||
-                  String(p.name || p).includes('Nguyễn Minh Anh'),
+                (p) =>
+                  String(typeof p === 'string' ? p : p.id || p.user_id) === String(userId) ||
+                  personName(p).includes('Nguyễn Minh Anh'),
               )),
           );
 
-  const participantText = record.participantText || record.attendees_text || (Array.isArray(record.participants) ? record.participants.map((p: any) => p.display_name || p.name || p).join(', ') : '');
+  const participantText = record.participantText || record.attendees_text || (Array.isArray(record.participants) ? record.participants.map(personName).join(', ') : '');
 
   const attachments = Array.isArray(record.attachments) ? record.attachments : Array.isArray(record.file_attachments) ? record.file_attachments : [];
   const content = plainText(record.content || record.description || record.notes);
@@ -335,11 +381,11 @@ export function normalizeMeeting(record: CalendarEvent | any, userId = 'nhanvien
         .filter(Boolean)
         .join(' ')
     ),
-    raw: record,
+    raw: { ...record, scope, ticketType, isUserParticipant, isUserWatcher, executors: record.executors?.map((person) => ({ ...person, id: person.id || person.user_id || '', name: personName(person) })), watchers: record.watchers?.map((person) => ({ ...person, id: person.id || person.user_id || '', name: personName(person) })), id: String(record.id), title: record.title || 'Cuộc họp', startAt: start.toISOString(), endAt: rawEnd || start.toISOString(), type: record.type || 'meeting', organizer: record.organizer || '', participants: record.participants?.map(personName), dutyInfo: typeof record.dutyInfo === 'string' ? record.dutyInfo : undefined },
   };
 }
 
-export function collectDuty(records: any[]): Record<string, DutyShiftData> {
+export function collectDuty(records: CalendarRecord[]): Record<string, DutyShiftData> {
   const duties: Record<string, DutyShiftData> = {};
 
   // Luôn nạp thông tin trực ban chuẩn từ bảng phân công getDayDutyInfo
@@ -352,7 +398,7 @@ export function collectDuty(records: any[]): Record<string, DutyShiftData> {
         if (!duties[dateKey]) {
           const dayDuty = getDayDutyInfo(d);
           if (dayDuty) {
-            const shiftsRecord: Record<string, any> = {};
+            const shiftsRecord: DutyShifts = {};
             if (Array.isArray(dayDuty.shifts)) {
               dayDuty.shifts.forEach((s) => {
                 shiftsRecord[s.name] = {
@@ -392,7 +438,7 @@ export function collectDuty(records: any[]): Record<string, DutyShiftData> {
   return duties;
 }
 
-export const eventTime = (event: NormalizedMeetingEvent): string => {
+export const eventTime = (event: Pick<NormalizedMeetingEvent, 'ticketType' | 'start' | 'end'>): string => {
   if (event.ticketType === 'TASK') {
     const target = event.end || event.start;
     return target ? target.format('HH:mm') : '';
@@ -408,7 +454,7 @@ export const eventTime = (event: NormalizedMeetingEvent): string => {
 /**
  * Chuẩn hóa thời gian sự kiện: Chỉ hiển thị 1 mốc thời gian duy nhất (HH:mm)
  */
-export const eventTimeRange = (event: NormalizedMeetingEvent): string => {
+export const eventTimeRange = (event: Pick<NormalizedMeetingEvent, 'ticketType' | 'start' | 'end'>): string => {
   if (event.ticketType === 'TASK') {
     const target = event.end || event.start;
     return target ? `Hạn: ${target.format('HH:mm')}` : '';
@@ -422,7 +468,7 @@ export const eventTimeRange = (event: NormalizedMeetingEvent): string => {
 /**
  * Tính thời lượng bằng tiếng Việt dễ đọc (vd: 1 giờ 30 phút, 45 phút)
  */
-export const eventDurationText = (event: NormalizedMeetingEvent): string => {
+export const eventDurationText = (event: Pick<NormalizedMeetingEvent, 'start' | 'end'>): string => {
   if (!event.end || !event.end.isValid() || event.end.isSame(event.start)) return '';
   const diffMinutes = event.end.diff(event.start, 'minute');
   if (diffMinutes <= 0) return '';
@@ -445,10 +491,8 @@ export function positionEvents(events: NormalizedMeetingEvent[]) {
     )
     .map((event) => {
       const startMinutes = event.start.hour() * 60 + event.start.minute();
-      let left = Math.max(0, Math.min(94, ((startMinutes - 420) / 660) * 100));
-      if (left >= previousLeft && left - previousLeft < 3.8) {
-        left = Math.min(94, previousLeft + 3.8);
-      }
+      let left = Math.max(0, Math.min(92.5, ((startMinutes - 420) / 660) * 100));
+      if (left - previousLeft < 3.8) left = Math.min(92.5, previousLeft + 3.8);
       previousLeft = left;
       const durationWidth = event.end
         ? (Math.max(
@@ -461,11 +505,8 @@ export function positionEvents(events: NormalizedMeetingEvent[]) {
             660) *
           100
         : 7.5;
-      return {
-        event,
-        left,
-        width: Math.min(100 - left, Math.max(7.5, durationWidth)),
-      };
+      const width = Math.min(100 - left, Math.max(7.5, durationWidth));
+      return { event, left, width };
     });
 }
 
@@ -494,4 +535,11 @@ export function isPastEvent(
     if (startDayjs.isValid()) return current.isAfter(startDayjs);
   }
   return false;
+}
+
+export function getMeetingPhysicalLocation(event: Pick<CalendarEvent, 'location' | 'meetingUrl'>) {
+  return event.location?.split(/\s+•\s+/)
+    .map((part) => part.trim())
+    .filter((part) => part && part !== event.meetingUrl?.trim() && !/^https?:\/\//i.test(part) && part !== 'Trực tuyến')
+    .join(' • ') ?? '';
 }

@@ -1,9 +1,8 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 
 import { authApi } from '@/services/api';
+import { clearSessionToken, getSessionToken, SESSION_KEY, setSessionToken } from '@/services/authSession';
 import type { User } from '@/types/domain';
-
-const SESSION_KEY = 'erp-session';
 
 interface AuthContextValue {
   user: User | null;
@@ -20,12 +19,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isInitializing, setIsInitializing] = useState(true);
 
   useEffect(() => {
-    const session = window.sessionStorage.getItem(SESSION_KEY);
+    const session = getSessionToken();
     if (!session) {
       setIsInitializing(false);
       return;
     }
-    authApi.me().then((response) => setUser(response.data)).catch(() => window.sessionStorage.removeItem(SESSION_KEY)).finally(() => setIsInitializing(false));
+    authApi.me().then((response) => setUser(response.data)).catch(clearSessionToken).finally(() => setIsInitializing(false));
+  }, []);
+
+  useEffect(() => {
+    const syncSession = (event: StorageEvent) => {
+      if (event.storageArea !== window.localStorage || (event.key !== SESSION_KEY && event.key !== null)) return;
+      window.sessionStorage.removeItem(SESSION_KEY);
+      if (!window.localStorage.getItem(SESSION_KEY)) {
+        setUser(null);
+      } else {
+        authApi.me().then((response) => setUser(response.data)).catch(() => {
+          clearSessionToken();
+          setUser(null);
+        });
+      }
+    };
+    window.addEventListener('storage', syncSession);
+    return () => window.removeEventListener('storage', syncSession);
   }, []);
 
   const updateUser = (data: Partial<User>) => {
@@ -37,18 +53,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     isInitializing,
     login: async (username, password) => {
       const response = await authApi.login(username, password);
-      window.sessionStorage.setItem(SESSION_KEY, response.data.token);
+      setSessionToken(response.data.token);
       setUser(response.data.user);
     },
     logout: async () => {
       await authApi.logout();
-      window.sessionStorage.removeItem(SESSION_KEY);
+      clearSessionToken();
       setUser(null);
     },
     updateUser,
   }), [isInitializing, user]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+}
+
+export function useOptionalAuth() {
+  return useContext(AuthContext);
 }
 
 export function useAuth() {

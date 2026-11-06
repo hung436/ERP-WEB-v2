@@ -241,8 +241,7 @@
   flex-direction: column !important;
   border-left: 1px solid #f2f4f7;
   background-color: #ffffff;
-  flex: 1 1 auto !important;
-  height: auto !important;
+  width: auto !important;
 }
 
 .jt-calendar-popup .ant-picker-time-panel .ant-picker-header {
@@ -265,26 +264,28 @@
 
 .jt-calendar-popup .ant-picker-time-panel .ant-picker-content {
   display: flex !important;
-  flex: 1 1 auto !important;
-  height: 100% !important;
-  min-height: 0 !important;
+  height: 224px !important;
+  max-height: 224px !important;
   box-sizing: border-box !important;
 }
 
 .jt-calendar-popup .ant-picker-time-panel-column {
   width: 80px !important;
   min-width: 80px !important;
-  flex: 1 1 auto !important;
-  height: 100% !important;
-  min-height: 0 !important;
-  max-height: none !important;
-  padding: 0 0 12px 0;
+  height: 224px !important;
+  max-height: 224px !important;
+  padding: 0;
   background-color: #ffffff;
   /* Ẩn hoàn toàn scrollbar tránh che khuất chữ số */
   scrollbar-width: none !important;
   -ms-overflow-style: none !important;
   overflow-y: scroll !important;
   box-sizing: border-box !important;
+}
+
+/* Ant Design thêm một vùng cuộn trống sau giá trị cuối để đưa mục đã chọn lên đầu cột. */
+.jt-calendar-popup .ant-picker-time-panel-column::after {
+  content: none;
 }
 
 .jt-calendar-popup .ant-picker-time-panel-column:first-child {
@@ -470,11 +471,22 @@
     min-width: 24px;
     font-size: 12px;
   }
+  .jt-calendar-popup .ant-picker-time-panel .ant-picker-header {
+    height: 32px !important;
+    min-height: 32px !important;
+    max-height: 32px !important;
+    padding: 3px 8px;
+    font-size: 12px;
+  }
+  .jt-calendar-popup .ant-picker-time-panel .ant-picker-content {
+    height: 196px !important;
+    max-height: 196px !important;
+  }
   .jt-calendar-popup .ant-picker-time-panel-column {
     width: 66px !important;
     min-width: 66px !important;
-    height: 100% !important;
-    max-height: none !important;
+    height: 196px !important;
+    max-height: 196px !important;
     scrollbar-width: none !important;
     -ms-overflow-style: none !important;
   }
@@ -1078,8 +1090,7 @@
   padding: 2px 4px;
 }
 
-/* ─── Compact Attached Files Grid & Chips (Anti-AI Clean Design) ─── */
-.attached-files-custom-grid,
+/* ─── Compact Attached Chips (Anti-AI Clean Design) ─── */
 .jt-attached-chips-container {
   display: flex;
   flex-wrap: wrap;
@@ -1087,7 +1098,6 @@
   width: 100%;
 }
 
-.custom-file-card-item,
 .jt-attached-chip {
   display: inline-flex;
   align-items: center;
@@ -1102,13 +1112,11 @@
   user-select: none;
 }
 
-.custom-file-card-item:hover,
 .jt-attached-chip:hover {
   background: #f1f5f9;
   border-color: #cbd5e1;
 }
 
-.file-badge-type,
 .jt-attached-chip__icon {
   width: 22px;
   height: 22px;
@@ -1119,14 +1127,6 @@
   flex-shrink: 0;
 }
 
-.file-card-details {
-  display: inline-flex;
-  align-items: baseline;
-  gap: 6px;
-  min-width: 0;
-}
-
-.file-card-name,
 .jt-attached-chip__name {
   font-size: 12px;
   font-weight: 500;
@@ -1138,7 +1138,6 @@
   line-height: 1;
 }
 
-.file-card-size,
 .jt-attached-chip__size {
   font-size: 11px;
   color: #64748b;
@@ -1146,7 +1145,6 @@
   line-height: 1;
 }
 
-.btn-remove-file-card,
 .jt-attached-chip__remove {
   display: inline-flex;
   align-items: center;
@@ -1163,29 +1161,7 @@
   transition: all 0.12s ease;
 }
 
-.btn-remove-file-card:hover,
 .jt-attached-chip__remove:hover {
-  background: #fee2e2;
-  color: #d92d20;
-}
-
-.btn-download-file-card {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 22px;
-  height: 22px;
-  border-radius: 4px;
-  border: none;
-  background: transparent;
-  color: #64748b;
-  cursor: pointer;
-  padding: 0;
-  margin-left: 2px;
-  transition: all 0.12s ease;
-}
-
-.btn-download-file-card:hover {
   background: #fee2e2;
   color: #d92d20;
 }

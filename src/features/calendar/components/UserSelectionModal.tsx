@@ -2,8 +2,10 @@ import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { Modal, Input, Checkbox, Button } from 'antd';
 import { SearchOutlined, CloseOutlined, UserOutlined } from '@ant-design/icons';
 
-import { directoryContacts } from '@/mocks/fixtures';
+import { useOptionalAuth } from '@/features/auth/AuthContext';
+import { demoUsers } from '@/mocks/usersFixtures';
 import { avatarTone, nameInitials } from '@/utils/avatar';
+import { calendarPersonKey } from '../calendarMembership';
 
 const POSITION_MAP: Record<string, string> = {
   'Nguyễn Minh Anh': 'Phóng viên',
@@ -47,33 +49,36 @@ export interface UserSelectionModalProps {
   helperText?: string;
 }
 
+const EMPTY_NAMES: string[] = [];
+
 export const UserSelectionModal: React.FC<UserSelectionModalProps> = ({
   open,
   onCancel,
   onOk,
   title = 'Chọn thành phần',
-  initialSelected = [],
-  excludeNames = [],
+  initialSelected = EMPTY_NAMES,
+  excludeNames = EMPTY_NAMES,
   helperText,
 }) => {
+  const currentUserId = useOptionalAuth()?.user?.id;
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedList, setSelectedList] = useState<string[]>(initialSelected);
 
   // Sync state whenever modal opens or initialSelected changes
   useEffect(() => {
     if (open) {
-      setSelectedList(initialSelected || []);
+      setSelectedList(initialSelected);
       setSearchTerm('');
     }
   }, [open, initialSelected]);
 
   // Danh sách nhân sự loại trừ các tên không hợp lệ
   const availableUsers = useMemo(() => {
-    const excludeSet = new Set(excludeNames || []);
-    return directoryContacts
-      .filter((c) => !excludeSet.has(c.fullName))
+    const excludeSet = new Set(excludeNames.map(calendarPersonKey));
+    return demoUsers
+      .filter((c) => c.id !== currentUserId && !excludeSet.has(c.id))
       .map((c) => {
-        const pos = POSITION_MAP[c.fullName] || (c as unknown as { position?: string }).position || 'Nhân sự';
+        const pos = POSITION_MAP[c.fullName] || c.position || 'Nhân sự';
         const searchStr = `${c.fullName} ${c.penName || ''} ${c.department || ''} ${pos}`.toLowerCase();
         return {
           id: c.id,
@@ -84,7 +89,7 @@ export const UserSelectionModal: React.FC<UserSelectionModalProps> = ({
           searchStr,
         };
       });
-  }, [excludeNames]);
+  }, [excludeNames, currentUserId]);
 
   // Lọc theo search input
   const filteredUsers = useMemo(() => {
@@ -118,7 +123,8 @@ export const UserSelectionModal: React.FC<UserSelectionModalProps> = ({
   }, []);
 
   const handleConfirm = () => {
-    onOk(selectedList);
+    const excluded = new Set(excludeNames.map(calendarPersonKey));
+    onOk(selectedList.filter((name) => calendarPersonKey(name) !== currentUserId && !excluded.has(calendarPersonKey(name))));
     onCancel();
   };
 

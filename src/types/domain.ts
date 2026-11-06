@@ -97,6 +97,7 @@ export interface CalendarAttachmentItem {
 }
 
 export interface CalendarEvent {
+  priority?: TaskPriority;
   id: string;
   title: string;
   startAt: string;
@@ -107,6 +108,7 @@ export interface CalendarEvent {
   type: CalendarEventType;
   scope?: CalendarScope;
   organizer: string;
+  organizerId?: string;
   leader?: string;
   participantText?: string;
   participantCount?: number;
@@ -119,6 +121,7 @@ export interface CalendarEvent {
   notes?: string;
   description?: string;
   dutyInfo?: string;
+  participantIds?: string[];
   participants?: string[];
   attachments?: CalendarAttachmentItem[];
   comments?: CalendarComment[];

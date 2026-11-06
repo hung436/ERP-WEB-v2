@@ -94,7 +94,7 @@ export function DashboardPage() {
                 </button>
                 <StatusTag category="status" value={ticket.status} />
                 <time className="task-due" dateTime={ticket.createdAt}>{taskDue(ticket.createdAt)}</time>
-                <button className="work-ticket-process-btn" onClick={() => setDetailTicket(ticket)} type="button">Xử lý</button>
+                <button aria-label={`Xem và xử lý công việc: ${displayTitle}`} className="work-ticket-process-btn" onClick={() => setDetailTicket(ticket)} type="button">Xử lý</button>
               </article>;
             }
             const task = item.task;
@@ -112,6 +112,7 @@ export function DashboardPage() {
               </button>
               <StatusTag category="status" value={currentTask.status} />
               <time className="task-due" dateTime={task.dueAt}>{taskDue(task.dueAt)}</time>
+                <span className="task-row-actions"><button aria-label={`Xem và xử lý công việc: ${task.title}`} className="task-process-action" onClick={() => openTask(currentTask)} type="button">Chi tiết</button></span>
             </article>;
           })}</div>
           <footer className="section-footer">
@@ -121,7 +122,7 @@ export function DashboardPage() {
 
         <aside aria-label="Cập nhật trong ngày" className="dashboard-widgets communication-widget">
           <section className="surface-panel compact-widget announcement-widget">
-            <div className="widget-heading"><div><span className="section-icon announcements"><ModuleIcon module="announcements" /></span><span className="widget-heading-copy"><h2>Thông báo cơ quan</h2><span className="section-count">{announcements.filter((item) => !item.isRead).length}</span></span></div></div>
+            <div className="widget-heading"><div><span className="section-icon announcements"><ModuleIcon module="announcements" /></span><span className="widget-heading-copy"><span>Thông báo</span><h2>Thông báo cơ quan</h2><span className="section-count">{announcements.filter((item) => !item.isRead).length}</span></span></div></div>
             <div className="widget-body widget-list announcement-widget-list">{announcements.slice(0, 3).map((item) => <button aria-label={`${item.isRead ? 'Thông báo đã đọc' : 'Thông báo mới'}: ${item.title}`} className={`widget-item ${item.isRead ? 'read' : 'unread'}`} key={item.id} onClick={() => setSelectedAnnouncement(item)} type="button"><i /><span><strong>{item.title}</strong><small>{item.issuingDepartment} · {new Date(item.publishedAt).toLocaleDateString('vi-VN')}</small></span></button>)}</div>
             <footer className="widget-footer">
               <Link aria-label="Xem tất cả thông báo cơ quan" to="/announcements">Xem tất cả →</Link>
@@ -137,7 +138,7 @@ export function DashboardPage() {
           </section>
 
           <section className="surface-panel compact-widget chat-widget">
-            <div className="widget-heading"><div><span className="section-icon chat"><ModuleIcon module="chat" /></span><span className="widget-heading-copy"><h2>Tin nhắn</h2><span className="section-count">{summary.unreadChatCount}</span></span></div></div>
+            <div className="widget-heading"><div><span className="section-icon chat"><ModuleIcon module="chat" /></span><span className="widget-heading-copy"><h2>Tin nhắn mới</h2><span className="section-count">{summary.unreadChatCount}</span></span></div></div>
             <div className="widget-body widget-list">{chats.slice(0, 2).map((chat) => <button key={chat.id} onClick={() => setSelectedChat(chat)} type="button"><span className={`mini-avatar chat-avatar ${avatarTone(chat.participantName)}`}>{chat.participantName.slice(0, 2).toUpperCase()}</span><span><strong>{chat.participantName}</strong><small>{chat.lastMessage}</small></span>{chat.unreadCount > 0 && <b>{chat.unreadCount}</b>}</button>)}</div>
             <footer className="widget-footer">
               <Link aria-label="Xem tất cả Chat" to="/chat">Xem tất cả →</Link>
@@ -145,8 +146,8 @@ export function DashboardPage() {
           </section>
 
           <section className="surface-panel compact-widget mail-widget">
-            <div className="widget-heading"><div><span className="section-icon mail"><ModuleIcon module="mail" /></span><span className="widget-heading-copy"><h2>Email</h2><span className="section-count">{summary.unreadMailCount}</span></span></div></div>
-            <div className="widget-body widget-list">{mails.slice(0, 2).map((mail) => <button key={mail.id} onClick={() => setSelectedMail(mail)} type="button"><span className={`mini-avatar mail-avatar ${avatarTone(mail.senderName)}`}>{mail.senderName.slice(0, 2).toUpperCase()}</span><span><strong>{mail.senderName}</strong><small>{mail.subject}</small></span><time>{shortTime(mail.sentAt)}</time></button>)}</div>
+            <div className="widget-heading"><div><span className="section-icon mail"><ModuleIcon module="mail" /></span><span className="widget-heading-copy"><h2 role="tab" aria-selected="true">Mail chưa đọc</h2><span className="section-count">{summary.unreadMailCount}</span></span></div></div>
+            <div className="widget-body widget-list">{mails.slice(0, 2).map((mail) => <button aria-label={`${mail.senderName} ${mail.subject}`} key={mail.id} onClick={() => setSelectedMail(mail)} type="button"><span className={`mini-avatar mail-avatar ${avatarTone(mail.senderName)}`}>{mail.senderName.slice(0, 2).toUpperCase()}</span><span><strong>{mail.senderName}</strong><small>{mail.subject}</small></span><time>{shortTime(mail.sentAt)}</time></button>)}</div>
             <footer className="widget-footer">
               <Link aria-label="Xem tất cả Mail" to="/mail">Xem tất cả →</Link>
             </footer>

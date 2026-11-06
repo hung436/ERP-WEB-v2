@@ -47,11 +47,11 @@ describe('Module Nhân sự - Tạo hồ sơ mới', () => {
     renderApp('/personnel/create', true);
 
     expect(await screen.findByRole('heading', { name: /Tạo hồ sơ nhân sự mới/ })).toBeInTheDocument();
-    expect(screen.getByText('Ảnh thẻ 3x4 & Thông tin cơ bản')).toBeInTheDocument();
-    expect(screen.getByText('Đơn vị & Chức danh công tác')).toBeInTheDocument();
-    expect(screen.getByText('Đối tượng lao động & Chế độ đoàn thể')).toBeInTheDocument();
-    expect(screen.getByText('Chuyên môn & Căn cước công dân')).toBeInTheDocument();
-    expect(screen.getByText('Thông tin liên hệ & Ghi chú')).toBeInTheDocument();
+    expect(screen.getByText('Thông tin liên hệ')).toBeInTheDocument();
+    expect(screen.getByText(/Đơn vị \/ Chức danh & Chuyên môn/)).toBeInTheDocument();
+    expect(screen.getByText('Chế độ lao động & Đoàn thể')).toBeInTheDocument();
+    expect(screen.getByText('Căn cước công dân')).toBeInTheDocument();
+    expect(screen.getByText('Ghi chú')).toBeInTheDocument();
 
     const submitBtn = screen.getByRole('button', { name: 'Gửi hồ sơ' });
     const completeBtn = screen.getByRole('button', { name: 'Hoàn tất hồ sơ' });

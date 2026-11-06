@@ -77,7 +77,7 @@ export function AnnouncementsPage() {
       <div className="notification-list">
         {state.loading ? <ContentSkeleton rows={8} /> : state.error ? <ErrorState message={state.error} onRetry={state.reload} /> : !rows.length ? <EmptyState description="Không có thông báo phù hợp" /> : rows.map((item) => {
           const meta = sourceMeta[item.sourceModule ?? 'agency'];
-          return <button aria-label={`${item.isRead ? 'Đã xem' : 'Chưa xem'}: ${item.title}`} className={`notification-row${item.isRead ? '' : ' unread'}`} key={item.id} onClick={() => void openAnnouncement(item)} type="button">
+          return <button aria-label={`${item.isRead ? 'Đã xem' : 'Chưa xem'}: ${item.title}`} className={`notification-row announcement-card${item.isRead ? '' : ' unread'}`} key={item.id} onClick={() => void openAnnouncement(item)} type="button">
             <span className={`notification-source-icon ${item.sourceModule ?? 'agency'}`}><ModuleIcon module={meta.module} size={19} /></span>
             <span className="notification-row-content"><span><b>{meta.label}</b><i>·</i><small>{item.issuingDepartment}</small></span><strong>{item.title}</strong><p>{item.summary}</p></span>
             <span className="notification-row-time"><time>{new Date(item.publishedAt).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' })}</time><small>{new Date(item.publishedAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}</small></span>

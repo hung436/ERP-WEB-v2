@@ -4,6 +4,7 @@ import { App } from '@/App';
 
 export function renderApp(path: string, authenticated: boolean | 'admin' = false) {
   window.sessionStorage.clear();
+  window.localStorage.removeItem('erp-session');
   if (authenticated) {
     const token = authenticated === 'admin' ? 'mock-admin-token' : 'mock-token';
     const userId = authenticated === 'admin' ? 'user-admin' : 'user-001';

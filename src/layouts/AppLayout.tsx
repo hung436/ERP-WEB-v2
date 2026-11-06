@@ -1,7 +1,7 @@
 import { Badge, Button, Dropdown, Layout, Tooltip, message } from 'antd';
 import { useEffect, useState } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { LogOut, User as UserIcon } from 'lucide-react';
+import { ChevronDown, LogOut, User as UserIcon } from 'lucide-react';
 
 import { AppSidebar } from '@/layouts/AppSidebar';
 import { BirthdayCelebrationModal } from '@/components/BirthdayCelebrationModal';
@@ -21,7 +21,9 @@ export function AppLayout() {
   const [contactChatting, setContactChatting] = useState(false);
   const { user, logout } = useAuth();
   const [birthdayModalOpen, setBirthdayModalOpen] = useState(false);
-  const isBirthday = isUserBirthday(user);
+  // Tạm ẩn lời chúc sinh nhật và các lối mở trong app shell.
+  const birthdayCelebrationEnabled = false;
+  const isBirthday = birthdayCelebrationEnabled && isUserBirthday(user);
 
   const announcementsState = useAsyncData(async () => (await announcementApi.list()).data);
   const unreadAnnouncements = (announcementsState.data ?? []).filter((item) => !item.isRead).length;
@@ -29,6 +31,11 @@ export function AppLayout() {
   const location = useLocation();
   const isPersonnelPage = location.pathname.startsWith('/personnel');
   const isCloudPage = location.pathname.startsWith('/cloud');
+  const isCalendarDetailPage =
+    location.pathname.startsWith('/calendar/events/') ||
+    location.pathname.startsWith('/calendar/detail/') ||
+    (location.pathname.startsWith('/calendar/') &&
+      !['/calendar/week', '/calendar/notifications', '/calendar/groups'].includes(location.pathname));
 
   useEffect(() => {
     document.body.classList.toggle('personnel-page-open', isPersonnelPage);
@@ -39,6 +46,11 @@ export function AppLayout() {
     document.body.classList.toggle('cloud-page-open', isCloudPage);
     return () => document.body.classList.remove('cloud-page-open');
   }, [isCloudPage]);
+
+  useEffect(() => {
+    document.body.classList.toggle('calendar-detail-page-open', isCalendarDetailPage);
+    return () => document.body.classList.remove('calendar-detail-page-open');
+  }, [isCalendarDetailPage]);
 
   // Auto-open birthday celebration card once per session if today is user's birthday
   useEffect(() => {
@@ -110,7 +122,7 @@ export function AppLayout() {
   return (
     <Layout className="min-h-screen">
       <AppSidebar collapsed={collapsed} onCollapse={setCollapsed} />
-      <Layout className={`app-frame${collapsed ? ' app-frame-collapsed' : ''}${isPersonnelPage ? ' app-frame-personnel' : ''}${isCloudPage ? ' app-frame-cloud' : ''}`}>
+      <Layout className={`app-frame${collapsed ? ' app-frame-collapsed' : ''}${isPersonnelPage ? ' app-frame-personnel' : ''}${isCloudPage ? ' app-frame-cloud' : ''}${isCalendarDetailPage ? ' app-frame-calendar-detail' : ''}`}>
         <header className="app-header">
           <HeaderDirectorySearch onSelect={setSelectedContact} />
           <div className="app-header-account">
@@ -142,12 +154,12 @@ export function AppLayout() {
                   {isBirthday && <span className="avatar-party-hat" title="Chúc mừng sinh nhật!">🥳</span>}
                 </div>
                 <span className="account-name">{user?.fullName}</span>
-                <span aria-hidden>⌄</span>
+                <ChevronDown size={14} aria-hidden="true" className="shrink-0" />
               </Button>
             </Dropdown>
           </div>
         </header>
-        <main className={`app-content${isPersonnelPage ? ' app-content-personnel' : ''}${isCloudPage ? ' app-content-cloud' : ''}`}><Outlet /></main>
+        <main className={`app-content${isPersonnelPage ? ' app-content-personnel' : ''}${isCloudPage ? ' app-content-cloud' : ''}${isCalendarDetailPage ? ' app-content-calendar-detail' : ''}`}><Outlet /></main>
         <ContactQuickView chatting={contactChatting} contact={selectedContact} onChat={startContactChat} onClose={() => { setSelectedContact(null); setContactChatting(false); }} />
         
         {/* BIRTHDAY CELEBRATION MODAL */}

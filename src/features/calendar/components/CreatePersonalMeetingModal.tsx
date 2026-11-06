@@ -1,3 +1,5 @@
+import { readAttachment } from "../attachmentUtils";
+import { filterCalendarPeople, resolveCalendarUserId } from "../calendarMembership";
 import { useEffect, useMemo, useRef, useState } from "react";
 import dayjs, { type Dayjs, isDayjs } from "dayjs";
 import {
@@ -33,6 +35,7 @@ import { calendarApi } from "@/services/api";
 import type { CalendarAttachmentItem, CalendarEvent } from "@/types/domain";
 import { avatarTone, nameInitials } from "@/utils/avatar";
 
+import { getMeetingPhysicalLocation } from "../calendarWeekUtils";
 import { AttachedFilesGrid } from "./AttachedFilesList";
 import { SmartTimePicker } from "./SmartTimePicker";
 import { SmartParticipantPicker } from "./SmartParticipantPicker";
@@ -185,6 +188,7 @@ export function CreatePersonalMeetingModal({
 }: CreatePersonalMeetingModalProps) {
   const { user } = useAuth();
   const currentUserName = user?.fullName || "Nguyễn Minh Anh";
+  const organizerName = editingEvent?.organizer || currentUserName;
   const [form] = Form.useForm<TicketFormValues>();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -195,7 +199,7 @@ export function CreatePersonalMeetingModal({
     (editingEvent?.ticketType as "TASK" | "MEETING" | "EVENT" | undefined) ||
       initialTicketType,
   );
-  const [files, setFiles] = useState<UploadFile[]>([]);
+  const [files, setFiles] = useState<Array<UploadFile & { sourceFile?: File }>>([]);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
@@ -279,15 +283,15 @@ export function CreatePersonalMeetingModal({
           time: effectiveTime,
           startAt: start,
           deadline: end,
-          location: editingEvent.location,
+          location: tType === "MEETING" ? getMeetingPhysicalLocation(editingEvent) : editingEvent.location,
           meetingLink: editingEvent.meetingUrl,
           mode:
-            editingEvent.mode === "hybrid"
+            editingEvent.mode === "hybrid" || (!editingEvent.mode && editingEvent.meetingUrl && getMeetingPhysicalLocation(editingEvent))
               ? ["offline", "online"]
-              : editingEvent.mode === "online"
+              : editingEvent.mode === "online" || (!editingEvent.mode && editingEvent.meetingUrl && !getMeetingPhysicalLocation(editingEvent))
                 ? ["online"]
                 : ["offline"],
-          participants: editingEvent.participants || ["PHAN NGHỆ ĐÔ"],
+          participants: editingEvent.participants ?? [],
           executors: editingEvent.executors?.map((e) => e.name) || [
             "Bùi Lê Thế Kiệt",
           ],
@@ -306,7 +310,8 @@ export function CreatePersonalMeetingModal({
               name: att.name,
               size: att.size,
               type: att.type,
-              status: "done",
+              url: att.url,
+              status: "done" as const,
             })),
           );
         }
@@ -354,13 +359,14 @@ export function CreatePersonalMeetingModal({
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      const newFiles: UploadFile[] = Array.from(e.target.files).map(
+      const newFiles = Array.from(e.target.files).map(
         (f, idx) => ({
           uid: `f-${Date.now()}-${idx}`,
           name: f.name,
           size: f.size,
           type: f.type,
-          status: "done",
+          sourceFile: f,
+          status: "done" as const,
         }),
       );
       setFiles((prev) => [...prev, ...newFiles]);
@@ -429,8 +435,14 @@ export function CreatePersonalMeetingModal({
       setApproverModalError("Vui lòng chọn ít nhất một người duyệt");
       return;
     }
+    const eligibleApprovers = filterCalendarPeople(modalApprovers, (name) => name, selectedParticipantsList);
+    if (eligibleApprovers.length !== modalApprovers.length) {
+      setModalApprovers(eligibleApprovers);
+      setApproverModalError("Người duyệt không được trùng với thành phần đã chọn.");
+      return;
+    }
     setApproverModalError("");
-    form.setFieldValue("approver", modalApprovers);
+    form.setFieldValue("approver", eligibleApprovers);
     setShowApproverModal(false);
     setConfirmActionType("PROPOSE");
     setShowConfirmModal(true);
@@ -535,7 +547,8 @@ export function CreatePersonalMeetingModal({
           60,
         );
         startAtStr = startIso;
-        endAtStr = endIso;
+        const existingDuration = editingEvent ? dayjs(editingEvent.endAt).diff(dayjs(editingEvent.startAt)) : -1;
+        endAtStr = existingDuration >= 0 ? dayjs(startIso).add(existingDuration, "millisecond").toISOString() : endIso;
       } else if (ticketType === "TASK") {
         const { startIso } = extractTimeRange(
           data.time || data.deadline || data.startAt,
@@ -572,30 +585,22 @@ export function CreatePersonalMeetingModal({
             ? "online"
             : "offline";
 
-      const location =
-        ticketType === "MEETING"
-          ? finalMode === "online"
-            ? rawLink || rawLocation || "Trực tuyến"
-            : finalMode === "hybrid"
-              ? [rawLocation, rawLink].filter(Boolean).join(" • ") ||
-                "Phòng họp cơ quan"
-              : rawLocation || "Phòng họp cơ quan"
-          : ticketType === "TASK"
-            ? "Phiếu công việc"
-            : "Sự kiện cơ quan";
+      const location = ticketType === "MEETING" && hasOffline ? rawLocation : "";
 
-      const attachedItems: CalendarAttachmentItem[] = files.map(
-        (file, idx) => ({
-          id: `att-${Date.now()}-${idx}`,
+      const attachedItems: CalendarAttachmentItem[] = await Promise.all(files.map(async (file) => {
+        const existing = editingEvent?.attachments?.find((attachment) => attachment.id === file.uid);
+        return existing ?? {
+          id: file.uid,
           name: file.name,
-          size: file.size || 1024,
+          size: file.size ?? 0,
           type: file.type || "application/octet-stream",
+          url: file.sourceFile ? await readAttachment(file.sourceFile) : file.url,
           uploadedAt: new Date().toISOString(),
           uploadedBy: currentUserName,
-        }),
-      );
+        };
+      }));
 
-      const rawPartsList = (Array.isArray(data.participants)
+      const rawPartsList: string[] = (Array.isArray(data.participants)
         ? data.participants
         : typeof data.participants === "string" && data.participants.trim()
           ? [data.participants]
@@ -603,7 +608,7 @@ export function CreatePersonalMeetingModal({
       )
         .map((p: unknown) => (typeof p === "string" ? p.trim() : typeof (p as { name?: string })?.name === "string" ? ((p as { name?: string }).name || "").trim() : ""))
         .filter(Boolean);
-      const partsList = rawPartsList.length > 0 ? rawPartsList : [currentUserName];
+      const partsList = filterCalendarPeople(rawPartsList, (name) => name, [organizerName]);
 
       let approverName: string | undefined = undefined;
       let initialApprovalStatus: CalendarEvent["approvalStatus"] = "APPROVED";
@@ -642,39 +647,31 @@ export function CreatePersonalMeetingModal({
         }
       }
 
+      if (actionType === "PROPOSE" && filterCalendarPeople(apprListToSave, (name) => name, rawPartsList).length !== apprListToSave.length) {
+        message.error("Người duyệt không được trùng với thành phần đã chọn.");
+        setSaving(false);
+        return;
+      }
+
       const isSendingForApproval =
         actionType === "PROPOSE" ||
         initialApprovalStatus === "PENDING" ||
         (Boolean(approverName) && apprListToSave.length > 0);
 
-      // Quy tắc hệ thống theo yêu cầu:
-      // - Khi tạo phiếu/sự kiện gửi duyệt:
-      //   + Thành phần (participants) sẽ là: Người duyệt và Người tạo
-      //   + Thành phần mà người ta nhập ở form (rawPartsList) sẽ chuyển thành: Người theo dõi (watchers)
-      // - Khi không gửi duyệt (triển khai ngay):
-      //   + Thành phần là danh sách nhân sự đã nhập ở form
-      let finalParticipants: string[] = partsList;
-      let finalWatchers: Array<{ id: string | number; name: string }> = [];
-
-      if (isSendingForApproval) {
-        // Thành phần chính thức gồm: Người tạo và Người duyệt
-        finalParticipants = Array.from(
-          new Set([
-            currentUserName,
-            ...apprListToSave,
-          ])
-        ).filter(Boolean) as string[];
-
-        // Thành phần nhập ở form chuyển thành Người theo dõi
-        const rawWatchers = rawPartsList.filter(
-          (name: string) => !finalParticipants.includes(name)
-        );
-        const watcherNames = rawWatchers.length > 0 ? rawWatchers : rawPartsList;
-        finalWatchers = watcherNames.map((name: string, idx: number) => ({
-          id: `watcher-${idx}-${Date.now()}`,
-          name,
-        }));
-      }
+      const finalParticipants = isSendingForApproval
+        ? filterCalendarPeople(apprListToSave, (name) => name, [organizerName])
+        : partsList;
+      const proposedWatchers = isSendingForApproval
+        ? partsList.map((name, idx) => ({
+            id: resolveCalendarUserId(name) ?? `watcher-${idx}-${Date.now()}`,
+            name,
+          }))
+        : [];
+      const finalWatchers = filterCalendarPeople(
+        [...(editingEvent?.watchers ?? []), ...proposedWatchers],
+        (person) => person.name,
+        [organizerName, ...finalParticipants],
+      );
 
       const firstLine = rawContent.split(/\r?\n/)[0] || currentTypeMeta.name;
       const derivedTitle =
@@ -697,11 +694,12 @@ export function CreatePersonalMeetingModal({
         createdAt: editingEvent?.createdAt || new Date().toISOString(),
         deadline: ticketType === "TASK" ? endAtStr : undefined,
         location,
-        meetingUrl: ticketType === "MEETING" ? (rawLink || undefined) : undefined,
+        meetingUrl: ticketType === "MEETING" && hasOnline ? (rawLink || undefined) : undefined,
         mode: finalMode,
-        organizer: currentUserName,
+        organizer: organizerName,
         leader: ticketType === "MEETING" ? (editingEvent?.leader || currentUserName) : undefined,
         participants: finalParticipants,
+        participantIds: finalParticipants.flatMap((name) => resolveCalendarUserId(name) ?? []),
         participantText: finalParticipants.join(", "),
         participantCount: finalParticipants.length,
         isUserParticipant: true,
@@ -710,25 +708,19 @@ export function CreatePersonalMeetingModal({
         agenda: data.content,
         attachments: attachedItems,
         approver: approverName
-          ? { id: "appr-1", name: approverName }
+          ? { id: resolveCalendarUserId(approverName) ?? "appr-1", name: approverName }
           : undefined,
         approvers: apprListToSave.map((name, idx) => ({
-          id: `appr-${idx}`,
+          id: resolveCalendarUserId(name) ?? `appr-${idx}`,
           name,
           status: 'PENDING',
         })),
         approvalStatus: initialApprovalStatus,
         comments: editingEvent?.comments || [],
         executors: isSendingForApproval
-          ? [
-              {
-                id: `exec-creator`,
-                name: currentUserName,
-                status: 'PENDING',
-              },
-            ]
+          ? []
           : partsList.map((p: string, i: number) => ({
-              id: `exec-${i}`,
+              id: resolveCalendarUserId(p) ?? `exec-${i}`,
               name: p,
               status: actionType === "DEPLOY" ? 'IN_PROGRESS' : 'PENDING',
             })),
@@ -767,15 +759,25 @@ export function CreatePersonalMeetingModal({
         ],
       };
 
-      try {
-        if (isEdit) {
-          await calendarApi.update(newRecord.id, newRecord);
-        } else {
-          await calendarApi.create(newRecord);
-        }
-      } catch {
-        // Fallback local persistence
-      }
+      const savedRecord = isEdit
+        ? await calendarApi.update(newRecord.id, ticketType === "MEETING" ? {
+            title: newRecord.title,
+            notes: newRecord.notes,
+            description: newRecord.description,
+            agenda: newRecord.agenda,
+            startAt: newRecord.startAt,
+            endAt: newRecord.endAt,
+            location: newRecord.location,
+            meetingUrl: newRecord.meetingUrl,
+            mode: newRecord.mode,
+            participants: newRecord.participants,
+            participantIds: newRecord.participantIds,
+            participantText: newRecord.participantText,
+            participantCount: newRecord.participantCount,
+            watchers: newRecord.watchers,
+            attachments: newRecord.attachments,
+          } : newRecord)
+        : await calendarApi.create(newRecord);
 
       setShowConfirmModal(false);
       setSaving(false);
@@ -796,7 +798,7 @@ export function CreatePersonalMeetingModal({
         );
       }
 
-      onSuccess(newRecord);
+      onSuccess(savedRecord.data);
       onClose();
     } catch (err: unknown) {
       setSaving(false);
@@ -1446,6 +1448,7 @@ export function CreatePersonalMeetingModal({
                     <SmartParticipantPicker
                       ticketType="MEETING"
                       targetRole="participants"
+                      excludeNames={[organizerName, ...(editingEvent?.watchers ?? []).map((person) => person.name)]}
                       placeholder="Chọn nhân sự tham dự cuộc họp..."
                     />
                   </Form.Item>
@@ -1468,6 +1471,7 @@ export function CreatePersonalMeetingModal({
               : "Chọn thành phần tham dự"
         }
         initialSelected={selectedParticipantsList}
+        excludeNames={[organizerName, ...(editingEvent?.watchers ?? []).map((person) => person.name)]}
         onCancel={() => {
           isPendingDeployAfterSelection.current = false;
           setShowParticipantModal(false);
@@ -1523,6 +1527,7 @@ export function CreatePersonalMeetingModal({
           <SmartParticipantPicker
             ticketType={ticketType}
             targetRole="approvers"
+            excludeNames={selectedParticipantsList}
             allowGroups={false}
             status={approverModalError ? "error" : undefined}
             value={modalApprovers}
@@ -1658,12 +1663,6 @@ export function CreatePersonalMeetingModal({
                 : typeof rawApprovers === "string" && rawApprovers.trim()
                   ? [rawApprovers]
                   : [];
-          const draftWatchers: string[] =
-            Array.isArray(rawParticipants)
-              ? rawParticipants
-              : typeof rawParticipants === "string" && rawParticipants.trim()
-                ? [rawParticipants]
-                : [];
 
           return (
             <div style={{ padding: "8px 0 4px 0" }}>
@@ -1796,89 +1795,6 @@ export function CreatePersonalMeetingModal({
                 </div>
               )}
 
-              {/* Nếu là Gửi duyệt và có người trong danh sách thành phần: Chuyển thành Người theo dõi và cho phép loại bỏ */}
-              {confirmActionType === "PROPOSE" && draftWatchers.length > 0 && (
-                <div style={{ marginTop: 14 }}>
-                  <div
-                    style={{
-                      fontSize: 13,
-                      fontWeight: 600,
-                      color: "#344054",
-                      marginBottom: 8,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                    }}
-                  >
-                    <span>Chuyển thành người theo dõi ({draftWatchers.length})</span>
-                    <span style={{ fontSize: 11.5, color: "#667085", fontWeight: 400 }}>
-                      Nhận thông báo tiến độ phiếu
-                    </span>
-                  </div>
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-                    {draftWatchers.map((name, pIdx) => (
-                      <span
-                        key={`draft-watcher-${name}-${pIdx}`}
-                        style={{
-                          display: "inline-flex",
-                          alignItems: "center",
-                          gap: 6,
-                          padding: "3px 8px 3px 6px",
-                          backgroundColor: "#f8fafc",
-                          border: "1px solid #e2e8f0",
-                          borderRadius: 14,
-                          fontSize: 12.5,
-                          color: "#334155",
-                        }}
-                      >
-                        <span
-                          className={`mini-avatar ${avatarTone(name)}`}
-                          style={{
-                            width: 18,
-                            height: 18,
-                            borderRadius: "50%",
-                            fontSize: 9,
-                            fontWeight: 700,
-                            display: "inline-flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                          }}
-                        >
-                          {nameInitials(name)}
-                        </span>
-                        <span>{name}</span>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const updated = draftWatchers.filter((n) => n !== name);
-                            setModalParticipants(updated);
-                            form.setFieldValue("participants", updated);
-                          }}
-                          title={`Bỏ người theo dõi: ${name}`}
-                          aria-label={`Bỏ người theo dõi: ${name}`}
-                          style={{
-                            display: "inline-flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            width: 16,
-                            height: 16,
-                            padding: 0,
-                            marginLeft: 2,
-                            border: "none",
-                            background: "transparent",
-                            color: "#94a3b8",
-                            cursor: "pointer",
-                            borderRadius: "50%",
-                            transition: "all 0.15s ease",
-                          }}
-                        >
-                          <CloseOutlined style={{ fontSize: 9 }} />
-                        </button>
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
             </div>
           );
         })()}

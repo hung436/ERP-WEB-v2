@@ -4,20 +4,12 @@ import dayjs, { type Dayjs } from 'dayjs';
 import {
   ChevronLeft,
   ChevronRight,
-  MapPin,
-  MessageSquare,
-  Paperclip,
-  Plus,
   ShieldCheck,
-  Users,
-  Video,
   X,
 } from 'lucide-react';
 
-import type { CalendarEvent } from '@/types/domain';
 
 import { getDayDutyInfo } from '../dutySchedule';
-import { getApprovalStatusMeta } from '../calendarWeekUtils';
 
 import './DayScheduleDrawer.css';
 
@@ -26,10 +18,9 @@ const VI_DAY_NAMES = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Th�
 interface DayScheduleDrawerProps {
   open: boolean;
   onClose: () => void;
+  afterOpenChange?: (open: boolean) => void;
   day: Dayjs | null;
-  events: CalendarEvent[];
-  onSelectEvent: (event: CalendarEvent) => void;
-  onCreateEvent: (day: Dayjs) => void;
+  onCreateEvent?: (day: Dayjs) => void;
   onPrevDay?: () => void;
   onNextDay?: () => void;
 }
@@ -37,36 +28,27 @@ interface DayScheduleDrawerProps {
 export function DayScheduleDrawer({
   open,
   onClose,
+  afterOpenChange,
   day,
-  events,
-  onSelectEvent,
-  onCreateEvent,
   onPrevDay,
   onNextDay,
 }: DayScheduleDrawerProps) {
   const now = dayjs();
   const currentDay = day || now;
-  const dayStr = currentDay.format('YYYY-MM-DD');
   const dayNameVi = VI_DAY_NAMES[currentDay.day()];
   const isToday = currentDay.isSame(now, 'day');
 
   // Trực ban & ca trực trong ngày
   const duty = useMemo(() => getDayDutyInfo(currentDay), [currentDay]);
 
-  // Các sự kiện thuộc ngày được chọn, xếp theo thời gian
-  const dayEvents = useMemo(() => {
-    return events
-      .filter((ev) => dayjs(ev.startAt).format('YYYY-MM-DD') === dayStr)
-      .sort((a, b) => dayjs(a.startAt).diff(dayjs(b.startAt)));
-  }, [events, dayStr]);
-
   return (
     <Drawer
-      aria-label={`Lịch làm việc ${dayNameVi}, ngày ${currentDay.format('DD/MM/YYYY')}`}
+      aria-label={`Lịch ca trực ${dayNameVi}, ngày ${currentDay.format('DD/MM/YYYY')}`}
       className="day-schedule-drawer"
       closable={false}
       destroyOnClose={false}
       onClose={onClose}
+      afterOpenChange={afterOpenChange}
       open={open}
       placement="right"
       rootClassName="day-schedule-drawer"
@@ -81,7 +63,7 @@ export function DayScheduleDrawer({
         },
       }}
       title={null}
-      width={520}
+      width="min(460px, 100vw)"
     >
       <div className="day-schedule-wrapper">
         {/* Header thứ ngày đơn giản, gọn gàng, cố định ở trên */}
@@ -121,20 +103,10 @@ export function DayScheduleDrawer({
 
               {isToday && <Tag className="tag-today-pill" color="blue">Hôm nay</Tag>}
             </div>
-            <span className="day-subtitle-count">{dayEvents.length} sự kiện</span>
+            <span className="day-subtitle-count">Lịch trực ban & Ca trực tòa soạn</span>
           </div>
 
           <div className="day-schedule-header-actions">
-            <Button
-              className="btn-create-day-meeting-compact"
-              icon={<Plus size={14} />}
-              onClick={() => onCreateEvent(currentDay)}
-              size="middle"
-              type="primary"
-              aria-label="Tạo"
-            >
-              Tạo
-            </Button>
             <Button
               aria-label="Đóng"
               className="day-drawer-close-btn"
@@ -145,19 +117,18 @@ export function DayScheduleDrawer({
           </div>
         </header>
 
-        {/* Thân cuộn: Trực ban & Danh sách sự kiện */}
+        {/* Thân cuộn: Trực ban và ca trực */}
         <div className="day-schedule-scroll-body">
-          {/* Trực ban & Ca trực trong ngày: Viết liền Trực: {leader} */}
-          {duty && (
+          {duty ? (
             <section className="day-schedule-duty-banner">
               <div className="duty-banner-header">
-                <ShieldCheck className="duty-banner-icon" size={15} />
+                <ShieldCheck className="duty-banner-icon" size={18} />
                 <span className="duty-banner-inline-leader">
                   <strong>Trực:</strong> {duty.leader}
                 </span>
               </div>
 
-              {duty.shifts.length > 0 && (
+              {duty.shifts.length > 0 ? (
                 <div className="duty-banner-shifts-list">
                   {duty.shifts.map((shift, idx) => (
                     <div className="duty-banner-shift-row" key={idx}>
@@ -178,169 +149,20 @@ export function DayScheduleDrawer({
                     </div>
                   ))}
                 </div>
+              ) : (
+                <div style={{ padding: '8px 0', fontSize: 14, color: '#64748b', fontStyle: 'italic' }}>
+                  Chưa có phân công ca trực cụ thể cho ngày này.
+                </div>
               )}
             </section>
+          ) : (
+            <div className="day-schedule-empty">
+              <Empty
+                description={`Không có thông tin ca trực trong ${dayNameVi.toLowerCase()}, ngày ${currentDay.format('DD/MM')}.`}
+                image={Empty.PRESENTED_IMAGE_SIMPLE}
+              />
+            </div>
           )}
-
-          {/* Danh sách các sự kiện trong ngày */}
-          <div className="day-schedule-events-container">
-            {dayEvents.length === 0 ? (
-              <div className="day-schedule-empty">
-                <Empty
-                  description={`Không có sự kiện hoặc lịch họp nào trong ${dayNameVi.toLowerCase()}, ngày ${currentDay.format('DD/MM')}.`}
-                  image={Empty.PRESENTED_IMAGE_SIMPLE}
-                >
-                  <Button
-                    icon={<Plus size={14} />}
-                    onClick={() => onCreateEvent(currentDay)}
-                    type="primary"
-                  >
-                    Tạo mới
-                  </Button>
-                </Empty>
-              </div>
-            ) : (
-              <div className="day-schedule-timeline-list">
-                {dayEvents.map((event) => {
-                  const start = dayjs(event.startAt);
-                  const isEditorial = event.scope === 'editorial';
-                  const isPersonal = event.scope === 'personal';
-                  const isTaskTicket = event.ticketType === 'TASK';
-                  const isEventTicket = event.ticketType === 'EVENT';
-                  const isUserAttending = Boolean(event.isUserParticipant || event.isUserWatcher);
-                  const isAttendingMeeting =
-                    event.ticketType === 'MEETING' && isUserAttending;
-
-                  // Màu sắc thẻ đồng bộ tuyệt đối với WeekTimeline:
-                  // - Lịch BBT có tham gia: theme-red (nền phớt đỏ nhạt, viền đỏ nhạt)
-                  // - Lịch Cá nhân / Phiếu công việc có tham gia: theme-blue (nền phớt xanh nhạt, viền xanh nhạt)
-                  // - Sự kiện có tham gia: theme-green (nền phớt xanh ngọc nhạt, viền xanh ngọc nhạt)
-                  // - Lịch không tham gia: theme-gray (nền trắng/xám phẳng, viền xám nhạt)
-                  let cardColorClass = 'theme-gray';
-                  if (!isUserAttending) {
-                    cardColorClass = 'theme-gray';
-                  } else if (isTaskTicket || isPersonal) {
-                    cardColorClass = 'theme-blue';
-                  } else if (isAttendingMeeting) {
-                    cardColorClass = 'theme-red';
-                  } else if (isEventTicket) {
-                    cardColorClass = 'theme-green';
-                  }
-
-                  const approvalMeta = getApprovalStatusMeta(event.approvalStatus, event.ticketType, event.workflowType);
-                  const hasStatus = Boolean(
-                    approvalMeta &&
-                    approvalMeta.label &&
-                    (!isEditorial || (event.approvalStatus && event.approvalStatus !== 'SCHEDULED')) &&
-                    approvalMeta.value !== 'SCHEDULED'
-                  );
-
-                  const canOpen = isUserAttending;
-
-                  // Danh sách tham gia
-                  const participantsText =
-                    event.participantText ||
-                    (event.participants && event.participants.length > 0
-                      ? event.participants.join(', ')
-                      : (event.leader || event.organizer));
-
-                  return (
-                    <div
-                      className={`day-event-card ${cardColorClass}`}
-                      key={event.id}
-                      onClick={() => {
-                        if (canOpen) onSelectEvent(event);
-                      }}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          e.preventDefault();
-                          if (canOpen) onSelectEvent(event);
-                        }
-                      }}
-                      role="button"
-                      style={{ cursor: canOpen ? 'pointer' : 'default' }}
-                      tabIndex={0}
-                    >
-                      {/* Cột mốc thời gian */}
-                      <div className="day-event-time-col">
-                        <span className="event-start-time">{start.format('HH:mm')}</span>
-                      </div>
-
-                      {/* Cột nội dung chi tiết */}
-                      <div className="day-event-content-col">
-                        <div className="day-event-tags-row">
-                          {event.ticketType === 'MEETING' && (
-                            <Tag className={isAttendingMeeting ? 'event-badge-type-meeting' : 'event-badge-type-meeting-gray'}>
-                              Lịch họp
-                            </Tag>
-                          )}
-                          {event.ticketType === 'TASK' && (
-                            <Tag className="event-badge-type-task">Phiếu công việc</Tag>
-                          )}
-                          {event.ticketType === 'EVENT' && (
-                            <Tag className="event-badge-type-event">Sự kiện</Tag>
-                          )}
-                          {hasStatus && (
-                            <span className={`booking-week-status-badge booking-week-status-${approvalMeta.tone}`}>
-                              {approvalMeta.label}
-                            </span>
-                          )}
-                          {event.isAdjusted && (
-                            <Tag className="event-badge-adjusted" color="gold">
-                              Đã điều chỉnh
-                            </Tag>
-                          )}
-                        </div>
-
-                        <h4 className="day-event-title">{event.title}</h4>
-
-                        <div className="day-event-meta-list">
-                          {/* Địa điểm / Trực tuyến */}
-                          {(event.meetingUrl || event.platform) ? (
-                            <div className="day-event-meta-item is-online">
-                              <Video size={13} style={{ flexShrink: 0 }} />
-                              <span>Họp trực tuyến {event.platform ? `(${event.platform})` : ''}</span>
-                            </div>
-                          ) : event.location ? (
-                            <div className="day-event-meta-item">
-                              <MapPin size={13} style={{ flexShrink: 0 }} />
-                              <span>{event.location}</span>
-                            </div>
-                          ) : null}
-
-                          {/* Danh sách tham gia */}
-                          {Boolean(participantsText?.trim()) && (
-                            <div className="day-event-meta-item is-participants" title={participantsText}>
-                              <Users size={13} style={{ flexShrink: 0 }} />
-                              <span className="participants-text-line">{participantsText}</span>
-                            </div>
-                          )}
-
-                          {/* Tài liệu & Thảo luận dạng icon và số lượng đơn giản */}
-                          {(Boolean(event.attachments?.length) || Boolean(event.comments?.length)) && (
-                            <div className="day-event-meta-counts">
-                              {Boolean(event.attachments?.length) && (
-                                <span className="meta-count-chip" title={`${event.attachments!.length} tài liệu đính kèm`}>
-                                  <Paperclip size={12} />
-                                  <span>{event.attachments!.length}</span>
-                                </span>
-                              )}
-                              {Boolean(event.comments?.length) && (
-                                <span className="meta-count-chip" title={`${event.comments!.length} thảo luận`}>
-                                  <MessageSquare size={12} />
-                                  <span>{event.comments!.length}</span>
-                                </span>
-                              )}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
         </div>
       </div>
     </Drawer>

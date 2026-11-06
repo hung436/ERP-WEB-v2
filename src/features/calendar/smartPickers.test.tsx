@@ -175,7 +175,7 @@ describe('Milestone 1: SmartTimePicker Component (Custom Antd DatePicker)', () =
   });
 
   it('bảo toàn hàm Dayjs.prototype.date(), không bị đè thuộc tính date làm lỗi rc-picker', () => {
-    let capturedVal: any = null;
+    let capturedVal = dayjs();
     const handleChange = vi.fn((val) => {
       capturedVal = val;
     });
@@ -187,7 +187,7 @@ describe('Milestone 1: SmartTimePicker Component (Custom Antd DatePicker)', () =
 
     const { container } = render(
       <SmartTimePicker
-        value={brokenInput as any}
+        value={brokenInput}
         ticketType="TASK"
         onChange={handleChange}
       />,
@@ -200,7 +200,7 @@ describe('Milestone 1: SmartTimePicker Component (Custom Antd DatePicker)', () =
 
   it('cho phép click chọn ngày và giờ trong popup mà không bị crash date.date is not a function', async () => {
     const user = userEvent.setup();
-    let capturedVal: any = null;
+    let capturedVal = dayjs();
     const handleChange = vi.fn((val) => {
       capturedVal = val;
     });

@@ -49,9 +49,9 @@ const CouncilIcon = ({ size = 16 }: { size?: number }) => (
 );
 
 const modeOptions = [
-  { value: 'self', label: 'Phiếu của tôi', icon: <UserIcon /> },
-  { value: 'scoring', label: 'Chấm điểm', icon: <TeamIcon /> },
-  { value: 'council', label: 'Hội đồng kiểm tra', icon: <CouncilIcon /> },
+  { value: 'self', label: 'Phiếu của tôi', ariaLabel: 'Phiếu của tôi', icon: <UserIcon /> },
+  { value: 'scoring', label: 'Đánh giá cấp', ariaLabel: 'Chấm điểm', icon: <TeamIcon /> },
+  { value: 'council', label: 'Hội đồng kiểm tra', ariaLabel: 'Hội đồng kiểm tra', icon: <CouncilIcon /> },
 ];
 
 const stageOrder: EvaluationStage[] = ['self', 'deputy', 'manager', 'editorial', 'council'];
@@ -134,10 +134,7 @@ const stageTotalScore = (sheet: EvaluationSheet, stage: EvaluationStage | 'publi
 const previousStagesFor = (sheet: EvaluationSheet, mode: EvaluationMode) => {
   const isPublished = sheet.status === 'published' || sheet.stage === 'published';
   if (isPublished) {
-    if (mode === 'self') {
-      return ['self', 'published'] as EvaluationStage[];
-    }
-    return stageOrder;
+    return [...stageOrder, 'published'] as EvaluationStage[];
   }
   if (mode === 'self') {
     return [];
@@ -322,6 +319,7 @@ function EmployeeEvaluationListTable({
               <th className="text-center">Hội đồng đánh giá</th>
               <th className="text-center">Điểm bình quân</th>
               <th>Trạng thái</th>
+              <th className="text-center">Thao tác</th>
             </tr>
           </thead>
           <tbody>
@@ -381,6 +379,15 @@ function EmployeeEvaluationListTable({
                       <span className={`status-badge status-${sheet.status}`}>
                         {getStageStatusText(sheet)}
                       </span>
+                    </td>
+                    <td className="text-center" onClick={(e) => e.stopPropagation()}>
+                      <Button
+                        type="link"
+                        size="small"
+                        onClick={() => onSelectSheet(sheet.id)}
+                      >
+                        {sheet.status === 'published' ? 'Xem phiếu' : 'Chấm điểm'}
+                      </Button>
                     </td>
                   </tr>
                 );
@@ -1100,11 +1107,12 @@ function EvaluationWorkspace({
       sheets.filter((sheet) => {
         if (sheet.periodId !== periodId) return false;
         if (isAdmin) return true;
+        const isSelf = sheet.employeeCode === 'NV-001' || sheet.employeeCode === 'NV-2026-009' || sheet.employeeName === 'Nguyễn Minh Anh';
         return mode === 'self'
-          ? sheet.employeeCode === 'NV-001'
+          ? isSelf
           : mode === 'scoring'
-          ? sheet.employeeCode !== 'NV-001' && sheet.stage !== 'council'
-          : sheet.employeeCode !== 'NV-001' && (sheet.stage === 'council' || sheet.status === 'published');
+          ? !isSelf && sheet.stage !== 'council'
+          : !isSelf && (sheet.stage === 'council' || sheet.status === 'published');
       }),
     [isAdmin, mode, periodId, sheets]
   );
@@ -1323,6 +1331,9 @@ function EvaluationWorkspace({
     <div className="evaluation-workspace">
       {/* Header Bar */}
       <header className="evaluation-workspace-header">
+        <div className="evaluation-workspace-brand">
+          <h1>Đánh giá lao động</h1>
+        </div>
         {isAdmin && (
           <div className="evaluation-workspace-brand">
             <Tag color="gold">👑 Quản trị viên</Tag>
@@ -1372,7 +1383,7 @@ function EvaluationWorkspace({
                     key={opt.value}
                     type="button"
                     role="radio"
-                    aria-label={opt.label}
+                    aria-label={opt.ariaLabel || opt.label}
                     aria-checked={isActive}
                     className={`flat-tab-btn${isActive ? ' active' : ''}`}
                     onClick={() => {
@@ -1809,7 +1820,7 @@ function EvaluationWorkspace({
 
 
                 {/* Action Buttons inside Side Panel */}
-                {!readOnly && (
+                {(!readOnly || mode === 'council') && draft?.status !== 'published' && (
                   <div className="side-panel-actions">
                     <Button
                       className="btn-save-draft"
@@ -1835,29 +1846,13 @@ function EvaluationWorkspace({
                               <div className="confirm-modal-header">
                                 <span className="confirm-modal-icon"><Send size={24} /></span>
                                 <div className="confirm-modal-title">
-                                  <h3>Xác nhận gửi phiếu đánh giá</h3>
+                                  <h3>{mode === 'council' ? 'Xác nhận chốt kết quả đánh giá' : mode === 'scoring' ? 'Xác nhận hoàn tất chấm điểm' : 'Xác nhận gửi phiếu đánh giá'}</h3>
                                   <p>Vui lòng kiểm tra lại điểm số trước khi chốt phiếu</p>
-                                </div>
-                              </div>
-
-                              <div className="confirm-score-card">
-                                <span className="score-card-label">🏆 TỔNG ĐIỂM ĐÃ CHẤM</span>
-                                <strong className="score-card-value">{totalScore(draft)} <small>điểm</small></strong>
-                              </div>
-
-                              <div className="confirm-stats-grid">
-                                <div className="confirm-stat-item">
-                                  <small>Tiến độ hoàn thành</small>
-                                  <strong>{answered}/{criteria.length} tiêu chí ({completion}%)</strong>
-                                </div>
-                                <div className="confirm-stat-item">
-                                  <small>Người được đánh giá</small>
-                                  <strong>{draft.employeeName}</strong>
                                 </div>
                               </div>
                             </div>
                           ),
-                          okText: 'Xác nhận & Gửi phiếu ngay',
+                          okText: mode === 'council' ? 'Chốt kết quả' : mode === 'scoring' ? 'Hoàn tất chấm điểm' : 'Xác nhận & Gửi phiếu ngay',
                           cancelText: 'Quay lại xem',
                           okButtonProps: { type: 'primary', className: 'confirm-ok-btn' },
                           onOk: () => void persist(true),
@@ -1868,7 +1863,7 @@ function EvaluationWorkspace({
                         <Send size={15} />
                       </span>
                       <span className="btn-submit-text">
-                        Gửi phiếu đánh giá
+                        {mode === 'council' ? 'Chốt kết quả' : mode === 'scoring' ? 'Hoàn tất chấm điểm' : 'Gửi phiếu đánh giá'}
                       </span>
                     </Button>
                   </div>
@@ -1885,15 +1880,7 @@ function EvaluationWorkspace({
 
       {/* Note Modal */}
       <Modal
-        title={
-          <div className="note-modal-title">
-            <span className="note-modal-icon" aria-hidden="true">📝</span>
-            <div>
-              <h3>Ghi chú &amp; minh chứng</h3>
-              <p>Nội dung này hiển thị cho các cấp chấm điểm phía sau</p>
-            </div>
-          </div>
-        }
+        title="Ghi chú tiêu chí"
         open={Boolean(noteCriterion)}
         onCancel={() => setNoteCriterionId(null)}
         destroyOnHidden

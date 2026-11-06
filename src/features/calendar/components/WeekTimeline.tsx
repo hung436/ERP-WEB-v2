@@ -1,62 +1,22 @@
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import type { Dayjs } from 'dayjs';
-import { Button, Popover, Skeleton, message } from 'antd';
+import { Skeleton, message } from 'antd';
 import {
-  DownOutlined,
   EnvironmentOutlined,
   RightOutlined,
   StarFilled,
   StarOutlined,
-  UserOutlined,
 } from '@ant-design/icons';
 
 import {
   dayNames,
   eventTime,
-  eventTimeRange,
   getApprovalStatusMeta,
+  getCalendarStatusDotTone,
   isPastEvent,
   positionEvents,
-  type DutyShiftData,
   type NormalizedMeetingEvent,
 } from '../calendarWeekUtils';
-
-
-export function DutyInfo({ duty, past = false }: { duty?: DutyShiftData; past?: boolean }) {
-  if (!duty) return <span className="booking-week-muted">Chưa có thông tin trực</span>;
-  const shifts = duty.shifts;
-  if (!shifts) return null;
-
-  const shiftList = Array.isArray(shifts)
-    ? shifts.map((s) => ({
-        label: s.name ? `${s.name}:` : '',
-        details: [
-          s.tkts ? `TKTS: ${s.tkts}` : '',
-          s.btv ? `BTV: ${s.btv}` : '',
-        ].filter(Boolean).join(' · '),
-      }))
-    : Object.entries(shifts).map(([key, value]) => {
-        const label = `${key.replace(/_/g, ' ').replace(/^ca/i, 'Ca')}:`;
-        const details =
-          typeof value === 'object' && value !== null
-            ? Object.entries(value)
-                .map(([role, names]) => `${role.toUpperCase()}: ${Array.isArray(names) ? names.join(', ') : names || '—'}`)
-                .join(' · ')
-            : String(value || '—');
-        return { label, details };
-      });
-
-  return (
-    <div className="booking-week-duty-details">
-      {duty.leader && <strong className={past ? 'booking-week-past-duty' : ''}>{duty.leader}</strong>}
-      {shiftList.map((item, idx) => (
-        <div key={idx} className={past ? 'booking-week-past-duty' : ''}>
-          <b>{item.label}</b> {item.details}
-        </div>
-      ))}
-    </div>
-  );
-}
 
 interface EventCardProps {
   event: NormalizedMeetingEvent;
@@ -94,7 +54,7 @@ export const EventCard = memo(function EventCard({
 
   const approvalMeta = getApprovalStatusMeta(event.approvalStatus, event.ticketType, event.workflowType);
   const typeKey = String(event.ticketType || 'MEETING').toLowerCase();
-  const statusKey = approvalMeta.tone;
+  const statusDotTone = getCalendarStatusDotTone(event.approvalStatus, event.scope);
 
   const past = isPastEvent(event, now);
 
@@ -104,7 +64,7 @@ export const EventCard = memo(function EventCard({
     setStarred(nextState);
     onToggleInterest?.(event, nextState);
     if (nextState) {
-      message.success(`Đã quan tâm: "${event.title}". Bạn sẽ được nhắc nhở trước 15 phút!`);
+      message.success('Đã quan tâm');
     } else {
       message.info(`Đã hủy nhắc nhở lịch "${event.title}".`);
     }
@@ -118,13 +78,12 @@ export const EventCard = memo(function EventCard({
       } ${past ? 'booking-week-past-event is-past-event' : ''}`}
       style={
         vertical || compact
-          ? ({ border: 'none', ...(past ? { opacity: 0.65 } : {}) } as React.CSSProperties)
+          ? { border: 'none' }
           : ({
               border: 'none',
               left: `${left}%`,
-              width: `calc(${width}% - 4px)`,
+              width: `calc(${width}% - 2px)`,
               ['--booking-week-right']: `${100 - left - width}%`,
-              ...(past ? { opacity: 0.65 } : {}),
             } as React.CSSProperties)
       }
     >
@@ -132,11 +91,12 @@ export const EventCard = memo(function EventCard({
         type="button"
         className="booking-week-card-button"
         aria-label={`${eventTime(event)} ${event.title}`}
+        data-calendar-event={event.id}
         onClick={() => onSelect(event)}
         style={{ cursor: 'pointer', position: 'relative' }}
       >
         {/* Chấm tròn vàng ở góc phải nếu lịch đã điều chỉnh (Task 7) */}
-        {event.isAdjusted && (
+        {isEditorial && event.isAdjusted && (
           <span
             className="booking-week-adjusted-dot"
             title={event.adjustedNote ? `Đã điều chỉnh: ${event.adjustedNote}` : 'Lịch đã điều chỉnh'}
@@ -146,10 +106,12 @@ export const EventCard = memo(function EventCard({
         <div className="booking-week-card-top">
           <div className="booking-week-card-time-group" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
             {/* Chấm tròn trạng thái trước giờ (Task 7) */}
-            <span
-              className={`booking-week-status-dot dot-${statusKey}`}
-              title={`Trạng thái: ${approvalMeta.label}`}
-            />
+            {statusDotTone && (
+              <span
+                className={`booking-week-status-dot dot-${statusDotTone}`}
+                title={`Trạng thái: ${approvalMeta.label}`}
+              />
+            )}
             <span
               className={`booking-week-card-time ${isUserAttending ? 'is-attending-time' : ''}`}
               title={eventTime(event)}
@@ -159,29 +121,6 @@ export const EventCard = memo(function EventCard({
             </span>
           </div>
 
-          {isEditorial && !isUserAttending && !past && (
-            <span
-              role="button"
-              tabIndex={0}
-              className={`booking-week-card-star ${starred ? 'is-interested' : ''}`}
-              aria-label="Quan tâm lịch họp"
-              title="Nhắc trước 15 phút"
-              onClick={handleToggleStar}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  handleToggleStar(e);
-                }
-              }}
-            >
-              {starred ? <StarFilled style={{ color: '#f59e0b' }} /> : <StarOutlined />}
-              {starred && (
-                <span style={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clip: 'rect(0,0,0,0)' }}>
-                  Bạn sẽ được nhắc nhở trước 15 phút
-                </span>
-              )}
-            </span>
-          )}
         </div>
 
         {(event.continuesFromPreviousDay || event.continuesToNextDay) && (
@@ -194,26 +133,27 @@ export const EventCard = memo(function EventCard({
         <div className="booking-week-card-title">{event.title}</div>
 
         <div className="booking-week-card-meta-list">
-          {Boolean(event.location) && (
+          {!(event.scope === 'personal' && event.ticketType === 'EVENT') && Boolean(event.location) && (
             <div className="booking-week-card-location" title={event.location}>
               <EnvironmentOutlined className="booking-week-card-loc-icon" aria-hidden="true" style={{ color: '#667085' }} />
               <span>{event.location}</span>
             </div>
           )}
-          {event.ticketType === 'MEETING' && Boolean(event.leader?.trim()) && (
-            <div className="booking-week-card-leader" title={`Chủ trì: ${event.leader}`}>
-              <UserOutlined className="booking-week-card-loc-icon" aria-hidden="true" style={{ color: '#667085' }} />
-              <span>Chủ trì: <strong>{event.leader}</strong></span>
-            </div>
-          )}
-          {event.ticketType === 'TASK' && Boolean(event.executorText) && (
-            <div className="booking-week-card-leader" title={`Thực hiện: ${event.executorText}`}>
-              <UserOutlined className="booking-week-card-loc-icon" aria-hidden="true" style={{ color: '#667085' }} />
-              <span>{event.executorText}</span>
-            </div>
-          )}
+
         </div>
       </button>
+      {isEditorial && !isUserAttending && !past && (
+        <button
+          type="button"
+          className={`booking-week-card-star ${starred ? 'is-interested' : ''}`}
+          aria-label="Quan tâm lịch họp"
+          aria-pressed={starred}
+          title={starred ? 'Bỏ quan tâm' : 'Quan tâm lịch họp'}
+          onClick={handleToggleStar}
+        >
+          {starred ? <StarFilled className="calendar-star-icon" /> : <StarOutlined className="calendar-star-icon" />}
+        </button>
+      )}
     </div>
   );
 });
@@ -291,10 +231,9 @@ function OutHoursSlot({
 export interface WeekTimelineProps {
   week: Dayjs;
   now: Dayjs;
-  selectedDate: Dayjs;
+  selectedDate: Dayjs | null;
   events: NormalizedMeetingEvent[];
-  duties: Record<string, DutyShiftData>;
-  showDuty?: boolean;
+
   onSelectDay: (day: Dayjs) => void;
   onSelectEvent: (event: NormalizedMeetingEvent) => void;
   onToggleInterest?: (event: NormalizedMeetingEvent, nextState: boolean) => void;
@@ -307,14 +246,33 @@ export function WeekTimeline({
   now,
   selectedDate,
   events,
-  duties,
-  showDuty = true,
+
   onSelectDay,
   onSelectEvent,
   onToggleInterest,
   loading = false,
   disabledHover = false,
 }: WeekTimelineProps) {
+  const gridRef = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => {
+    const grid = gridRef.current;
+    if (!grid) return;
+    const fitRows = () => {
+      grid.querySelectorAll<HTMLElement>('.booking-week-day-row').forEach((row) => {
+        const cards = Array.from(row.querySelectorAll<HTMLElement>('.booking-week-day-track .booking-week-event'));
+        const heights = cards.map((card) => card.offsetHeight);
+        const outsideHeights = Array.from(row.querySelectorAll<HTMLElement>('.booking-week-out-hours-slot'), (slot) =>
+          Array.from(slot.querySelectorAll<HTMLElement>('.booking-week-event'))
+            .reduce((height, card) => height + card.offsetHeight + 6, 10),
+        );
+        row.style.minHeight = Math.max(118, ...outsideHeights, ...heights.map((height) => height + 8)) + 'px';
+      });
+    };
+    fitRows();
+    const observer = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(fitRows);
+    grid.querySelectorAll('.booking-week-event').forEach((card) => observer?.observe(card));
+    return () => observer?.disconnect();
+  }, [events, loading]);
   const hours = Array.from({ length: 11 }, (_, index) => index + 7);
   const currentMinutes = now.hour() * 60 + now.minute();
   const withinTimeline = week.isSame(now, 'isoWeek') && currentMinutes >= 420 && currentMinutes < 1080;
@@ -331,7 +289,7 @@ export function WeekTimeline({
   }, [events]);
 
   return (
-    <div className="booking-week-grid-scroll" aria-label="Lịch họp tuần" aria-busy={loading}>
+    <div ref={gridRef} className="booking-week-grid-scroll" aria-label="Lịch họp tuần" aria-busy={loading}>
       <div className="booking-week-grid">
         <div className="booking-week-hours-row">
           <div className="booking-week-corner" />
@@ -355,7 +313,7 @@ export function WeekTimeline({
         {dayNames.map((name, index) => {
           const day = week.add(index, 'day');
           const date = day.format('YYYY-MM-DD');
-          const selected = date === selectedDate.format('YYYY-MM-DD');
+          const selected = date === selectedDate?.format('YYYY-MM-DD');
           const dayEvents = eventsByDay.get(date) || [];
           const earlyEvents = dayEvents
             .filter((event) => event.start.hour() < 7)
@@ -364,8 +322,6 @@ export function WeekTimeline({
             .filter((event) => event.start.hour() >= 18)
             .sort((a, b) => a.start.valueOf() - b.start.valueOf());
           const normalEvents = dayEvents.filter((event) => event.start.hour() >= 7 && event.start.hour() < 18);
-          const pastDuty = week.isSame(now, 'isoWeek') && day.isBefore(now, 'day');
-          const duty = duties[date];
 
           return (
             <div
@@ -378,6 +334,8 @@ export function WeekTimeline({
                   type="button"
                   className="booking-week-day-button"
                   disabled={loading}
+                  aria-label={`Xem ca trực ngày ${name} ${day.format('DD/MM')}`}
+                  data-calendar-day={date}
                   onClick={() => onSelectDay(day)}
                 >
                   <span className="booking-week-day-title">
@@ -395,29 +353,6 @@ export function WeekTimeline({
                   </span>
                 </button>
 
-                {showDuty &&
-                  (loading ? (
-                    <div className="booking-week-duty-skeleton">
-                      <Skeleton.Input active size="small" style={{ width: 150, height: 14, minWidth: 0 }} />
-                    </div>
-                  ) : (
-                    <Popover
-                      trigger="click"
-                      placement={index >= 5 ? 'topLeft' : 'bottomLeft'}
-                      content={<DutyInfo duty={duty} past={pastDuty} />}
-                      overlayClassName="booking-week-duty-popover"
-                    >
-                      <button
-                        type="button"
-                        className={`booking-week-duty-button ${pastDuty ? 'booking-week-past-duty' : ''}`}
-                        aria-label="Mở rộng các ca trực"
-                      >
-                        <span>TRỰC:</span>
-                        <strong>{duty?.leader || 'Chưa có thông tin'}</strong>
-                        <DownOutlined />
-                      </button>
-                    </Popover>
-                  ))}
               </div>
 
               <OutHoursSlot

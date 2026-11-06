@@ -1,73 +1,17 @@
-import { useMemo, useRef, useState } from 'react';
+import { useMemo } from 'react';
 import type { Dayjs } from 'dayjs';
 import { Skeleton } from 'antd';
-import { DownOutlined, UpOutlined } from '@ant-design/icons';
 
-import { dayNames, type DutyShiftData, type NormalizedMeetingEvent } from '../calendarWeekUtils';
+import { dayNames, type NormalizedMeetingEvent } from '../calendarWeekUtils';
 
 import { EventCard } from './WeekTimeline';
-
-function DutyShifts({ shifts, past = false }: { shifts?: DutyShiftData['shifts']; past?: boolean }) {
-  if (!shifts) return null;
-
-  if (Array.isArray(shifts)) {
-    return (
-      <div className="booking-week-column-shifts">
-        {shifts.map((shift, idx) => (
-          <div className={`booking-week-column-shift ${past ? 'booking-week-past-duty' : ''}`} key={idx}>
-            <b>{shift.name ? `${shift.name}:` : ''}</b>
-            <div>
-              {shift.tkts && (
-                <div className="booking-week-column-role">
-                  <b>TKTS:</b>
-                  <span>{shift.tkts}</span>
-                </div>
-              )}
-              {shift.btv && (
-                <div className="booking-week-column-role">
-                  <b>BTV:</b>
-                  <span>{shift.btv}</span>
-                </div>
-              )}
-            </div>
-          </div>
-        ))}
-      </div>
-    );
-  }
-
-  return (
-    <div className="booking-week-column-shifts">
-      {Object.entries(shifts).map(([name, roles]) => (
-        <div className={`booking-week-column-shift ${past ? 'booking-week-past-duty' : ''}`} key={name}>
-          <b>{name.replace(/_/g, ' ').replace(/^ca/i, 'Ca')}:</b>
-          <div>
-            {typeof roles === 'object' && roles !== null
-              ? Object.entries(roles)
-                  .sort(([a], [b]) =>
-                    a.toUpperCase() === 'TKTS' ? -1 : b.toUpperCase() === 'TKTS' ? 1 : a.localeCompare(b),
-                  )
-                  .map(([role, names]) => (
-                    <div className="booking-week-column-role" key={role}>
-                      <b>{role.toUpperCase()}:</b>
-                      <span>{Array.isArray(names) ? names.join(', ') : String(names || '—')}</span>
-                    </div>
-                  ))
-              : String(roles || '—')}
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
 
 export interface WeekColumnsProps {
   week: Dayjs;
   now: Dayjs;
-  selectedDate: Dayjs;
+  selectedDate: Dayjs | null;
   events: NormalizedMeetingEvent[];
-  duties: Record<string, DutyShiftData>;
-  showDuty?: boolean;
+
   loading?: boolean;
   onSelectDay: (day: Dayjs) => void;
   onSelectEvent: (event: NormalizedMeetingEvent) => void;
@@ -80,17 +24,13 @@ export function WeekColumns({
   now,
   selectedDate,
   events,
-  duties,
-  showDuty = true,
+
   loading = false,
   onSelectDay,
   onSelectEvent,
   onToggleInterest,
   disabledHover = false,
 }: WeekColumnsProps) {
-  const [dutyExpanded, setDutyExpanded] = useState(false);
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
-
   // Tối ưu hóa: Nhóm các sự kiện theo ngày 1 lần duy nhất với useMemo (O(N) thay vì lặp O(7*N))
   const eventsByDay = useMemo(() => {
     const map = new Map<string, NormalizedMeetingEvent[]>();
@@ -105,19 +45,9 @@ export function WeekColumns({
     return map;
   }, [events]);
 
-  const handleToggleDutyExpanded = () => {
-    setDutyExpanded((prev) => {
-      const next = !prev;
-      if (next && scrollContainerRef.current && scrollContainerRef.current.scrollTop > 40) {
-        scrollContainerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
-      }
-      return next;
-    });
-  };
-
   return (
     <div
-      ref={scrollContainerRef}
+
       className="booking-week-columns-scroll"
       aria-label="Lịch họp tuần theo cột ngày"
       aria-busy={loading}
@@ -126,10 +56,10 @@ export function WeekColumns({
         {dayNames.map((name, index) => {
           const day = week.add(index, 'day');
           const date = day.format('YYYY-MM-DD');
-          const duty = duties[date];
-          const selected = date === selectedDate.format('YYYY-MM-DD');
+
+          const selected = date === selectedDate?.format('YYYY-MM-DD');
           const isToday = day.isSame(now, 'day');
-          const pastDuty = week.isSame(now, 'isoWeek') && day.isBefore(now, 'day');
+
           const dayEvents = eventsByDay.get(date) || [];
 
           return (
@@ -145,52 +75,21 @@ export function WeekColumns({
                   <button
                     type="button"
                     className="booking-week-column-day"
-                    aria-label={`Xem danh sách lịch ngày ${name} ${day.format('DD/MM')}`}
+                    aria-label={`Xem ca trực ngày ${name} ${day.format('DD/MM')}`}
+                    data-calendar-day={date}
                     onClick={() => onSelectDay(day)}
                     disabled={loading}
                   >
                     <span className="booking-week-column-day-title">
                       <span>{name}</span>
-                      {isToday && <span className="booking-week-today-pill">Hôm nay</span>}
                     </span>
                     <b className="booking-week-column-date">{day.format('DD/MM')}</b>
                   </button>
                 </div>
 
-                {showDuty && (
-                  <div className="booking-week-column-duty">
-                    {loading ? (
-                      <Skeleton active title={false} paragraph={{ rows: 1, width: ['75%'] }} />
-                    ) : (
-                      <button
-                        type="button"
-                        className={`booking-week-column-leader booking-week-column-leader--interactive ${
-                          pastDuty ? 'booking-week-past-duty' : ''
-                        }`}
-                        aria-expanded={dutyExpanded}
-                        aria-label={dutyExpanded ? 'Thu gọn các ca trực' : 'Mở rộng các ca trực'}
-                        onClick={handleToggleDutyExpanded}
-                      >
-                        <span>Trực:</span>
-                        <strong title={duty?.leader}>{duty?.leader || 'Chưa có thông tin'}</strong>
-                        {duty?.shifts &&
-                          (dutyExpanded ? (
-                            <UpOutlined className="booking-week-duty-chevron" />
-                          ) : (
-                            <DownOutlined className="booking-week-duty-chevron" />
-                          ))}
-                      </button>
-                    )}
-                  </div>
-                )}
               </div>
 
               <div className="booking-week-column-events">
-                {showDuty && !loading && dutyExpanded && duty?.shifts && (
-                  <div className="booking-week-column-shifts-drawer">
-                    <DutyShifts shifts={duty.shifts} past={pastDuty} />
-                  </div>
-                )}
                 {loading ? (
                   [0, 1, 2].map((item) => (
                     <div key={item} className="booking-week-feed-skeleton">
