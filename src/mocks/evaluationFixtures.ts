@@ -80,8 +80,10 @@ export const evaluationCampaigns: EvaluationCampaignFixture[] = [
 ];
 
 export const evaluationPeriods: EvaluationPeriod[] = [
-  { id: '2026-q3', label: 'Quý III/2026', startAt: '2026-08-01T08:00:00+07:00', dueAt: '2026-08-15T17:00:00+07:00', status: 'active' },
-  { id: '2026-q2', label: 'Quý II/2026', startAt: '2026-04-01T08:00:00+07:00', dueAt: '2026-04-15T17:00:00+07:00', status: 'closed' },
+  { id: '2026-q4', label: 'Quý IV/2026', startAt: '2026-10-01T08:00:00+07:00', dueAt: '2026-12-31T17:00:00+07:00', status: 'active' },
+  { id: '2026-q3', label: 'Quý III/2026', startAt: '2026-07-01T08:00:00+07:00', dueAt: '2026-09-30T17:00:00+07:00', status: 'closed' },
+  { id: '2026-q2', label: 'Quý II/2026', startAt: '2026-04-01T08:00:00+07:00', dueAt: '2026-06-30T17:00:00+07:00', status: 'closed' },
+  { id: '2026-q1', label: 'Quý I/2026', startAt: '2026-01-01T08:00:00+07:00', dueAt: '2026-03-31T17:00:00+07:00', status: 'closed' },
 ];
 
 const numberCriterion = (id: string, groupId: string, title: string, max = 5, score: number | null = null) => ({ id, groupId, title, type: 'number' as const, min: 0, max, score });
