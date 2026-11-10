@@ -26,7 +26,7 @@ import './personnel-list.css';
 type EvaluationPersonnelRow = (typeof evaluationPersonnelRows)[number] & { id: string; employmentType?: string };
 type EvaluationGroup = 'BBT' | 'TKTS' | 'TPPB' | 'BTV' | 'NVND' | 'NVCN' | 'NVKD' | 'NVTS' | 'PVCT' | 'PVCM';
 type EmploymentStatus = 'Đang công tác' | 'Tạm hoãn' | 'Đã nghỉ việc' | 'Nghỉ hưu theo chế độ' | 'Chuyển công tác' | string;
-type WorkflowStep = { id: number; role: string; reviewer: string };
+type WorkflowStep = { id: number; level: number; role: string; reviewer: string };
 type PersonnelDocument = { name: string; date: string; size: string; type: string };
 
 const groupOptions: { value: EvaluationGroup; label: string }[] = [
@@ -67,10 +67,10 @@ const statusColors: Record<EvaluationSheet['status'], string> = {
 };
 
 const initialWorkflow: WorkflowStep[] = [
-  { id: 1, role: 'Tự đánh giá', reviewer: 'Cá nhân tự đánh giá' },
-  { id: 2, role: 'Cấp Quản lý', reviewer: 'Trần Xuân Toàn (Quản lý trực tiếp)' },
-  { id: 3, role: 'Cấp Lãnh đạo', reviewer: 'Lê Xuân Trung (Ban Lãnh đạo)' },
-  { id: 4, role: 'Hội đồng thi đua', reviewer: 'Hội đồng đánh giá chất lượng' },
+  { id: 1, level: 1, role: 'Tự đánh giá', reviewer: 'Cá nhân tự đánh giá' },
+  { id: 2, level: 2, role: 'Cấp Quản lý', reviewer: 'Trần Xuân Toàn (Quản lý trực tiếp)' },
+  { id: 3, level: 3, role: 'Cấp Lãnh đạo', reviewer: 'Lê Xuân Trung (Ban Lãnh đạo)' },
+  { id: 4, level: 4, role: 'Hội đồng thi đua', reviewer: 'Hội đồng đánh giá chất lượng' },
 ];
 
 const campaignStages = [
@@ -534,37 +534,7 @@ export function PersonnelListPage() {
       message.warning('Quy trình đánh giá phải có ít nhất 1 cấp.');
       return;
     }
-    const stepToDelete = workflow[index];
-    const capName = `Cấp ${index + 1}`;
-    const heSoName = `hệ số ${index + 1}`;
-
-    Modal.confirm({
-      icon: (
-        <AlertTriangle color="#d92d20" size={26} style={{ marginRight: 12, verticalAlign: 'middle', flexShrink: 0 }} />
-      ),
-      title: (
-        <span style={{ color: '#d92d20', fontWeight: 700, fontSize: 16 }}>
-          Xác nhận xóa cấp đánh giá
-        </span>
-      ),
-      content: (
-        <div style={{ marginTop: 8, fontSize: 13.5, lineHeight: 1.6, color: '#344054' }}>
-          Bạn có chắc chắn muốn xóa <b>{capName} ({heSoName})</b> - Vai trò: <i>&ldquo;{stepToDelete?.role || capName}&rdquo;</i> khỏi quy trình đánh giá không?
-        </div>
-      ),
-      okText: 'Xác nhận xóa',
-      cancelText: 'Hủy',
-      okButtonProps: {
-        danger: true,
-        style: {
-          fontWeight: 600,
-        },
-      },
-      onOk: () => {
-        setWorkflow((previous) => previous.filter((_, itemIndex) => itemIndex !== index));
-        message.success(`Đã xóa ${capName} (${heSoName}) khỏi quy trình đánh giá.`);
-      },
-    });
+    setWorkflow((previous) => previous.filter((_, itemIndex) => itemIndex !== index));
   };
 
   const createCampaign = () => {
@@ -838,10 +808,14 @@ export function PersonnelListPage() {
     }
     if (draggedStep === null || draggedStep === targetIndex) return;
     setWorkflow((previous) => {
+      const existingLevels = [...previous.map((item) => item.level)].sort((a, b) => a - b);
       const next = [...previous];
       const [moved] = next.splice(draggedStep, 1);
       next.splice(targetIndex, 0, moved);
-      return next;
+      return next.map((item, index) => ({
+        ...item,
+        level: existingLevels[index],
+      }));
     });
     setDraggedStep(null);
   };
@@ -1281,10 +1255,10 @@ export function PersonnelListPage() {
                                         ⋮⋮
                                       </span>
                                     </td>
-                                    <td><span className="badge-cap">Cấp {index + 1}</span></td>
+                                    <td><span className="badge-cap">Cấp {step.level}</span></td>
                                     <td>
                                       <Input
-                                        aria-label={`Vai trò cấp ${index + 1}`}
+                                        aria-label={`Vai trò cấp ${step.level}`}
                                         disabled={isPeriodClosed}
                                         onChange={(event) => setWorkflow((previous) => previous.map((item, itemIndex) => itemIndex === index ? { ...item, role: event.target.value } : item))}
                                         size="small"
@@ -1293,17 +1267,17 @@ export function PersonnelListPage() {
                                     </td>
                                     <td>
                                       <Input
-                                        aria-label={`Người phụ trách cấp ${index + 1}`}
+                                        aria-label={`Người phụ trách cấp ${step.level}`}
                                         disabled={isPeriodClosed}
                                         onChange={(event) => setWorkflow((previous) => previous.map((item, itemIndex) => itemIndex === index ? { ...item, reviewer: event.target.value } : item))}
                                         size="small"
                                         value={step.reviewer}
                                       />
                                     </td>
-                                    <td><span className="he-so-box">hệ số {index + 1}</span></td>
+                                    <td><span className="he-so-box">hệ số {step.level}</span></td>
                                     <td>
                                       <Button
-                                        aria-label={`Xóa cấp ${index + 1}`}
+                                        aria-label={`Xóa cấp ${step.level}`}
                                         disabled={isPeriodClosed}
                                         onClick={() => removeWorkflowStep(index)}
                                         size="small"
@@ -1320,7 +1294,11 @@ export function PersonnelListPage() {
                           <div className="peopleos-workflow-actions">
                             <Button
                               disabled={isPeriodClosed}
-                              onClick={() => setWorkflow((previous) => [...previous, { id: Date.now(), role: `Cấp phê duyệt ${previous.length + 1}`, reviewer: 'Chưa phân công' }])}
+                              onClick={() => setWorkflow((previous) => {
+                                const maxLevel = previous.length > 0 ? Math.max(...previous.map((s) => s.level ?? 0)) : 0;
+                                const nextLevel = maxLevel + 1;
+                                return [...previous, { id: Date.now(), level: nextLevel, role: `Cấp phê duyệt ${nextLevel}`, reviewer: 'Chưa phân công' }];
+                              })}
                               size="small"
                             >
                               ＋ Thêm cấp
