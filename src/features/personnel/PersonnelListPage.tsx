@@ -11,7 +11,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { ContentSkeleton, ErrorState } from '@/components/AsyncState';
 import { useAsyncData } from '@/hooks/useAsyncData';
-import { evaluationCampaigns } from '@/mocks/evaluationFixtures';
+import { evaluationCampaigns, evaluationPeriods } from '@/mocks/evaluationFixtures';
 import evaluationPersonnelRows from '@/mocks/evaluationPersonnelFixtures.json';
 import { personalProfile } from '@/mocks/personnelFixtures';
 import { evaluationApi, personnelApi } from '@/services/api';
@@ -85,12 +85,12 @@ const campaignStages = [
 type CampaignDateKey = (typeof campaignStages)[number]['key'];
 
 const initialCampaignDates: Record<CampaignDateKey, string> = {
-  start: '30/09/2026',
-  step1: '01/11/2026',
-  step2: '02/11/2026',
-  step3: '03/11/2026',
-  council: '05/11/2026',
-  publish: '06/11/2026',
+  start: '01/10/2026',
+  step1: '15/11/2026',
+  step2: '25/11/2026',
+  step3: '05/12/2026',
+  council: '15/12/2026',
+  publish: '31/12/2026',
 };
 
 const emptyPeriods: EvaluationPeriod[] = [];
@@ -160,7 +160,7 @@ export function PersonnelListPage() {
     if (node) {
       const update = () => {
         if (node.offsetHeight > 0) {
-          setLeftStackHeight(Math.max(node.offsetHeight, 800));
+          setLeftStackHeight(node.offsetHeight);
         }
       };
       update();
@@ -195,19 +195,78 @@ export function PersonnelListPage() {
     return [...customPeople, ...personnelRows];
   }, [customPeople]);
 
-  const periods = state.data?.periods ?? emptyPeriods;
+  // Danh sách kỳ đánh giá bổ sung (khi khởi tạo đợt bình bầu mới)
+  const [customPeriods, setCustomPeriods] = useState<EvaluationPeriod[]>(() => {
+    try {
+      const saved = localStorage.getItem('erp_custom_periods');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  const apiPeriods = state.data?.periods ?? emptyPeriods;
+  const periods = useMemo(() => {
+    const list = [...customPeriods];
+    for (const p of apiPeriods) {
+      if (!list.some((existing) => existing.id === p.id)) {
+        list.push(p);
+      }
+    }
+    return list;
+  }, [customPeriods, apiPeriods]);
+
+  const [selectedPeriodId, setSelectedPeriodId] = useState<string>(() => {
+    try {
+      return localStorage.getItem('erp_selected_period_id') || '';
+    } catch {
+      return '';
+    }
+  });
+
+  const handlePeriodChange = (periodId: string) => {
+    setSelectedPeriodId(periodId);
+    try {
+      localStorage.setItem('erp_selected_period_id', periodId);
+    } catch {}
+  };
+
   const sheets = state.data?.evaluations ?? emptySheets;
-  const [selectedPeriodId, setSelectedPeriodId] = useState('');
   const currentPeriod = periods.find((period) => period.id === selectedPeriodId) ?? periods[0];
   const periodSheets = sheets.filter((sheet) => sheet.periodId === currentPeriod?.id);
 
-  // Kiểm tra nếu kỳ đánh giá đã kết thúc / đã đóng (ví dụ Quý III/2026 hoặc kỳ đã đóng)
+  // Đồng bộ customPeriods vào evaluationPeriods fixture
+  useEffect(() => {
+    if (customPeriods.length > 0) {
+      customPeriods.forEach((cp) => {
+        if (!evaluationPeriods.some((p) => p.id === cp.id)) {
+          evaluationPeriods.unshift(cp);
+        }
+      });
+    }
+  }, [customPeriods]);
+
+  // Kỳ đánh giá mới nhất đang active (ví dụ Quý 4/2026 hoặc đợt vừa khởi tạo)
+  const activePeriod = useMemo(() => {
+    return periods.find((p) => p.status === 'active') ?? periods[0];
+  }, [periods]);
+
+  // Kiểm tra nếu kỳ đánh giá bị khóa:
+  // CHỈ DUY NHẤT kỳ mới nhất (activePeriod) là được phép thao tác.
+  // TẤT CẢ các quý trước đó đều bị khóa hoàn toàn!
   const isPeriodClosed = useMemo(() => {
-    if (!currentPeriod) return false;
-    if (currentPeriod.status === 'closed') return true;
-    if (currentPeriod.dueAt && new Date(currentPeriod.dueAt).getTime() < Date.now()) return true;
-    return currentPeriod.status !== 'active';
-  }, [currentPeriod]);
+    if (!currentPeriod || !activePeriod) return false;
+    // Nếu chọn xem bất kỳ quý nào khác ngoài kỳ active mới nhất -> Khóa!
+    if (currentPeriod.id !== activePeriod.id) {
+      return true;
+    }
+    // Nếu chính kỳ này có trạng thái closed -> Khóa!
+    if (currentPeriod.status === 'closed') {
+      return true;
+    }
+    // Kỳ active mới nhất: Luôn cho phép thao tác!
+    return false;
+  }, [currentPeriod, activePeriod]);
 
   // Trạng thái đã khởi tạo đợt thi đua thành công (để mở khóa tab Lịch trình & Bộ tiêu chí)
   const [isCampaignCreated, setIsCampaignCreated] = useState<boolean>(false);
@@ -228,7 +287,7 @@ export function PersonnelListPage() {
   const [roleDraft, setRoleDraft] = useState<PersonnelAssignment[]>([]);
   const [workStatusDraft, setWorkStatusDraft] = useState<EmploymentStatus>('Đang công tác');
   const [campaignStep, setCampaignStep] = useState(1);
-  const [campaignName, setCampaignName] = useState('Đánh giá lao động Quý 3 năm 2026');
+  const [campaignName, setCampaignName] = useState('Đánh giá lao động Quý 4 năm 2026');
   const [campaignDates, setCampaignDates] = useState(initialCampaignDates);
   const [campaign, setCampaign] = useState(evaluationCampaigns[0]);
   const [criteriaSearch, setCriteriaSearch] = useState('');
@@ -330,7 +389,7 @@ export function PersonnelListPage() {
     const mainAssignment = roleDraft.find((assignment) => assignment.isPrimary) ?? roleDraft[0];
     if (mainAssignment) setDepartmentOverrides((previous) => ({ ...previous, [selectedPerson.id]: mainAssignment.department }));
     setModal(null);
-    message.success('Đã cập nhật đơn vị và chức vụ trong phiên làm việc.');
+    message.success('Đã cập nhật đơn vị và chức vụ ');
   };
 
   // Xử lý khi thêm nhân sự mới thành công -> add ngay vào danh sách nhân sự
@@ -551,6 +610,39 @@ export function PersonnelListPage() {
     setCampaignName(createdCampaign.name);
     setIsCampaignCreated(true);
     setCampaignStep(2);
+
+    // Khóa tất cả các quý trước lại (status: 'closed')
+    evaluationPeriods.forEach((p) => {
+      p.status = 'closed';
+    });
+
+    // Tạo kỳ đánh giá mới và đưa vào danh sách kỳ đánh giá
+    const newPeriodId = `campaign-period-${Date.now()}`;
+    const newPeriod: EvaluationPeriod = {
+      id: newPeriodId,
+      label: campaignName.trim(),
+      startAt: campaignDates.start ? dayjs(campaignDates.start, 'DD/MM/YYYY').toISOString() : new Date().toISOString(),
+      dueAt: campaignDates.publish ? dayjs(campaignDates.publish, 'DD/MM/YYYY').toISOString() : dayjs().add(60, 'day').toISOString(),
+      status: 'active',
+    };
+
+    setCustomPeriods((prev) => {
+      // Khóa tất cả các đợt trước đó trong danh sách
+      const closedPrev = prev.map((p) => ({ ...p, status: 'closed' as const }));
+      const next = [newPeriod, ...closedPrev.filter((p) => p.id !== newPeriodId)];
+      try {
+        localStorage.setItem('erp_custom_periods', JSON.stringify(next));
+      } catch (err) {
+        console.error(err);
+      }
+      return next;
+    });
+
+    if (!evaluationPeriods.some((p) => p.id === newPeriodId)) {
+      evaluationPeriods.unshift(newPeriod);
+    }
+
+    handlePeriodChange(newPeriodId);
     message.success(`Đã khởi tạo thành công đợt thi đua: ${createdCampaign.name}`);
   };
 
@@ -645,7 +737,7 @@ export function PersonnelListPage() {
       render: (value: string, person) => <span className="dept-badge">{departmentOverrides[person.id] ?? value}</span>,
     },
     {
-      title: 'Chức vụ Đảng, Chính quyền, Đoàn thể',
+      title: 'Chức vụ',
       dataIndex: 'positions',
       key: 'positions',
       width: 310,
@@ -658,21 +750,21 @@ export function PersonnelListPage() {
       ),
     },
     {
-      title: 'Đối tượng lao động',
+      title: 'ĐTLĐ',
       dataIndex: 'employmentType',
       key: 'employmentType',
       width: 150,
       render: (_, person) => person.employmentType ?? 'Chính thức',
     },
     {
-      title: 'ĐÁNH GIÁ LAO ĐỘNG',
+      title: 'Mẫu đánh giá',
       dataIndex: 'evaluationModel',
       key: 'evaluationModel',
       width: 170,
       render: (value: string, person) => <span className="badge-mau">{modelOverrides[person.id] ?? value}</span>,
     },
     {
-      title: 'Tình trạng hồ sơ',
+      title: 'Hồ sơ',
       key: 'profileStatus',
       width: 130,
       render: (_, person) => (
@@ -689,7 +781,7 @@ export function PersonnelListPage() {
       ),
     },
     {
-      title: 'Thao tác',
+      // title: 'Thao tác',
       key: 'action',
       width: 80,
       fixed: 'right',
@@ -782,101 +874,96 @@ export function PersonnelListPage() {
             <div className={`peopleos-workspace ${profileActiveTab === 'resume' && isFocusResume ? 'resume-focus-active' : ''}`}>
 
               <div className="peopleos-left-stack" ref={leftStackCallbackRef}>
-                <section className="peopleos-card peopleos-section">
-                  <div className="peopleos-section-title" style={{ flexShrink: 0 }}>
-                    <div>
-                      <span className="section-kicker">Danh sách nhân sự</span>
-                      <h2>Danh sách nhân sự &amp; Chức vụ</h2>
-                    </div>
-                    <Select
-                      aria-label="Kỳ đánh giá"
-                      onChange={setSelectedPeriodId}
-                      options={periods.map((period: EvaluationPeriod) => ({ value: period.id, label: period.label }))}
-                      value={currentPeriod?.id}
-                    />
+                <div className="peopleos-section-title" style={{ flexShrink: 0 }}>
+                  <div>
+                    <h2>Danh sách nhân sự </h2>
                   </div>
+                  <Select
+                    aria-label="Kỳ đánh giá"
+                    onChange={handlePeriodChange}
+                    options={periods.map((period: EvaluationPeriod) => ({ value: period.id, label: period.label }))}
+                    value={currentPeriod?.id}
+                  />
+                </div>
 
-                  <div className="peopleos-toolbar">
-                    <Input
-                      aria-label="Tìm tên, chức vụ, bộ phận"
-                      className="peopleos-search"
-                      onChange={(event) => setSearch(event.target.value)}
-                      placeholder="⌕ Tìm tên, chức vụ, bộ phận..."
-                      value={search}
-                    />
-                    <Select
-                      allowClear
-                      aria-label="Lọc bộ phận"
-                      onChange={(value) => setDepartment(value ?? '')}
-                      placeholder="Tất cả bộ phận"
-                      value={department || undefined}
-                    >
-                      {[...new Set([...departmentOptions, ...Object.values(departmentOverrides)])].map((item) => <Select.Option key={item} value={item}>{item}</Select.Option>)}
-                    </Select>
-                    <Select
-                      allowClear
-                      aria-label="Lọc nhóm đối tượng"
-                      onChange={(value: EvaluationGroup | undefined) => setGroup(value ?? '')}
-                      placeholder="Tất cả nhóm đối tượng"
-                      value={group || undefined}
-                    >
-                      {groupOptions.map((item) => <Select.Option key={item.value} value={item.value}>{item.label}</Select.Option>)}
-                    </Select>
-                    <Select
-                      allowClear
-                      aria-label="Lọc mẫu đánh giá"
-                      onChange={(value) => setModel(value ?? '')}
-                      placeholder="Mọi mẫu đánh giá"
-                      value={model || undefined}
-                    >
-                      {evaluationModels.map((item) => <Select.Option key={item} value={item}>{item}</Select.Option>)}
-                    </Select>
-                    <Button className="btn sm" onClick={clearFilters}>Đặt lại</Button>
-                  </div>
+                <div className="peopleos-toolbar" style={{ flexShrink: 0 }}>
+                  <Input
+                    aria-label="Tìm tên, chức vụ, bộ phận"
+                    className="peopleos-search"
+                    onChange={(event) => setSearch(event.target.value)}
+                    placeholder="⌕ Tìm tên, chức vụ, bộ phận..."
+                    value={search}
+                  />
+                  <Select
+                    allowClear
+                    aria-label="Lọc bộ phận"
+                    onChange={(value) => setDepartment(value ?? '')}
+                    placeholder="Tất cả bộ phận"
+                    value={department || undefined}
+                  >
+                    {[...new Set([...departmentOptions, ...Object.values(departmentOverrides)])].map((item) => <Select.Option key={item} value={item}>{item}</Select.Option>)}
+                  </Select>
+                  <Select
+                    allowClear
+                    aria-label="Lọc nhóm đối tượng"
+                    onChange={(value: EvaluationGroup | undefined) => setGroup(value ?? '')}
+                    placeholder="Tất cả nhóm đối tượng"
+                    value={group || undefined}
+                  >
+                    {groupOptions.map((item) => <Select.Option key={item.value} value={item.value}>{item.label}</Select.Option>)}
+                  </Select>
+                  <Select
+                    allowClear
+                    aria-label="Lọc mẫu đánh giá"
+                    onChange={(value) => setModel(value ?? '')}
+                    placeholder="Mọi mẫu đánh giá"
+                    value={model || undefined}
+                  >
+                    {evaluationModels.map((item) => <Select.Option key={item} value={item}>{item}</Select.Option>)}
+                  </Select>
+                  <Button className="btn sm" onClick={clearFilters}>Đặt lại</Button>
+                </div>
 
-                  <div className="peopleos-tablewrap">
-                    {filteredPeople.length ? (
-                      <Table
-                        columns={columns}
-                        dataSource={filteredPeople}
-                        onRow={(person) => ({
-                          className: person.id === selectedPerson?.id ? 'peopleos-selected-row' : '',
-                          onClick: () => setSelectedId(person.id),
-                          onContextMenu: (event) => {
-                            event.preventDefault();
-                            openRoleEditor(person);
-                          },
-                        })}
-                        pagination={{
-                          current: page,
-                          pageSize,
-                          pageSizeOptions: [10, 25, 50, 100],
-                          showQuickJumper: true,
-                          showSizeChanger: true,
-                          showTotal: (total, range) => `Hiển thị ${range[0]}-${range[1]} trong ${total} hồ sơ`,
-                          total: filteredPeople.length,
-                          itemRender: (current, type, originalElement) => {
-                            if (type === 'jump-next') {
-                              return <span title="Chuyển sang trang tiếp theo" style={{ cursor: 'pointer', color: '#1570ef', fontWeight: 700, fontSize: 14 }}>➔</span>;
-                            }
-                            if (type === 'jump-prev') {
-                              return <span title="Quay về trang trước" style={{ cursor: 'pointer', color: '#1570ef', fontWeight: 700, fontSize: 14 }}>⬅</span>;
-                            }
-                            return originalElement;
-                          },
-                          onChange: (nextPage, nextPageSize) => {
-                            setPageSize(nextPageSize);
-                            setPage(nextPageSize === pageSize ? nextPage : 1);
-                          },
-                        }}
-                        rowKey="id"
-                        scroll={{ x: 1250 }}
-                      />
-                    ) : (
-                      <Empty description="Không tìm thấy nhân sự phù hợp" />
-                    )}
-                  </div>
-                </section>
+                {filteredPeople.length ? (
+                  <Table
+                    columns={columns}
+                    dataSource={filteredPeople}
+                    onRow={(person) => ({
+                      className: person.id === selectedPerson?.id ? 'peopleos-selected-row' : '',
+                      onClick: () => setSelectedId(person.id),
+                      onContextMenu: (event) => {
+                        event.preventDefault();
+                        openRoleEditor(person);
+                      },
+                    })}
+                    pagination={{
+                      current: page,
+                      pageSize,
+                      pageSizeOptions: [10, 25, 50, 100],
+                      showQuickJumper: true,
+                      showSizeChanger: true,
+                      showTotal: (total, range) => `Hiển thị ${range[0]}-${range[1]} trong ${total} hồ sơ`,
+                      total: filteredPeople.length,
+                      itemRender: (current, type, originalElement) => {
+                        if (type === 'jump-next') {
+                          return <span title="Chuyển sang trang tiếp theo" style={{ cursor: 'pointer', color: '#1570ef', fontWeight: 700, fontSize: 14 }}>➔</span>;
+                        }
+                        if (type === 'jump-prev') {
+                          return <span title="Quay về trang trước" style={{ cursor: 'pointer', color: '#1570ef', fontWeight: 700, fontSize: 14 }}>⬅</span>;
+                        }
+                        return originalElement;
+                      },
+                      onChange: (nextPage, nextPageSize) => {
+                        setPageSize(nextPageSize);
+                        setPage(nextPageSize === pageSize ? nextPage : 1);
+                      },
+                    }}
+                    rowKey="id"
+                    scroll={{ x: 1250 }}
+                  />
+                ) : (
+                  <Empty description="Không tìm thấy nhân sự phù hợp" />
+                )}
               </div>
 
               <aside
@@ -884,9 +971,9 @@ export function PersonnelListPage() {
                 style={
                   !isFocusResume
                     ? {
-                        height: leftStackHeight || 800,
-                        maxHeight: leftStackHeight || 800,
-                        minHeight: leftStackHeight || 800,
+                        height: leftStackHeight,
+                        maxHeight: leftStackHeight,
+                        minHeight: leftStackHeight,
                         overflow: 'hidden',
                       }
                     : undefined
@@ -1234,6 +1321,7 @@ export function PersonnelListPage() {
                                 Mặc định
                               </Button>
                               <Button
+                              style={{color:"#0f172a !important"}}
                                 disabled={isPeriodClosed}
                                 onClick={() => {
                                   if (isPeriodClosed) {
@@ -1506,6 +1594,11 @@ export function PersonnelListPage() {
               </div>
               <div className="peopleos-criteria-footer"><span>Hiển thị {visibleCampaignGroupRows.length} trên tổng số {campaignGroupRows.length} bộ tiêu chí</span><Button disabled>&lt;</Button><Button disabled type="primary">1</Button><Button disabled>&gt;</Button></div>
             </section>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12, marginTop: 16 }}>
+              <Button onClick={() => setModal(null)} type="primary" size="middle">
+                Hoàn tất &amp; Xem đợt đánh giá
+              </Button>
+            </div>
           </div>
         )}
       </Modal>

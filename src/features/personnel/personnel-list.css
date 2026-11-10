@@ -17,7 +17,8 @@
 .peopleos-shell {
   width: 100%;
   max-width: 100%;
-  padding: 14px 24px 28px;
+  /* padding: 14px 24px 28px; */
+  padding: 14px 0px 28px;
 }
 
 .peopleos-mast {
@@ -263,21 +264,20 @@
 
 .peopleos-workspace {
   display: grid;
-  grid-template-columns: minmax(0, 1.12fr) minmax(580px, 1.08fr);
+  grid-template-columns: minmax(0, 1.38fr) minmax(480px, 1fr);
   align-items: start;
   gap: 16px;
 }
 
 .peopleos-left-stack,
 .peopleos-right-stack {
-  min-height: 800px;
   display: flex;
   min-width: 0;
   flex-direction: column;
 }
 
 .peopleos-right-stack {
-  min-height: 800px;
+  min-height: 920px;
   position: sticky;
   top: 14px;
 }
@@ -359,7 +359,7 @@
 }
 
 .peopleos-tablewrap {
-  min-height: 580px;
+  min-height: 680px;
   max-height: calc(100vh - 200px);
   flex: 1;
   overflow: auto;
@@ -417,7 +417,7 @@
 }
 
 .person-name {
-  color: #0f172a;
+  color: #0f172a !important;
   font-size: 13px;
   font-weight: 700;
 }
@@ -1792,7 +1792,7 @@
   }
 
   .peopleos-right-stack {
-  min-height: 800px;
+  min-height: 920px;
     position: static;
   }
 
@@ -1862,12 +1862,12 @@
 }
 
 .peopleos-workspace.resume-focus-active .peopleos-left-stack {
-  min-height: 800px;
+  min-height: 920px;
   display: none !important;
 }
 
 .peopleos-workspace.resume-focus-active .peopleos-right-stack {
-  min-height: 800px;
+  min-height: 920px;
   width: 100% !important;
   max-width: 100% !important;
   height: auto !important;
@@ -1882,15 +1882,14 @@
 
 /* Block separation cards */
 .peopleos-left-stack {
-  min-height: 800px;
   border: 1px solid #e4e7ec;
   border-radius: 12px;
   background: #ffffff;
   box-shadow: 0 1px 3px rgba(16, 24, 40, 0.05);
+  padding: 16px 20px;
 }
 
 .peopleos-right-stack {
-  min-height: 800px;
   border: 1px solid #e4e7ec;
   border-radius: 12px;
   background: #ffffff;
@@ -1926,7 +1925,7 @@
 
 @media (max-width: 1280px) {
   .peopleos-right-stack {
-  min-height: 800px;
+  min-height: 920px;
     height: auto !important;
     max-height: none !important;
     min-height: 0 !important;
@@ -2197,4 +2196,230 @@
   font-weight: 500;
   line-height: 1.5;
   width: 100%;
+}
+
+
+/* Table styles in left stack (không scroll, không bọc nhiều div) */
+.peopleos-left-stack .ant-table-wrapper {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.peopleos-left-stack .ant-table {
+  white-space: nowrap;
+  border: 1px solid #e4e7ec;
+  border-radius: 8px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.peopleos-left-stack .ant-table-thead > tr > th,
+.peopleos-left-stack .ant-table-thead th,
+.peopleos-left-stack .ant-table-thead .ant-table-cell,
+.peopleos-left-stack .ant-table-thead .ant-table-column-title {
+  padding: 12px 14px;
+  border-bottom: 1px solid #cbd5e1;
+  background: #f8fafc;
+  color: #475569;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  white-space: normal !important;
+  word-break: normal !important;
+  overflow-wrap: break-word !important;
+  line-height: 1.35 !important;
+  vertical-align: middle !important;
+}
+
+.peopleos-left-stack .ant-table-tbody > tr > td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #f1f5f9;
+  color: #334155;
+  font-size: 13px;
+  vertical-align: middle;
+}
+
+.peopleos-left-stack .ant-table-tbody > tr {
+  cursor: pointer;
+  transition: background-color 0.12s ease;
+}
+
+.peopleos-left-stack .ant-table-tbody > tr:hover > td {
+  background: #f8fafc;
+}
+
+.peopleos-left-stack .ant-table-tbody > tr.peopleos-selected-row > td {
+  background: var(--personnel-brand-soft, #eff8ff) !important;
+}
+
+.peopleos-left-stack .ant-table-pagination.ant-pagination {
+  margin: 14px 0 0 0 !important;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* Nút disabled: Text đậm rõ nét, dễ đọc */
+.ant-btn[disabled],
+.ant-btn-disabled,
+.ant-btn.ant-btn-disabled,
+.ant-btn[disabled]:hover,
+.ant-btn-disabled:hover,
+button:disabled,
+.peopleos-btn:disabled,
+.btn:disabled {
+  color: #344054 !important;
+  border-color: #d0d5dd !important;
+  background-color: #f2f4f7 !important;
+  opacity: 0.9 !important;
+  cursor: not-allowed !important;
+  font-weight: 600 !important;
+}
+
+.ant-btn[disabled] *,
+.ant-btn-disabled *,
+button:disabled * {
+  color: #344054 !important;
+}
+
+
+
+/* =========================================================
+   RESPONSIVE — MÀN HÌNH MÁY TÍNH NHỎ HƠN (không mobile)
+   ========================================================= */
+
+/* 1600px: Màn hình laptop lớn */
+@media (max-width: 1600px) {
+  .peopleos-shell {
+    padding: 20px 24px 32px;
+  }
+
+  .peopleos-workspace {
+    gap: 14px;
+  }
+
+  .peopleos-left-stack {
+    padding: 14px 16px;
+  }
+
+  .peopleos-toolbar {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .peopleos-search {
+    min-width: 150px !important;
+  }
+
+  .peopleos-right-stack {
+    min-height: 860px;
+  }
+}
+
+/* 1400px: Laptop trung bình */
+@media (max-width: 1400px) {
+  .peopleos-workspace {
+    grid-template-columns: minmax(0, 1.15fr) minmax(400px, 1fr);
+    gap: 12px;
+  }
+
+  .peopleos-toolbar .ant-select {
+    min-width: 110px !important;
+  }
+
+  .peopleos-toolbar .ant-select-selector {
+    font-size: 12px !important;
+  }
+
+  .peopleos-left-stack {
+    padding: 12px 14px;
+  }
+
+  .peopleos-right-stack {
+    min-height: 820px;
+  }
+
+  .peopleos-section-title {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .peopleos-left-stack .ant-table-thead > tr > th,
+  .peopleos-left-stack .ant-table-thead th,
+  .peopleos-left-stack .ant-table-thead .ant-table-cell {
+    padding: 10px 10px !important;
+    font-size: 11px !important;
+  }
+
+  .peopleos-left-stack .ant-table-tbody > tr > td {
+    padding: 10px 12px !important;
+    font-size: 12px !important;
+  }
+}
+
+/* 1280px: Thay vì collapse 1 cột ngay, giữ 2 cột đến 1200px */
+@media (min-width: 1201px) and (max-width: 1280px) {
+  .peopleos-workspace {
+    grid-template-columns: minmax(0, 1.05fr) minmax(360px, 1fr) !important;
+    gap: 10px;
+  }
+
+  .peopleos-toolbar {
+    flex-wrap: wrap;
+    gap: 5px;
+    row-gap: 6px;
+  }
+
+  .peopleos-toolbar .ant-select {
+    min-width: 100px !important;
+  }
+
+  .peopleos-left-stack {
+    padding: 10px 12px;
+  }
+
+  .peopleos-left-stack .ant-table-thead > tr > th,
+  .peopleos-left-stack .ant-table-thead th {
+    padding: 8px 8px !important;
+    font-size: 11px !important;
+  }
+
+  .peopleos-left-stack .ant-table-tbody > tr > td {
+    padding: 8px 10px !important;
+    font-size: 12px !important;
+  }
+
+  .peopleos-right-stack {
+    min-height: 780px;
+  }
+}
+
+/* <= 1200px: Xuống 1 cột (thay thế 1280px collapse cũ) */
+@media (max-width: 1200px) {
+  .peopleos-workspace {
+    grid-template-columns: 1fr !important;
+  }
+
+  .peopleos-right-stack {
+    position: static !important;
+    min-height: unset !important;
+    height: auto !important;
+    max-height: none !important;
+  }
+
+  .peopleos-toolbar {
+    flex-wrap: wrap;
+    gap: 6px;
+    row-gap: 8px;
+  }
+
+  .peopleos-section-title {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
 }
