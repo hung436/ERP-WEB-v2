@@ -2257,11 +2257,7 @@
 
 .peopleos-left-stack .ant-table-pagination.ant-pagination {
   margin: 14px 0 0 0 !important;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  flex-wrap: wrap;
-  gap: 8px;
+  flex-wrap: nowrap !important;
 }
 
 /* Nút disabled: Text đậm rõ nét, dễ đọc */
