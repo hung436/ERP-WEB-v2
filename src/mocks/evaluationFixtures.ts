@@ -144,7 +144,6 @@ const groupedCriterion = (
   scoreMode,
   children,
 });
-
 const baseGroups: EvaluationGroup[] = [
   {
     id: 'duties',
