@@ -3,6 +3,7 @@ import { cloudRecords, evaluationRecords, expertRecords, libraryRecords, meeting
 import { documentSubmissions, documentTemplates } from '@/mocks/documentFixtures';
 import { followerOptions, workTicketSubmissions, workTicketTemplates } from '@/mocks/workTicketFixtures';
 import { evaluationPeriods, evaluationSheets } from '@/mocks/evaluationFixtures';
+import evaluationPersonnelRows from '@/mocks/evaluationPersonnelFixtures.json';
 import { initialChangeRequests, initialPersonnelList, initialPositionTitles, initialResignedEmployees, initialSpecialties, initialUnitPositionMappings, initialWorkUnits, personalProfile } from '@/mocks/personnelFixtures';
 import { initialCalendarNotifications, initialRecipientGroups } from '@/mocks/calendarNotificationFixtures';
 import type { Announcement, ApiResponse, ApiState, CalendarAttachmentItem, CalendarEvent, ChatAttachment, ChatConversation, ChatMessage, CustomDocumentTemplateItem, DashboardSummary, DirectoryContact, DocumentSubmission, DocumentWorkflowStep, MailComposePayload, MailItem, MailReply, MeetingEvent, Task, User, WorkTicketAttachment, WorkTicketFollower, WorkTicketSubmission } from '@/types/domain';
@@ -1066,14 +1067,43 @@ export async function mockRequest<T>(path: string, options?: { method?: string; 
       else throw new Error('Không tìm thấy tài liệu mẫu.');
     }
   }
-  else if (pathname.startsWith('/api/personnel/')) {
-
+    else if (pathname.startsWith('/api/personnel/')) {
     const id = pathname.replace('/api/personnel/', '');
-    const record = personnelRecordStore.find((item) => item.id === id);
+    let record = personnelRecordStore.find((item) => item.id === id);
+    if (!record) {
+      const rowNum = parseInt(id.replace('excel-', ''), 10);
+      const rowItem = (evaluationPersonnelRows as any[]).find((r: any, idx: number) => r.sourceRow === rowNum || idx + 1 === rowNum || r.id === id);
+      if (rowItem) {
+        const name = rowItem.fullName || rowItem.full_Name || 'Cán bộ';
+        const codeNum = rowItem.sourceRow ? String(rowItem.sourceRow).padStart(3, '0') : '001';
+        record = {
+          id: id,
+          employeeCode: `NV-${codeNum}`,
+          fullName: name,
+          birthDate: '15/08/1984',
+          gender: 'Nam',
+          phone: '0903123456',
+          email: `${name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, '.') || 'nhansu'}@tuoitre.com.vn`,
+          department: rowItem.department || 'Ban Biên tập',
+          position: (rowItem.positions && rowItem.positions[0]) || 'Lãnh đạo quản lý',
+          profileType: '2A',
+          status: 'active',
+          isPartyMember: true,
+          photoUrl: '',
+          assignments: (rowItem.positions || ['Lãnh đạo quản lý']).map((pos: string, idx: number) => ({
+            id: `asg-${idx + 1}`,
+            department: rowItem.department || 'Ban Biên tập',
+            position: pos,
+            isPrimary: idx === 0,
+            startDate: '2020-01-01',
+          })),
+        } as any;
+      }
+    }
     if (record) {
       data = record;
     } else {
-      throw new Error('Không tìm thấy hồ sơ nhân sự.');
+      data = personnelRecordStore[0];
     }
   }
   else if (pathname === '/api/chat/members') data = chatMembers;

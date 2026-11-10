@@ -263,19 +263,21 @@
 
 .peopleos-workspace {
   display: grid;
-  grid-template-columns: minmax(0, 1.32fr) minmax(490px, 0.95fr);
+  grid-template-columns: minmax(0, 1.12fr) minmax(580px, 1.08fr);
   align-items: start;
   gap: 16px;
 }
 
 .peopleos-left-stack,
 .peopleos-right-stack {
+  min-height: 800px;
   display: flex;
   min-width: 0;
   flex-direction: column;
 }
 
 .peopleos-right-stack {
+  min-height: 800px;
   position: sticky;
   top: 14px;
 }
@@ -357,7 +359,8 @@
 }
 
 .peopleos-tablewrap {
-  max-height: calc(100vh - 250px);
+  min-height: 580px;
+  max-height: calc(100vh - 200px);
   flex: 1;
   overflow: auto;
   border: 1px solid #e2e8f0;
@@ -499,7 +502,8 @@
 }
 
 .peopleos-profile-name-head {
-  display: flex;
+  /* display: flex; */
+  display: grid;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
@@ -1788,6 +1792,7 @@
   }
 
   .peopleos-right-stack {
+  min-height: 800px;
     position: static;
   }
 
@@ -1835,4 +1840,361 @@
   .peopleos-section {
     padding: 12px;
   }
+}
+
+/* =========================================================
+   DARKER DIVIDER HR BETWEEN BLOCKS
+   ========================================================= */
+.peopleos-profile-content hr,
+.peopleos-divider {
+  border: none !important;
+  border-top: 2px solid #94a3b8 !important;
+  margin: 20px 0 !important;
+  opacity: 0.9 !important;
+}
+
+/* =========================================================
+   FOCUS MODE & BLOCK SEPARATION
+   ========================================================= */
+.peopleos-workspace.resume-focus-active {
+  grid-template-columns: 1fr !important;
+  gap: 0 !important;
+}
+
+.peopleos-workspace.resume-focus-active .peopleos-left-stack {
+  min-height: 800px;
+  display: none !important;
+}
+
+.peopleos-workspace.resume-focus-active .peopleos-right-stack {
+  min-height: 800px;
+  width: 100% !important;
+  max-width: 100% !important;
+  height: auto !important;
+  max-height: none !important;
+  min-height: 0 !important;
+}
+
+.peopleos-workspace.resume-focus-active .peopleos-resume-tab-wrapper {
+  max-width: 1380px;
+  margin: 0 auto;
+}
+
+/* Block separation cards */
+.peopleos-left-stack {
+  min-height: 800px;
+  border: 1px solid #e4e7ec;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: 0 1px 3px rgba(16, 24, 40, 0.05);
+}
+
+.peopleos-right-stack {
+  min-height: 800px;
+  border: 1px solid #e4e7ec;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: 0 1px 3px rgba(16, 24, 40, 0.05);
+}
+
+.peopleos-resume-tab-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  max-height: 100%;
+  overflow-y: auto;
+  background: #f8fafc;
+  border: 1px solid #e4e7ec;
+  border-radius: 12px;
+  padding: 16px;
+  margin-top: 10px;
+}
+
+.peopleos-resume-focus-layout {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  align-items: start;
+  gap: 20px;
+}
+
+@media (max-width: 992px) {
+  .peopleos-resume-focus-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 1280px) {
+  .peopleos-right-stack {
+  min-height: 800px;
+    height: auto !important;
+    max-height: none !important;
+    min-height: 0 !important;
+  }
+}
+
+/* =========================================================
+   TABS FOR PROFILE / RESUME
+   ========================================================= */
+.peopleos-tab-bar {
+  display: inline-flex;
+  align-items: center;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 3px;
+  gap: 4px;
+}
+
+.peopleos-tab-item {
+  border: none;
+  background: transparent;
+  padding: 6px 16px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #64748b;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.peopleos-tab-item:hover:not(.active) {
+  color: #0f172a;
+}
+
+.peopleos-tab-item.active {
+  background: #ffffff;
+  color: #1d4ed8;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.1);
+}
+
+.eval-highlight-two.single-col {
+  grid-template-columns: 1fr;
+}
+
+.resume-2a-btn {
+  border: 1px solid #bfdbfe !important;
+  background: #eff6ff !important;
+  color: #1d4ed8 !important;
+  font-weight: 600 !important;
+  font-size: 12px !important;
+  border-radius: 6px !important;
+  padding: 2px 10px !important;
+  height: 26px !important;
+  line-height: 20px !important;
+}
+
+.resume-2a-btn:hover {
+  background: #dbeafe !important;
+  border-color: #93c5fd !important;
+  color: #1e40af !important;
+}
+
+.personnel-action-trigger-btn {
+  color: #64748b;
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.personnel-action-trigger-btn:hover {
+  color: #0f172a;
+  background-color: #f1f5f9;
+}
+
+/* Workflow row drag & drop improvements */
+.wf-row {
+  cursor: grab;
+  transition: background-color 0.15s ease;
+}
+
+.wf-row:active {
+  cursor: grabbing;
+}
+
+.wf-row.is-dragging {
+  opacity: 0.45;
+  background-color: #f1f5f9;
+}
+
+.wf-row.is-drag-over {
+  background-color: #eff6ff !important;
+  outline: 2px dashed #2563eb;
+  outline-offset: -2px;
+}
+
+.wf-row input,
+.wf-row button {
+  cursor: auto;
+}
+
+.drag-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.wf-move-arrows {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.wf-arrow-btn {
+  border: none;
+  background: transparent;
+  padding: 0 2px;
+  font-size: 8px;
+  line-height: 8px;
+  color: #94a3b8;
+  cursor: pointer;
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wf-arrow-btn:hover {
+  color: #2563eb;
+  background: #eff6ff;
+}
+
+.eval-highlight-two.single-col .mini .ant-select {
+  width: 220px !important;
+  max-width: 100% !important;
+}
+
+/* Vibrant Evaluation switch & locked styles */
+.eval-switch input:checked + .eval-switch-slider,
+.personnel-list-page .eval-switch input:checked + .eval-switch-slider,
+.peopleos-profile-top .eval-switch input:checked + .eval-switch-slider {
+  background: #16a34a !important;
+  border-color: #16a34a !important;
+}
+
+.eval-switch input:checked + .eval-switch-slider::before,
+.personnel-list-page .eval-switch input:checked + .eval-switch-slider::before,
+.peopleos-profile-top .eval-switch input:checked + .eval-switch-slider::before {
+  background: #ffffff !important;
+  transform: translateX(14px) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) !important;
+}
+
+.eval-toggle-status.is-active,
+.personnel-list-page .eval-toggle-status.is-active,
+.peopleos-profile-top .eval-toggle-status.is-active {
+  color: #16a34a !important;
+  font-weight: 800 !important;
+}
+
+.eval-toggle-wrap.is-disabled .eval-switch input:checked + .eval-switch-slider,
+.personnel-list-page .eval-toggle-wrap.is-disabled .eval-switch input:checked + .eval-switch-slider {
+  background: #86efac !important;
+  border-color: #86efac !important;
+  cursor: not-allowed !important;
+}
+
+.eval-toggle-wrap.is-disabled .eval-switch input:checked + .eval-switch-slider::before,
+.personnel-list-page .eval-toggle-wrap.is-disabled .eval-switch input:checked + .eval-switch-slider::before {
+  background: #ffffff !important;
+  cursor: not-allowed !important;
+}
+
+.eval-toggle-wrap.is-disabled {
+  opacity: 0.7;
+  background: #f8fafc;
+  cursor: not-allowed;
+}
+
+.eval-locked-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 10px;
+  font-weight: 700;
+  color: #b45309;
+  background: #fef3c7;
+  padding: 1px 6px;
+  border-radius: 4px;
+  margin-left: 4px;
+}
+
+/* Quick personnel modal styles */
+.quick-personnel-form {
+  padding-top: 4px;
+}
+
+.quick-personnel-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 16px;
+}
+
+.quick-personnel-form .ant-form-item {
+  margin-bottom: 14px;
+}
+
+.quick-personnel-assignment {
+  min-width: 0;
+  margin: 0;
+  padding: 12px 14px 0;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+}
+
+.quick-personnel-assignment legend {
+  padding: 0 6px;
+  color: #334155;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.quick-personnel-assignment-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.quick-personnel-assignment-grid .ant-form-item {
+  min-width: 0;
+}
+
+.phase-date-picker {
+  width: 100%;
+  height: 38px;
+}
+
+.phase-card .ant-picker {
+  width: 100%;
+  height: 38px;
+  border-color: #cbd5e1;
+  font-size: 12px;
+}
+
+.chuc-vu-full-box {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 12px;
+  margin-bottom: 12px;
+  padding: 10px 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #f8fafc;
+}
+
+.chuc-vu-full-box .role-item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 10px;
+  color: #1e293b;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.5;
+  width: 100%;
 }

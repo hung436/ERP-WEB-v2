@@ -1,0 +1,79 @@
+/* Styling for RequestChangeModal to match PersonnelProfilePage resume document exactly */
+
+.req-inline-input {
+  width: 100%;
+  border: none;
+  border-bottom: 1px dashed #cbd5e1;
+  background: transparent;
+  color: #101828;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 1px 4px;
+  outline: none;
+  transition: all 0.15s ease-in-out;
+  border-radius: 2px;
+}
+
+.req-inline-input:hover,
+.req-inline-input:focus {
+  border-bottom: 1.5px solid #2563eb;
+  background: #f8faff;
+}
+
+.req-editable-field {
+  position: relative;
+  transition: background 0.15s ease;
+  border-radius: 4px;
+}
+
+.req-editable-field.req-modified {
+  background: #eff6ff !important;
+  border-radius: 4px;
+  padding: 2px 6px !important;
+}
+
+.req-editable-field.req-modified .req-inline-input {
+  color: #1d4ed8 !important;
+  font-weight: 700 !important;
+  border-bottom: 1.5px solid #2563eb !important;
+  background: #ffffff !important;
+}
+
+.req-rollback-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 6px;
+  color: #94a3b8;
+  cursor: pointer;
+  font-size: 11px;
+  transition: color 0.15s;
+}
+
+.req-rollback-btn:hover {
+  color: #ef4444;
+}
+
+.req-table-input {
+  width: 100%;
+  border: 1px solid transparent;
+  border-bottom: 1px dashed #cbd5e1;
+  background: transparent;
+  color: #344054;
+  font-size: 12px;
+  line-height: 1.5;
+  padding: 4px 6px;
+  outline: none;
+  border-radius: 3px;
+  transition: all 0.15s ease;
+}
+
+.req-table-input:hover,
+.req-table-input:focus {
+  border: 1px solid #93c5fd;
+  background: #ffffff;
+}
+
+.req-popup-sidebar-nav a {
+  cursor: pointer;
+}

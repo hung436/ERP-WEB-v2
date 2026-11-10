@@ -1,8 +1,8 @@
-import { Avatar, Button, Tag } from 'antd';
-import { DownloadOutlined, FormOutlined, HistoryOutlined } from '@ant-design/icons';
-import { useState } from 'react';
+import { Avatar, Button, Select, Tag } from 'antd';
+import { DownloadOutlined, FormOutlined, HistoryOutlined, UploadOutlined } from '@ant-design/icons';
+import { useEffect, useState } from 'react';
 import type { MouseEvent, ReactNode } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 
 import { ContentSkeleton, EmptyState, ErrorState } from '@/components/AsyncState';
 import { ModuleIcon } from '@/components/ModuleIcon';
@@ -10,12 +10,14 @@ import { ChangeHistoryDrawer } from '@/features/personnel/components/ChangeHisto
 import { RequestChangeModal } from '@/features/personnel/components/RequestChangeModal';
 import { useAsyncData } from '@/hooks/useAsyncData';
 import { changeRequestsApi, personnelApi } from '@/services/api';
+import evaluationPersonnelRows from '@/mocks/evaluationPersonnelFixtures.json';
+import { personalProfile } from '@/mocks/personnelFixtures';
 import type { PersonalProfile, PersonnelRecordItem } from '@/types/personnel';
 import './personnel-profile.css';
 
 const initials = (name: string) => name.split(' ').slice(-2).map((part) => part[0]).join('').toUpperCase();
 
-const profileSections = [
+export const profileSections = [
   { numeral: 'I', title: 'Thông tin cá nhân' },
   { numeral: 'II', title: 'Lịch sử bản thân' },
   { numeral: 'III', title: 'Đặc điểm lịch sử' },
@@ -29,7 +31,7 @@ const profileSections = [
   { numeral: 'XI', title: 'Tự nhận xét' },
 ] as const;
 
-function convertRecordToProfile(record: PersonnelRecordItem): PersonalProfile {
+export function convertRecordToProfile(record: PersonnelRecordItem): PersonalProfile {
   return {
     id: record.id,
     employeeCode: record.employeeCode,
@@ -103,20 +105,63 @@ function convertRecordToProfile(record: PersonnelRecordItem): PersonalProfile {
   };
 }
 
-function ProfileSectionNav() {
+export function ProfileSectionNav() {
   const [activeSection, setActiveSection] = useState('I');
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollPos = window.scrollY + 120;
+      for (let i = profileSections.length - 1; i >= 0; i--) {
+        const sec = profileSections[i];
+        const el = document.getElementById(`personnel-section-${sec.numeral}`);
+        if (el && el.offsetTop <= scrollPos) {
+          setActiveSection(sec.numeral);
+          break;
+        }
+      }
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const navigateToSection = (event: MouseEvent<HTMLAnchorElement>, numeral: string) => {
     event.preventDefault();
-    document.getElementById(`personnel-section-${numeral}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    setActiveSection(numeral);
+    const el = document.getElementById(`personnel-section-${numeral}`);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      setActiveSection(numeral);
+    }
   };
 
   return (
     <aside className="personnel-section-nav">
       <div className="personnel-section-nav-heading">
         <span><ModuleIcon module="personnel" size={16} /></span>
-        <div><strong>Mục lục hồ sơ</strong></div>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <strong>Mục lục hồ sơ</strong>
+          <small style={{ color: '#667085', fontSize: 11 }}>Chọn để di chuyển nhanh</small>
+        </div>
+        <button
+          type="button"
+          aria-label="Cài đặt mục lục"
+          style={{
+            background: '#ffffff',
+            border: '1px solid #e4e7ec',
+            borderRadius: 8,
+            width: 30,
+            height: 30,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            color: '#667085',
+          }}
+        >
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="3" />
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+          </svg>
+        </button>
       </div>
       <nav aria-label="Các mục hồ sơ nhân sự">
         {profileSections.map((section) => (
@@ -137,10 +182,11 @@ function ProfileSectionNav() {
 }
 
 function FormField({ label, value, wide = false }: { label: string; value: string; wide?: boolean }) {
+  const cleanLabel = (label || '').trim().replace(/[:\s]+$/, '');
   return (
     <div className={`personnel-form-field${wide ? ' wide' : ''}`}>
-      <dt>{label}</dt>
-      <dd>{value}</dd>
+      <dt>{cleanLabel}:</dt>
+      <dd>{value || '—'}</dd>
     </div>
   );
 }
@@ -177,7 +223,7 @@ function DataTable<T>({ columns, rows, emptyText }: { columns: Array<{ title: st
   );
 }
 
-function ProfileDocument({ profile }: { profile: PersonalProfile }) {
+export function ProfileDocument({ profile, onImport }: { profile: PersonalProfile; onImport?: (file?: File) => void }) {
   const [requestModalOpen, setRequestModalOpen] = useState(false);
   const [historyDrawerOpen, setHistoryDrawerOpen] = useState(false);
 
@@ -191,19 +237,51 @@ function ProfileDocument({ profile }: { profile: PersonalProfile }) {
       {/* Action bar — right-aligned compact buttons */}
       <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 8 }}>
         <Button
+          icon={<UploadOutlined />}
+          onClick={() => {
+            const input = document.getElementById(`profile-doc-import-${profile.id}`) as HTMLInputElement;
+            input?.click();
+          }}
+          style={{
+            height: 36,
+            fontSize: 13.5,
+            fontWeight: 600,
+            borderColor: '#e4e7ec',
+            background: '#ffffff',
+            color: '#475467',
+          }}
+        >
+          Import lý lịch
+        </Button>
+        <input
+          accept=".pdf,.doc,.docx"
+          id={`profile-doc-import-${profile.id}`}
+          onChange={(event) => {
+            const file = event.target.files?.[0];
+            if (file) {
+              if (onImport) onImport(file);
+              else {
+                import('antd').then(({ message: msg }) => msg.success(`Đã import lý lịch: ${file.name}`));
+              }
+            }
+          }}
+          type="file"
+          style={{ display: 'none' }}
+        />
+        <Button
           icon={<DownloadOutlined />}
           onClick={() => {
             const fileName = `Ly_lich_2A_${profile.employeeCode}_${new Date().toISOString().slice(0, 10)}.pdf`;
             import('antd').then(({ message: msg }) => msg.success(`Đang tải xuống file Lý lịch: ${fileName}`));
           }}
-          style={{ height: 36, fontSize: 13.5, fontWeight: 600, borderColor: '#e4e7ec', color: '#475467' }}
+          style={{ height: 36, fontSize: 13.5, fontWeight: 600, borderColor: '#e4e7ec', background: '#ffffff', color: '#475467' }}
         >
           Tải file
         </Button>
         <Button
           icon={<HistoryOutlined />}
           onClick={() => setHistoryDrawerOpen(true)}
-          style={{ height: 36, fontSize: 13.5, fontWeight: 600, borderColor: '#e4e7ec', color: '#475467' }}
+          style={{ height: 36, fontSize: 13.5, fontWeight: 600, borderColor: '#e4e7ec', background: '#ffffff', color: '#475467' }}
         >
           Lịch sử chỉnh sửa ({historyList.length})
         </Button>
@@ -245,13 +323,41 @@ function ProfileDocument({ profile }: { profile: PersonalProfile }) {
 
           <section aria-label="Xuất thân và học vấn" className="personnel-form-section">
             <FormRow><FormField label="Thành phần gia đình xuất thân" value={profile.familyBackground} /><FormField label="Nghề nghiệp khi được tuyển dụng" value={profile.occupationAtRecruitment} /></FormRow>
-            <div className="personnel-education"><span className="personnel-inline-label">Trình độ học vấn</span><div><FormField label="Văn hóa phổ thông" value={profile.generalEducation} /><FormField label="Chuyên môn, kỹ thuật" value={profile.professionalQualification} /><FormField label="Lý luận chính trị" value={profile.politicalTheory} /><FormField label="Ngoại ngữ" value={profile.foreignLanguages} /><FormField label="Tin học" value={profile.informationTechnology} /></div></div>
+            <div className="personnel-education">
+              <span className="personnel-inline-label">Trình độ học vấn</span>
+              <div>
+                <FormField label="Văn hóa phổ thông" value={profile.generalEducation} />
+                <FormField label="Chuyên môn, kỹ thuật" value={profile.professionalQualification} />
+                <FormField label="Lý luận chính trị" value={profile.politicalTheory} />
+                <FormField label="Ngoại ngữ" value={profile.foreignLanguages} />
+                <FormField label="Tin học" value={profile.informationTechnology} />
+              </div>
+            </div>
           </section>
 
           <section aria-label="Quá trình tham gia và tuyển dụng" className="personnel-form-section">
-            <FormRow columns={3}><FormField label="Ngày tuyển dụng" value={profile.recruitmentDate} /><FormField label="Cơ quan tuyển dụng" value={profile.recruitingAgency} /><FormField label="Tham gia cách mạng" value={profile.revolutionParticipationDate} /></FormRow>
-            <FormRow columns={3}><FormField label="Ngày vào Đảng (dự bị)" value={profile.partyProbationaryDate} /><FormField label="Ngày chính thức" value={profile.partyOfficialDate} /><FormField label="Số thẻ Đảng" value={profile.partyCardNumber} /></FormRow>
-            <FormRow columns={3}><FormField label="Ngày nhập ngũ" value={profile.enlistmentDate} /><FormField label="Ngày xuất ngũ" value={profile.dischargeDate} /><FormField label="Quân hàm" value={profile.militaryRank} /></FormRow>
+            <FormRow columns={2}>
+              <FormField label="Ngày tham gia cách mạng" value={profile.revolutionParticipationDate} />
+              <FormField label="Làm gì, trong tổ chức nào" value={profile.revolutionActivity} />
+            </FormRow>
+            <FormRow columns={3}>
+              <FormField label="Ngày nhập ngũ" value={profile.enlistmentDate} />
+              <FormField label="Ngày xuất ngũ" value={profile.dischargeDate} />
+              <FormField label="Quân hàm" value={profile.militaryRank} />
+            </FormRow>
+            <FormRow columns={2}>
+              <FormField label="Ngày được tuyển dụng" value={profile.recruitmentDate} />
+              <FormField label="Cơ quan tuyển dụng" value={profile.recruitingAgency} />
+            </FormRow>
+            <FormRow columns={2}>
+              <FormField label="Ngày vào Đoàn TNCS Hồ Chí Minh" value={profile.youthUnionJoinDate} />
+              <FormField label="Nơi kết nạp" value={profile.youthUnionJoinPlace} />
+            </FormRow>
+            <FormRow columns={3}>
+              <FormField label="Ngày vào Đảng (dự bị)" value={profile.partyProbationaryDate} />
+              <FormField label="Ngày chính thức" value={profile.partyOfficialDate} />
+              <FormField label="Số thẻ Đảng" value={profile.partyCardNumber} />
+            </FormRow>
           </section>
 
           <section aria-label="Tình trạng sức khỏe và tài sản" className="personnel-form-section last">
@@ -309,12 +415,43 @@ function ProfileDocument({ profile }: { profile: PersonalProfile }) {
 
 export function PersonnelProfilePage() {
   const { id } = useParams<{ id?: string }>();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const [selectedType, setSelectedType] = useState<string>(searchParams.get('type') || '2A');
 
   const state = useAsyncData(async () => {
     if (id) {
-      const recordRes = await personnelApi.get(id);
-      if (recordRes.data) {
-        return convertRecordToProfile(recordRes.data);
+      try {
+        const recordRes = await personnelApi.get(id);
+        if (recordRes.data) {
+          return convertRecordToProfile(recordRes.data);
+        }
+      } catch (err) {
+        console.warn('Fallback to local personnel fixtures for id:', id, err);
+      }
+      const rowNum = parseInt(id.replace('excel-', ''), 10);
+      const rowItem = (evaluationPersonnelRows as any[]).find(
+        (r: any, idx: number) => r.sourceRow === rowNum || idx + 1 === rowNum || r.id === id
+      );
+      if (rowItem) {
+        const name = rowItem.fullName || rowItem.full_Name || 'Cán bộ';
+        const codeNum = rowItem.sourceRow ? String(rowItem.sourceRow).padStart(3, '0') : '001';
+        return {
+          ...personalProfile,
+          id: id,
+          employeeCode: `NV-${codeNum}`,
+          fullName: name,
+          birthDate: '15/08/1984',
+          gender: 'Nam',
+          phone: '0903123456',
+          email: `${name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, '.') || 'nhansu'}@tuoitre.com.vn`,
+          department: rowItem.department || 'Ban Biên tập',
+          currentPosition: (rowItem.positions && rowItem.positions[0]) || 'Lãnh đạo quản lý',
+          employmentHistory: (rowItem.positions || ['Lãnh đạo quản lý']).map((pos: string, idx: number) => ({
+            period: `202${idx + 1} – Nay`,
+            details: `${pos} — ${rowItem.department || 'Ban Biên tập'}`,
+          })),
+        };
       }
     }
     return (await personnelApi.profile()).data;
@@ -322,6 +459,64 @@ export function PersonnelProfilePage() {
 
   return (
     <div className="module-page personnel-profile-page">
+      {/* Top action header bar */}
+      <div
+        className="personnel-profile-header-bar"
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '12px 20px',
+          marginBottom: 16,
+          background: '#ffffff',
+          border: '1px solid #e4e7ec',
+          borderRadius: 12,
+          boxShadow: '0 1px 3px rgba(16,24,40,0.04)',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+          <Button
+            onClick={() => navigate('/personnel/list')}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+              fontWeight: 600,
+              color: '#344054',
+              borderColor: '#d0d5dd',
+              background: '#ffffff',
+              height: 36,
+            }}
+          >
+            ← Quay lại Danh sách nhân sự
+          </Button>
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <span style={{ fontSize: 16, fontWeight: 700, color: '#101828' }}>
+              {state.data ? `${state.data.fullName} — Sơ yếu lý lịch cán bộ` : 'Lý lịch cá nhân'}
+            </span>
+            <small style={{ color: '#667085', fontSize: 12 }}>
+               · Đơn vị công tác: <strong>{state.data?.department || 'Ban Biên tập'}</strong>
+            </small>
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <span style={{ fontSize: 13, color: '#475467', fontWeight: 600 }}>Loại lý lịch:</span>
+          <Select
+            value={selectedType}
+            onChange={(val) => {
+              setSelectedType(val);
+              setSearchParams({ type: val });
+            }}
+            style={{ width: 140 }}
+          >
+            <Select.Option value="2A">Lý lịch 2A</Select.Option>
+            <Select.Option value="2B">Lý lịch 2B</Select.Option>
+            <Select.Option value="2C">Lý lịch 2C</Select.Option>
+          </Select>
+        </div>
+      </div>
+
       {state.loading ? (
         <ContentSkeleton rows={12} />
       ) : state.error ? (
