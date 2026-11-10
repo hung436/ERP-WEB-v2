@@ -158,9 +158,16 @@ export function PersonnelListPage() {
       leftStackObserverRef.current = null;
     }
     if (node) {
+      let lastHeight = 0;
+      let debounceTimer: ReturnType<typeof setTimeout> | null = null;
       const update = () => {
-        if (node.offsetHeight > 0) {
-          setLeftStackHeight(node.offsetHeight);
+        const h = node.offsetHeight;
+        if (h > 0 && Math.abs(h - lastHeight) > 2) {
+          if (debounceTimer) clearTimeout(debounceTimer);
+          debounceTimer = setTimeout(() => {
+            lastHeight = h;
+            setLeftStackHeight(h);
+          }, 60);
         }
       };
       update();
@@ -296,6 +303,7 @@ export function PersonnelListPage() {
   const [documents, setDocuments] = useState<Record<string, PersonnelDocument[]>>({});
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [tableLoading, setTableLoading] = useState(false);
 
   useEffect(() => {
     if (!selectedPeriodId && periods[0]) setSelectedPeriodId(periods[0].id);
@@ -928,6 +936,7 @@ export function PersonnelListPage() {
                   <Table
                     columns={columns}
                     dataSource={filteredPeople}
+                    loading={tableLoading}
                     onRow={(person) => ({
                       className: person.id === selectedPerson?.id ? 'peopleos-selected-row' : '',
                       onClick: () => setSelectedId(person.id),
@@ -954,8 +963,12 @@ export function PersonnelListPage() {
                         return originalElement;
                       },
                       onChange: (nextPage, nextPageSize) => {
-                        setPageSize(nextPageSize);
-                        setPage(nextPageSize === pageSize ? nextPage : 1);
+                        setTableLoading(true);
+                        setTimeout(() => {
+                          setPageSize(nextPageSize);
+                          setPage(nextPageSize === pageSize ? nextPage : 1);
+                          setTableLoading(false);
+                        }, 150);
                       },
                     }}
                     rowKey="id"
