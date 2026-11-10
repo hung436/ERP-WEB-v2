@@ -1,6 +1,41 @@
 import type { PersonalProfile, PersonnelChangeRequest } from '@/types/personnel';
 import { demoUsers } from './usersFixtures';
 
+export const personnelDepartmentOptions = [
+  'Ban Biên tập',
+  'Ban Thư ký toà soạn',
+  'Ban Nội dung & Xuất bản',
+  'Ban Công nghệ thông tin',
+  'Ban Tài chính - Kế toán',
+  'Ban Tổ chức - Nhân sự',
+  'Ban Kỹ thuật & Công nghệ',
+  'Ban Kinh tế - Xã hội',
+  'Ban Quảng cáo & Phát hành',
+  'Ban Thời sự - Chính trị',
+  'Ban Vấn đề - Sự kiện',
+  'Ban Văn hóa - Giải trí',
+  'Ban Bạn đọc',
+  'Đoàn Thanh niên Báo Tuổi Trẻ',
+  'Công đoàn Báo Tuổi Trẻ',
+  'Đảng ủy Báo Tuổi Trẻ',
+];
+
+export const personnelPositionOptions = [
+  'Tổng Biên tập',
+  'Phó Tổng Biên tập',
+  'Trưởng ban',
+  'Phó Trưởng ban',
+  'Phóng viên',
+  'Phóng viên cao cấp',
+  'Biên tập viên',
+  'Biên tập viên chính',
+  'Kế toán viên',
+  'Chuyên viên Nhân sự',
+  'Bí thư Đoàn Thanh niên',
+  'Chủ tịch Công đoàn',
+  'Bí thư Đảng ủy',
+];
+
 export const personalProfile: PersonalProfile = {
   employeeCode: 'NV-2026-009',
   fullName: 'Nguyễn Minh Anh',

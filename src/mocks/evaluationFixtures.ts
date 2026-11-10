@@ -3,9 +3,84 @@ import type { EvaluationCriterion, EvaluationGroup, EvaluationPeriod, Evaluation
 
 const stageOrder: EvaluationStage[] = ['self', 'deputy', 'manager', 'editorial', 'council'];
 
+export interface EvaluationCampaignFixture {
+  id: string;
+  name: string;
+  status: 'active' | 'published';
+  start: string;
+  step1: string;
+  step2: string;
+  step3: string;
+  council: string;
+  publish: string;
+  flow: string;
+}
+
+export const evaluationCampaigns: EvaluationCampaignFixture[] = [
+  {
+    id: 'campaign-q3-check',
+    name: 'Đánh giá lao động quý 3 năm 2026 (Kiểm tra)',
+    status: 'active',
+    start: '30/09/2026',
+    step1: '01/11/2026',
+    step2: '02/11/2026',
+    step3: '03/11/2026',
+    council: '05/11/2026',
+    publish: '06/11/2026',
+    flow: 'v1 | * v2',
+  },
+  {
+    id: 'campaign-0909',
+    name: 'Đánh giá lao động ngày 09-09 lúc 22:56',
+    status: 'published',
+    start: '02/07/2026',
+    step1: '03/07/2026',
+    step2: '04/07/2026',
+    step3: '05/07/2026',
+    council: '09/07/2026',
+    publish: '10/07/2026',
+    flow: 'v1 | * v2',
+  },
+  {
+    id: 'campaign-q3-v2',
+    name: 'Đánh giá lao động quý III v2 năm 2026',
+    status: 'published',
+    start: '01/04/2026',
+    step1: '02/04/2026',
+    step2: '03/04/2026',
+    step3: '04/04/2026',
+    council: '05/04/2026',
+    publish: '06/04/2026',
+    flow: 'v1 | * v2',
+  },
+  {
+    id: 'campaign-q3',
+    name: 'Đánh giá lao động quý III năm 2026',
+    status: 'published',
+    start: '24/02/2026',
+    step1: '26/02/2026',
+    step2: '28/02/2026',
+    step3: '01/03/2026',
+    council: '02/03/2026',
+    publish: '03/03/2026',
+    flow: 'v1 | * v2',
+  },
+  {
+    id: 'campaign-q2',
+    name: 'ĐÁNH GIÁ LAO ĐỘNG QUÝ 2 - 2026',
+    status: 'published',
+    start: '27/01/2026',
+    step1: '30/01/2026',
+    step2: '31/01/2026',
+    step3: '01/02/2026',
+    council: '02/02/2026',
+    publish: '23/02/2026',
+    flow: 'v1 | v2',
+  },
+];
+
 export const evaluationPeriods: EvaluationPeriod[] = [
-  { id: '2026-q4', label: 'Quý IV/2026', startAt: '2026-11-01T08:00:00+07:00', dueAt: '2026-11-15T17:00:00+07:00', status: 'active' },
-  { id: '2026-q3', label: 'Quý III/2026', startAt: '2026-08-01T08:00:00+07:00', dueAt: '2026-08-15T17:00:00+07:00', status: 'closed' },
+  { id: '2026-q3', label: 'Quý III/2026', startAt: '2026-08-01T08:00:00+07:00', dueAt: '2026-08-15T17:00:00+07:00', status: 'active' },
   { id: '2026-q2', label: 'Quý II/2026', startAt: '2026-04-01T08:00:00+07:00', dueAt: '2026-04-15T17:00:00+07:00', status: 'closed' },
 ];
 
@@ -277,11 +352,10 @@ const defaultEvaluators = {
 };
 
 export const evaluationSheets: EvaluationSheet[] = [
-  { id: 'eval-self-q2', employeeName: 'Nguyễn Minh Anh', employeeCode: 'NV-2026-009', department: 'Ban Thời sự', position: 'Phóng viên Điều tra & Đô thị', periodId: '2026-q2', periodLabel: 'Quý II/2026', status: 'published', stage: 'published', progress: 100, selfScore: 165, currentScore: 155, stageTotals: { self: 165, deputy: 161, manager: 158, editorial: 155, council: 155, published: 155 }, stageEvaluators: defaultEvaluators, dueAt: '2026-04-15T17:00:00+07:00', updatedAt: '2026-04-25T09:00:00+07:00', groups: cloneGroups(100, 'published') },
-  { id: 'eval-self-q4', employeeName: 'Nguyễn Minh Anh', employeeCode: 'NV-2026-009', department: 'Ban Thời sự', position: 'Phóng viên Điều tra & Đô thị', periodId: '2026-q4', periodLabel: 'Quý IV/2026', status: 'draft', stage: 'self', progress: 88, selfScore: 165, currentScore: 165, stageTotals: { self: 165 }, stageEvaluators: defaultEvaluators, dueAt: '2026-11-15T17:00:00+07:00', updatedAt: '2026-11-04T10:20:00+07:00', groups: cloneGroups(88, 'self') },
-  { id: 'eval-tu-q4', employeeName: 'Bùi Anh Tú', employeeCode: 'NV-2026-010', department: 'Ban Thời sự', position: 'Phóng viên Chính trị - Xã hội', periodId: '2026-q4', periodLabel: 'Quý IV/2026', status: 'waiting', stage: 'manager', progress: 100, selfScore: 165, currentScore: 161, stageTotals: { self: 165, deputy: 161 }, stageEvaluators: { ...defaultEvaluators, self: 'Bùi Anh Tú' }, dueAt: '2026-11-12T17:00:00+07:00', updatedAt: '2026-11-03T16:10:00+07:00', groups: cloneGroups(100, 'manager') },
-  { id: 'eval-huy-q4', employeeName: 'Đỗ Quang Huy', employeeCode: 'NV-2026-018', department: 'Trung tâm Media & Podcast', position: 'Chuyên viên Dựng hình & Kỹ thuật số', periodId: '2026-q4', periodLabel: 'Quý IV/2026', status: 'in_review', stage: 'editorial', progress: 100, selfScore: 165, currentScore: 158, stageTotals: { self: 165, deputy: 161, manager: 158 }, stageEvaluators: { ...defaultEvaluators, self: 'Đỗ Quang Huy', manager: 'Võ Hùng Thuật' }, dueAt: '2026-11-13T17:00:00+07:00', updatedAt: '2026-11-04T08:45:00+07:00', groups: cloneGroups(100, 'editorial') },
-  { id: 'eval-ha-q4', employeeName: 'Trần Thu Hà', employeeCode: 'NV-2026-012', department: 'Ban Kinh tế', position: 'Phóng viên Kinh tế / Thị trường', periodId: '2026-q4', periodLabel: 'Quý IV/2026', status: 'in_review', stage: 'council', progress: 100, selfScore: 165, currentScore: 155, stageTotals: { self: 165, deputy: 161, manager: 158, editorial: 155, council: 155 }, stageEvaluators: { ...defaultEvaluators, self: 'Trần Thu Hà', manager: 'Lê Cao Cường' }, dueAt: '2026-11-14T17:00:00+07:00', updatedAt: '2026-11-03T14:30:00+07:00', groups: cloneGroups(100, 'council') },
-  { id: 'eval-self-q3', employeeName: 'Nguyễn Minh Anh', employeeCode: 'NV-2026-009', department: 'Ban Thời sự', position: 'Phóng viên Điều tra & Đô thị', periodId: '2026-q3', periodLabel: 'Quý III/2026', status: 'published', stage: 'published', progress: 100, selfScore: 165, currentScore: 155, stageTotals: { self: 165, deputy: 161, manager: 158, editorial: 155, council: 155, published: 155 }, stageEvaluators: defaultEvaluators, dueAt: '2026-08-15T17:00:00+07:00', updatedAt: '2026-08-25T09:00:00+07:00', groups: cloneGroups(100, 'published') },
-  { id: 'eval-tu-q3', employeeName: 'Bùi Anh Tú', employeeCode: 'NV-2026-010', department: 'Ban Thời sự', position: 'Phóng viên Chính trị - Xã hội', periodId: '2026-q3', periodLabel: 'Quý III/2026', status: 'published', stage: 'published', progress: 100, selfScore: 165, currentScore: 155, stageTotals: { self: 165, deputy: 161, manager: 158, editorial: 155, council: 155, published: 155 }, stageEvaluators: { ...defaultEvaluators, self: 'Bùi Anh Tú' }, dueAt: '2026-08-15T17:00:00+07:00', updatedAt: '2026-08-25T09:00:00+07:00', groups: cloneGroups(100, 'published') },
+  { id: 'eval-self-q3', employeeName: 'Nguyễn Minh Anh', employeeCode: 'NV-001', department: 'Ban Nội dung', position: 'Phóng viên', periodId: '2026-q3', periodLabel: 'Quý III/2026', status: 'draft', stage: 'self', progress: 88, selfScore: 165, currentScore: 165, stageTotals: { self: 165 }, stageEvaluators: defaultEvaluators, dueAt: '2026-08-15T17:00:00+07:00', updatedAt: '2026-08-07T10:20:00+07:00', groups: cloneGroups(88, 'self') },
+  { id: 'eval-van-q3', employeeName: 'Lê Thanh Vân', employeeCode: 'NV-014', department: 'Ban Nội dung', position: 'Biên tập viên', periodId: '2026-q3', periodLabel: 'Quý III/2026', status: 'waiting', stage: 'deputy', progress: 100, selfScore: 165, currentScore: 161, stageTotals: { self: 165, deputy: 161 }, stageEvaluators: { ...defaultEvaluators, self: 'Lê Thanh Vân' }, dueAt: '2026-08-12T17:00:00+07:00', updatedAt: '2026-08-06T16:10:00+07:00', groups: cloneGroups(100, 'deputy') },
+  { id: 'eval-huy-q3', employeeName: 'Đỗ Quang Huy', employeeCode: 'NV-026', department: 'Ban Khoa giáo', position: 'Phóng viên', periodId: '2026-q3', periodLabel: 'Quý III/2026', status: 'in_review', stage: 'manager', progress: 100, selfScore: 165, currentScore: 158, stageTotals: { self: 165, deputy: 161, manager: 158 }, stageEvaluators: { ...defaultEvaluators, self: 'Đỗ Quang Huy' }, dueAt: '2026-08-13T17:00:00+07:00', updatedAt: '2026-08-07T08:45:00+07:00', groups: cloneGroups(100, 'manager') },
+  { id: 'eval-mai-q3', employeeName: 'Mai Phương Thảo', employeeCode: 'NV-031', department: 'Phòng Lưu trữ', position: 'Chuyên viên', periodId: '2026-q3', periodLabel: 'Quý III/2026', status: 'in_review', stage: 'council', progress: 100, selfScore: 165, currentScore: 155, stageTotals: { self: 165, deputy: 161, manager: 158, editorial: 155, council: 155 }, stageEvaluators: { ...defaultEvaluators, self: 'Mai Phương Thảo' }, dueAt: '2026-08-14T17:00:00+07:00', updatedAt: '2026-08-06T14:30:00+07:00', groups: cloneGroups(100, 'council') },
+  { id: 'eval-self-q2', employeeName: 'Nguyễn Minh Anh', employeeCode: 'NV-001', department: 'Ban Nội dung', position: 'Phóng viên', periodId: '2026-q2', periodLabel: 'Quý II/2026', status: 'published', stage: 'published', progress: 100, selfScore: 165, currentScore: 155, stageTotals: { self: 165, deputy: 161, manager: 158, editorial: 155, council: 155, published: 155 }, stageEvaluators: defaultEvaluators, dueAt: '2026-04-15T17:00:00+07:00', updatedAt: '2026-04-25T09:00:00+07:00', groups: cloneGroups(100, 'published') },
+  { id: 'eval-van-q2', employeeName: 'Lê Thanh Vân', employeeCode: 'NV-014', department: 'Ban Nội dung', position: 'Biên tập viên', periodId: '2026-q2', periodLabel: 'Quý II/2026', status: 'published', stage: 'published', progress: 100, selfScore: 165, currentScore: 155, stageTotals: { self: 165, deputy: 161, manager: 158, editorial: 155, council: 155, published: 155 }, stageEvaluators: { ...defaultEvaluators, self: 'Lê Thanh Vân' }, dueAt: '2026-04-15T17:00:00+07:00', updatedAt: '2026-04-25T09:00:00+07:00', groups: cloneGroups(100, 'published') },
 ];

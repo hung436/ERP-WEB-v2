@@ -1,0 +1,3801 @@
+[
+  {
+    "sourceRow": 4,
+    "fullName": "TRẦN XUÂN TOÀN",
+    "groupCode": "BBT",
+    "department": "Ban Biên tập",
+    "positions": [
+      "Ủy viên BTV, Chủ nhiệm UBKT Đảng ủy Báo và Phát thanh, Truyền hình TP.HCM",
+      "Bí thư Đảng ủy Báo điện tử Tuổi Trẻ",
+      "Phó TGĐ Báo và Phát thanh, Truyền hình TP.HCM",
+      "Tổng biên tập"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 1",
+    "reviewer1": "",
+    "reviewer2": "",
+    "reviewer3": "",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 5,
+    "fullName": "LÊ XUÂN TRUNG",
+    "groupCode": "BBT",
+    "department": "Ban Biên tập",
+    "positions": [
+      "Phó Tổng biên tập"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 1",
+    "reviewer1": "",
+    "reviewer2": "",
+    "reviewer3": "TRẦN XUÂN TOÀN",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 6,
+    "fullName": "ĐINH MINH TRUNG",
+    "groupCode": "BBT",
+    "department": "Ban Biên tập",
+    "positions": [
+      "Ủy viên BCH Đảng bộ Báo và Phát thanh, Truyền hình TP.HCM",
+      "Phó Bí thư Đảng ủy Báo điện tử Tuổi Trẻ",
+      "Phó Tổng biên tập"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 1",
+    "reviewer1": "",
+    "reviewer2": "",
+    "reviewer3": "TRẦN XUÂN TOÀN",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 7,
+    "fullName": "NGUYỄN HOÀNG NGUYÊN",
+    "groupCode": "BBT",
+    "department": "Ban Biên tập",
+    "positions": [
+      "Bí thư Chi bộ Tòa soạn số",
+      "Phó Tổng biên tập"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 1",
+    "reviewer1": "",
+    "reviewer2": "",
+    "reviewer3": "TRẦN XUÂN TOÀN",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 8,
+    "fullName": "NGUYỄN THÁI BÌNH",
+    "groupCode": "BBT",
+    "department": "Ban Biên tập",
+    "positions": [
+      "Phó Tổng biên tập"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 1",
+    "reviewer1": "",
+    "reviewer2": "",
+    "reviewer3": "TRẦN XUÂN TOÀN",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 9,
+    "fullName": "LÊ CAO CƯỜNG",
+    "groupCode": "BBT",
+    "department": "Ban Biên tập",
+    "positions": [
+      "Phó Tổng biên tập",
+      "Thư ký Chi hội nhà báo"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 1",
+    "reviewer1": "",
+    "reviewer2": "",
+    "reviewer3": "TRẦN XUÂN TOÀN",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 10,
+    "fullName": "ĐINH ĐỨC THỌ",
+    "groupCode": "BBT",
+    "department": "Ban Biên tập",
+    "positions": [
+      "Phó Tổng biên tập"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 1",
+    "reviewer1": "",
+    "reviewer2": "",
+    "reviewer3": "TRẦN XUÂN TOÀN",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 11,
+    "fullName": "NGUYỄN THỊ THU HÀ",
+    "groupCode": "BBT",
+    "department": "Ban Biên tập",
+    "positions": [
+      "Phó Tổng biên tập"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 1",
+    "reviewer1": "",
+    "reviewer2": "",
+    "reviewer3": "TRẦN XUÂN TOÀN",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 12,
+    "fullName": "NGUYỄN THỊ HƯƠNG",
+    "groupCode": "BBT",
+    "department": "Ban Biên tập",
+    "positions": [
+      "Đảng ủy viên Đảng bộ Báo điện tử Tuổi Trẻ",
+      "Bí thư Chi bộ Văn phòng",
+      "Ủy viên Ban biên tập, Trưởng ban Tổ chức hành chính, Chánh văn phòng"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 1",
+    "reviewer1": "",
+    "reviewer2": "",
+    "reviewer3": "TRẦN XUÂN TOÀN",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 13,
+    "fullName": "NGUYỄN HỒNG MINH",
+    "groupCode": "BBT",
+    "department": "Ban Biên tập",
+    "positions": [
+      "Đảng ủy viên Đảng bộ Báo điện tử Tuổi Trẻ",
+      "Ủy viên Ban biên tập, Tổng Thư ký tòa soạn",
+      "Ủy viên Chi hội nhà báo"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 1",
+    "reviewer1": "",
+    "reviewer2": "",
+    "reviewer3": "TRẦN XUÂN TOÀN",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 15,
+    "fullName": "LÊ THANH LIÊM",
+    "groupCode": "TKTS",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Thư ký tòa soạn"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 1",
+    "reviewer1": "NGUYỄN HỒNG MINH",
+    "reviewer2": "NGUYỄN THÁI BÌNH",
+    "reviewer3": "TRẦN XUÂN TOÀN",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 16,
+    "fullName": "DƯƠNG ĐỨC ĐÀ TRANG",
+    "groupCode": "TKTS",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Thư ký tòa soạn"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 1",
+    "reviewer1": "NGUYỄN HỒNG MINH",
+    "reviewer2": "LÊ XUÂN TRUNG",
+    "reviewer3": "TRẦN XUÂN TOÀN",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 17,
+    "fullName": "TRƯƠNG BẢO CHÂU",
+    "groupCode": "TKTS",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Thư ký tòa soạn"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 1",
+    "reviewer1": "NGUYỄN HỒNG MINH",
+    "reviewer2": "NGUYỄN HOÀNG NGUYÊN",
+    "reviewer3": "TRẦN XUÂN TOÀN",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 18,
+    "fullName": "ĐÀM VĂN ĐẢNG",
+    "groupCode": "TKTS",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Thư ký tòa soạn"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 1",
+    "reviewer1": "NGUYỄN HỒNG MINH",
+    "reviewer2": "LÊ CAO CƯỜNG",
+    "reviewer3": "TRẦN XUÂN TOÀN",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 19,
+    "fullName": "NGUYỄN VĂN TIẾN HÙNG",
+    "groupCode": "TKTS",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Thư ký tòa soạn"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 1",
+    "reviewer1": "NGUYỄN HỒNG MINH",
+    "reviewer2": "NGUYỄN THÁI BÌNH",
+    "reviewer3": "TRẦN XUÂN TOÀN",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 20,
+    "fullName": "VÕ MINH LUẬN",
+    "groupCode": "TKTS",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Thư ký tòa soạn"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 1",
+    "reviewer1": "NGUYỄN HỒNG MINH",
+    "reviewer2": "NGUYỄN HOÀNG NGUYÊN",
+    "reviewer3": "TRẦN XUÂN TOÀN",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 21,
+    "fullName": "NGUYỄN VIỄN SỰ",
+    "groupCode": "TKTS",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Đảng ủy viên Đảng bộ Báo điện tử Tuổi Trẻ",
+      "Bí thư Chi bộ Phóng viên",
+      "Thư ký tòa soạn"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 1",
+    "reviewer1": "NGUYỄN HỒNG MINH",
+    "reviewer2": "LÊ XUÂN TRUNG",
+    "reviewer3": "TRẦN XUÂN TOÀN",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 22,
+    "fullName": "PHẠM QUỲNH TRUNG",
+    "groupCode": "TKTS",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Thư ký tòa soạn"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 1",
+    "reviewer1": "NGUYỄN HỒNG MINH",
+    "reviewer2": "LÊ XUÂN TRUNG",
+    "reviewer3": "TRẦN XUÂN TOÀN",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 23,
+    "fullName": "PHẠM VĂN QUEN",
+    "groupCode": "TKTS",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Phó Bí thư Chi bộ Tòa soạn số",
+      "Thư ký tòa soạn"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 1",
+    "reviewer1": "NGUYỄN HỒNG MINH",
+    "reviewer2": "LÊ XUÂN TRUNG",
+    "reviewer3": "TRẦN XUÂN TOÀN",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 24,
+    "fullName": "NGUYỄN THANH LIÊM",
+    "groupCode": "TKTS",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Thư ký tòa soạn"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 1",
+    "reviewer1": "NGUYỄN HỒNG MINH",
+    "reviewer2": "LÊ XUÂN TRUNG",
+    "reviewer3": "TRẦN XUÂN TOÀN",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 25,
+    "fullName": "NGUYỄN VĂN HẢI",
+    "groupCode": "TKTS",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Thư ký tòa soạn"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 1",
+    "reviewer1": "NGUYỄN HỒNG MINH",
+    "reviewer2": "NGUYỄN HOÀNG NGUYÊN",
+    "reviewer3": "TRẦN XUÂN TOÀN",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 26,
+    "fullName": "ĐỖ THỊ NGỌC HÀ",
+    "groupCode": "TKTS",
+    "department": "Văn phòng đại diện Miền Bắc",
+    "positions": [
+      "Bí thư Chi bộ Văn phòng Miền Bắc",
+      "Thư ký tòa soạn, Trưởng văn phòng"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 1",
+    "reviewer1": "",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "TRẦN XUÂN TOÀN",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 27,
+    "fullName": "HỒ TẤN VŨ",
+    "groupCode": "TKTS",
+    "department": "Văn phòng đại diện Miền Trung",
+    "positions": [
+      "Bí thư Chi bộ Văn phòng Miền Trung",
+      "Thư ký tòa soạn, Trưởng văn phòng"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 1",
+    "reviewer1": "",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "TRẦN XUÂN TOÀN",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 28,
+    "fullName": "HOÀNG TRÍ DŨNG",
+    "groupCode": "TKTS",
+    "department": "Văn phòng đại diện Miền Tây",
+    "positions": [
+      "Bí thư Chi bộ Văn phòng Miền Tây",
+      "Thư ký tòa soạn, Trưởng văn phòng"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 1",
+    "reviewer1": "",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "TRẦN XUÂN TOÀN",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 30,
+    "fullName": "ĐẶNG ANH TUẤN",
+    "groupCode": "TPPB",
+    "department": "Trung tâm Công nghệ và nội dung số",
+    "positions": [
+      "Đảng ủy viên Đảng bộ Báo điện tử Tuổi Trẻ",
+      "Bí thư Chi bộ Công nghệ số",
+      "Giám đốc Trung tâm Công nghệ và nội dung số"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 1",
+    "reviewer1": "",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "TRẦN XUÂN TOÀN",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 31,
+    "fullName": "VÕ HÙNG THUẬT",
+    "groupCode": "TPPB",
+    "department": "Trung tâm Truyền thông số Tuổi Trẻ",
+    "positions": [
+      "Đảng ủy viên Đảng bộ Báo điện tử Tuổi Trẻ",
+      "Bí thư Chi bộ Truyền thông số",
+      "Giám đốc Trung tâm Truyền thông số Tuổi Trẻ"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 1",
+    "reviewer1": "",
+    "reviewer2": "ĐINH MINH TRUNG",
+    "reviewer3": "TRẦN XUÂN TOÀN",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 32,
+    "fullName": "BÙI TIẾN DŨNG",
+    "groupCode": "TPPB",
+    "department": "Trung tâm Đào tạo Tuổi Trẻ",
+    "positions": [
+      "Giám đốc Trung tâm Đào tạo Tuổi Trẻ"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 1",
+    "reviewer1": "",
+    "reviewer2": "LÊ XUÂN TRUNG",
+    "reviewer3": "TRẦN XUÂN TOÀN",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 33,
+    "fullName": "CHÂU HOÀNG VŨ",
+    "groupCode": "TPPB",
+    "department": "Trung tâm Cao ốc Tuổi Trẻ",
+    "positions": [
+      "Giám đốc Trung tâm Cao ốc Tuổi Trẻ",
+      "Chủ tịch Công đoàn"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 1",
+    "reviewer1": "",
+    "reviewer2": "ĐINH MINH TRUNG",
+    "reviewer3": "TRẦN XUÂN TOÀN",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 34,
+    "fullName": "HOÀNG ĐẠI THẮNG",
+    "groupCode": "TPPB",
+    "department": "Ban Tài chính kế toán",
+    "positions": [
+      "Phó Bí thư Chi bộ Văn phòng",
+      "Trưởng ban Tài chính kế toán, Kế toán trưởng"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 1",
+    "reviewer1": "",
+    "reviewer2": "ĐINH MINH TRUNG",
+    "reviewer3": "TRẦN XUÂN TOÀN",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 35,
+    "fullName": "PHAN NGHỆ ĐÔ",
+    "groupCode": "TPPB",
+    "department": "Trung tâm Công nghệ và nội dung số",
+    "positions": [
+      "Phó Giám đốc Trung tâm Công nghệ và nội dung số"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 1",
+    "reviewer1": "ĐẶNG ANH TUẤN",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "TRẦN XUÂN TOÀN",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 36,
+    "fullName": "NGUYỄN VŨ BÌNH",
+    "groupCode": "TPPB",
+    "department": "Trung tâm Truyền thông số Tuổi Trẻ",
+    "positions": [
+      "Phó Giám đốc Trung tâm Truyền thông số Tuổi Trẻ"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 1",
+    "reviewer1": "VÕ HÙNG THUẬT",
+    "reviewer2": "ĐINH MINH TRUNG",
+    "reviewer3": "TRẦN XUÂN TOÀN",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 37,
+    "fullName": "PHAN VĂN ĐẮC",
+    "groupCode": "TPPB",
+    "department": "Ban Tổ chức hành chính",
+    "positions": [
+      "Phó Giám đốc Trung tâm Truyền thông số Tuổi Trẻ"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 1",
+    "reviewer1": "VÕ HÙNG THUẬT",
+    "reviewer2": "ĐINH MINH TRUNG",
+    "reviewer3": "TRẦN XUÂN TOÀN",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 38,
+    "fullName": "NGUYỄN THANH SƠN",
+    "groupCode": "TPPB",
+    "department": "Trung tâm Truyền thông số Tuổi Trẻ",
+    "positions": [
+      "Phó Bí thư Chi bộ Truyền thông số",
+      "Phó Giám đốc Trung tâm Truyền thông số Tuổi Trẻ"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 1",
+    "reviewer1": "VÕ HÙNG THUẬT",
+    "reviewer2": "ĐINH MINH TRUNG",
+    "reviewer3": "TRẦN XUÂN TOÀN",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 39,
+    "fullName": "LÊ BẢO KỲ",
+    "groupCode": "TPPB",
+    "department": "Trung tâm Truyền thông số Tuổi Trẻ",
+    "positions": [
+      "Phó Giám đốc Trung tâm Truyền thông số Tuổi Trẻ"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 1",
+    "reviewer1": "VÕ HÙNG THUẬT",
+    "reviewer2": "ĐINH MINH TRUNG",
+    "reviewer3": "TRẦN XUÂN TOÀN",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 40,
+    "fullName": "TRỊNH THỊ LỆ",
+    "groupCode": "TPPB",
+    "department": "Trung tâm Đào tạo Tuổi Trẻ",
+    "positions": [
+      "Chi ủy viên Chi bộ Truyền thông số",
+      "Phó Giám đốc Trung tâm đào tạo",
+      "Ủy viên Ban Thanh tra nhân dân"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 1",
+    "reviewer1": "BÙI TIẾN DŨNG",
+    "reviewer2": "LÊ XUÂN TRUNG",
+    "reviewer3": "TRẦN XUÂN TOÀN",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 41,
+    "fullName": "TRẦN NGỌC TUẤN",
+    "groupCode": "TPPB",
+    "department": "Ban Tổ chức hành chính",
+    "positions": [
+      "Chi ủy viên Chi bộ Văn phòng",
+      "Phó Trưởng ban Tổ chức hành chính",
+      "Thư ký Đảng ủy hỗ trợ công tác đảng"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 1",
+    "reviewer1": "NGUYỄN THỊ HƯƠNG",
+    "reviewer2": "ĐINH MINH TRUNG",
+    "reviewer3": "TRẦN XUÂN TOÀN",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 42,
+    "fullName": "LÊ NGỌC HIỂN",
+    "groupCode": "TPPB",
+    "department": "Ban Tổ chức hành chính",
+    "positions": [
+      "Phó Trưởng ban Tổ chức hành chính"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 1",
+    "reviewer1": "NGUYỄN THỊ HƯƠNG",
+    "reviewer2": "ĐINH MINH TRUNG",
+    "reviewer3": "TRẦN XUÂN TOÀN",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 44,
+    "fullName": "PHẠM HỒNG THÁI",
+    "groupCode": "BTV",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Biên tập viên"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 1",
+    "reviewer1": "",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "LÊ CAO CƯỜNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 45,
+    "fullName": "PHAN THI CẦM",
+    "groupCode": "BTV",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Biên tập viên"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 1",
+    "reviewer1": "",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "LÊ CAO CƯỜNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 46,
+    "fullName": "NGUYỄN QUỐC VIỆT",
+    "groupCode": "BTV",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Biên tập viên"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 1",
+    "reviewer1": "",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "LÊ CAO CƯỜNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 47,
+    "fullName": "NGUYỄN ĐÌNH ĐĂNG",
+    "groupCode": "BTV",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Biên tập viên"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 1",
+    "reviewer1": "ĐÀM VĂN ĐẢNG",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "LÊ CAO CƯỜNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 48,
+    "fullName": "KHƯƠNG THỊ XUÂN",
+    "groupCode": "BTV",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Biên tập viên"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 1",
+    "reviewer1": "VÕ MINH LUẬN",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "NGUYỄN HOÀNG NGUYÊN",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 49,
+    "fullName": "LÊ THỊ THÁI HÒA",
+    "groupCode": "BTV",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Biên tập viên"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 1",
+    "reviewer1": "VÕ MINH LUẬN",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "NGUYỄN HOÀNG NGUYÊN",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 50,
+    "fullName": "TRẦN QUỐC LINH",
+    "groupCode": "BTV",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Biên tập viên",
+      "Phó Thư ký Chi hội Nhà báo"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 1",
+    "reviewer1": "VÕ MINH LUẬN",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "NGUYỄN HOÀNG NGUYÊN",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 51,
+    "fullName": "PHẠM CAO CƯỜNG",
+    "groupCode": "BTV",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Biên tập viên"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 1",
+    "reviewer1": "NGUYỄN VĂN HẢI",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "NGUYỄN HOÀNG NGUYÊN",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 52,
+    "fullName": "TRẦN QUANG KHẢI",
+    "groupCode": "BTV",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Phó Bí thư Chi bộ Phóng viên",
+      "Biên tập viên"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 1",
+    "reviewer1": "NGUYỄN VIỄN SỰ",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "LÊ XUÂN TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 53,
+    "fullName": "NGUYỄN VĂN LỘC",
+    "groupCode": "BTV",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Biên tập viên",
+      "Trưởng ban Thanh tra nhân dân"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 1",
+    "reviewer1": "NGUYỄN VIỄN SỰ",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "LÊ XUÂN TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 54,
+    "fullName": "TRƯƠNG VIỆT TOÀN",
+    "groupCode": "BTV",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Biên tập viên"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 1",
+    "reviewer1": "PHẠM QUỲNH TRUNG",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "LÊ XUÂN TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 55,
+    "fullName": "LƯƠNG NGUYỄN TRƯỜNG SƠN",
+    "groupCode": "BTV",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Biên tập viên"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 1",
+    "reviewer1": "PHẠM QUỲNH TRUNG",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "LÊ XUÂN TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 56,
+    "fullName": "TRẦN TRỌNG HẢI MINH",
+    "groupCode": "BTV",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Biên tập viên"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 1",
+    "reviewer1": "PHẠM QUỲNH TRUNG",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "LÊ XUÂN TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 57,
+    "fullName": "NGUYỄN BÌNH PHƯƠNG THẢO",
+    "groupCode": "BTV",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Biên tập viên"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 1",
+    "reviewer1": "PHẠM QUỲNH TRUNG",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "LÊ XUÂN TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 58,
+    "fullName": "DƯƠNG THỊ KIM THOA",
+    "groupCode": "BTV",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Biên tập viên"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 1",
+    "reviewer1": "PHẠM QUỲNH TRUNG",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "LÊ XUÂN TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 59,
+    "fullName": "ĐÀO THỊ BÍCH DẬU",
+    "groupCode": "BTV",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Biên tập viên"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 1",
+    "reviewer1": "PHẠM VĂN QUEN",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "LÊ XUÂN TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 60,
+    "fullName": "ĐOÀN TỪ DUY",
+    "groupCode": "BTV",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Biên tập viên",
+      "Ủy viên BCH - Tổ trưởng CĐ Tòa soạn số"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 1",
+    "reviewer1": "",
+    "reviewer2": "",
+    "reviewer3": "NGUYỄN HỒNG MINH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 61,
+    "fullName": "NGUYỄN VĂN THANH",
+    "groupCode": "BTV",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Biên tập viên"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 1",
+    "reviewer1": "PHẠM VĂN QUEN",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "LÊ XUÂN TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 62,
+    "fullName": "NGUYỄN THỊ HOÀNG HÀ",
+    "groupCode": "BTV",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Biên tập viên",
+      "Ủy viên Ban Thanh tra nhân dân"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 1",
+    "reviewer1": "PHẠM VĂN QUEN",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "LÊ XUÂN TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 63,
+    "fullName": "DƯƠNG THỊ NGỌC HÀ",
+    "groupCode": "BTV",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Biên tập viên"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 1",
+    "reviewer1": "PHẠM VĂN QUEN",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "LÊ XUÂN TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 64,
+    "fullName": "NGUYỄN ĐỨC TUYÊN",
+    "groupCode": "BTV",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Biên tập viên"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 1",
+    "reviewer1": "",
+    "reviewer2": "HOÀNG TRÍ DŨNG",
+    "reviewer3": "NGUYỄN HỒNG MINH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 65,
+    "fullName": "VŨ THỊ NHƯ BÌNH",
+    "groupCode": "BTV",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Biên tập viên"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 1",
+    "reviewer1": "ĐÀM VĂN ĐẢNG",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "LÊ CAO CƯỜNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 66,
+    "fullName": "ĐÀO NHƯ THÙY MAI",
+    "groupCode": "BTV",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Biên tập viên"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 1",
+    "reviewer1": "DƯƠNG ĐỨC ĐÀ TRANG",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "ĐINH ĐỨC THỌ",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 67,
+    "fullName": "PHẠM NGUYỄN HOÀI TRANG",
+    "groupCode": "BTV",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Biên tập viên"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 1",
+    "reviewer1": "",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "LÊ CAO CƯỜNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 68,
+    "fullName": "TRẦN THỊ HỒNG TƯƠI",
+    "groupCode": "BTV",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Chi ủy viên Chi bộ Tòa soạn số",
+      "Biên tập viên"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 1",
+    "reviewer1": "",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "LÊ CAO CƯỜNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 69,
+    "fullName": "VÕ THỊ KIM NHUNG",
+    "groupCode": "BTV",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Biên tập viên"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 1",
+    "reviewer1": "NGUYỄN VĂN HẢI",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "NGUYỄN HOÀNG NGUYÊN",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 70,
+    "fullName": "NGUYỄN THỊ LAN ANH",
+    "groupCode": "BTV",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Chi ủy viên Chi bộ Văn phòng Miền Bắc",
+      "Biên tập viên"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 1",
+    "reviewer1": "LÊ THANH LIÊM",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "NGUYỄN THÁI BÌNH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 71,
+    "fullName": "PHẠM HỮU KHÁ",
+    "groupCode": "BTV",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Biên tập viên"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 1",
+    "reviewer1": "",
+    "reviewer2": "HỒ TẤN VŨ",
+    "reviewer3": "NGUYỄN HỒNG MINH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 72,
+    "fullName": "ĐỖ THỊ HỒNG ĐIỆP",
+    "groupCode": "BTV",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Biên tập viên"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 1",
+    "reviewer1": "NGUYỄN VIỄN SỰ",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "ĐINH ĐỨC THỌ",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 73,
+    "fullName": "NGUYỄN PHƯƠNG THẢO",
+    "groupCode": "BTV",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Biên tập viên"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 1",
+    "reviewer1": "NGUYỄN VĂN TIẾN HÙNG",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "NGUYỄN THÁI BÌNH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 74,
+    "fullName": "LÊ ANH PHONG",
+    "groupCode": "BTV",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Biên tập viên"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 1",
+    "reviewer1": "NGUYỄN VĂN TIẾN HÙNG",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "NGUYỄN THÁI BÌNH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 75,
+    "fullName": "TRẦN VĂN HƯNG",
+    "groupCode": "BTV",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Biên tập viên"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 1",
+    "reviewer1": "NGUYỄN VĂN TIẾN HÙNG",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "NGUYỄN THÁI BÌNH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 76,
+    "fullName": "PHẠM TẤN PHÚC",
+    "groupCode": "BTV",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Biên tập viên"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 1",
+    "reviewer1": "NGUYỄN VĂN TIẾN HÙNG",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "NGUYỄN THÁI BÌNH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 77,
+    "fullName": "ĐẶNG TẤN ĐỨC",
+    "groupCode": "BTV",
+    "department": "Trung tâm Công nghệ và nội dung số",
+    "positions": [
+      "Biên tập viên"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 1",
+    "reviewer1": "",
+    "reviewer2": "ĐẶNG ANH TUẤN",
+    "reviewer3": "NGUYỄN HỒNG MINH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 78,
+    "fullName": "NGUYỄN VĂN TRIỀU",
+    "groupCode": "BTV",
+    "department": "Trung tâm Công nghệ và nội dung số",
+    "positions": [
+      "Phó Bí thư Chi bộ Công nghệ số",
+      "Biên tập viên",
+      "Ủy viên BCH - Chủ nhiệm UBKT Công đoàn"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 1",
+    "reviewer1": "",
+    "reviewer2": "ĐẶNG ANH TUẤN",
+    "reviewer3": "NGUYỄN HỒNG MINH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 79,
+    "fullName": "NGUYỄN ĐỨC BÌNH",
+    "groupCode": "BTV",
+    "department": "Văn phòng đại diện Miền Bắc",
+    "positions": [
+      "Phó Bí thư Chi bộ Văn phòng Miền Bắc",
+      "Biên tập viên, Phó Trưởng Văn phòng"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 1",
+    "reviewer1": "",
+    "reviewer2": "ĐỖ THỊ NGỌC HÀ",
+    "reviewer3": "NGUYỄN HỒNG MINH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 80,
+    "fullName": "LÊ TRUNG KIÊN",
+    "groupCode": "BTV",
+    "department": "Văn phòng đại diện Miền Bắc",
+    "positions": [
+      "Biên tập viên, Phó Trưởng Văn phòng"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 1",
+    "reviewer1": "",
+    "reviewer2": "ĐỖ THỊ NGỌC HÀ",
+    "reviewer3": "NGUYỄN HỒNG MINH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 81,
+    "fullName": "NGUYỄN QUỐC KHƯƠNG",
+    "groupCode": "BTV",
+    "department": "Văn phòng đại diện Miền Trung",
+    "positions": [
+      "Phó Bí thư Chi bộ Văn phòng Miền Trung",
+      "Biên tập viên, Phó Trưởng văn phòng"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 1",
+    "reviewer1": "",
+    "reviewer2": "HỒ TẤN VŨ",
+    "reviewer3": "NGUYỄN HỒNG MINH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 83,
+    "fullName": "LÊ TRỊ THIÊN",
+    "groupCode": "NVND",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Nhân viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 3",
+    "reviewer1": "",
+    "reviewer2": "",
+    "reviewer3": "NGUYỄN HỒNG MINH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 84,
+    "fullName": "TRẦN GIA TIẾN",
+    "groupCode": "NVND",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Nhân viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 3",
+    "reviewer1": "",
+    "reviewer2": "",
+    "reviewer3": "NGUYỄN HỒNG MINH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 85,
+    "fullName": "VÕ THỊ HUỆ",
+    "groupCode": "NVND",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Nhân viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 3",
+    "reviewer1": "",
+    "reviewer2": "",
+    "reviewer3": "NGUYỄN HỒNG MINH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 86,
+    "fullName": "PHAN THANH TUẤN",
+    "groupCode": "NVND",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Nhân viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 3",
+    "reviewer1": "",
+    "reviewer2": "",
+    "reviewer3": "NGUYỄN HỒNG MINH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 87,
+    "fullName": "THÁI TRẦN NGỌC THÀNH",
+    "groupCode": "NVND",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Nhân viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 3",
+    "reviewer1": "",
+    "reviewer2": "",
+    "reviewer3": "NGUYỄN HỒNG MINH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 88,
+    "fullName": "NGUYỄN TUẤN ANH",
+    "groupCode": "NVND",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Nhân viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 3",
+    "reviewer1": "",
+    "reviewer2": "",
+    "reviewer3": "NGUYỄN HỒNG MINH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 89,
+    "fullName": "BÙI LÊ THẾ KIỆT",
+    "groupCode": "NVND",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Nhân viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 3",
+    "reviewer1": "ĐÀM VĂN ĐẢNG",
+    "reviewer2": "",
+    "reviewer3": "NGUYỄN HỒNG MINH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 90,
+    "fullName": "BÙI MẠNH TÁNH",
+    "groupCode": "NVND",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Nhân viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 3",
+    "reviewer1": "",
+    "reviewer2": "",
+    "reviewer3": "NGUYỄN HỒNG MINH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 91,
+    "fullName": "PHẠM NGUYỄN BẢO NGHI",
+    "groupCode": "NVND",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Nhân viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 3",
+    "reviewer1": "",
+    "reviewer2": "",
+    "reviewer3": "NGUYỄN HỒNG MINH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 92,
+    "fullName": "NGUYỄN QUỐC KHA",
+    "groupCode": "NVND",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Nhân viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 3",
+    "reviewer1": "",
+    "reviewer2": "",
+    "reviewer3": "NGUYỄN HỒNG MINH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 93,
+    "fullName": "TRẦN VĨNH NHẬT TOÀN",
+    "groupCode": "NVND",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Nhân viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 3",
+    "reviewer1": "",
+    "reviewer2": "",
+    "reviewer3": "NGUYỄN HỒNG MINH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 94,
+    "fullName": "LÊ VĂN TRƯỢNG",
+    "groupCode": "NVND",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Nhân viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 3",
+    "reviewer1": "",
+    "reviewer2": "",
+    "reviewer3": "NGUYỄN HỒNG MINH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 96,
+    "fullName": "HUỲNH ĐỨC ANH",
+    "groupCode": "NVCN",
+    "department": "Trung tâm Công nghệ và nội dung số",
+    "positions": [
+      "Trưởng nhóm phát triển mạng xã hội"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 5",
+    "reviewer1": "",
+    "reviewer2": "ĐẶNG ANH TUẤN",
+    "reviewer3": "NGUYỄN HỒNG MINH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 97,
+    "fullName": "PHAN NGUYỄN BẢO DUY",
+    "groupCode": "NVCN",
+    "department": "Trung tâm Công nghệ và nội dung số",
+    "positions": [
+      "Trưởng nhóm sáng tạo nội dung"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 5",
+    "reviewer1": "",
+    "reviewer2": "ĐẶNG ANH TUẤN",
+    "reviewer3": "NGUYỄN HỒNG MINH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 98,
+    "fullName": "NGUYỄN TẤN ĐẠT",
+    "groupCode": "NVCN",
+    "department": "Trung tâm Công nghệ và nội dung số",
+    "positions": [
+      "Nhân viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 5",
+    "reviewer1": "",
+    "reviewer2": "ĐẶNG ANH TUẤN",
+    "reviewer3": "NGUYỄN HỒNG MINH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 99,
+    "fullName": "PHẠM SANH TÀI",
+    "groupCode": "NVCN",
+    "department": "Trung tâm Công nghệ và nội dung số",
+    "positions": [
+      "Nhân viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 5",
+    "reviewer1": "",
+    "reviewer2": "ĐẶNG ANH TUẤN",
+    "reviewer3": "NGUYỄN HỒNG MINH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 100,
+    "fullName": "PHẠM VIỆT ĐÔNG HẢI",
+    "groupCode": "NVCN",
+    "department": "Trung tâm Công nghệ và nội dung số",
+    "positions": [
+      "Nhân viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 5",
+    "reviewer1": "",
+    "reviewer2": "ĐẶNG ANH TUẤN",
+    "reviewer3": "NGUYỄN HỒNG MINH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 101,
+    "fullName": "TRƯƠNG CÔNG HOÀNG NGUYÊN",
+    "groupCode": "NVCN",
+    "department": "Trung tâm Công nghệ và nội dung số",
+    "positions": [
+      "Nhân viên chính thức",
+      "Phó Bí thư Chi đoàn Công nghệ số"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 5",
+    "reviewer1": "",
+    "reviewer2": "ĐẶNG ANH TUẤN",
+    "reviewer3": "NGUYỄN HỒNG MINH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 102,
+    "fullName": "CHẾ XUÂN THÂN",
+    "groupCode": "NVCN",
+    "department": "Trung tâm Công nghệ và nội dung số",
+    "positions": [
+      "Nhân viên chính thức",
+      "Ủy viên BCH Liên Chi đoàn",
+      "Bí thư Chi đoàn Tòa soạn số"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 5",
+    "reviewer1": "",
+    "reviewer2": "ĐẶNG ANH TUẤN",
+    "reviewer3": "NGUYỄN HỒNG MINH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 103,
+    "fullName": "LÊ CÔNG TIẾN",
+    "groupCode": "NVCN",
+    "department": "Trung tâm Công nghệ và nội dung số",
+    "positions": [
+      "Phụ trách điều hành các nhóm"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 5",
+    "reviewer1": "PHAN NGHỆ ĐÔ",
+    "reviewer2": "ĐẶNG ANH TUẤN",
+    "reviewer3": "NGUYỄN HỒNG MINH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 104,
+    "fullName": "NGUYỄN VĂN LỢI",
+    "groupCode": "NVCN",
+    "department": "Trung tâm Công nghệ và nội dung số",
+    "positions": [
+      "Trưởng nhóm lập trình dữ liệu",
+      "Phó Bí thư Liên Chi đoàn",
+      "Bí thư Chi đoàn Công nghệ số"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 5",
+    "reviewer1": "PHAN NGHỆ ĐÔ",
+    "reviewer2": "ĐẶNG ANH TUẤN",
+    "reviewer3": "NGUYỄN HỒNG MINH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 105,
+    "fullName": "NGUYỄN HOÀI NAM",
+    "groupCode": "NVCN",
+    "department": "Trung tâm Công nghệ và nội dung số",
+    "positions": [
+      "Trưởng nhóm lập trình giao diện",
+      "Ủy viên BCH Chi đoàn Công nghệ số"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 5",
+    "reviewer1": "PHAN NGHỆ ĐÔ",
+    "reviewer2": "ĐẶNG ANH TUẤN",
+    "reviewer3": "NGUYỄN HỒNG MINH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 106,
+    "fullName": "NGUYỄN HUY LÂN",
+    "groupCode": "NVCN",
+    "department": "Trung tâm Công nghệ và nội dung số",
+    "positions": [
+      "Trưởng nhóm kỹ thuật máy tính"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 5",
+    "reviewer1": "PHAN NGHỆ ĐÔ",
+    "reviewer2": "ĐẶNG ANH TUẤN",
+    "reviewer3": "NGUYỄN HỒNG MINH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 107,
+    "fullName": "NGUYỄN VĂN KHÁNH",
+    "groupCode": "NVCN",
+    "department": "Trung tâm Công nghệ và nội dung số",
+    "positions": [
+      "Trưởng nhóm lập trình hệ thống"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 5",
+    "reviewer1": "PHAN NGHỆ ĐÔ",
+    "reviewer2": "ĐẶNG ANH TUẤN",
+    "reviewer3": "NGUYỄN HỒNG MINH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 108,
+    "fullName": "PHAN HOÀNG VŨ",
+    "groupCode": "NVCN",
+    "department": "Trung tâm Công nghệ và nội dung số",
+    "positions": [
+      "Nhân viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 5",
+    "reviewer1": "PHAN NGHỆ ĐÔ",
+    "reviewer2": "ĐẶNG ANH TUẤN",
+    "reviewer3": "NGUYỄN HỒNG MINH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 109,
+    "fullName": "VŨ NHẬT MINH",
+    "groupCode": "NVCN",
+    "department": "Trung tâm Công nghệ và nội dung số",
+    "positions": [
+      "Nhân viên chính thức",
+      "Phó Chủ tịch Công đoàn"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 5",
+    "reviewer1": "PHAN NGHỆ ĐÔ",
+    "reviewer2": "ĐẶNG ANH TUẤN",
+    "reviewer3": "NGUYỄN HỒNG MINH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 110,
+    "fullName": "HÀ THANH NHẤT",
+    "groupCode": "NVCN",
+    "department": "Trung tâm Công nghệ và nội dung số",
+    "positions": [
+      "Chi ủy viên Chi bộ Công nghệ số",
+      "Nhân viên chính thức",
+      "Tổ trưởng CĐ Công nghệ số"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 5",
+    "reviewer1": "PHAN NGHỆ ĐÔ",
+    "reviewer2": "ĐẶNG ANH TUẤN",
+    "reviewer3": "NGUYỄN HỒNG MINH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 111,
+    "fullName": "NGUYỄN THANH PHONG",
+    "groupCode": "NVCN",
+    "department": "Trung tâm Công nghệ và nội dung số",
+    "positions": [
+      "Nhân viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 5",
+    "reviewer1": "PHAN NGHỆ ĐÔ",
+    "reviewer2": "ĐẶNG ANH TUẤN",
+    "reviewer3": "NGUYỄN HỒNG MINH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 112,
+    "fullName": "ĐOÀN MẠNH TUẤN",
+    "groupCode": "NVCN",
+    "department": "Trung tâm Công nghệ và nội dung số",
+    "positions": [
+      "Nhân viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 5",
+    "reviewer1": "PHAN NGHỆ ĐÔ",
+    "reviewer2": "ĐẶNG ANH TUẤN",
+    "reviewer3": "NGUYỄN HỒNG MINH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 113,
+    "fullName": "VÕ CƯỜNG THỊNH",
+    "groupCode": "NVCN",
+    "department": "Trung tâm Công nghệ và nội dung số",
+    "positions": [
+      "Nhân viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 5",
+    "reviewer1": "PHAN NGHỆ ĐÔ",
+    "reviewer2": "ĐẶNG ANH TUẤN",
+    "reviewer3": "NGUYỄN HỒNG MINH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 114,
+    "fullName": "NGÔ THANH DANH",
+    "groupCode": "NVCN",
+    "department": "Trung tâm Công nghệ và nội dung số",
+    "positions": [
+      "Nhân viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 5",
+    "reviewer1": "PHAN NGHỆ ĐÔ",
+    "reviewer2": "ĐẶNG ANH TUẤN",
+    "reviewer3": "NGUYỄN HỒNG MINH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 115,
+    "fullName": "ĐINH QUỐC HỘI",
+    "groupCode": "NVCN",
+    "department": "Trung tâm Công nghệ và nội dung số",
+    "positions": [
+      "Nhân viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 5",
+    "reviewer1": "PHAN NGHỆ ĐÔ",
+    "reviewer2": "ĐẶNG ANH TUẤN",
+    "reviewer3": "NGUYỄN HỒNG MINH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 116,
+    "fullName": "NGUYỄN TRỌNG TRÍ",
+    "groupCode": "NVCN",
+    "department": "Trung tâm Công nghệ và nội dung số",
+    "positions": [
+      "Nhân viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 5",
+    "reviewer1": "PHAN NGHỆ ĐÔ",
+    "reviewer2": "ĐẶNG ANH TUẤN",
+    "reviewer3": "NGUYỄN HỒNG MINH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 117,
+    "fullName": "HUỲNH THỊ HẰNG",
+    "groupCode": "NVCN",
+    "department": "Trung tâm Công nghệ và nội dung số",
+    "positions": [
+      "Nhân viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 5",
+    "reviewer1": "PHAN NGHỆ ĐÔ",
+    "reviewer2": "ĐẶNG ANH TUẤN",
+    "reviewer3": "NGUYỄN HỒNG MINH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 118,
+    "fullName": "SƠN SẸN",
+    "groupCode": "NVCN",
+    "department": "Trung tâm Công nghệ và nội dung số",
+    "positions": [
+      "Nhân viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 5",
+    "reviewer1": "PHAN NGHỆ ĐÔ",
+    "reviewer2": "ĐẶNG ANH TUẤN",
+    "reviewer3": "NGUYỄN HỒNG MINH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 119,
+    "fullName": "PHẠM ĐOAN KHANG",
+    "groupCode": "NVCN",
+    "department": "Trung tâm Công nghệ và nội dung số",
+    "positions": [
+      "Nhân viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 5",
+    "reviewer1": "PHAN NGHỆ ĐÔ",
+    "reviewer2": "ĐẶNG ANH TUẤN",
+    "reviewer3": "NGUYỄN HỒNG MINH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 120,
+    "fullName": "TRẦN PHƯỚC LỘC",
+    "groupCode": "NVCN",
+    "department": "Trung tâm Công nghệ và nội dung số",
+    "positions": [
+      "Nhân viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 5",
+    "reviewer1": "PHAN NGHỆ ĐÔ",
+    "reviewer2": "ĐẶNG ANH TUẤN",
+    "reviewer3": "NGUYỄN HỒNG MINH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 122,
+    "fullName": "NGUYỄN THỊ THANH KIỀU",
+    "groupCode": "NVKD",
+    "department": "Trung tâm Truyền thông số Tuổi Trẻ",
+    "positions": [
+      "Nhân viên chính thức - Quản lý tổ chức sự kiện"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 4",
+    "reviewer1": "LÊ BẢO KỲ",
+    "reviewer2": "VÕ HÙNG THUẬT",
+    "reviewer3": "LÊ CAO CƯỜNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 123,
+    "fullName": "VÕ HUỲNH THẾ TRUNG",
+    "groupCode": "NVKD",
+    "department": "Trung tâm Truyền thông số Tuổi Trẻ",
+    "positions": [
+      "Nhân viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 4",
+    "reviewer1": "LÊ BẢO KỲ",
+    "reviewer2": "VÕ HÙNG THUẬT",
+    "reviewer3": "LÊ CAO CƯỜNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 124,
+    "fullName": "PHAN HOÀNG THANH TRÍ",
+    "groupCode": "NVKD",
+    "department": "Trung tâm Truyền thông số Tuổi Trẻ",
+    "positions": [
+      "Nhân viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 4",
+    "reviewer1": "LÊ BẢO KỲ",
+    "reviewer2": "VÕ HÙNG THUẬT",
+    "reviewer3": "LÊ CAO CƯỜNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 125,
+    "fullName": "LÂM ÁI ĐIỆP",
+    "groupCode": "NVKD",
+    "department": "Trung tâm Truyền thông số Tuổi Trẻ",
+    "positions": [
+      "Nhân viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 4",
+    "reviewer1": "LÊ BẢO KỲ",
+    "reviewer2": "VÕ HÙNG THUẬT",
+    "reviewer3": "LÊ CAO CƯỜNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 126,
+    "fullName": "KIỀU THỊ THẢO MY",
+    "groupCode": "NVKD",
+    "department": "Trung tâm Truyền thông số Tuổi Trẻ",
+    "positions": [
+      "Nhân viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 4",
+    "reviewer1": "LÊ BẢO KỲ",
+    "reviewer2": "VÕ HÙNG THUẬT",
+    "reviewer3": "LÊ CAO CƯỜNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 127,
+    "fullName": "NGUYỄN VŨ HOÀNG",
+    "groupCode": "NVKD",
+    "department": "Trung tâm Truyền thông số Tuổi Trẻ",
+    "positions": [
+      "Nhân viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 4",
+    "reviewer1": "LÊ BẢO KỲ",
+    "reviewer2": "VÕ HÙNG THUẬT",
+    "reviewer3": "LÊ CAO CƯỜNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 128,
+    "fullName": "PHẠM THỊ KIM LIÊN",
+    "groupCode": "NVKD",
+    "department": "Trung tâm Truyền thông số Tuổi Trẻ",
+    "positions": [
+      "Nhân viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 4",
+    "reviewer1": "LÊ BẢO KỲ",
+    "reviewer2": "VÕ HÙNG THUẬT",
+    "reviewer3": "LÊ CAO CƯỜNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 129,
+    "fullName": "HÀNG KIM TY LUÂN",
+    "groupCode": "NVKD",
+    "department": "Trung tâm Truyền thông số Tuổi Trẻ",
+    "positions": [
+      "Nhân viên chính thức - Quản lý biên tập truyền thông",
+      "Ủy viên BCH - Tổ trưởng CĐ Truyền thông số",
+      "Ủy viên Ban Thanh tra nhân dân"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 4",
+    "reviewer1": "NGUYỄN VŨ BÌNH",
+    "reviewer2": "VÕ HÙNG THUẬT",
+    "reviewer3": "NGUYỄN THÁI BÌNH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 130,
+    "fullName": "PHẠM ANH PHI",
+    "groupCode": "NVKD",
+    "department": "Trung tâm Truyền thông số Tuổi Trẻ",
+    "positions": [
+      "Nhân viên chính thức - Quản lý giải pháp kinh doanh"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 4",
+    "reviewer1": "NGUYỄN VŨ BÌNH",
+    "reviewer2": "VÕ HÙNG THUẬT",
+    "reviewer3": "NGUYỄN THÁI BÌNH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 131,
+    "fullName": "ĐỖ VĂN HÓA",
+    "groupCode": "NVKD",
+    "department": "Trung tâm Truyền thông số Tuổi Trẻ",
+    "positions": [
+      "Nhân viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 4",
+    "reviewer1": "NGUYỄN VŨ BÌNH",
+    "reviewer2": "VÕ HÙNG THUẬT",
+    "reviewer3": "NGUYỄN THÁI BÌNH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 132,
+    "fullName": "HUỲNH THỊ THANH TÂM",
+    "groupCode": "NVKD",
+    "department": "Trung tâm Truyền thông số Tuổi Trẻ",
+    "positions": [
+      "Nhân viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 4",
+    "reviewer1": "NGUYỄN VŨ BÌNH",
+    "reviewer2": "VÕ HÙNG THUẬT",
+    "reviewer3": "NGUYỄN THÁI BÌNH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 133,
+    "fullName": "BÙI VĂN BÌNH",
+    "groupCode": "NVKD",
+    "department": "Trung tâm Truyền thông số Tuổi Trẻ",
+    "positions": [
+      "Nhân viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 4",
+    "reviewer1": "NGUYỄN VŨ BÌNH",
+    "reviewer2": "VÕ HÙNG THUẬT",
+    "reviewer3": "NGUYỄN THÁI BÌNH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 134,
+    "fullName": "HUỲNH NGUYỄN NGỌC MINH",
+    "groupCode": "NVKD",
+    "department": "Trung tâm Truyền thông số Tuổi Trẻ",
+    "positions": [
+      "Nhân viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 4",
+    "reviewer1": "NGUYỄN VŨ BÌNH",
+    "reviewer2": "VÕ HÙNG THUẬT",
+    "reviewer3": "NGUYỄN THÁI BÌNH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 135,
+    "fullName": "NGUYỄN THẢO PHƯƠNG",
+    "groupCode": "NVKD",
+    "department": "Trung tâm Truyền thông số Tuổi Trẻ",
+    "positions": [
+      "Nhân viên chính thức",
+      "Phó Bí thư Chi đoàn Văn phòng"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 4",
+    "reviewer1": "NGUYỄN VŨ BÌNH",
+    "reviewer2": "VÕ HÙNG THUẬT",
+    "reviewer3": "NGUYỄN THÁI BÌNH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 136,
+    "fullName": "DƯƠNG THANH DÂN",
+    "groupCode": "NVKD",
+    "department": "Trung tâm Truyền thông số Tuổi Trẻ",
+    "positions": [
+      "Nhân viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 4",
+    "reviewer1": "PHAN VĂN ĐẮC",
+    "reviewer2": "VÕ HÙNG THUẬT",
+    "reviewer3": "NGUYỄN HOÀNG NGUYÊN",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 137,
+    "fullName": "PHẠM THỊ NGỌC THÚY",
+    "groupCode": "NVKD",
+    "department": "Trung tâm Truyền thông số Tuổi Trẻ",
+    "positions": [
+      "Nhân viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 4",
+    "reviewer1": "PHAN VĂN ĐẮC",
+    "reviewer2": "VÕ HÙNG THUẬT",
+    "reviewer3": "NGUYỄN HOÀNG NGUYÊN",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 138,
+    "fullName": "PHAN THỊ MỸ HƯỜNG",
+    "groupCode": "NVKD",
+    "department": "Trung tâm Truyền thông số Tuổi Trẻ",
+    "positions": [
+      "Nhân viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 4",
+    "reviewer1": "PHAN VĂN ĐẮC",
+    "reviewer2": "VÕ HÙNG THUẬT",
+    "reviewer3": "NGUYỄN HOÀNG NGUYÊN",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 139,
+    "fullName": "NGUYỄN THIỆN AN",
+    "groupCode": "NVKD",
+    "department": "Trung tâm Truyền thông số Tuổi Trẻ",
+    "positions": [
+      "Nhân viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 4",
+    "reviewer1": "PHAN VĂN ĐẮC",
+    "reviewer2": "VÕ HÙNG THUẬT",
+    "reviewer3": "NGUYỄN HOÀNG NGUYÊN",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 140,
+    "fullName": "TRẦN TIẾN DŨNG",
+    "groupCode": "NVKD",
+    "department": "Trung tâm Đào tạo Tuổi Trẻ",
+    "positions": [
+      "Nhân viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 4",
+    "reviewer1": "",
+    "reviewer2": "BÙI TIẾN DŨNG",
+    "reviewer3": "LÊ XUÂN TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 141,
+    "fullName": "TRẦN CÔNG DŨNG",
+    "groupCode": "NVKD",
+    "department": "Trung tâm Đào tạo Tuổi Trẻ",
+    "positions": [
+      "Nhân viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 4",
+    "reviewer1": "",
+    "reviewer2": "BÙI TIẾN DŨNG",
+    "reviewer3": "LÊ XUÂN TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 142,
+    "fullName": "NGUYỄN VŨ ANH THƯ",
+    "groupCode": "NVKD",
+    "department": "Trung tâm Đào tạo Tuổi Trẻ",
+    "positions": [
+      "Nhân viên chính thức",
+      "Tổ phó CĐ Truyền thông số"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 4",
+    "reviewer1": "",
+    "reviewer2": "BÙI TIẾN DŨNG",
+    "reviewer3": "LÊ XUÂN TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 143,
+    "fullName": "TRẦN TUẤN MINH",
+    "groupCode": "NVKD",
+    "department": "Trung tâm Cao ốc Tuổi Trẻ",
+    "positions": [
+      "Nhân viên chính thức",
+      "Tổ phó CĐ Truyền thông số"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 4",
+    "reviewer1": "",
+    "reviewer2": "CHÂU HOÀNG VŨ",
+    "reviewer3": "ĐINH MINH TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 144,
+    "fullName": "ĐOÀN VĂN HIỀN",
+    "groupCode": "NVKD",
+    "department": "Trung tâm Cao ốc Tuổi Trẻ",
+    "positions": [
+      "Nhân viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 4",
+    "reviewer1": "",
+    "reviewer2": "CHÂU HOÀNG VŨ",
+    "reviewer3": "ĐINH MINH TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 145,
+    "fullName": "MAI HOÀI ÂN",
+    "groupCode": "NVKD",
+    "department": "Trung tâm Cao ốc Tuổi Trẻ",
+    "positions": [
+      "Nhân viên chính thức",
+      "Ủy viên BCH Chi đoàn Văn phòng"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 4",
+    "reviewer1": "",
+    "reviewer2": "CHÂU HOÀNG VŨ",
+    "reviewer3": "ĐINH MINH TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 146,
+    "fullName": "TRẦN LÊ TRUNG HUY",
+    "groupCode": "NVKD",
+    "department": "Trung tâm Truyền thông số Tuổi Trẻ",
+    "positions": [
+      "Nhân viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 4",
+    "reviewer1": "NGUYỄN THANH SƠN",
+    "reviewer2": "VÕ HÙNG THUẬT",
+    "reviewer3": "ĐINH MINH TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 147,
+    "fullName": "NGUYỄN TUẤN HIỆP",
+    "groupCode": "NVKD",
+    "department": "Văn phòng đại diện Miền Bắc",
+    "positions": [
+      "Nhân viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 4",
+    "reviewer1": "ĐỖ THỊ NGỌC HÀ",
+    "reviewer2": "VÕ HÙNG THUẬT",
+    "reviewer3": "ĐINH MINH TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 148,
+    "fullName": "NGUYỄN TRỌNG THẮNG",
+    "groupCode": "NVKD",
+    "department": "Văn phòng đại diện Miền Bắc",
+    "positions": [
+      "Nhân viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 4",
+    "reviewer1": "ĐỖ THỊ NGỌC HÀ",
+    "reviewer2": "VÕ HÙNG THUẬT",
+    "reviewer3": "ĐINH MINH TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 149,
+    "fullName": "ĐẶNG VĂN NAM",
+    "groupCode": "NVKD",
+    "department": "Văn phòng đại diện Miền Trung",
+    "positions": [
+      "Nhân viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 4",
+    "reviewer1": "HỒ TẤN VŨ",
+    "reviewer2": "VÕ HÙNG THUẬT",
+    "reviewer3": "ĐINH MINH TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 150,
+    "fullName": "NGUYỄN VĂN VIÊN",
+    "groupCode": "NVKD",
+    "department": "Văn phòng đại diện Miền Trung",
+    "positions": [
+      "Nhân viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 4",
+    "reviewer1": "HỒ TẤN VŨ",
+    "reviewer2": "VÕ HÙNG THUẬT",
+    "reviewer3": "ĐINH MINH TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 151,
+    "fullName": "NGUYỄN TẤN PHÁT",
+    "groupCode": "NVKD",
+    "department": "Văn phòng đại diện Miền Tây",
+    "positions": [
+      "Nhân viên chính thức",
+      "Tổ trưởng CĐ Văn phòng Miền Tây"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 4",
+    "reviewer1": "HOÀNG TRÍ DŨNG",
+    "reviewer2": "VÕ HÙNG THUẬT",
+    "reviewer3": "ĐINH MINH TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 153,
+    "fullName": "TRẦN THỤY ĐAN TÂM",
+    "groupCode": "NVTS",
+    "department": "Ban Tổ chức hành chính",
+    "positions": [
+      "Trưởng nhóm quản lý nhân sự"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 6",
+    "reviewer1": "",
+    "reviewer2": "NGUYỄN THỊ HƯƠNG",
+    "reviewer3": "ĐINH MINH TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 154,
+    "fullName": "NINH THỊ TUYẾT PHƯỢNG",
+    "groupCode": "NVTS",
+    "department": "Ban Tổ chức hành chính",
+    "positions": [
+      "Trưởng nhóm quản lý hành chính",
+      "Phó Chủ tịch Công đoàn"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 6",
+    "reviewer1": "",
+    "reviewer2": "NGUYỄN THỊ HƯƠNG",
+    "reviewer3": "ĐINH MINH TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 155,
+    "fullName": "PHẠM NGUYỄN HOÀI KHANH",
+    "groupCode": "NVTS",
+    "department": "Ban Tổ chức hành chính",
+    "positions": [
+      "Trưởng nhóm quản lý văn bản"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 6",
+    "reviewer1": "",
+    "reviewer2": "NGUYỄN THỊ HƯƠNG",
+    "reviewer3": "ĐINH MINH TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 156,
+    "fullName": "HUỲNH VĂN TUẤN",
+    "groupCode": "NVTS",
+    "department": "Ban Tổ chức hành chính",
+    "positions": [
+      "Nhân viên chính thức",
+      "Tổ phó CĐ Văn phòng"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 6",
+    "reviewer1": "",
+    "reviewer2": "NGUYỄN THỊ HƯƠNG",
+    "reviewer3": "ĐINH MINH TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 157,
+    "fullName": "PHẠM LÊ TRINH QUỲNH",
+    "groupCode": "NVTS",
+    "department": "Ban Tổ chức hành chính",
+    "positions": [
+      "Nhân viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 6",
+    "reviewer1": "",
+    "reviewer2": "NGUYỄN THỊ HƯƠNG",
+    "reviewer3": "ĐINH MINH TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 158,
+    "fullName": "NGUYỄN TRẦN BÍCH TRÂM",
+    "groupCode": "NVTS",
+    "department": "Ban Tổ chức hành chính",
+    "positions": [
+      "Nhân viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 6",
+    "reviewer1": "",
+    "reviewer2": "NGUYỄN THỊ HƯƠNG",
+    "reviewer3": "ĐINH MINH TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 159,
+    "fullName": "NGUYỄN THỊ ĐỖ QUYÊN",
+    "groupCode": "NVTS",
+    "department": "Ban Tổ chức hành chính",
+    "positions": [
+      "Nhân viên chính thức",
+      "Ủy viên Ban Kiểm tra Công đoàn"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 6",
+    "reviewer1": "",
+    "reviewer2": "NGUYỄN THỊ HƯƠNG",
+    "reviewer3": "ĐINH MINH TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 160,
+    "fullName": "NGUYỄN DUY KHÁNH",
+    "groupCode": "NVTS",
+    "department": "Ban Tổ chức hành chính",
+    "positions": [
+      "Trưởng nhóm quản trị"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 6",
+    "reviewer1": "TRẦN NGỌC TUẤN",
+    "reviewer2": "NGUYỄN THỊ HƯƠNG",
+    "reviewer3": "ĐINH MINH TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 161,
+    "fullName": "PHẠM THÀNH HIẾU",
+    "groupCode": "NVTS",
+    "department": "Ban Tổ chức hành chính",
+    "positions": [
+      "Phó nhóm quản trị"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 6",
+    "reviewer1": "NGUYỄN DUY KHÁNH",
+    "reviewer2": "NGUYỄN THỊ HƯƠNG",
+    "reviewer3": "ĐINH MINH TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 162,
+    "fullName": "NGUYỄN SƠN NAM",
+    "groupCode": "NVTS",
+    "department": "Ban Tổ chức hành chính",
+    "positions": [
+      "Nhân viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 6",
+    "reviewer1": "NGUYỄN DUY KHÁNH",
+    "reviewer2": "NGUYỄN THỊ HƯƠNG",
+    "reviewer3": "ĐINH MINH TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 163,
+    "fullName": "NGUYỄN HỮU NAM",
+    "groupCode": "NVTS",
+    "department": "Ban Tổ chức hành chính",
+    "positions": [
+      "Nhân viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 6",
+    "reviewer1": "NGUYỄN DUY KHÁNH",
+    "reviewer2": "NGUYỄN THỊ HƯƠNG",
+    "reviewer3": "ĐINH MINH TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 164,
+    "fullName": "LÊ HỮU MỪNG",
+    "groupCode": "NVTS",
+    "department": "Ban Tổ chức hành chính",
+    "positions": [
+      "Nhân viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 6",
+    "reviewer1": "NGUYỄN DUY KHÁNH",
+    "reviewer2": "NGUYỄN THỊ HƯƠNG",
+    "reviewer3": "ĐINH MINH TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 165,
+    "fullName": "VŨ THỊ ÁNH HỒNG",
+    "groupCode": "NVTS",
+    "department": "Ban Tổ chức hành chính",
+    "positions": [
+      "Nhân viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 6",
+    "reviewer1": "NGUYỄN DUY KHÁNH",
+    "reviewer2": "NGUYỄN THỊ HƯƠNG",
+    "reviewer3": "ĐINH MINH TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 166,
+    "fullName": "PHAN THỊ HIẾU HẠNH",
+    "groupCode": "NVTS",
+    "department": "Ban Tổ chức hành chính",
+    "positions": [
+      "Nhân viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 6",
+    "reviewer1": "NGUYỄN DUY KHÁNH",
+    "reviewer2": "NGUYỄN THỊ HƯƠNG",
+    "reviewer3": "ĐINH MINH TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 167,
+    "fullName": "NGUYỄN THỊ VĨNH",
+    "groupCode": "NVTS",
+    "department": "Ban Tổ chức hành chính",
+    "positions": [
+      "Nhân viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 6",
+    "reviewer1": "NGUYỄN DUY KHÁNH",
+    "reviewer2": "NGUYỄN THỊ HƯƠNG",
+    "reviewer3": "ĐINH MINH TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 168,
+    "fullName": "VÕ NGỌC KHẢ",
+    "groupCode": "NVTS",
+    "department": "Ban Tổ chức hành chính",
+    "positions": [
+      "Trưởng nhóm hậu cần"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 6",
+    "reviewer1": "TRẦN NGỌC TUẤN",
+    "reviewer2": "NGUYỄN THỊ HƯƠNG",
+    "reviewer3": "ĐINH MINH TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 169,
+    "fullName": "LÊ VĂN TÙNG",
+    "groupCode": "NVTS",
+    "department": "Ban Tổ chức hành chính",
+    "positions": [
+      "Nhân viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 6",
+    "reviewer1": "VÕ NGỌC KHẢ",
+    "reviewer2": "NGUYỄN THỊ HƯƠNG",
+    "reviewer3": "ĐINH MINH TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 170,
+    "fullName": "CHÂU NHỰT THÀNH",
+    "groupCode": "NVTS",
+    "department": "Ban Tổ chức hành chính",
+    "positions": [
+      "Nhân viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 6",
+    "reviewer1": "VÕ NGỌC KHẢ",
+    "reviewer2": "NGUYỄN THỊ HƯƠNG",
+    "reviewer3": "ĐINH MINH TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 171,
+    "fullName": "NGUYỄN THANH NHÃ",
+    "groupCode": "NVTS",
+    "department": "Ban Tổ chức hành chính",
+    "positions": [
+      "Nhân viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 6",
+    "reviewer1": "TRẦN NGỌC TUẤN",
+    "reviewer2": "NGUYỄN THỊ HƯƠNG",
+    "reviewer3": "ĐINH MINH TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 172,
+    "fullName": "NGUYỄN VĂN THẢO",
+    "groupCode": "NVTS",
+    "department": "Ban Tổ chức hành chính",
+    "positions": [
+      "Trưởng nhóm an ninh an toàn"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 6",
+    "reviewer1": "TRẦN NGỌC TUẤN",
+    "reviewer2": "NGUYỄN THỊ HƯƠNG",
+    "reviewer3": "ĐINH MINH TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 173,
+    "fullName": "THÁI QUỐC HÙNG",
+    "groupCode": "NVTS",
+    "department": "Ban Tổ chức hành chính",
+    "positions": [
+      "Nhân viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 6",
+    "reviewer1": "TRẦN NGỌC TUẤN",
+    "reviewer2": "NGUYỄN THỊ HƯƠNG",
+    "reviewer3": "ĐINH MINH TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 174,
+    "fullName": "NGUYỄN VĂN TRUNG",
+    "groupCode": "NVTS",
+    "department": "Ban Tổ chức hành chính",
+    "positions": [
+      "Nhân viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 6",
+    "reviewer1": "TRẦN NGỌC TUẤN",
+    "reviewer2": "NGUYỄN THỊ HƯƠNG",
+    "reviewer3": "ĐINH MINH TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 175,
+    "fullName": "NGÔ THANH THUẬN",
+    "groupCode": "NVTS",
+    "department": "Ban Tổ chức hành chính",
+    "positions": [
+      "Nhân viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 6",
+    "reviewer1": "TRẦN NGỌC TUẤN",
+    "reviewer2": "NGUYỄN THỊ HƯƠNG",
+    "reviewer3": "ĐINH MINH TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 176,
+    "fullName": "ĐỖ ĐỨC TÙNG",
+    "groupCode": "NVTS",
+    "department": "Ban Tổ chức hành chính",
+    "positions": [
+      "Nhân viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 6",
+    "reviewer1": "TRẦN NGỌC TUẤN",
+    "reviewer2": "NGUYỄN THỊ HƯƠNG",
+    "reviewer3": "ĐINH MINH TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 177,
+    "fullName": "NGUYỄN TRỌNG QUANG",
+    "groupCode": "NVTS",
+    "department": "Ban Tổ chức hành chính",
+    "positions": [
+      "Nhân viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 6",
+    "reviewer1": "TRẦN NGỌC TUẤN",
+    "reviewer2": "NGUYỄN THỊ HƯƠNG",
+    "reviewer3": "ĐINH MINH TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 178,
+    "fullName": "DANH HOÀNG PHÚC",
+    "groupCode": "NVTS",
+    "department": "Ban Tổ chức hành chính",
+    "positions": [
+      "Nhân viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 6",
+    "reviewer1": "TRẦN NGỌC TUẤN",
+    "reviewer2": "NGUYỄN THỊ HƯƠNG",
+    "reviewer3": "ĐINH MINH TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 179,
+    "fullName": "DƯƠNG MINH TẤN",
+    "groupCode": "NVTS",
+    "department": "Ban Tổ chức hành chính",
+    "positions": [
+      "Nhân viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 6",
+    "reviewer1": "TRẦN NGỌC TUẤN",
+    "reviewer2": "NGUYỄN THỊ HƯƠNG",
+    "reviewer3": "ĐINH MINH TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 180,
+    "fullName": "NGUYỄN THÀNH MINH",
+    "groupCode": "NVTS",
+    "department": "Ban Tổ chức hành chính",
+    "positions": [
+      "Nhân viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 6",
+    "reviewer1": "TRẦN NGỌC TUẤN",
+    "reviewer2": "NGUYỄN THỊ HƯƠNG",
+    "reviewer3": "ĐINH MINH TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 181,
+    "fullName": "DIỆP THẾ BẢO",
+    "groupCode": "NVTS",
+    "department": "Ban Tài chính kế toán",
+    "positions": [
+      "Tổ trưởng kế toán truyền thông"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 6",
+    "reviewer1": "",
+    "reviewer2": "HOÀNG ĐẠI THẮNG",
+    "reviewer3": "ĐINH MINH TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 182,
+    "fullName": "HUỲNH VIẾT HOÀNG THĂNG",
+    "groupCode": "NVTS",
+    "department": "Ban Tài chính kế toán",
+    "positions": [
+      "Tổ trưởng kế toán tiền lương"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 6",
+    "reviewer1": "",
+    "reviewer2": "HOÀNG ĐẠI THẮNG",
+    "reviewer3": "ĐINH MINH TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 183,
+    "fullName": "ĐÀO THỊ THÙY TRANG",
+    "groupCode": "NVTS",
+    "department": "Ban Tài chính kế toán",
+    "positions": [
+      "Chi ủy viên CB Văn phòng",
+      "Kế toán tổng hợp",
+      "Ủy viên BTV Liên Chi đoàn",
+      "Bí thư Chi đoàn Truyền thông số",
+      "Ủy viên BCH Công đoàn"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 6",
+    "reviewer1": "",
+    "reviewer2": "HOÀNG ĐẠI THẮNG",
+    "reviewer3": "ĐINH MINH TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 184,
+    "fullName": "NGUYỄN THANH TUẤN",
+    "groupCode": "NVTS",
+    "department": "Ban Tài chính kế toán",
+    "positions": [
+      "Tổ trưởng theo dõi kế hoạch"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 6",
+    "reviewer1": "",
+    "reviewer2": "HOÀNG ĐẠI THẮNG",
+    "reviewer3": "ĐINH MINH TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 185,
+    "fullName": "NGUYỄN HẠ",
+    "groupCode": "NVTS",
+    "department": "Ban Tài chính kế toán",
+    "positions": [
+      "Nhân viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 6",
+    "reviewer1": "",
+    "reviewer2": "HOÀNG ĐẠI THẮNG",
+    "reviewer3": "ĐINH MINH TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 186,
+    "fullName": "PHẠM THỊ THU TÂM",
+    "groupCode": "NVTS",
+    "department": "Ban Tài chính kế toán",
+    "positions": [
+      "Thủ quỹ cơ quan",
+      "Thủ quỹ Đảng - Công đoàn"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 6",
+    "reviewer1": "",
+    "reviewer2": "HOÀNG ĐẠI THẮNG",
+    "reviewer3": "ĐINH MINH TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 187,
+    "fullName": "HUỲNH THỊ TRUNG TRINH",
+    "groupCode": "NVTS",
+    "department": "Ban Tài chính kế toán",
+    "positions": [
+      "Nhân viên chính thức",
+      "Ủy viên BCH Công đoàn"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 6",
+    "reviewer1": "",
+    "reviewer2": "HOÀNG ĐẠI THẮNG",
+    "reviewer3": "ĐINH MINH TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 188,
+    "fullName": "NGUYỄN THANH HUYỀN",
+    "groupCode": "NVTS",
+    "department": "Ban Tài chính kế toán",
+    "positions": [
+      "Nhân viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 6",
+    "reviewer1": "",
+    "reviewer2": "HOÀNG ĐẠI THẮNG",
+    "reviewer3": "ĐINH MINH TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 189,
+    "fullName": "NGUYỄN KIM LAN",
+    "groupCode": "NVTS",
+    "department": "Ban Tài chính kế toán",
+    "positions": [
+      "Nhân viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 6",
+    "reviewer1": "",
+    "reviewer2": "HOÀNG ĐẠI THẮNG",
+    "reviewer3": "ĐINH MINH TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 190,
+    "fullName": "TRẦN QUỐC BẢO",
+    "groupCode": "NVTS",
+    "department": "Ban Tài chính kế toán",
+    "positions": [
+      "Nhân viên chính thức",
+      "Tổ trưởng CĐ Văn phòng",
+      "Ủy viên Ban Thanh tra nhân dân"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 6",
+    "reviewer1": "",
+    "reviewer2": "HOÀNG ĐẠI THẮNG",
+    "reviewer3": "ĐINH MINH TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 191,
+    "fullName": "NGUYỄN HỒNG GIANH",
+    "groupCode": "NVTS",
+    "department": "Ban Tài chính kế toán",
+    "positions": [
+      "Nhân viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 6",
+    "reviewer1": "",
+    "reviewer2": "HOÀNG ĐẠI THẮNG",
+    "reviewer3": "ĐINH MINH TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 192,
+    "fullName": "QUANG ANH KIỆT",
+    "groupCode": "NVTS",
+    "department": "Ban Tài chính kế toán",
+    "positions": [
+      "Nhân viên chính thức",
+      "Ủy viên BCH Liên Chi đoàn",
+      "Bí thư Chi đoàn Văn phòng"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 6",
+    "reviewer1": "",
+    "reviewer2": "HOÀNG ĐẠI THẮNG",
+    "reviewer3": "ĐINH MINH TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 193,
+    "fullName": "HUỲNH NGỌC PHỤNG",
+    "groupCode": "NVTS",
+    "department": "Ban Tài chính kế toán",
+    "positions": [
+      "Nhân viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 6",
+    "reviewer1": "",
+    "reviewer2": "HOÀNG ĐẠI THẮNG",
+    "reviewer3": "ĐINH MINH TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 194,
+    "fullName": "HỒ THANH VINH",
+    "groupCode": "NVTS",
+    "department": "Văn phòng đại diện Miền Bắc",
+    "positions": [
+      "Nhân viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 6",
+    "reviewer1": "",
+    "reviewer2": "ĐỖ THỊ NGỌC HÀ",
+    "reviewer3": "ĐINH MINH TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 195,
+    "fullName": "NGUYỄN TIẾN VANG",
+    "groupCode": "NVTS",
+    "department": "Văn phòng đại diện Miền Bắc",
+    "positions": [
+      "Nhân viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 6",
+    "reviewer1": "",
+    "reviewer2": "ĐỖ THỊ NGỌC HÀ",
+    "reviewer3": "ĐINH MINH TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 196,
+    "fullName": "NGUYỄN NGỌC QUANG",
+    "groupCode": "NVTS",
+    "department": "Văn phòng đại diện Miền Bắc",
+    "positions": [
+      "Nhân viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 6",
+    "reviewer1": "",
+    "reviewer2": "ĐỖ THỊ NGỌC HÀ",
+    "reviewer3": "ĐINH MINH TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 197,
+    "fullName": "NGUYỄN DUY TẤN",
+    "groupCode": "NVTS",
+    "department": "Văn phòng đại diện Miền Trung",
+    "positions": [
+      "Nhân viên chính thức",
+      "Tổ trưởng CĐ Văn phòng Miền Trung"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 6",
+    "reviewer1": "",
+    "reviewer2": "HỒ TẤN VŨ",
+    "reviewer3": "ĐINH MINH TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 199,
+    "fullName": "TRẦN QUANG ĐỊNH",
+    "groupCode": "PVCT",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Phóng viên chính thức",
+      "Ủy viên BCH Liên Chi đoàn",
+      "Bí thư Chi đoàn Phóng viên",
+      "Ủy viên Ban Kiểm tra Công đoàn"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 2",
+    "reviewer1": "NGUYỄN VIỄN SỰ",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "LÊ XUÂN TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 200,
+    "fullName": "TRẦN ĐỨC PHÚ",
+    "groupCode": "PVCT",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Phóng viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 2",
+    "reviewer1": "NGUYỄN VIỄN SỰ",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "LÊ XUÂN TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 201,
+    "fullName": "ĐẶNG TIẾN LONG",
+    "groupCode": "PVCT",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Phóng viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 2",
+    "reviewer1": "NGUYỄN VIỄN SỰ",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "LÊ XUÂN TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 202,
+    "fullName": "BÙI TÂN SƠN ĐỊNH",
+    "groupCode": "PVCT",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Phóng viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 2",
+    "reviewer1": "NGUYỄN VIỄN SỰ",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "LÊ XUÂN TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 203,
+    "fullName": "NGUYỄN BÁ SƠN",
+    "groupCode": "PVCT",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Phóng viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 2",
+    "reviewer1": "NGUYỄN VIỄN SỰ",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "LÊ XUÂN TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 204,
+    "fullName": "LƯU NGUYỄN ÁI NHÂN",
+    "groupCode": "PVCT",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Phóng viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 2",
+    "reviewer1": "NGUYỄN VIỄN SỰ",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "LÊ XUÂN TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 205,
+    "fullName": "LÊ THANH HIẾU",
+    "groupCode": "PVCT",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Phóng viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 2",
+    "reviewer1": "NGUYỄN VIỄN SỰ",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "LÊ XUÂN TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 206,
+    "fullName": "NGUYỄN THỊ TUYẾT MAI",
+    "groupCode": "PVCT",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Phóng viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 2",
+    "reviewer1": "NGUYỄN VIỄN SỰ",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "LÊ XUÂN TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 207,
+    "fullName": "LIỀU A LỘC",
+    "groupCode": "PVCT",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Phóng viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 2",
+    "reviewer1": "NGUYỄN VIỄN SỰ",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "LÊ XUÂN TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 208,
+    "fullName": "PHÙNG THỊ XUÂN MAI",
+    "groupCode": "PVCT",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Phóng viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 2",
+    "reviewer1": "NGUYỄN VIỄN SỰ",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "LÊ XUÂN TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 209,
+    "fullName": "NGUYỄN MINH HÒA",
+    "groupCode": "PVCT",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Phóng viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 2",
+    "reviewer1": "NGUYỄN VIỄN SỰ",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "LÊ XUÂN TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 210,
+    "fullName": "TRẦN LÊ ĐAN THUẦN",
+    "groupCode": "PVCT",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Phóng viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 2",
+    "reviewer1": "NGUYỄN VIỄN SỰ",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "LÊ XUÂN TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 211,
+    "fullName": "ĐINH CHÂU TUẤN",
+    "groupCode": "PVCT",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Phóng viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 2",
+    "reviewer1": "NGUYỄN VIỄN SỰ",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "LÊ XUÂN TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 212,
+    "fullName": "NGUYỄN THỊ THU HIẾN",
+    "groupCode": "PVCT",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Phóng viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 2",
+    "reviewer1": "NGUYỄN VIỄN SỰ",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "LÊ XUÂN TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 213,
+    "fullName": "TRẦN CÔNG SƠN LÂM",
+    "groupCode": "PVCT",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Phóng viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 2",
+    "reviewer1": "NGUYỄN VIỄN SỰ",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "LÊ XUÂN TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 214,
+    "fullName": "THÂN VĂN HOÀNG",
+    "groupCode": "PVCT",
+    "department": "Văn phòng đại diện Miền Bắc",
+    "positions": [
+      "Phóng viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 2",
+    "reviewer1": "NGUYỄN VIỄN SỰ",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "LÊ XUÂN TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 215,
+    "fullName": "TRẦN DANH TRỌNG",
+    "groupCode": "PVCT",
+    "department": "Văn phòng đại diện Miền Bắc",
+    "positions": [
+      "Phóng viên chính thức",
+      "Ủy viên BCH Chi đoàn VP Miền Bắc"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 2",
+    "reviewer1": "NGUYỄN VIỄN SỰ",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "LÊ XUÂN TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 216,
+    "fullName": "PHẠM VŨ QUỲNH HƯƠNG",
+    "groupCode": "PVCT",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Phóng viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 2",
+    "reviewer1": "VÕ MINH LUẬN",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "NGUYỄN HOÀNG NGUYÊN",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 217,
+    "fullName": "TRẦN NGÔ NGUYÊN KHÔI",
+    "groupCode": "PVCT",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Phóng viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 2",
+    "reviewer1": "VÕ MINH LUẬN",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "NGUYỄN HOÀNG NGUYÊN",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 218,
+    "fullName": "PHAN HUY ĐĂNG",
+    "groupCode": "PVCT",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Phóng viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 2",
+    "reviewer1": "VÕ MINH LUẬN",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "NGUYỄN HOÀNG NGUYÊN",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 219,
+    "fullName": "LÊ HOÀI DƯ",
+    "groupCode": "PVCT",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Phóng viên chính thức",
+      "Ủy viên BCH - Tổ trưởng CĐ Phóng viên"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 2",
+    "reviewer1": "VÕ MINH LUẬN",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "NGUYỄN HOÀNG NGUYÊN",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 220,
+    "fullName": "NGUYỄN HOÀI PHƯƠNG",
+    "groupCode": "PVCT",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Phóng viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 2",
+    "reviewer1": "VÕ MINH LUẬN",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "NGUYỄN HOÀNG NGUYÊN",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 221,
+    "fullName": "ĐẬU THỊ DUNG",
+    "groupCode": "PVCT",
+    "department": "Văn phòng đại diện Miền Bắc",
+    "positions": [
+      "Phóng viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 2",
+    "reviewer1": "VÕ MINH LUẬN",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "NGUYỄN HOÀNG NGUYÊN",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 222,
+    "fullName": "NGUYỄN THỊ ÁNH HỒNG",
+    "groupCode": "PVCT",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Phóng viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 2",
+    "reviewer1": "ĐÀM VĂN ĐẢNG",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "LÊ CAO CƯỜNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 223,
+    "fullName": "NGUYỄN THỊ TUYẾT MAI (BM)",
+    "groupCode": "PVCT",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Phóng viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 2",
+    "reviewer1": "ĐÀM VĂN ĐẢNG",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "LÊ CAO CƯỜNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 224,
+    "fullName": "NGÔ CÔNG TRUNG",
+    "groupCode": "PVCT",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Phóng viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 2",
+    "reviewer1": "ĐÀM VĂN ĐẢNG",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "LÊ CAO CƯỜNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 225,
+    "fullName": "NGUYỄN THỊ MẠNH",
+    "groupCode": "PVCT",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Phóng viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 2",
+    "reviewer1": "ĐÀM VĂN ĐẢNG",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "LÊ CAO CƯỜNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 226,
+    "fullName": "VÕ ĐỨC THIỆN",
+    "groupCode": "PVCT",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Phóng viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 2",
+    "reviewer1": "ĐÀM VĂN ĐẢNG",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "LÊ CAO CƯỜNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 227,
+    "fullName": "LÊ THỊ THANH NHÀN",
+    "groupCode": "PVCT",
+    "department": "Văn phòng đại diện Miền Bắc",
+    "positions": [
+      "Phóng viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 2",
+    "reviewer1": "ĐÀM VĂN ĐẢNG",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "LÊ CAO CƯỜNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 228,
+    "fullName": "NGUYỄN THỊ AN",
+    "groupCode": "PVCT",
+    "department": "Văn phòng đại diện Miền Bắc",
+    "positions": [
+      "Phóng viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 2",
+    "reviewer1": "ĐÀM VĂN ĐẢNG",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "LÊ CAO CƯỜNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 229,
+    "fullName": "NGUYỄN NAM NGỌC ĐÔNG",
+    "groupCode": "PVCT",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Phóng viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 2",
+    "reviewer1": "PHẠM QUỲNH TRUNG",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "LÊ XUÂN TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 230,
+    "fullName": "HÀNG DUY LINH",
+    "groupCode": "PVCT",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Phóng viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 2",
+    "reviewer1": "PHẠM QUỲNH TRUNG",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "LÊ XUÂN TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 231,
+    "fullName": "HOÀNG THỊ HƯƠNG",
+    "groupCode": "PVCT",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Phóng viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 2",
+    "reviewer1": "PHẠM CAO CƯỜNG",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "NGUYỄN HOÀNG NGUYÊN",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 232,
+    "fullName": "TRẦN NGỌC QUÝ",
+    "groupCode": "PVCT",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Phóng viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 2",
+    "reviewer1": "PHẠM CAO CƯỜNG",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "NGUYỄN HOÀNG NGUYÊN",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 233,
+    "fullName": "LÊ MINH GIẢNG",
+    "groupCode": "PVCT",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Phóng viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 2",
+    "reviewer1": "PHẠM CAO CƯỜNG",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "NGUYỄN HOÀNG NGUYÊN",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 234,
+    "fullName": "TRẦN TRỌNG NHÂN",
+    "groupCode": "PVCT",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Phóng viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 2",
+    "reviewer1": "PHẠM CAO CƯỜNG",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "NGUYỄN HOÀNG NGUYÊN",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 235,
+    "fullName": "PHAN THỊ DUYÊN",
+    "groupCode": "PVCT",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Phóng viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 2",
+    "reviewer1": "PHẠM CAO CƯỜNG",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "NGUYỄN HOÀNG NGUYÊN",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 236,
+    "fullName": "PHẠM THỊ KIM ANH",
+    "groupCode": "PVCT",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Chi ủy viên Chi bộ Phóng viên",
+      "Phóng viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 2",
+    "reviewer1": "TRẦN QUỐC LINH",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "NGUYỄN HOÀNG NGUYÊN",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 237,
+    "fullName": "VŨ BÌNH MINH",
+    "groupCode": "PVCT",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Phóng viên chính thức",
+      "Bí thư Liên Chi đoàn"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 2",
+    "reviewer1": "TRẦN QUỐC LINH",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "NGUYỄN HOÀNG NGUYÊN",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 238,
+    "fullName": "NGUYỄN THÀNH KHÁNH",
+    "groupCode": "PVCT",
+    "department": "Văn phòng đại diện Miền Bắc",
+    "positions": [
+      "Phóng viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 2",
+    "reviewer1": "",
+    "reviewer2": "ĐỖ THỊ NGỌC HÀ",
+    "reviewer3": "NGUYỄN HỒNG MINH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 239,
+    "fullName": "NGUYỄN THÀNH CHUNG",
+    "groupCode": "PVCT",
+    "department": "Văn phòng đại diện Miền Bắc",
+    "positions": [
+      "Phóng viên chính thức",
+      "Tổ trưởng CĐ Văn phòng Miền Bắc"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 2",
+    "reviewer1": "",
+    "reviewer2": "ĐỖ THỊ NGỌC HÀ",
+    "reviewer3": "NGUYỄN HỒNG MINH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 240,
+    "fullName": "TRẦN NGỌC NAM",
+    "groupCode": "PVCT",
+    "department": "Văn phòng đại diện Miền Bắc",
+    "positions": [
+      "Phóng viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 2",
+    "reviewer1": "",
+    "reviewer2": "ĐỖ THỊ NGỌC HÀ",
+    "reviewer3": "NGUYỄN HỒNG MINH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 241,
+    "fullName": "NGUYỄN CHÍ TUỆ",
+    "groupCode": "PVCT",
+    "department": "Văn phòng đại diện Miền Bắc",
+    "positions": [
+      "Phóng viên chính thức",
+      "Ủy viên BCH Liên Chi đoàn",
+      "Bí thư Chi đoàn VP Miền Bắc"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 2",
+    "reviewer1": "",
+    "reviewer2": "ĐỖ THỊ NGỌC HÀ",
+    "reviewer3": "NGUYỄN HỒNG MINH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 242,
+    "fullName": "DƯƠNG THỊ LIỄU",
+    "groupCode": "PVCT",
+    "department": "Văn phòng đại diện Miền Bắc",
+    "positions": [
+      "Phóng viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 2",
+    "reviewer1": "",
+    "reviewer2": "ĐỖ THỊ NGỌC HÀ",
+    "reviewer3": "NGUYỄN HỒNG MINH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 243,
+    "fullName": "VŨ ANH TUẤN",
+    "groupCode": "PVCT",
+    "department": "Văn phòng đại diện Miền Bắc",
+    "positions": [
+      "Phóng viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 2",
+    "reviewer1": "",
+    "reviewer2": "ĐỖ THỊ NGỌC HÀ",
+    "reviewer3": "NGUYỄN HỒNG MINH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 244,
+    "fullName": "NGUYỄN HỒNG QUANG",
+    "groupCode": "PVCT",
+    "department": "Văn phòng đại diện Miền Bắc",
+    "positions": [
+      "Phóng viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 2",
+    "reviewer1": "",
+    "reviewer2": "ĐỖ THỊ NGỌC HÀ",
+    "reviewer3": "NGUYỄN HỒNG MINH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 245,
+    "fullName": "ĐOÀN VĂN CƯỜNG",
+    "groupCode": "PVCT",
+    "department": "Văn phòng đại diện Miền Trung",
+    "positions": [
+      "Phóng viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 2",
+    "reviewer1": "",
+    "reviewer2": "HỒ TẤN VŨ",
+    "reviewer3": "NGUYỄN HỒNG MINH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 246,
+    "fullName": "THÁI BÁ DŨNG",
+    "groupCode": "PVCT",
+    "department": "Văn phòng đại diện Miền Trung",
+    "positions": [
+      "Phóng viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 2",
+    "reviewer1": "",
+    "reviewer2": "HỒ TẤN VŨ",
+    "reviewer3": "NGUYỄN HỒNG MINH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 247,
+    "fullName": "TRẦN LÊ NINH",
+    "groupCode": "PVCT",
+    "department": "Văn phòng đại diện Miền Trung",
+    "positions": [
+      "Phóng viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 2",
+    "reviewer1": "",
+    "reviewer2": "HỒ TẤN VŨ",
+    "reviewer3": "NGUYỄN HỒNG MINH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 248,
+    "fullName": "NGUYỄN TRƯỜNG TRUNG",
+    "groupCode": "PVCT",
+    "department": "Văn phòng đại diện Miền Trung",
+    "positions": [
+      "Phóng viên chính thức",
+      "Ủy viên BCH Liên Chi đoàn",
+      "Bí thư Chi đoàn VP Miền Trung"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 2",
+    "reviewer1": "",
+    "reviewer2": "HỒ TẤN VŨ",
+    "reviewer3": "NGUYỄN HỒNG MINH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 249,
+    "fullName": "LÊ THÀNH TRUNG",
+    "groupCode": "PVCT",
+    "department": "Văn phòng đại diện Miền Trung",
+    "positions": [
+      "Phóng viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 2",
+    "reviewer1": "",
+    "reviewer2": "HỒ TẤN VŨ",
+    "reviewer3": "NGUYỄN HỒNG MINH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 250,
+    "fullName": "LÊ PHẠM NHẬT LINH",
+    "groupCode": "PVCT",
+    "department": "Văn phòng đại diện Miền Trung",
+    "positions": [
+      "Phóng viên tập sự"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 2",
+    "reviewer1": "",
+    "reviewer2": "HỒ TẤN VŨ",
+    "reviewer3": "NGUYỄN HỒNG MINH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 251,
+    "fullName": "ĐÀO ĐỨC BẢO",
+    "groupCode": "PVCT",
+    "department": "Văn phòng đại diện Miền Trung",
+    "positions": [
+      "Phóng viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 2",
+    "reviewer1": "",
+    "reviewer2": "HỒ TẤN VŨ",
+    "reviewer3": "NGUYỄN HỒNG MINH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 252,
+    "fullName": "PHẠM TẤN LỰC",
+    "groupCode": "PVCT",
+    "department": "Văn phòng đại diện Miền Trung",
+    "positions": [
+      "Phóng viên chính thức",
+      "Phó Bí thư Chi đoàn Miền Trung"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 2",
+    "reviewer1": "",
+    "reviewer2": "HỒ TẤN VŨ",
+    "reviewer3": "NGUYỄN HỒNG MINH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 253,
+    "fullName": "PHẠM CHÍ QUỐC",
+    "groupCode": "PVCT",
+    "department": "Văn phòng đại diện Miền Tây",
+    "positions": [
+      "Phó Bí thư Chi bộ Văn phòng Miền Tây",
+      "Phóng viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 2",
+    "reviewer1": "",
+    "reviewer2": "HOÀNG TRÍ DŨNG",
+    "reviewer3": "NGUYỄN HỒNG MINH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 254,
+    "fullName": "NGUYỄN MẬU TRƯỜNG",
+    "groupCode": "PVCT",
+    "department": "Văn phòng đại diện Miền Tây",
+    "positions": [
+      "Phóng viên chính thức"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 2",
+    "reviewer1": "",
+    "reviewer2": "HOÀNG TRÍ DŨNG",
+    "reviewer3": "NGUYỄN HỒNG MINH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 256,
+    "fullName": "LÊ THỊ THU THẢO",
+    "groupCode": "PVCM",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Phóng viên mức 3"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 2",
+    "reviewer1": "NGUYỄN VIỄN SỰ",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "LÊ XUÂN TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 257,
+    "fullName": "ĐINH ĐỨC THIỆN",
+    "groupCode": "PVCM",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Phóng viên mức 2"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 2",
+    "reviewer1": "VÕ MINH LUẬN",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "NGUYỄN HOÀNG NGUYÊN",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 258,
+    "fullName": "PHẠM THỊ NHẬT XUÂN",
+    "groupCode": "PVCM",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Phóng viên mức 1",
+      "Phó Bí thư Chi đoàn Phóng viên"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 2",
+    "reviewer1": "ĐÀM VĂN ĐẢNG",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "LÊ CAO CƯỜNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 259,
+    "fullName": "VŨ ĐÌNH PHƯƠNG NGHI",
+    "groupCode": "PVCM",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Phóng viên mức 1",
+      "Ủy viên BCH Chi đoàn Phóng viên"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 2",
+    "reviewer1": "ĐÀM VĂN ĐẢNG",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "LÊ CAO CƯỜNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 260,
+    "fullName": "TRẦN BẢO ANH",
+    "groupCode": "PVCM",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Phóng viên mức 3"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 2",
+    "reviewer1": "PHẠM QUỲNH TRUNG",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "LÊ XUÂN TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 261,
+    "fullName": "NGUYỄN THANH HIỀN",
+    "groupCode": "PVCM",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Phóng viên mức 3",
+      "Phó Bí thư Chi đoàn VP Miền Bắc"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 2",
+    "reviewer1": "PHẠM QUỲNH TRUNG",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "LÊ XUÂN TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 262,
+    "fullName": "TRẦN NGỌC MINH ĐỨC",
+    "groupCode": "PVCM",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Phóng viên mức 3",
+      "Phó Bí thư Chi đoàn Tòa soạn số"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 2",
+    "reviewer1": "PHẠM QUỲNH TRUNG",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "LÊ XUÂN TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 263,
+    "fullName": "VÕ THỊ THANH HÀ",
+    "groupCode": "PVCM",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Phóng viên mức 1"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 2",
+    "reviewer1": "PHẠM QUỲNH TRUNG",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "LÊ XUÂN TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 264,
+    "fullName": "NGUYỄN THỊ NHƯ PHÚ",
+    "groupCode": "PVCM",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Phóng viên mức 1"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 2",
+    "reviewer1": "PHẠM QUỲNH TRUNG",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "LÊ XUÂN TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 265,
+    "fullName": "NGUYỄN THỊ HỒNG NGÂN",
+    "groupCode": "PVCM",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Phóng viên mức 1"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 2",
+    "reviewer1": "PHẠM QUỲNH TRUNG",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "LÊ XUÂN TRUNG",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 266,
+    "fullName": "ĐẶNG THỊ THẢO THƯƠNG",
+    "groupCode": "PVCM",
+    "department": "Tòa soạn số",
+    "positions": [
+      "Phóng viên mức 3"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 2",
+    "reviewer1": "PHẠM CAO CƯỜNG",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "NGUYỄN HOÀNG NGUYÊN",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 267,
+    "fullName": "ĐỖ THẾ SẢY",
+    "groupCode": "PVCM",
+    "department": "Văn phòng đại diện Miền Bắc",
+    "positions": [
+      "Phóng viên mức 2"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 2",
+    "reviewer1": "PHẠM CAO CƯỜNG",
+    "reviewer2": "NGUYỄN HỒNG MINH",
+    "reviewer3": "NGUYỄN HOÀNG NGUYÊN",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 268,
+    "fullName": "NGUYỄN THỊ HIỀN",
+    "groupCode": "PVCM",
+    "department": "Văn phòng đại diện Miền Bắc",
+    "positions": [
+      "Phóng viên mức 2"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 2",
+    "reviewer1": "",
+    "reviewer2": "ĐỖ THỊ NGỌC HÀ",
+    "reviewer3": "NGUYỄN HỒNG MINH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 269,
+    "fullName": "PHẠM ANH TUẤN",
+    "groupCode": "PVCM",
+    "department": "Văn phòng đại diện Miền Bắc",
+    "positions": [
+      "Phóng viên mức 3"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 2",
+    "reviewer1": "",
+    "reviewer2": "ĐỖ THỊ NGỌC HÀ",
+    "reviewer3": "NGUYỄN HỒNG MINH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 270,
+    "fullName": "HOÀNG LÊ TÁO",
+    "groupCode": "PVCM",
+    "department": "Văn phòng đại diện Miền Trung",
+    "positions": [
+      "Phóng viên mức 3"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 2",
+    "reviewer1": "",
+    "reviewer2": "HỒ TẤN VŨ",
+    "reviewer3": "NGUYỄN HỒNG MINH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 271,
+    "fullName": "TRẦN MINH CHIẾN",
+    "groupCode": "PVCM",
+    "department": "Văn phòng đại diện Miền Trung",
+    "positions": [
+      "Phóng viên mức 1"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 2",
+    "reviewer1": "",
+    "reviewer2": "HỒ TẤN VŨ",
+    "reviewer3": "NGUYỄN HỒNG MINH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 272,
+    "fullName": "NGUYỄN MINH HOÀNG",
+    "groupCode": "PVCM",
+    "department": "Văn phòng đại diện Miền Trung",
+    "positions": [
+      "Phóng viên mức 2"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 2",
+    "reviewer1": "",
+    "reviewer2": "HỒ TẤN VŨ",
+    "reviewer3": "NGUYỄN HỒNG MINH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 273,
+    "fullName": "QUÁCH ĐỨC TRONG",
+    "groupCode": "PVCM",
+    "department": "Văn phòng đại diện Miền Trung",
+    "positions": [
+      "Phóng viên mức 2"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 2",
+    "reviewer1": "",
+    "reviewer2": "HỒ TẤN VŨ",
+    "reviewer3": "NGUYỄN HỒNG MINH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 274,
+    "fullName": "ĐẶNG THỊ NGỌC TUYẾT",
+    "groupCode": "PVCM",
+    "department": "Văn phòng đại diện Miền Tây",
+    "positions": [
+      "Phóng viên mức 1",
+      "Ủy viên BCH Liên Chi đoàn",
+      "Bí thư Chi đoàn Văn phòng Miền Tây"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 2",
+    "reviewer1": "",
+    "reviewer2": "HOÀNG TRÍ DŨNG",
+    "reviewer3": "NGUYỄN HỒNG MINH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 275,
+    "fullName": "NGUYỄN CHÍ CÔNG",
+    "groupCode": "PVCM",
+    "department": "Văn phòng đại diện Miền Tây",
+    "positions": [
+      "Phóng viên mức 2"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 2",
+    "reviewer1": "",
+    "reviewer2": "HOÀNG TRÍ DŨNG",
+    "reviewer3": "NGUYỄN HỒNG MINH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 276,
+    "fullName": "TRẦN HOÀI THƯƠNG",
+    "groupCode": "PVCM",
+    "department": "Văn phòng đại diện Miền Tây",
+    "positions": [
+      "Phóng viên mức 1"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 2",
+    "reviewer1": "",
+    "reviewer2": "HOÀNG TRÍ DŨNG",
+    "reviewer3": "NGUYỄN HỒNG MINH",
+    "councilReviewer": ""
+  },
+  {
+    "sourceRow": 277,
+    "fullName": "HUỲNH HOÀNG THÀNH",
+    "groupCode": "PVCM",
+    "department": "Văn phòng đại diện Miền Tây",
+    "positions": [
+      "Phóng viên mức 2"
+    ],
+    "evaluationModel": "ĐÁNH GIÁ MẪU 2",
+    "reviewer1": "",
+    "reviewer2": "HOÀNG TRÍ DŨNG",
+    "reviewer3": "NGUYỄN HỒNG MINH",
+    "councilReviewer": ""
+  }
+]
