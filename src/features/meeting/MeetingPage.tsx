@@ -276,18 +276,11 @@ export function MeetingPage() {
                 hour: '2-digit',
                 minute: '2-digit',
               });
-              const endTime = new Date(event.endAt).toLocaleTimeString('vi-VN', {
-                hour: '2-digit',
-                minute: '2-digit',
-              });
               const dateStr = new Date(event.startAt).toLocaleDateString('vi-VN', {
                 day: '2-digit',
                 month: '2-digit',
                 year: 'numeric',
               });
-              const durationMin = Math.round(
-                (new Date(event.endAt).getTime() - new Date(event.startAt).getTime()) / 60000
-              );
 
               return (
                 <article className={`meet-wow-item-card status-card-${status}`} key={event.id}>
@@ -305,16 +298,21 @@ export function MeetingPage() {
                       )}
                     </div>
                     <strong className="time-range-text">
-                      {startTime} – {endTime}
+                      {startTime}
                     </strong>
                     <span className="time-date-text">{dateStr}</span>
-                    <small className="time-duration-text">{durationMin} phút</small>
                   </div>
 
                   {/* MAIN INFO COLUMN */}
                   <div
                     className="item-main-col"
                     onClick={() => setSelectedEvent(event)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        setSelectedEvent(event);
+                      }
+                    }}
                     role="button"
                     tabIndex={0}
                   >

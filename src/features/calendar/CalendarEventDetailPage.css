@@ -1,0 +1,162 @@
+/* Trang chi tiết dùng trực tiếp nội dung và design system của drawer cũ, fit chuẩn 100% viewport 1 màn hình */
+.event-detail-page {
+  padding: 0 !important;
+  margin: 0 !important;
+  min-width: 0 !important;
+  height: 100% !important;
+  max-height: 100% !important;
+  min-height: 0 !important;
+  flex: 1 1 0% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+}
+
+.event-detail-original-host {
+  height: 100% !important;
+  max-height: 100% !important;
+  min-height: 0 !important;
+  flex: 1 1 0% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+}
+
+.calendar-detail-original-page {
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100% !important;
+  max-height: 100% !important;
+  min-height: 0 !important;
+  flex: 1 1 0% !important;
+  overflow: hidden !important;
+  background: #ffffff !important;
+  border: 1px solid #e4e7ec !important;
+  border-radius: 10px !important;
+  box-shadow: 0 1px 3px rgba(16, 24, 40, 0.04) !important;
+}
+
+.calendar-detail-original-page > .ant-drawer-header {
+  flex: 0 0 auto !important;
+  padding: 0 !important;
+  border-bottom: 1px solid #f1f5f9 !important;
+}
+
+.calendar-detail-original-page > .ant-drawer-body {
+  flex: 1 1 0% !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+  padding: 0 !important;
+}
+
+.calendar-detail-original-page .jt-doc-detail {
+  min-height: 0 !important;
+  height: 100% !important;
+  max-height: 100% !important;
+  flex: 1 1 0% !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.calendar-detail-original-page .jt-doc-detail__grid {
+  height: 100% !important;
+  max-height: 100% !important;
+  min-height: 0 !important;
+  flex: 1 1 0% !important;
+  overflow: hidden !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, 2fr) minmax(300px, 1fr) !important;
+}
+
+.calendar-detail-original-page .jt-doc-chat-pane {
+  height: 100% !important;
+  max-height: 100% !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.calendar-detail-original-page .jt-doc-chat-stream {
+  flex: 1 1 0% !important;
+  min-height: 0 !important;
+  overflow-y: auto !important;
+}
+
+.calendar-detail-original-page .jt-doc-chat-input-area {
+  flex: 0 0 auto !important;
+}
+
+.calendar-detail-original-page .jt-doc-detail-sidebar-stack {
+  height: 100% !important;
+  max-height: 100% !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.calendar-detail-original-page .jt-doc-detail-sidebar-scroll {
+  flex: 1 1 0% !important;
+  min-height: 0 !important;
+  overflow-y: auto !important;
+}
+
+.calendar-detail-original-page .jt-pinned-hero-card__text {
+  margin: 0;
+}
+
+.calendar-detail-original-page .jt-doc-detail-pane--steps {
+  flex-shrink: 0;
+}
+
+.is-panel-collapsed .calendar-detail-original-page .jt-doc-detail__grid {
+  grid-template-columns: minmax(0, 1fr) !important;
+}
+
+.is-panel-collapsed .calendar-detail-original-page .jt-doc-detail-sidebar-stack {
+  display: none !important;
+}
+
+.event-detail-page button:focus-visible,
+.event-detail-page a:focus-visible {
+  outline: 2px solid #1570ef;
+  outline-offset: 3px;
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .calendar-detail-original-page .jt-doc-detail__grid {
+    grid-template-columns: minmax(0, 1.4fr) minmax(240px, 1fr) !important;
+  }
+}
+
+/* Cỡ chữ nội dung và thao tác của trang chi tiết. */
+.calendar-detail-original-page {
+  font-size: 14px;
+}
+
+.calendar-detail-original-page :is(
+  .jt-doc-info-item__label,
+  .jt-doc-info-item__value,
+  .jt-person-sec-title,
+  .jt-person-chip__name,
+  .jt-person-add-tag-chip,
+  .jt-doc-pane-title,
+  .jt-doc-step__top h4,
+  .jt-step-subheading,
+  .jt-chat-message__sender-name,
+  .jt-hero-file-card__name,
+  .jt-pinned-attachments-label,
+  .jt-document-drawer__back-btn.ant-btn
+) {
+  font-size: 14px;
+}
+
+.calendar-detail-original-page .jt-step-person-row {
+  font-size: 14px !important;
+}

@@ -218,7 +218,7 @@ export function CreatePersonnelPage() {
   return (
     <div className="module-page create-personnel-page">
       <header className="create-personnel-page-head">
-        <h1>{isEditMode ? 'Chỉnh sửa hồ sơ nhân sự' : 'Tạo hồ sơ mới'}</h1>
+        <h1>{isEditMode ? 'Chỉnh sửa hồ sơ nhân sự' : 'Tạo hồ sơ nhân sự mới'}</h1>
       </header>
 
       {submitError && (

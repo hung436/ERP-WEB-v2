@@ -1,11 +1,12 @@
 import { Layout, Tooltip } from 'antd';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 
 import { ModuleIcon, type ModuleName } from '@/components/ModuleIcon';
 import tuoiTreLogo from '@/assets/logo-tuoitre-2026-do-chu.svg';
 import { collapsedLogo } from '@/assets/collapsedLogo';
 import { useAsyncData } from '@/hooks/useAsyncData';
+import { useAuth } from '@/features/auth/AuthContext';
 import { chatApi, documentApi, evaluationApi, mailApi, meetingApi, taskApi, workTicketApi } from '@/services/api';
 
 interface NavItem {
@@ -15,7 +16,7 @@ interface NavItem {
   children?: { path: string; label: string }[];
 }
 
-const navItems: NavItem[] = [
+const baseNavItems: NavItem[] = [
   { path: '/', module: 'home', label: 'Trang chủ' },
   { path: '/tasks', module: 'work-tickets', label: 'Công việc' },
   {
@@ -62,7 +63,22 @@ const navItems: NavItem[] = [
 
 export function AppSidebar({ collapsed, onCollapse }: { collapsed: boolean; onCollapse: (value: boolean) => void }) {
   const { pathname } = useLocation();
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'admin';
   const [openGroup, setOpenGroup] = useState<string | null>(null);
+
+  const navItems = useMemo<NavItem[]>(() => {
+    return baseNavItems.map((item) => {
+      if (item.module === 'calendar' && !isAdmin) {
+        return {
+          path: '/calendar/week',
+          module: 'calendar' as ModuleName,
+          label: 'Lịch làm việc',
+        };
+      }
+      return item;
+    });
+  }, [isAdmin]);
 
   const badgeState = useAsyncData<Record<string, number>>(async () => {
     const [tasks, documents, workTickets, evaluations, meetings, chats, mails] = await Promise.all([
@@ -130,7 +146,7 @@ export function AppSidebar({ collapsed, onCollapse }: { collapsed: boolean; onCo
             const count = badgeState.data?.[item.path] ?? 0;
             const hasChildren = Boolean(item.children?.length);
             const isSubActive = hasChildren ? item.children!.some((child) => pathname.startsWith(child.path)) : false;
-            const isParentActive = pathname === item.path || isSubActive;
+            const isParentActive = pathname === item.path || isSubActive || (item.module === 'calendar' && pathname.startsWith('/calendar'));
             // Submenu is open when: has children AND (route is active under this group OR user manually opened it)
             const isSubOpen = hasChildren && !collapsed && (isSubActive || openGroup === item.path);
 
@@ -161,7 +177,7 @@ export function AppSidebar({ collapsed, onCollapse }: { collapsed: boolean; onCo
                     </button>
                   ) : (
                     <NavLink
-                      aria-label={`${item.label}${count ? `, ${count} mục cần chú ý` : ''}`}
+                      aria-label={item.label}
                       className={`sidebar-nav-link${isParentActive ? ' active' : ''}`}
                       end={item.path === '/'}
                       onClick={handleNavClick}

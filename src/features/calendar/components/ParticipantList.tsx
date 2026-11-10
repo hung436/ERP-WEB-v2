@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState, type ReactNode } from 'react';
+import { useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 
 interface ParticipantListProps {
   text?: string;
@@ -32,7 +32,7 @@ export function ParticipantList({ text, children, lines = 3, scrollExpanded = fa
   return (
     <span
       className={`booking-week-participants ${expanded ? 'booking-week-participants-expanded' : ''} ${scrollExpanded ? 'booking-week-participants-scroll' : ''}`}
-      style={{ ['--booking-week-participant-lines' as any]: lines }}
+      style={{ '--booking-week-participant-lines': lines } as CSSProperties}
     >
       <span ref={textRef} className="booking-week-participants-text">
         {children || text || '—'}

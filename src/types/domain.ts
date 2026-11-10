@@ -97,6 +97,7 @@ export interface CalendarAttachmentItem {
 }
 
 export interface CalendarEvent {
+  priority?: TaskPriority;
   id: string;
   title: string;
   startAt: string;
@@ -107,10 +108,12 @@ export interface CalendarEvent {
   type: CalendarEventType;
   scope?: CalendarScope;
   organizer: string;
+  organizerId?: string;
   leader?: string;
   participantText?: string;
   participantCount?: number;
   isUserParticipant?: boolean;
+  isDeclined?: boolean;
   responseStatus?: 'pending' | 'accepted' | 'declined';
   meetingId?: string;
   platform?: string;
@@ -118,6 +121,7 @@ export interface CalendarEvent {
   notes?: string;
   description?: string;
   dutyInfo?: string;
+  participantIds?: string[];
   participants?: string[];
   attachments?: CalendarAttachmentItem[];
   comments?: CalendarComment[];
@@ -127,15 +131,37 @@ export interface CalendarEvent {
   isAdjusted?: boolean;
   adjustedNote?: string;
   ticketType?: 'TASK' | 'MEETING' | 'EVENT';
+  workflowType?: 'PROPOSAL' | 'DISPATCH';
   mode?: 'offline' | 'online' | 'hybrid';
   deadline?: string;
-  executors?: Array<{ id: string | number; name: string; role?: string }>;
+  executors?: Array<{
+    id: string | number;
+    name: string;
+    role?: string;
+    status?: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED';
+    completed_at?: string;
+  }>;
   watchers?: Array<{ id: string | number; name: string }>;
   approver?: { id: string | number; name: string; note?: string };
-  approvalStatus?: 'APPROVED' | 'PENDING' | 'ACTIVE' | 'CONSULTING' | 'COMPLETED' | 'REJECTED' | 'CANCELLED';
+  approvers?: Array<{
+    id: string | number;
+    name: string;
+    status?: 'PENDING' | 'APPROVED' | 'REJECTED';
+    completed_at?: string;
+    note?: string;
+  }>;
+  approvalStatus?: 'APPROVED' | 'PENDING' | 'ACTIVE' | 'CONSULTING' | 'COMPLETED' | 'REJECTED' | 'CANCELLED' | 'IN_PROGRESS' | 'SCHEDULED';
   consultQuestion?: string;
   consultantName?: string;
   consultReply?: string;
+  consultants?: Array<{
+    id: string | number;
+    name: string;
+    requestedById?: string;
+    status?: 'PENDING' | 'COMPLETED';
+    completed_at?: string;
+    reply?: string;
+  }>;
   signedAt?: string;
   signedBy?: string;
   signedOtp?: string;

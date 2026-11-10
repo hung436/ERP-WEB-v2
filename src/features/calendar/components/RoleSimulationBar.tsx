@@ -1,5 +1,7 @@
 import React from 'react';
-import { Button, Popconfirm, Tag, Tooltip, message } from 'antd';
+import { Button, Tag, Tooltip, message } from 'antd';
+
+import { useCalendarConfirmation } from '../useCalendarConfirmation';
 import {
   Crown,
   FileEdit,
@@ -63,7 +65,7 @@ export const SIMULATION_ROLES: SimulationRoleInfo[] = [
 interface RoleSimulationBarProps {
   currentRole: SimulationRole;
   onRoleChange: (role: SimulationRole) => void;
-  onResetData: () => void;
+  onResetData: () => void | Promise<void>;
 }
 
 export function RoleSimulationBar({
@@ -71,6 +73,7 @@ export function RoleSimulationBar({
   onRoleChange,
   onResetData,
 }: RoleSimulationBarProps) {
+  const { confirm, confirmationHolder } = useCalendarConfirmation();
   const activeRoleInfo =
     SIMULATION_ROLES.find((r) => r.id === currentRole) || SIMULATION_ROLES[0];
 
@@ -90,11 +93,12 @@ export function RoleSimulationBar({
         boxShadow: '0 1px 3px rgba(15, 23, 42, 0.04)',
       }}
     >
+      {confirmationHolder}
       {/* Cụm bên trái: Nhãn thanh điều khiển & Danh sách 4 vai trò */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginRight: 4 }}>
           <User size={15} style={{ color: '#64748b' }} />
-          <span style={{ fontSize: 13, fontWeight: 700, color: '#0f172a' }}>
+          <span style={{ fontSize: 13, fontWeight: 600, color: '#0f172a' }}>
             Giả lập vai trò:
           </span>
         </div>
@@ -117,8 +121,8 @@ export function RoleSimulationBar({
                     padding: '5px 12px',
                     borderRadius: 20,
                     fontSize: 12,
-                    fontWeight: isActive ? 650 : 500,
-                    border: isActive ? '1.5px solid #dc2626' : '1px solid #e2e8f0',
+                    fontWeight: isActive ? 600 : 500,
+                    border: isActive ? '2px solid #dc2626' : '1px solid #e2e8f0',
                     background: isActive ? '#fef2f2' : '#ffffff',
                     color: isActive ? '#dc2626' : '#334155',
                     cursor: 'pointer',
@@ -144,32 +148,34 @@ export function RoleSimulationBar({
           </Tag>
         </div>
 
-        <Popconfirm
-          title="Khôi phục dữ liệu gốc?"
-          description="Toàn bộ lịch họp, phiếu công việc và bình luận bạn vừa tạo/sửa sẽ được đặt lại về dữ liệu ban đầu."
-          okText="Khôi phục"
-          cancelText="Hủy"
-          okButtonProps={{ danger: true }}
-          onConfirm={() => {
-            onResetData();
-            message.success('Đã khôi phục dữ liệu mẫu ban đầu');
+        <Button
+          onClick={() => confirm({
+              title: 'Khôi phục dữ liệu gốc?',
+              content: 'Toàn bộ lịch họp, phiếu công việc và bình luận bạn vừa tạo hoặc sửa sẽ trở về dữ liệu ban đầu.',
+              okText: 'Khôi phục',
+              onConfirm: async () => {
+                try {
+                  await onResetData();
+                  message.success('Đã khôi phục dữ liệu mẫu ban đầu');
+                } catch (error) {
+                  message.error('Không thể khôi phục dữ liệu. Vui lòng thử lại.');
+                  throw error;
+                }
+              },
+            })}
+          size="small"
+          icon={<RotateCcw size={13} />}
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 4,
+            borderRadius: 6,
+            fontSize: 12,
+            color: '#475569',
           }}
         >
-          <Button
-            size="small"
-            icon={<RotateCcw size={13} />}
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 4,
-              borderRadius: 6,
-              fontSize: 12,
-              color: '#475569',
-            }}
-          >
-            Khôi phục dữ liệu gốc
-          </Button>
-        </Popconfirm>
+          Khôi phục dữ liệu gốc
+        </Button>
       </div>
     </div>
   );

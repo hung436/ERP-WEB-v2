@@ -1,4 +1,4 @@
-import { mockRequest } from '@/services/mockApi';
+import { mockRequest, saveCalendarDemoChanges } from '@/services/mockApi';
 import type { Announcement, CalendarAttachmentItem, CalendarEvent, ChatAttachment, ChatConversation, ChatMember, ChatMessage, ChatReply, DashboardSummary, DirectoryContact, DocumentSubmission, DocumentTemplate, MailAttachment, MailComposePayload, MailItem, MailReply, MeetingEvent, Task, User, WorkTicketAttachment, WorkTicketFollower, WorkTicketSubmission, WorkTicketTemplate } from '@/types/domain';
 import type { ExpertRecord, WorkspaceFile, WorkspaceRecord } from '@/types/extended';
 import type { EvaluationPeriod, EvaluationSheet, EvaluationSummary } from '@/types/evaluation';
@@ -29,6 +29,8 @@ export const meetingApi = {
   create: (data: Partial<MeetingEvent>) => mockRequest<MeetingEvent>('/api/meeting/events', { method: 'POST', body: data }),
 };
 export const calendarApi = {
+  saveDemoChanges: saveCalendarDemoChanges,
+  get: (id: string) => mockRequest<CalendarEvent>(`/api/calendar/events/${id}`),
   list: (query = '') => mockRequest<CalendarEvent[]>(`/api/calendar/events${query}`),
   respond: (id: string, responseStatus: NonNullable<CalendarEvent['responseStatus']>) => mockRequest<CalendarEvent>(`/api/calendar/events/${id}/respond`, { method: 'POST', body: { responseStatus } }),
   create: (data: Partial<CalendarEvent>) => mockRequest<CalendarEvent>('/api/calendar/events', { method: 'POST', body: data }),

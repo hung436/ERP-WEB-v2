@@ -1,3 +1,4 @@
+import { readAttachment } from "../attachmentUtils";
 import { Button, Checkbox, DatePicker, Dropdown, Form, Input, Modal, Select, Space, Upload, message } from 'antd';
 import type { MenuProps } from 'antd';
 import type { UploadFile } from 'antd/es/upload/interface';
@@ -41,7 +42,7 @@ export function CreateBroadcastNoticeModal({
 }) {
   const [form] = Form.useForm<FormValues>();
   const [submitting, setSubmitting] = useState(false);
-  const [fileList, setFileList] = useState<UploadFile[]>([]);
+  const [fileList, setFileList] = useState<Array<UploadFile & File>>([]);
   const [recipientType, setRecipientType] = useState<'all' | 'groups' | 'individuals'>('all');
   const [attachedTemplate, setAttachedTemplate] = useState<AttachedTemplateInfo | null>(null);
   const [showTemplatePreview, setShowTemplatePreview] = useState(true);
@@ -161,12 +162,13 @@ export function CreateBroadcastNoticeModal({
         return;
       }
 
-      const attachments: CalendarAttachment[] = fileList.map((f, idx) => ({
+      const attachments: CalendarAttachment[] = await Promise.all(fileList.map(async (f, idx) => ({
         id: `att-${Date.now()}-${idx}`,
         name: f.name,
         size: f.size ?? 1024 * 500,
         type: f.type || 'application/octet-stream',
-      }));
+        url: await readAttachment(f),
+      })));
 
       // If attached template, also add it as attachment
       if (attachedTemplate) {
@@ -175,6 +177,7 @@ export function CreateBroadcastNoticeModal({
           name: attachedTemplate.name,
           size: attachedTemplate.size,
           type: attachedTemplate.isHtml ? 'text/html' : 'text/plain',
+          url: await readAttachment(new Blob([attachedTemplate.content], { type: attachedTemplate.isHtml ? 'text/html' : 'text/plain' })),
         });
       }
 
@@ -326,9 +329,9 @@ export function CreateBroadcastNoticeModal({
 
         {/* 3. TẢI BIỂU MẪU ĐÍNH KÈM */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-          <label style={{ fontWeight: 600, fontSize: 14, color: '#344054' }}>
+          <span id="broadcast-content-label" style={{ fontWeight: 600, fontSize: 14, color: '#344054' }}>
             Nội dung thông báo <span style={{ color: '#d92d20' }}>*</span>
-          </label>
+          </span>
 
           <Dropdown menu={{ items: templateMenuItems }} placement="bottomRight">
             <Button className="btn-attack-template" size="middle" type="dashed">
@@ -343,6 +346,7 @@ export function CreateBroadcastNoticeModal({
           style={{ marginBottom: 14 }}
         >
           <RichTextEditor
+            ariaLabelledby="broadcast-content-label"
             minHeight={200}
             onChange={(html) => {
               setEditorContent(html);

@@ -1451,6 +1451,34 @@ body.cloud-page-open #root > .ant-layout {
   flex-direction: column !important;
 }
 
+/* Calendar Event Detail Page 1-screen viewport fit */
+body.calendar-detail-page-open {
+  overflow: hidden !important;
+}
+
+.app-frame.app-frame-calendar-detail,
+body.calendar-detail-page-open .app-frame {
+  height: 100vh !important;
+  max-height: 100vh !important;
+  min-height: 100vh !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.app-content.app-content-calendar-detail,
+body.calendar-detail-page-open .app-content {
+  height: calc(100vh - 68px) !important;
+  max-height: calc(100vh - 68px) !important;
+  min-height: 0 !important;
+  flex: 1 1 auto !important;
+  padding: 12px 16px 14px 16px !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
 .cloud-module-page {
   height: 100% !important;
   max-height: 100% !important;

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState, useDeferredValue, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import dayjs, { extend, type Dayjs } from "dayjs";
 import isoWeek from "dayjs/plugin/isoWeek";
@@ -30,23 +30,26 @@ import { calendarApi } from "@/services/api";
 import type { CalendarEvent } from "@/types/domain";
 
 import {
-  collectDuty,
   normalizeMeeting,
   searchText,
   vietnamNow,
+  getApprovalStatusMeta,
   type NormalizedMeetingEvent,
 } from "./calendarWeekUtils";
+import { useOptionalAuth } from "@/features/auth/AuthContext";
+import { getCalendarMembership } from "./calendarMembership";
 import { getEventsForWeek } from "./mockCalendarData";
+import { CalendarEventPreviewDrawer } from "./components/CalendarEventPreviewDrawer";
 import { WeekColumns } from "./components/WeekColumns";
 import { WeekTimeline } from "./components/WeekTimeline";
-import { CalendarEventDetailModal } from "./components/CalendarEventDetailModal";
 import { CreatePersonalMeetingModal } from "./components/CreatePersonalMeetingModal";
 import { DayScheduleDrawer } from "./components/DayScheduleDrawer";
+import "./components/DayScheduleDrawer.css";
 import "./calendar-week.css";
 
 extend(isoWeek);
 
-const EVENTS_STORAGE_KEY = "jt_calendar_events_store";
+const EVENTS_STORAGE_KEY = "jt_calendar_events_v9";
 
 function ViewIcon({ vertical = false }: { vertical?: boolean }) {
   return (
@@ -67,6 +70,7 @@ function ViewIcon({ vertical = false }: { vertical?: boolean }) {
 }
 
 export function CalendarWeekPage() {
+  const user = useOptionalAuth()?.user;
   const [now, setNow] = useState<Dayjs>(vietnamNow);
   useEffect(() => {
     const timer = setInterval(() => setNow(vietnamNow()), 30000);
@@ -91,40 +95,23 @@ export function CalendarWeekPage() {
 
   // Fetch dữ liệu từ API
   const state = useAsyncData(async () => (await calendarApi.list()).data);
-  const [userCreatedEvents, setUserCreatedEvents] = useState<CalendarEvent[]>(
-    () => {
-      try {
-        const saved = localStorage.getItem(EVENTS_STORAGE_KEY);
-        if (saved) {
-          const parsed = JSON.parse(saved);
-          if (Array.isArray(parsed)) {
-            const filtered = parsed.filter(
-              (ev) => !/^(ádasd|đâsdasd|sdasd|abcdefgh)$/i.test((ev.title || '').trim())
-            );
-            if (filtered.length !== parsed.length) {
-              try {
-                localStorage.setItem(EVENTS_STORAGE_KEY, JSON.stringify(filtered));
-              } catch {
-                // ignore
-              }
-            }
-            return filtered;
-          }
-        }
-      } catch {
-        // ignore
-      }
-      return [];
-    },
-  );
+  const [userCreatedEvents, setUserCreatedEvents] = useState<CalendarEvent[]>([]);
 
-  const saveUserEvents = useCallback((events: CalendarEvent[]) => {
-    setUserCreatedEvents(events);
+  const [deletedEventIds, setDeletedEventIds] = useState<string[]>(() => {
     try {
-      localStorage.setItem(EVENTS_STORAGE_KEY, JSON.stringify(events));
+      const saved = localStorage.getItem("jt_calendar_deleted_ids_v8");
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) return parsed;
+      }
     } catch {
       // ignore
     }
+    return [];
+  });
+
+  const saveUserEvents = useCallback((events: CalendarEvent[]) => {
+    setUserCreatedEvents(events);
   }, []);
 
   const rawEvents = useMemo(() => {
@@ -136,12 +123,16 @@ export function CalendarWeekPage() {
     return Array.from(map.values());
   }, [state.data, userCreatedEvents]);
 
-  // Hợp nhất dữ liệu tuần phong phú
+  // Hợp nhất dữ liệu tuần phong phú (loại bỏ các lịch người dùng đã chọn Không tham gia)
   const allEvents = useMemo(() => {
-    return getEventsForWeek(week, rawEvents);
-  }, [week, rawEvents]);
+    const eventsInWeek = getEventsForWeek(week, rawEvents);
+    if (deletedEventIds.length === 0) return eventsInWeek;
+    const deletedSet = new Set(deletedEventIds);
+    return eventsInWeek.filter((ev) => !deletedSet.has(ev.id));
+  }, [week, rawEvents, deletedEventIds]);
 
   const [query, setQuery] = useState("");
+  const deferredQuery = useDeferredValue(query);
   const [searchOpen, setSearchOpen] = useState(false);
   const [editorial, setEditorial] = useState(true);
   const [personal, setPersonal] = useState(true);
@@ -211,11 +202,12 @@ export function CalendarWeekPage() {
   // Chuẩn hóa meetings
   const meetings: NormalizedMeetingEvent[] = useMemo(() => {
     return allEvents
-      .map((record) => normalizeMeeting(record, "nhanvien"))
+      .map((record) => {
+        const normalized = normalizeMeeting(record, user?.id ?? "nhanvien");
+        return normalized && user ? { ...normalized, ...getCalendarMembership(record, user) } : normalized;
+      })
       .filter((ev): ev is NormalizedMeetingEvent => ev !== null);
-  }, [allEvents]);
-
-  const duties = useMemo(() => collectDuty(allEvents), [allEvents]);
+  }, [allEvents, user]);
 
   const isInWeek = useCallback(
     (event: NormalizedMeetingEvent) =>
@@ -225,22 +217,20 @@ export function CalendarWeekPage() {
   );
 
   const searchedMeetings = useMemo(() => {
-    if (!query.trim()) return meetings;
-    const q = searchText(query.trim());
+    if (!deferredQuery.trim()) return meetings;
+    const q = searchText(deferredQuery.trim());
     return meetings.filter((event) => {
-      const combined = [
-        event.title,
-        event.content,
-        event.participantText,
-        event.watcherText,
-        event.location,
-        event.leader,
-      ]
-        .filter(Boolean)
-        .join(" ");
-      return searchText(combined).includes(q);
+      // Dùng searchIndex đã được tính toán trước, nhanh hơn 100 lần so với tính toán lại từng trường
+      if (event.searchIndex) {
+        return event.searchIndex.includes(q);
+      }
+      return (
+        searchText(event.title).includes(q) ||
+        searchText(event.location || '').includes(q) ||
+        searchText(event.leader || '').includes(q)
+      );
     });
-  }, [meetings, query]);
+  }, [meetings, deferredQuery]);
 
   const searchedInWeek = useMemo(
     () => searchedMeetings.filter(isInWeek),
@@ -249,13 +239,10 @@ export function CalendarWeekPage() {
 
   const filteredMeetings = useMemo(() => {
     return searchedMeetings.filter((event) => {
-      const scopeMatch = attending
-        ? event.isUserParticipant || event.isUserWatcher
-        : event.scope === "personal"
-          ? personal
-          : editorial;
+      const scopeMatch = event.scope === "personal" ? personal : editorial;
+      const attendanceMatch = !attending || event.isUserParticipant || event.isUserWatcher;
       const typeMatch = ticketTypes[event.ticketType || "MEETING"] !== false;
-      return scopeMatch && typeMatch;
+      return scopeMatch && attendanceMatch && typeMatch;
     });
   }, [searchedMeetings, attending, personal, editorial, ticketTypes]);
 
@@ -280,31 +267,80 @@ export function CalendarWeekPage() {
       ).length,
       event: searchedInWeek.filter((event) => event.ticketType === "EVENT")
         .length,
+      allStatus: searchedInWeek.length,
+      pending: searchedInWeek.filter(
+        (ev) => getApprovalStatusMeta(ev.approvalStatus, ev.ticketType, ev.workflowType).value === "PENDING",
+      ).length,
+      approved: searchedInWeek.filter((ev) => {
+        const m = getApprovalStatusMeta(ev.approvalStatus, ev.ticketType, ev.workflowType).value;
+        return m === "APPROVED" || m === "SCHEDULED";
+      }).length,
+      inProgress: searchedInWeek.filter(
+        (ev) => getApprovalStatusMeta(ev.approvalStatus, ev.ticketType, ev.workflowType).value === "IN_PROGRESS",
+      ).length,
+      completed: searchedInWeek.filter(
+        (ev) => getApprovalStatusMeta(ev.approvalStatus, ev.ticketType, ev.workflowType).value === "COMPLETED",
+      ).length,
+      rejected: searchedInWeek.filter(
+        (ev) => getApprovalStatusMeta(ev.approvalStatus, ev.ticketType, ev.workflowType).value === "REJECTED",
+      ).length,
     };
   }, [searchedInWeek]);
 
-  // Selection handler
+  const pageRef = useRef<HTMLElement>(null);
+  const drawerTriggerRef = useRef<HTMLElement | null>(null);
+  const rememberDrawerTrigger = () => {
+    drawerTriggerRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+  };
+  const handleDrawerOpenChange = (open: boolean) => {
+    if (open) return;
+    const trigger = drawerTriggerRef.current;
+    const fallback = pageRef.current?.querySelector<HTMLButtonElement>(
+      `[data-calendar-day="${selectedDate.format('YYYY-MM-DD')}"]`,
+    );
+    (trigger?.isConnected ? trigger : fallback)?.focus({ preventScroll: true });
+  };
+
+  // Selection handler: Mọi sự kiện trên lịch khi click đều mở Drawer xem nhanh (Task 5)
   const handleSelectNormalizedEvent = (normalized: NormalizedMeetingEvent) => {
     const raw = normalized.raw || allEvents.find((e) => e.id === normalized.id);
     if (raw) {
+      rememberDrawerTrigger();
+      setSelectedDay(null);
       setSelectedEvent(raw);
     }
   };
 
-  const handleUpdateEvent = (updated: CalendarEvent) => {
+  const handleUpdateEvent = useCallback((updated: CalendarEvent) => {
     setSelectedEvent(updated);
     const updatedList = [
       ...userCreatedEvents.filter((item) => item.id !== updated.id),
       updated,
     ];
     saveUserEvents(updatedList);
-  };
+  }, [userCreatedEvents, saveUserEvents]);
 
-  const handleDeleteEvent = (eventId: string) => {
-    const updatedList = userCreatedEvents.filter((item) => item.id !== eventId);
-    saveUserEvents(updatedList);
-    setSelectedEvent(null);
-  };
+  const handleToggleInterest = useCallback(
+    (event: NormalizedMeetingEvent, nextState: boolean) => {
+      const raw = event.raw || allEvents.find((e) => e.id === event.id);
+      if (!raw) return;
+      let updated: CalendarEvent;
+      try {
+        updated = calendarApi.saveDemoChanges(raw, { isInterested: nextState });
+      } catch {
+        message.error("Không thể lưu thay đổi. Vui lòng thử lại.");
+        return;
+      }
+      const updatedList = [
+        ...userCreatedEvents.filter((item) => item.id !== updated.id),
+        updated,
+      ];
+      saveUserEvents(updatedList);
+      // Chỉ cập nhật selectedEvent nếu drawer đang mở cho sự kiện này, không tự ý mở drawer
+      setSelectedEvent((current) => (current?.id === updated.id ? updated : current));
+    },
+    [allEvents, userCreatedEvents, saveUserEvents],
+  );
 
   const handleCreateSuccess = (newEvent: CalendarEvent) => {
     const updatedList = [
@@ -312,16 +348,44 @@ export function CalendarWeekPage() {
       ...userCreatedEvents.filter((item) => item.id !== newEvent.id),
     ];
     saveUserEvents(updatedList);
-    setSelectedEvent(newEvent);
+    setDeletedEventIds((prev) => {
+      if (!prev.includes(newEvent.id)) return prev;
+      const next = prev.filter((id) => id !== newEvent.id);
+      try {
+        localStorage.setItem("jt_calendar_deleted_ids_v8", JSON.stringify(next));
+      } catch {
+        // ignore
+      }
+      return next;
+    });
+    const evDate = dayjs(newEvent.startAt);
+    if (
+      evDate.isValid() &&
+      (evDate.format("YYYY-MM-DD") < week.format("YYYY-MM-DD") ||
+        evDate.format("YYYY-MM-DD") > end.format("YYYY-MM-DD"))
+    ) {
+      changeDate(evDate);
+    }
+    setSelectedEvent(null);
     setCreateDate(null);
     setEditingEvent(null);
   };
 
+  const reloadCalendar = state.reload;
   const handleResetData = useCallback(() => {
     localStorage.removeItem(EVENTS_STORAGE_KEY);
+    localStorage.removeItem("jt_calendar_events_store");
+    localStorage.removeItem("jt_calendar_events_v8");
+    localStorage.removeItem("jt_calendar_deleted_ids_v8");
+    for (const key of Object.keys(localStorage)) {
+      if (key.startsWith("erp:calendar-discussion:")) localStorage.removeItem(key);
+    }
+    setSelectedEvent(null);
     setUserCreatedEvents([]);
+    setDeletedEventIds([]);
+    reloadCalendar();
     message.success("Đã khôi phục dữ liệu gốc thành công!");
-  }, []);
+  }, [reloadCalendar]);
 
   useEffect(() => {
     (
@@ -338,14 +402,14 @@ export function CalendarWeekPage() {
       locale={locale}
       theme={{
         token: {
-          colorPrimary: "#dc2626",
-          borderRadius: 8,
-          colorBorder: "#dfe5ee",
+          colorPrimary: "#D92D20",
+          borderRadius: 10,
+          colorBorder: "#E4E7EC",
           fontFamily: "Inter, system-ui, -apple-system, sans-serif",
         },
       }}
     >
-      <main className="booking-week-page" aria-label="Lịch họp tuần">
+      <main ref={pageRef} className="booking-week-page" aria-label="Lịch họp tuần">
         <header className="booking-week-toolbar">
           <div className="booking-week-nav-group">
             {searchOpen ? (
@@ -354,7 +418,7 @@ export function CalendarWeekPage() {
                 aria-label="Tìm kiếm lịch công tác"
                 prefix={<SearchOutlined />}
                 value={query}
-                placeholder="Tìm công việc, lịch họp, sự kiện..."
+                placeholder="Tìm kiếm công việc, lịch họp, sự kiện"
                 onChange={(event) => setQuery(event.target.value)}
                 onBlur={() => {
                   if (!query) setSearchOpen(false);
@@ -430,12 +494,6 @@ export function CalendarWeekPage() {
               />
             </div>
 
-            <Button
-              className="booking-week-today-btn"
-              onClick={() => changeDate(vietnamNow())}
-            >
-              Hôm nay
-            </Button>
           </div>
 
           <div className="booking-week-divider booking-week-divider-nav" />
@@ -448,16 +506,15 @@ export function CalendarWeekPage() {
           >
             <button
               type="button"
-              className={`booking-week-source-btn ${editorial ? "is-active" : ""}`}
+              className={`booking-week-source-btn is-editorial ${editorial ? "is-active" : ""}`}
               aria-pressed={editorial}
-              aria-label="Ban biên tập"
+              aria-label="Lịch chung"
               onClick={() => setEditorial((value) => !value)}
             >
-              <span
-                className="booking-week-semantic-dot dot-editorial"
-                aria-hidden="true"
-              />
-              <span className="booking-week-source-label">Ban biên tập</span>
+              <span className="booking-week-source-check" aria-hidden="true">
+                {editorial && <CheckOutlined />}
+              </span>
+              <span className="booking-week-source-label">Lịch chung</span>
               <span
                 className={`booking-week-source-count ${state.loading ? "booking-week-count-loading" : ""}`}
               >
@@ -469,14 +526,13 @@ export function CalendarWeekPage() {
               type="button"
               className={`booking-week-source-btn is-personal ${personal ? "is-active" : ""}`}
               aria-pressed={personal}
-              aria-label="Cá nhân"
+              aria-label="Lịch cá nhân"
               onClick={() => setPersonal((value) => !value)}
             >
-              <span
-                className="booking-week-semantic-dot dot-personal"
-                aria-hidden="true"
-              />
-              <span className="booking-week-source-label">Cá nhân</span>
+              <span className="booking-week-source-check" aria-hidden="true">
+                {personal && <CheckOutlined />}
+              </span>
+              <span className="booking-week-source-label">Lịch cá nhân</span>
               <span
                 className={`booking-week-source-count ${state.loading ? "booking-week-count-loading" : ""}`}
               >
@@ -518,7 +574,7 @@ export function CalendarWeekPage() {
               content={
                 <div className="booking-week-type-menu">
                   <div className="booking-week-type-menu-head">
-                    <span>Loại mục ghi trên lịch</span>
+                    <span>Loại mục trên lịch</span>
                     {(!ticketTypes.MEETING ||
                       !ticketTypes.EVENT ||
                       !ticketTypes.TASK) && (
@@ -603,7 +659,7 @@ export function CalendarWeekPage() {
               <button
                 type="button"
                 className={`booking-week-type-dropdown-btn ${!ticketTypes.MEETING || !ticketTypes.EVENT || !ticketTypes.TASK ? "is-filtered" : ""}`}
-                aria-label="Lọc theo loại mục ghi"
+                aria-label="Lọc theo loại mục"
               >
                 <span className="booking-week-type-prefix">Loại:</span>
                 <span className="booking-week-type-value">
@@ -614,7 +670,7 @@ export function CalendarWeekPage() {
             </Popover>
           </div>
 
-          {/* Cụm nút Bộ lọc thu gọn — Hiển thị trên laptop/tablet (< 1680px) chứa Chỉ có mặt tôi & Loại mục ghi */}
+          {/* Cụm nút Bộ lọc thu gọn — Hiển thị trên laptop/tablet (< 1680px) chứa Chỉ có mặt tôi & Loại mục */}
           <div className="booking-week-filters-compact">
             <Popover
               trigger="click"
@@ -677,7 +733,7 @@ export function CalendarWeekPage() {
                       }}
                     >
                       <span className="booking-week-compact-filter-group-title">
-                        Loại mục ghi
+                        Loại mục
                       </span>
                       {(!ticketTypes.MEETING ||
                         !ticketTypes.EVENT ||
@@ -826,14 +882,11 @@ export function CalendarWeekPage() {
             <Button
               type="primary"
               className="booking-week-create"
-              aria-label="Tạo lịch họp"
+              aria-label="Tạo"
               icon={<PlusOutlined />}
               onClick={() => setCreateDate(selectedDate)}
             >
-              <span className="booking-week-create-text-full">
-                Tạo phiếu / Lịch
-              </span>
-              <span className="booking-week-create-text-compact">Tạo lịch</span>
+              <span>Tạo</span>
             </Button>
           </div>
         </header>
@@ -858,17 +911,16 @@ export function CalendarWeekPage() {
         <div className="booking-week-timeline-wrap">
           {state.loading && (
             <span className="booking-week-loading-label" role="status">
-              Đang tải lịch họp...
+              Đang tải lịch họp
             </span>
           )}
           <CalendarView
             key={`${viewMode}-${fromDate}`}
             week={week}
             now={now}
-            selectedDate={selectedDate}
+            selectedDate={selectedDay}
             events={visible}
-            duties={duties}
-            showDuty={editorial}
+
             loading={
               state.loading &&
               (location.search.includes("state=loading") ||
@@ -876,54 +928,45 @@ export function CalendarWeekPage() {
             }
             disabledHover={Boolean(selectedDay || selectedEvent || createDate)}
             onSelectDay={(day) => {
+              rememberDrawerTrigger();
+              setSelectedEvent(null);
               setSelectedDay(day);
               changeDate(day);
             }}
             onSelectEvent={handleSelectNormalizedEvent}
+            onToggleInterest={handleToggleInterest}
           />
         </div>
 
-        {selectedDay && (
-          <DayScheduleDrawer
-            open={Boolean(selectedDay)}
-            day={selectedDay}
-            events={allEvents}
-            onClose={() => setSelectedDay(null)}
-            onSelectEvent={(ev) => {
-              setSelectedEvent(ev);
-            }}
-            onCreateEvent={(day) => {
-              setCreateDate(day);
-            }}
-            onPrevDay={() => {
-              const prev = selectedDay.subtract(1, "day");
-              setSelectedDay(prev);
-              changeDate(prev);
-            }}
-            onNextDay={() => {
-              const next = selectedDay.add(1, "day");
-              setSelectedDay(next);
-              changeDate(next);
-            }}
-          />
-        )}
-
-        {selectedEvent && (
-          <CalendarEventDetailModal
-            key={selectedEvent.id}
-            event={selectedEvent}
-            open={Boolean(selectedEvent)}
-            onClose={() => setSelectedEvent(null)}
-            onUpdateEvent={handleUpdateEvent}
-            onDeleteEvent={handleDeleteEvent}
-          />
-        )}
-
+        <DayScheduleDrawer
+          open={Boolean(selectedDay)}
+          day={selectedDay}
+          onClose={() => setSelectedDay(null)}
+          afterOpenChange={handleDrawerOpenChange}
+          onPrevDay={() => {
+            if (!selectedDay) return;
+            const prev = selectedDay.subtract(1, "day");
+            setSelectedDay(prev);
+            changeDate(prev);
+          }}
+          onNextDay={() => {
+            if (!selectedDay) return;
+            const next = selectedDay.add(1, "day");
+            setSelectedDay(next);
+            changeDate(next);
+          }}
+        />
+        <CalendarEventPreviewDrawer
+          event={selectedEvent}
+          onClose={() => setSelectedEvent(null)}
+          afterOpenChange={handleDrawerOpenChange}
+        />
         {(createDate || editingEvent) && (
           <CreatePersonalMeetingModal
             open={Boolean(createDate || editingEvent)}
             initialDate={createDate}
             editingEvent={editingEvent}
+            existingEvents={allEvents}
             onClose={() => {
               setCreateDate(null);
               setEditingEvent(null);

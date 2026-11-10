@@ -23,6 +23,33 @@ describe('Xác thực', () => {
     expect(await screen.findByText('Công việc của tôi')).toBeInTheDocument();
   });
 
+  it('đăng nhập bằng tài khoản lãnh đạo xuantrung thành công', async () => {
+    const user = userEvent.setup(); renderApp('/login');
+    await user.type(screen.getByLabelText('Tên đăng nhập'), 'xuantrung');
+    await user.type(screen.getByLabelText('Mật khẩu'), '123456');
+    await user.click(screen.getByRole('button', { name: 'Đăng nhập' }));
+    await waitFor(() => expect(window.location.pathname).toBe('/'));
+    expect(await screen.findByText('Công việc của tôi')).toBeInTheDocument();
+  });
+
+  it('đăng nhập bằng tài khoản minhanh thành công', async () => {
+    const user = userEvent.setup(); renderApp('/login');
+    await user.type(screen.getByLabelText('Tên đăng nhập'), 'minhanh');
+    await user.type(screen.getByLabelText('Mật khẩu'), '123456');
+    await user.click(screen.getByRole('button', { name: 'Đăng nhập' }));
+    await waitFor(() => expect(window.location.pathname).toBe('/'));
+    expect(await screen.findByText('Công việc của tôi')).toBeInTheDocument();
+  });
+
+  it('đăng nhập bằng tài khoản thư ký dinhductho thành công', async () => {
+    const user = userEvent.setup(); renderApp('/login');
+    await user.type(screen.getByLabelText('Tên đăng nhập'), 'dinhductho');
+    await user.type(screen.getByLabelText('Mật khẩu'), '123456');
+    await user.click(screen.getByRole('button', { name: 'Đăng nhập' }));
+    await waitFor(() => expect(window.location.pathname).toBe('/'));
+    expect(await screen.findByText('Công việc của tôi')).toBeInTheDocument();
+  });
+
   it('hiển thị lỗi khi đăng nhập sai', async () => {
     const user = userEvent.setup(); renderApp('/login');
     await user.type(screen.getByLabelText('Tên đăng nhập'), 'nhanvien');

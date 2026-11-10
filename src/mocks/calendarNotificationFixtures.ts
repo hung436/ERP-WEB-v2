@@ -12,40 +12,40 @@ export const initialRecipientGroups: CalendarRecipientGroup[] = [
   {
     id: 'grp-01',
     name: 'Ban Biên tập',
-    description: 'Thành viên Ban Biên tập Báo Tuổi Trẻ (Tổng Biên tập & Các Phó Tổng Biên tập)',
-    members: ['Phạm Đức Long (Admin)', 'Trần Thu Hà', 'Lê Thanh Vân', 'Nguyễn Minh Anh', 'Nguyễn Hoài Nam', 'Đỗ Quang Huy'],
+    description: 'Lãnh đạo Ban Biên tập Báo Tuổi Trẻ (Tổng Biên tập & Các Phó Tổng Biên tập)',
+    members: ['Lê Thế Chữ', 'Lê Xuân Trung', 'Trần Xuân Toàn', 'Nguyễn Hoàng Nguyên'],
     status: 'active',
-    createdAt: '2026-08-01T08:00:00+07:00',
+    createdAt: '2026-11-01T08:00:00+07:00',
   },
   {
     id: 'grp-02',
     name: 'Ban Thư ký tòa soạn & Biên tập viên chính',
-    description: 'Bộ phận duyệt xuất bản và điều phối nội dung các ấn phẩm',
-    members: ['Trần Thu Hà', 'Lê Thanh Vân', 'Mai Phương Thảo', 'Vũ Hoàng Yến', 'Bùi Văn Hùng'],
+    description: 'Bộ phận duyệt xuất bản, điều phối ca trực và quản lý dòng tin',
+    members: ['Đinh Đức Thọ', 'Lê Ngọc Hiển', 'Dương Đức Đà Trang'],
     status: 'active',
-    createdAt: '2026-08-02T09:30:00+07:00',
+    createdAt: '2026-11-01T09:30:00+07:00',
   },
   {
     id: 'grp-03',
-    name: 'Phóng viên Ban Thời sự & Nội dung',
-    description: 'Đội ngũ phóng viên tác nghiệp hiện trường các tuyến bài trong nước và quốc tế',
-    members: ['Nguyễn Minh Anh', 'Nguyễn Hoài Nam', 'Đỗ Quang Huy', 'Hoàng Minh Tuấn', 'Trịnh Thị Lan', 'Phan Văn Kiệt'],
+    name: 'Trưởng các Ban Chuyên môn',
+    description: 'Trưởng các ban nội dung chuyên ngành và phòng ban chức năng',
+    members: ['Nguyễn Viễn Sự', 'Lê Cao Cường', 'Nguyễn Hoài Nam', 'Đinh Gia Hân', 'Lương Hải Đăng', 'Hoàng Điệp', 'Võ Hùng Thuật', 'Trịnh Khánh Vy'],
     status: 'active',
-    createdAt: '2026-08-05T10:15:00+07:00',
+    createdAt: '2026-11-01T10:15:00+07:00',
   },
   {
     id: 'grp-04',
-    name: 'Tổ Chuyển đổi số & Công nghệ',
-    description: 'Bộ phận quản trị hệ thống CMS, ERP và hạ tầng số tòa soạn',
-    members: ['Phan Văn Kiệt', 'Đỗ Quang Huy', 'Phạm Đức Long (Admin)', 'Lê Quốc Bảo'],
+    name: 'Khối Phóng viên & Kỹ thuật',
+    description: 'Đội ngũ phóng viên tác nghiệp hiện trường, dựng hình media và quản trị IT',
+    members: ['Nguyễn Minh Anh', 'Bùi Anh Tú', 'Trần Thu Hà', 'Đỗ Quang Huy', 'Phạm Đức Long (Admin)'],
     status: 'active',
-    createdAt: '2026-08-08T14:20:00+07:00',
+    createdAt: '2026-11-01T14:20:00+07:00',
   },
   {
     id: 'grp-05',
-    name: 'Hội đồng Tuyển dụng nhiệm kỳ trước',
-    description: 'Nhóm đã hoàn thành nhiệm vụ và đóng quyền nhận thông báo định kỳ',
-    members: ['Lê Thanh Vân', 'Mai Phương Thảo', 'Nguyễn Hoài Nam'],
+    name: 'Hội đồng Thi đua - Khen thưởng năm 2025',
+    description: 'Hội đồng xét khen thưởng nhiệm kỳ trước (đã lưu trữ)',
+    members: ['Lê Xuân Trung', 'Đinh Đức Thọ', 'Trịnh Khánh Vy'],
     status: 'closed',
     createdAt: '2026-06-10T08:00:00+07:00',
   },
@@ -77,11 +77,11 @@ export const HTML_NOTIFICATION_TEMPLATES: HtmlTemplateItem[] = [
       </tr>
       <tr style="background: #f9fafb;">
         <td style="padding: 10px 14px; border: 1px solid #e5e7eb; font-weight: 600;">Chủ trì:</td>
-        <td style="padding: 10px 14px; border: 1px solid #e5e7eb;">Tổng Biên tập & Các Phó Tổng Biên tập</td>
+        <td style="padding: 10px 14px; border: 1px solid #e5e7eb;">Tổng Biên tập Lê Thế Chữ & Các Phó Tổng Biên tập</td>
       </tr>
       <tr>
         <td style="padding: 10px 14px; border: 1px solid #e5e7eb; font-weight: 600;">Thành phần:</td>
-        <td style="padding: 10px 14px; border: 1px solid #e5e7eb;">Ban Biên tập, Trưởng ban Nội dung, Ban Thư ký Tòa soạn, Ban Bạn đọc, Phòng Công nghệ.</td>
+        <td style="padding: 10px 14px; border: 1px solid #e5e7eb;">Ban Biên tập, Ban Thư ký Tòa soạn, Trưởng Ban Thời sự, Ban Kinh tế, Trung tâm Media.</td>
       </tr>
     </table>
 
@@ -93,7 +93,7 @@ export const HTML_NOTIFICATION_TEMPLATES: HtmlTemplateItem[] = [
       <li style="margin-bottom: 6px;">Kết luận và phân công nhiệm vụ của Tổng Biên tập.</li>
     </ol>
 
-    <div style="background: #fef3f2; border-left: 4px solid #d92d20; padding: 12px 16px; border-radius: 4px; margin-top: 20px;">
+    <div style="background: #fef3f2; border: 1px solid #fee4e2; padding: 12px 16px; border-radius: 6px; margin-top: 20px;">
       <p style="margin: 0; color: #b42318; font-size: 13px; font-weight: 600;">Lưu ý bảo mật:</p>
       <p style="margin: 4px 0 0 0; color: #4b5563; font-size: 13px;">Tài liệu cuộc họp đã được gắn watermark cá nhân hóa. Các đồng chí vui lòng nghiên cứu trước tài liệu đính kèm và có mặt đúng giờ.</p>
     </div>
@@ -121,7 +121,7 @@ export const HTML_NOTIFICATION_TEMPLATES: HtmlTemplateItem[] = [
   <div style="padding: 24px;">
     <h2 style="color: #111827; font-size: 17px; font-weight: 700; margin-top: 0; text-align: center;">THÔNG BÁO VỀ VIỆC TRIỂN KHAI TUYẾN BÀI TRỌNG ĐIỂM</h2>
     
-    <p>Kính gửi: <strong>Toàn thể Cán bộ, Phóng viên, Biên tập viên Ban Nội dung & Ban Thời sự</strong></p>
+    <p>Kính gửi: <strong>Toàn thể Cán bộ, Phóng viên, Biên tập viên Ban Thời sự & Ban Kinh tế</strong></p>
     
     <p>Căn cứ định hướng tuyên truyền và kết luận tại cuộc họp Ban Biên tập, Ban Biên tập yêu cầu các bộ phận phối hợp triển khai tuyến nội dung:</p>
     
@@ -134,7 +134,7 @@ export const HTML_NOTIFICATION_TEMPLATES: HtmlTemplateItem[] = [
       </ul>
     </div>
 
-    <p>Đề nghị các Trưởng ban chủ động phân công phóng viên thực hiện, gửi đề cương chi tiết về Ban Thư ký trước 17:00 hàng ngày.</p>
+    <p>Đề nghị các Trưởng ban chủ động phân công phóng viên thực hiện, gửi đề cương chi tiết về Ban Thư ký Tòa soạn trước 17:00 hàng ngày.</p>
   </div>
   <div style="background: #f9fafb; border-top: 1px solid #e5e7eb; padding: 14px 24px; display: flex; justify-content: space-between; font-size: 13px; color: #4b5563;">
     <span>Hệ thống ERP Tuổi Trẻ</span>
@@ -149,23 +149,24 @@ export const HTML_NOTIFICATION_TEMPLATES: HtmlTemplateItem[] = [
     description: 'Thông báo lịch làm việc, nghỉ lễ và danh sách phân công ca trực ban tòa soạn.',
     htmlContent: `<div style="font-family: Arial, sans-serif; line-height: 1.6; color: #1f2937; max-width: 720px; margin: 0 auto; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; background: #ffffff;">
   <div style="background: #1e293b; color: #ffffff; padding: 18px 24px;">
-    <h3 style="margin: 0; font-size: 17px; font-weight: 700; color: #f87171;">BÁO TUỔI TRẺ · PHÒNG TỔ CHỨC - HÀNH CHÍNH</h3>
-    <p style="margin: 4px 0 0 0; font-size: 13px; color: #cbd5e1;">THÔNG BÁO V/V NGHỈ LỄ VÀ LỊCH TRỰC BAN TÒA SOẠN</p>
+    <h3 style="margin: 0; font-size: 17px; font-weight: 700; color: #f87171;">BÁO TUỔI TRẺ · PHÒNG TỔ CHỨC - CÁN BỘ</h3>
+    <p style="margin: 4px 0 0 0; font-size: 13px; color: #cbd5e1;">THÔNG BÁO V/V LỊCH LÀM VIỆC VÀ TRỰC BAN TÒA SOẠN</p>
   </div>
   <div style="padding: 24px;">
     <p style="margin-top: 0;">Kính gửi: <strong>Toàn thể Cán bộ công nhân viên Báo Tuổi Trẻ</strong></p>
     
-    <p>Thực hiện quy định của Nhà nước và kế hoạch công tác của Cơ quan, Ban Biên tập thông báo lịch nghỉ và trực ban như sau:</p>
+    <p>Thực hiện kế hoạch công tác của Cơ quan, Ban Biên tập thông báo lịch trực ban và ca làm việc như sau:</p>
     
     <ul style="padding-left: 20px; margin: 12px 0;">
-      <li><strong>Thời gian nghỉ:</strong> Từ ngày ... đến hết ngày ...</li>
-      <li><strong>Thời gian đi làm lại:</strong> Bắt đầu từ 08:00 ngày ...</li>
+      <li><strong>Ca 0:</strong> Từ 06:00 đến 14:00 (Trưởng ca: Dương Đức Đà Trang)</li>
+      <li><strong>Ca 1:</strong> Từ 14:00 đến 22:00 (Trưởng ca: Đinh Đức Thọ)</li>
+      <li><strong>Ca 2:</strong> Từ 22:00 đến 06:00 sáng hôm sau (Trưởng ca: Lê Ngọc Hiển)</li>
     </ul>
 
-    <p>Trong thời gian nghỉ lễ, các bộ phận trực ban xuất bản, trực công nghệ và bảo vệ tòa soạn duy trì chế độ trực 24/7 để đảm bảo dòng tin tức không gián đoạn.</p>
+    <p>Trong các ca trực, các bộ phận trực ban xuất bản, trực hạ tầng IT và bảo vệ tòa soạn duy trì chế độ túc trực 24/7 để đảm bảo dòng tin tức không gián đoạn.</p>
     
     <div style="margin-top: 18px; padding: 12px 16px; background: #eff6ff; border-radius: 6px; border: 1px solid #bfdbfe; font-size: 13px; color: #1e40af;">
-      ☎ Hotline khẩn cấp Tòa soạn: <strong>0918.033.133</strong> · Trực ban xuất bản Online: <strong>Ext 102</strong>
+      ☎ Hotline khẩn cấp Tòa soạn: <strong>0918.033.133</strong> · Trực ban xuất bản Online: <strong>Ext 2001</strong>
     </div>
   </div>
 </div>`,
@@ -179,11 +180,11 @@ export const initialCalendarNotifications: CalendarNotificationItem[] = [
     title: 'Lịch họp Ban Biên tập đầu tuần: Duyệt kế hoạch xuất bản & Tuyến bài trọng điểm Tuần 34',
     content: `Kính gửi các đồng chí Thành viên Ban Biên tập & Trưởng các ban chuyên môn,
 
-Ban Biên tập triệu tập cuộc họp giao ban đầu tuần để đánh giá các ấn phẩm tuần 33 và duyệt kế hoạch tuyến bài trọng tâm tuần 34.
+Ban Biên tập triệu tập cuộc họp giao ban đầu tuần để đánh giá các ấn phẩm tuần qua và duyệt kế hoạch tuyến bài trọng tâm tuần 45 (Tháng 11/2026).
 
-1. Thời gian: 08:30 - Thứ Hai (17/08/2026)
-2. Địa điểm: Phòng họp số 1 - Tòa soạn Tuổi Trẻ
-3. Chủ trì: Tổng Biên tập
+1. Thời gian: 08:30 - Thứ Hai (02/11/2026)
+2. Địa điểm: Phòng họp số 1 - Tòa soạn Tuổi Trẻ (60A Hoàng Văn Thụ)
+3. Chủ trì: Tổng Biên tập Lê Thế Chữ
 4. Nội dung chính:
    - Đánh giá chất lượng các vệt bài thời sự, kinh tế trong tuần qua.
    - Duyệt tuyến phóng sự điều tra và chuyên đề chuyển đổi số báo chí.
@@ -194,18 +195,18 @@ Các đồng chí chuẩn bị kỹ báo cáo và tài liệu đính kèm.`,
     recipients: {
       targetType: 'groups',
       groupIds: ['grp-01', 'grp-02'],
-      groupNames: ['Ban Biên tập', 'Ban Thư ký tòa soạn & Biên tập viên chính'],
+      groupNames: ['Ban Biên tập', 'Ban Thư ký Tòa soạn & Trực ca'],
     },
-    sentAt: '2026-08-16T17:00:00+07:00',
+    sentAt: '2026-11-01T17:00:00+07:00',
     status: 'sent',
     sendMailCopy: true,
     applyWatermark: true,
     attachments: [
-      { id: 'att-1', name: 'Ke-hoach-tuyen-bai-tuan-34.pdf', size: 1450000, type: 'application/pdf' },
-      { id: 'att-2', name: 'Bao-cao-xuat-ban-tuan-33.xlsx', size: 890000, type: 'application/vnd.ms-excel' },
+      { id: 'att-1', name: 'Ke-hoach-tuyen-bai-tuan-45.pdf', size: 1450000, type: 'application/pdf' },
+      { id: 'att-2', name: 'Bao-cao-xuat-ban-tuan-44.xlsx', size: 890000, type: 'application/vnd.ms-excel' },
     ],
-    createdBy: 'Trần Thu Hà (Ban Thư ký)',
-    createdAt: '2026-08-15T09:30:00+07:00',
+    createdBy: 'Đinh Đức Thọ (Trưởng ban TKTS)',
+    createdAt: '2026-11-01T09:30:00+07:00',
   },
   {
     id: 'notif-02',
@@ -216,62 +217,62 @@ Các đồng chí chuẩn bị kỹ báo cáo và tài liệu đính kèm.`,
     recipients: {
       targetType: 'all',
     },
-    sentAt: '2026-08-14T08:00:00+07:00',
+    sentAt: '2026-11-02T08:00:00+07:00',
     status: 'sent',
     sendMailCopy: true,
     applyWatermark: false,
     attachments: [
       { id: 'att-3', name: 'Quy-che-nhuan-but-multimedia-2026.pdf', size: 2100000, type: 'application/pdf' },
     ],
-    createdBy: 'Phòng Tài chính - Quản trị',
-    createdAt: '2026-08-13T14:00:00+07:00',
+    createdBy: 'Phòng Tổ chức - Cán bộ',
+    createdAt: '2026-11-01T14:00:00+07:00',
   },
   {
     id: 'notif-03',
     type: 'editorial_meeting',
-    title: 'Họp Ban Biên tập đột xuất: Xử lý thông tin thời sự và phối hợp tác nghiệp quốc tế',
+    title: 'Họp Ban Biên tập đột xuất: Xử lý thông tin thời sự và điều phối phóng viên tác nghiệp',
     content: `Kính gửi các đồng chí thành viên Ban Biên tập,
 
-Theo chỉ đạo khẩn của Tổng Biên tập, Ban Biên tập sẽ họp đột xuất lúc 14:00 chiều nay để thống nhất hướng xử lý nguồn tin và điều phối phóng viên thường trú tác nghiệp sự kiện quốc tế.
+Theo chỉ đạo khẩn của Tổng Biên tập, Ban Biên tập sẽ họp đột xuất lúc 14:00 chiều nay để thống nhất hướng xử lý nguồn tin và điều phối phóng viên tác nghiệp hiện trường.
 
-- Thời gian: 14:00 - Chiều nay
+- Thời gian: 14:00 - Chiều nay (04/11/2026)
 - Hình thức: Trực tiếp tại Phòng họp Ban Biên tập & Trực tuyến qua Tuổi Trẻ In-App Video Engine.
-- Yêu cầu: Đầy đủ các thành viên Ban Biên tập và Trưởng ban Thời sự quốc tế.`,
+- Yêu cầu: Đầy đủ các thành viên Ban Biên tập và Trưởng Ban Thời sự.`,
     isHtmlContent: false,
     recipients: {
       targetType: 'groups',
       groupIds: ['grp-01'],
       groupNames: ['Ban Biên tập'],
-      individuals: ['Nguyễn Minh Anh', 'Lê Thanh Vân'],
+      individuals: ['Nguyễn Viễn Sự', 'Đinh Đức Thọ'],
     },
-    sentAt: '2026-08-14T11:30:00+07:00',
+    sentAt: '2026-11-04T11:30:00+07:00',
     status: 'sent',
     sendMailCopy: true,
     applyWatermark: true,
     attachments: [
       { id: 'att-4', name: 'Ho-so-nguon-tin-thoi-su.pdf', size: 3400000, type: 'application/pdf' },
     ],
-    createdBy: 'Lê Thanh Vân',
-    createdAt: '2026-08-14T11:00:00+07:00',
+    createdBy: 'Lê Xuân Trung (Phó TBT)',
+    createdAt: '2026-11-04T11:00:00+07:00',
   },
   {
     id: 'notif-04',
     type: 'general_announcement',
-    title: 'Thông báo kế hoạch nâng cấp hạ tầng hệ thống ERP và CMS Tòa soạn Tuổi Trẻ',
+    title: 'Thông báo kế hoạch bảo trì định kỳ hệ thống máy chủ CMS & ERP Tòa soạn',
     content: HTML_NOTIFICATION_TEMPLATES[0].htmlContent,
     isHtmlContent: true,
     recipients: {
       targetType: 'all',
     },
-    scheduledAt: '2026-08-18T20:00:00+07:00',
+    scheduledAt: '2026-11-06T20:00:00+07:00',
     status: 'pending',
     sendMailCopy: true,
     applyWatermark: true,
     attachments: [
       { id: 'att-5', name: 'Lich-trinh-nang-cap-ha-tang.pdf', size: 1200000, type: 'application/pdf' },
     ],
-    createdBy: 'Phòng Công nghệ',
-    createdAt: '2026-08-14T09:15:00+07:00',
+    createdBy: 'Phạm Đức Long (Admin)',
+    createdAt: '2026-11-04T09:15:00+07:00',
   },
   {
     id: 'notif-05',
@@ -281,23 +282,23 @@ Theo chỉ đạo khẩn của Tổng Biên tập, Ban Biên tập sẽ họp đ
 
 Ban Biên tập tổ chức cuộc họp mở rộng chuyên đề Chuyển đổi số báo chí và Ứng dụng AI trong quy trình sản xuất tin bài của Báo Tuổi Trẻ.
 
-- Thời gian: 09:00 - Thứ Sáu (21/08/2026)
-- Thành phần: Ban Biên tập, Phòng Công nghệ, Trung tâm Dữ liệu, Ban Phát triển bạn đọc số.
-- Tài liệu đính kèm: Dự thảo Đề án số hóa và phân tích dữ liệu độc giả quý 3.`,
+- Thời gian: 09:00 - Thứ Sáu (06/11/2026)
+- Thành phần: Ban Biên tập, Ban Quản trị & Công nghệ, Trung tâm Media & Podcast, Ban Thư ký Tòa soạn.
+- Tài liệu đính kèm: Dự thảo Đề án số hóa và phân tích dữ liệu độc giả quý 4.`,
     isHtmlContent: false,
     recipients: {
       targetType: 'groups',
-      groupIds: ['grp-01', 'grp-04'],
-      groupNames: ['Ban Biên tập', 'Tổ Chuyển đổi số & Công nghệ'],
+      groupIds: ['grp-01', 'grp-03'],
+      groupNames: ['Ban Biên tập', 'Trưởng các Ban Chuyên môn'],
     },
-    scheduledAt: '2026-08-20T08:00:00+07:00',
+    scheduledAt: '2026-11-06T08:00:00+07:00',
     status: 'pending',
     sendMailCopy: true,
     applyWatermark: true,
     attachments: [
       { id: 'att-6', name: 'Du-thao-de-an-chuyen-doi-so-2026.docx', size: 4800000, type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' },
     ],
-    createdBy: 'Nguyễn Minh Anh',
-    createdAt: '2026-08-14T10:00:00+07:00',
+    createdBy: 'Trần Xuân Toàn (Phó TBT)',
+    createdAt: '2026-11-04T10:00:00+07:00',
   },
 ];

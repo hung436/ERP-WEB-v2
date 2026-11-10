@@ -4,13 +4,12 @@
    Dùng cho Drawer Chi tiết phiếu trong Lịch làm việc Booking
    ========================================================================== */
 
-:root,
 .jt-document-drawer,
 .jt-doc-detail,
 .job-ticket-drawer {
-  --jt-color-primary: rgb(227, 14, 22);
-  --jt-color-primary-light: rgba(227, 14, 22, 0.08);
-  --jt-color-primary-hover: rgba(227, 14, 22, 0.12);
+  --jt-color-primary: #D92D20;
+  --jt-color-primary-light: rgba(217, 45, 32, 0.08);
+  --jt-color-primary-hover: rgba(217, 45, 32, 0.12);
   --jt-color-success: rgb(95, 159, 114);
   --jt-color-success-light: rgba(95, 159, 114, 0.1);
   --jt-color-success-hover: rgba(95, 159, 114, 0.18);
@@ -26,7 +25,7 @@
   --jt-radius-sm: 6px;
   --jt-radius-md: 8px;
   --jt-radius-lg: 12px;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
 /* --- DRAWER CONTAINER & HEADER --- */
@@ -79,6 +78,23 @@
   box-sizing: border-box;
 }
 
+.jt-document-drawer__header--page {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  height: auto;
+  row-gap: 4px;
+  padding-block: 8px 12px;
+}
+
+.jt-document-drawer__back-btn.ant-btn {
+  grid-column: 1 / -1;
+  justify-self: start;
+  padding-inline: 4px;
+  color: #475467;
+  font-size: 12px;
+}
+
+
 .jt-document-drawer__title-wrap {
   min-width: 0;
   display: flex;
@@ -92,7 +108,7 @@
   margin: 0;
   color: #0f172a !important;
   font-size: 16px !important;
-  font-weight: 650 !important;
+  font-weight: 600 !important;
   line-height: 1.4;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -193,7 +209,7 @@
 
 .jt-drawer-action-btn--edit {
   color: #1e293b !important;
-  font-weight: 550 !important;
+  font-weight: 500 !important;
 }
 
 .jt-drawer-action-btn--edit:hover {
@@ -310,8 +326,34 @@
   gap: 0 !important;
   min-height: 0 !important;
   height: 100% !important;
-  overflow-y: auto !important;
+  max-height: 100% !important;
+  overflow: hidden !important;
   background: #ffffff !important;
+  position: relative !important;
+}
+
+.jt-doc-detail-sidebar-scroll {
+  flex: 1 1 0% !important;
+  min-height: 0 !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0 !important;
+  background: #ffffff !important;
+}
+
+.jt-doc-detail-sidebar-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.jt-doc-detail-sidebar-scroll::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+.jt-doc-detail-sidebar-scroll::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
 }
 
 .jt-doc-detail-pane--info {
@@ -334,7 +376,7 @@
   margin: 2px 0 0;
   color: #0f172a;
   font-size: 15px;
-  font-weight: 650;
+  font-weight: 600;
 }
 
 .jt-doc-detail-pane__eyebrow {
@@ -405,12 +447,12 @@
 
 .jt-doc-chat-msg__author {
   font-size: 12px;
-  font-weight: 650;
+  font-weight: 600;
   color: #1e293b;
 }
 
 .jt-doc-chat-msg__role {
-  font-size: 10px;
+  font-size: 11px;
   padding: 1px 6px;
   border-radius: 4px;
   background: #e2e8f0;
@@ -472,15 +514,6 @@
 }
 
 /* --- CỘT PHẢI: STACK THÔNG TIN + QUY TRÌNH --- */
-.jt-doc-detail-sidebar-stack {
-  display: flex !important;
-  flex-direction: column !important;
-  gap: 14px !important;
-  min-height: 0 !important;
-  height: 100% !important;
-  overflow-y: auto !important;
-}
-
 /* Panel Thông tin của phiếu */
 .jt-doc-detail-pane--info {
   flex-shrink: 0;
@@ -518,9 +551,9 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  color: #64748b;
-  font-size: 12px;
-  font-weight: 550;
+  color: #475467;
+  font-size: 13px;
+  font-weight: 600;
   flex-shrink: 0;
 }
 
@@ -530,7 +563,9 @@
 
 .jt-doc-info-item__value {
   color: #0f172a;
-  font-weight: 550;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.45;
   text-align: right;
   word-break: break-word;
 }
@@ -555,7 +590,7 @@
 
 .jt-doc-info-user-name {
   color: #0f172a;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
   line-height: 1.45;
   word-break: break-word;
@@ -571,7 +606,7 @@
 .jt-doc-info-action-btn {
   height: 24px !important;
   padding: 0 6px !important;
-  font-size: 11.5px !important;
+  font-size: 12px !important;
   font-weight: 500 !important;
   color: #475467 !important;
   border-radius: 4px !important;
@@ -630,13 +665,14 @@
 
 /* Panel Quy trình xử lý */
 .jt-doc-detail-pane--steps {
-  flex: 1 1 auto;
-  min-height: 220px;
+  flex: 0 0 auto !important;
+  min-height: auto !important;
+  overflow: visible !important;
 }
 
 .jt-doc-steps {
-  padding: 14px 16px;
-  overflow-y: auto;
+  padding: 14px 16px 20px 16px;
+  overflow: visible !important;
   display: flex;
   flex-direction: column;
 }
@@ -705,11 +741,18 @@
   text-transform: uppercase;
 }
 
+.jt-doc-step__top > div {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+}
+
 .jt-doc-step__top h4 {
-  margin: 2px 0 0;
+  margin: 0;
   color: #0f172a;
   font-size: 13px;
-  font-weight: 650;
+  font-weight: 600;
 }
 
 .jt-doc-step__actor {
@@ -882,7 +925,7 @@
 .jt-pinned-hero-card__title {
   margin: 0;
   font-size: 15px;
-  font-weight: 700;
+  font-weight: 600;
   color: #0f172a;
   white-space: nowrap;
   overflow: hidden;
@@ -965,16 +1008,124 @@
 }
 
 .jt-pinned-attachments-label {
-  font-size: 12px;
+  font-size: 11.5px;
   font-weight: 600;
   color: #64748b;
+  margin-bottom: 2px;
 }
 
 .jt-pinned-attachments-list {
   display: flex;
-  align-items: center;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: 6px;
+  align-self: stretch;
+}
+
+.jt-pinned-attachments-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-width: 0;
+}
+
+/* Compact Hero Pinned File Card (Anti-AI clean, compact design) */
+.jt-hero-file-card {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px;
+  background: #ffffff;
+  border: 1px solid #d0d5dd !important;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.16s ease;
+  user-select: none;
+  align-self: flex-start;
+  width: fit-content;
+  max-width: min(100%, 420px);
+  box-sizing: border-box;
+  min-height: 34px;
+}
+
+.jt-hero-file-card:hover {
+  background: #f9fafb;
+  border-color: #98a2b3 !important;
+}
+
+.jt-hero-file-card__badge {
+  width: 26px;
+  height: 26px;
+  border-radius: 5px;
+  border: none !important;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.jt-hero-file-card__icon {
+  font-size: 11px;
+  line-height: 1;
+}
+
+.jt-hero-file-card__ext {
+  font-size: 8px;
+  font-weight: 700;
+  line-height: 1;
+  margin-top: 1px;
+}
+
+.jt-hero-file-card__info {
+  flex: 1 1 0%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.jt-hero-file-card__name {
+  font-size: 12px;
+  font-weight: 500;
+  color: #1e293b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.3;
+}
+
+.jt-hero-file-card:hover .jt-hero-file-card__name {
+  color: #d92d20;
+}
+
+.jt-hero-file-card__meta {
+  font-size: 11px;
+  color: #64748b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2;
+}
+
+.jt-hero-file-card__download {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  border: none !important;
+  background: #ffffff;
+  color: #64748b;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  padding: 0;
+}
+
+.jt-hero-file-card__download:hover {
+  background: #fee2e2;
+  color: #d92d20;
 }
 
 .jt-pinned-attachment-chip {
@@ -1023,7 +1174,7 @@
   display: flex !important;
   flex-direction: column !important;
   gap: 14px !important;
-  background: #f8fafc !important;
+  background: #ffffff !important;
 }
 
 .jt-chat-stream__timeline::-webkit-scrollbar {
@@ -1042,93 +1193,54 @@
 /* Mốc sự kiện hệ thống (System Event Item) */
 .jt-chat-system-event {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  margin: 6px 0;
+  margin: 6px 0 10px 0;
+  width: 100%;
+}
+
+.jt-chat-system-event--attachment {
+  gap: 8px;
 }
 
 .jt-chat-system-event__badge {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 7px;
   padding: 4px 14px;
   background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 20px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  border: 1px solid #e4e7ec;
+  border-radius: 9999px;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
   font-size: 12px;
-  color: #475569;
+  color: #475467;
 }
 
 .jt-chat-system-event__text {
   font-weight: 500;
+  color: #344054;
+}
+
+.jt-chat-system-event__text strong {
+  font-weight: 600;
+  color: #1d2939;
 }
 
 .jt-chat-system-event__time {
   font-size: 11px;
-  color: #94a3b8;
-  margin-left: 4px;
+  color: #667085;
+  margin-left: 3px;
 }
 
 /* Mốc đính kèm tệp trên Timeline trao đổi */
-.jt-timeline-attachment-event {
-  margin: 4px 0 10px 0;
+.jt-chat-system-event--attachment .jt-timeline-attachment-grid {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  width: 100%;
-}
-
-.jt-timeline-attachment-event--outgoing {
-  align-items: flex-end;
-}
-.jt-timeline-attachment-event--outgoing .jt-timeline-attachment-event__header {
-  display: flex;
-  justify-content: flex-end;
-  width: 100%;
-}
-.jt-timeline-attachment-event--outgoing .jt-timeline-attachment-grid {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-}
-
-.jt-timeline-attachment-event--incoming {
-  align-items: flex-start;
-}
-.jt-timeline-attachment-event--incoming .jt-timeline-attachment-event__header {
-  display: flex;
-  justify-content: flex-start;
-  width: 100%;
-}
-.jt-timeline-attachment-event--incoming .jt-timeline-attachment-grid {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-start;
-}
-
-.jt-timeline-attachment-event__badge {
-  display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 4px 14px;
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 20px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-  font-size: 12px;
-  color: #475569;
-}
-
-.jt-timeline-attachment-event__text {
-  font-weight: 500;
-}
-
-.jt-timeline-attachment-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
   width: 100%;
+  margin-top: 4px;
 }
 
 .jt-timeline-file-card {
@@ -1137,18 +1249,20 @@
   gap: 10px;
   padding: 8px 12px;
   background: #ffffff;
-  border: 1px solid #e2e8f0;
+  border: 1px solid #e4e7ec;
   border-radius: 8px;
   box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
   cursor: pointer;
   transition: all 0.16s ease;
   user-select: none;
+  max-width: 440px;
+  width: 100%;
 }
 
 .jt-timeline-file-card:hover {
-  border-color: #cbd5e1;
-  background: #f8fafc;
-  box-shadow: 0 2px 6px rgba(16, 24, 40, 0.08);
+  border-color: #d0d5dd;
+  background: #fcfcfd;
+  box-shadow: 0 2px 6px rgba(16, 24, 40, 0.06);
 }
 
 .jt-timeline-file-card__badge {
@@ -1169,8 +1283,8 @@
 }
 
 .jt-timeline-file-card__ext {
-  font-size: 9px;
-  font-weight: 700;
+  font-size: 10px;
+  font-weight: 600;
   line-height: 1.1;
   margin-top: 1px;
 }
@@ -1184,7 +1298,7 @@
 }
 
 .jt-timeline-file-card__name {
-  font-size: 12.5px;
+  font-size: 12px;
   font-weight: 600;
   color: #1e293b;
   white-space: nowrap;
@@ -1229,104 +1343,110 @@
 /* Bong bóng tin nhắn (Chat Messages) */
 .jt-chat-message {
   display: flex;
+  align-items: flex-start;
   gap: 10px;
-  max-width: 85%;
+  width: 100%;
 }
 
 .jt-chat-message--incoming {
+  justify-content: flex-start;
   align-self: flex-start;
+  margin-right: auto;
 }
 
 .jt-chat-message--outgoing {
+  justify-content: flex-end;
   align-self: flex-end;
-  flex-direction: row-reverse;
+  margin-left: auto;
 }
 
-.jt-chat-message__avatar {
-  background: #e2e8f0;
-  color: #475569;
-  flex-shrink: 0;
+.jt-chat-message .group-msg-avatar {
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  min-height: 32px;
+  flex: 0 0 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+  margin: 0;
+  margin-top: 1px;
+  align-self: flex-start;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.08);
 }
 
 .jt-chat-message__wrap {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  align-items: flex-start;
+  gap: 4px;
+  min-width: 0;
+  max-width: min(85%, 600px);
 }
 
 .jt-chat-message--outgoing .jt-chat-message__wrap {
   align-items: flex-end;
+  margin-left: auto;
 }
 
 .jt-chat-message__sender-row {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12px;
+  padding-inline: 4px;
 }
 
 .jt-chat-message__sender-name {
-  font-weight: 650;
-  color: #1e293b;
-}
-
-.jt-chat-message__role-tag {
-  font-size: 10px;
-  line-height: 16px;
-  padding: 0 6px;
-  border-radius: 4px;
-  margin: 0;
-}
-
-.jt-chat-message__time {
-  font-size: 11px;
-  color: #94a3b8;
+  font-size: 13px;
+  font-weight: 600;
+  color: #344054;
+  line-height: 1.4;
 }
 
 .jt-chat-message__bubble {
-  padding: 10px 14px;
-  border-radius: 12px;
-  font-size: 13px;
+  box-sizing: border-box;
+  padding: 8px 12px;
+  max-width: 100%;
+  color: #1d2939;
+  font-size: 14px;
   line-height: 1.5;
-  word-break: break-word;
+  overflow-wrap: anywhere;
   white-space: pre-wrap;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 
 .jt-chat-message__bubble--incoming {
-  background: #ffffff;
-  color: #0f172a;
-  border: 1px solid #e2e8f0;
-  border-top-left-radius: 2px;
+  background: #f2f4f7;
+  border-radius: 6px 10px 10px;
 }
 
 .jt-chat-message__bubble--outgoing {
-  background: #e30e16;
-  color: #ffffff;
-  border-top-right-radius: 2px;
+  background: #fef3f2;
+  border-radius: 10px 6px 10px 10px;
 }
 
-.jt-chat-message__attachment {
-  margin-top: 6px;
-  padding: 6px 10px;
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 6px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
+.jt-chat-message__bubble:has(> .jt-chat-bubble-attachments:only-child) {
+  padding: 0;
+  background: transparent;
+}
+
+.jt-chat-bubble-attachments:only-child {
+  margin-top: 0;
+}
+
+.jt-chat-message__meta {
+  padding-inline: 4px;
+  color: #667085;
   font-size: 12px;
-  font-weight: 500;
+  line-height: 1.4;
+  white-space: nowrap;
 }
 
-.jt-chat-message__bubble--incoming .jt-chat-message__attachment {
-  background: #f1f5f9;
-  color: #0f172a;
-  border: 1px solid #cbd5e1;
-}
 
 /* Tệp đính kèm trong bóng chat (Chat Bubble Attachments) */
 .jt-chat-bubble-attachments {
-  margin-top: 8px;
+  margin-top: 6px;
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -1381,38 +1501,42 @@
 }
 
 .jt-chat-bubble-file--outgoing {
-  background: rgba(255, 255, 255, 0.16);
-  border: 1px solid rgba(255, 255, 255, 0.28);
-  color: #ffffff;
+  background: #ffffff;
+  border: 1px solid #fee4e2;
+  color: #1d2939;
 }
 
 .jt-chat-bubble-file--outgoing:hover {
-  background: rgba(255, 255, 255, 0.24);
-  border-color: rgba(255, 255, 255, 0.45);
+  background: #fff5f5;
+  border-color: #fecdca;
 }
 
 .jt-chat-bubble-file--outgoing .jt-chat-bubble-file__name {
-  color: #ffffff;
+  color: #1d2939;
+}
+
+.jt-chat-bubble-file--outgoing:hover .jt-chat-bubble-file__name {
+  color: #b42318;
 }
 
 .jt-chat-bubble-file--outgoing .jt-chat-bubble-file__size {
-  color: rgba(255, 255, 255, 0.85);
+  color: #912018;
 }
 
 .jt-chat-bubble-file--outgoing .jt-chat-bubble-file__badge {
   background: #ffffff !important;
-  border-color: rgba(255, 255, 255, 0.8) !important;
+  border-color: #fecdca !important;
 }
 
 .jt-chat-bubble-file--outgoing .jt-chat-bubble-file__download {
-  background: rgba(255, 255, 255, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  color: #ffffff;
+  background: #fef3f2;
+  border: 1px solid #fecdca;
+  color: #912018;
 }
 
 .jt-chat-bubble-file--outgoing .jt-chat-bubble-file__download:hover {
-  background: #ffffff;
-  color: #d92d20;
+  background: #fee4e2;
+  color: #b42318;
 }
 
 .jt-chat-bubble-file__badge {
@@ -1433,8 +1557,8 @@
 }
 
 .jt-chat-bubble-file__ext {
-  font-size: 8px;
-  font-weight: 700;
+  font-size: 10px;
+  font-weight: 600;
   line-height: 1;
   margin-top: 1px;
 }
@@ -1456,7 +1580,7 @@
 }
 
 .jt-chat-bubble-file__size {
-  font-size: 10.5px;
+  font-size: 11px;
 }
 
 .jt-chat-bubble-file__download {
@@ -1534,9 +1658,9 @@
   width: 36px;
   height: 36px;
   border-radius: 8px;
-  border: 1px solid #cbd5e1;
-  background: #f8fafc;
-  color: #64748b;
+  border: 1px solid #e4e7ec;
+  background: #f9fafb;
+  color: #475467;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1547,40 +1671,43 @@
 }
 
 .jt-chat-attach-btn:hover {
-  color: #e30e16;
-  border-color: #e30e16;
-  background: #fff;
+  color: #d92d20;
+  border-color: #fecdca;
+  background: #fef3f2;
 }
 
 .jt-chat-textarea {
   flex: 1;
   border-radius: 8px !important;
-  border: 1px solid #cbd5e1 !important;
+  border: 1px solid #d0d5dd !important;
   padding: 7px 12px !important;
-  font-size: 13px !important;
+  font-size: 14px !important;
   line-height: 1.5 !important;
   resize: none !important;
+  background: #ffffff !important;
+  color: #1d2939 !important;
 }
 
 .jt-chat-textarea:focus {
-  border-color: #e30e16 !important;
-  box-shadow: 0 0 0 2px rgba(227, 14, 22, 0.1) !important;
+  border-color: #d92d20 !important;
+  box-shadow: 0 0 0 2px rgba(217, 45, 32, 0.1) !important;
 }
 
 .jt-chat-send-btn {
   height: 36px !important;
   border-radius: 8px !important;
-  background: #e30e16 !important;
-  border-color: #e30e16 !important;
+  background: #d92d20 !important;
+  border-color: #d92d20 !important;
   font-weight: 600 !important;
   color: #ffffff !important;
   flex-shrink: 0;
+  padding: 0 14px !important;
 }
 
 .jt-chat-send-btn:hover,
 .jt-chat-send-btn:focus {
-  background: #c90c13 !important;
-  border-color: #c90c13 !important;
+  background: #b42318 !important;
+  border-color: #b42318 !important;
 }
 
 /* ==========================================================================
@@ -1603,7 +1730,7 @@
 .jt-user-template-modal .ant-modal-title {
   color: #0f172a !important;
   font-size: 17px !important;
-  font-weight: 700 !important;
+  font-weight: 600 !important;
 }
 
 .jt-user-template-modal .ant-modal-body {
@@ -1619,19 +1746,19 @@
 .jt-template-picker__grid {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 10px;
 }
 
 .jt-template-option {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 14px;
   width: 100%;
-  padding: 16px 20px;
+  padding: 12px 16px;
   text-align: left;
   background: #ffffff;
   border: 1px solid #e5e7eb;
-  border-radius: 12px;
+  border-radius: 10px;
   cursor: pointer;
   transition: all 0.2s ease;
 }
@@ -1639,14 +1766,14 @@
 .jt-template-option:hover,
 .jt-template-option:focus {
   border-color: #fca5a5;
-  box-shadow: 0 4px 14px rgba(220, 38, 38, 0.08);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.08);
   outline: none;
-  transform: translateY(-1px);
+  background: #fffafa;
 }
 
 .jt-template-option__icon {
-  width: 44px;
-  height: 44px;
+  width: 38px;
+  height: 38px;
   border-radius: 8px;
   display: inline-flex;
   align-items: center;
@@ -1655,27 +1782,25 @@
   background: #fef2f2;
   border: 1px solid #fee2e2;
   color: #dc2626;
-  font-size: 20px;
+  font-size: 18px;
 }
 
 .jt-template-option__body {
   min-width: 0;
   display: flex;
-  flex-direction: column;
-  gap: 4px;
+  align-items: center;
+  flex: 1;
 }
 
 .jt-template-option__name {
   color: #111827;
-  font-size: 16px;
-  font-weight: 700;
+  font-size: 15px;
+  font-weight: 600;
   line-height: 1.35;
 }
 
 .jt-template-option__desc {
-  color: #6b7280;
-  font-size: 13px;
-  line-height: 1.4;
+  display: none;
 }
 
 /* Modal Step 1 */
@@ -1746,7 +1871,7 @@
 .jt-modal-clean-header__title {
   margin: 0;
   font-size: 16px;
-  font-weight: 700;
+  font-weight: 600;
   color: #0f172a;
   letter-spacing: -0.01em;
 }
@@ -1805,7 +1930,7 @@
   align-items: center;
   gap: 8px;
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: #475569;
@@ -1818,9 +1943,129 @@
 }
 
 .jt-field-label {
-  font-size: 13.5px;
+  font-size: 14px;
   font-weight: 600;
   color: #1e293b;
+}
+
+.jt-create-template-modal .ant-form-item-label {
+  width: 100%;
+}
+
+.jt-create-template-modal .ant-form-item-label > label {
+  display: flex !important;
+  align-items: center;
+  width: 100% !important;
+}
+
+.jt-create-template-modal .ant-form-item-label > label::after {
+  display: none !important;
+  margin: 0 !important;
+}
+
+.jt-content-field-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex: 1;
+  width: 100%;
+}
+
+.jt-attach-inline-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 10px;
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  color: #334155;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  height: 26px;
+}
+
+.jt-attach-inline-btn:hover {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+  color: #0f172a;
+}
+
+.jt-attach-inline-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 4px;
+  font-size: 11px;
+  font-weight: 600;
+  background: #1d4ed8;
+  color: #ffffff;
+  border-radius: 9px;
+  margin-left: 2px;
+}
+
+.jt-attached-chips-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: -6px;
+  margin-bottom: 12px;
+}
+
+.jt-attached-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 8px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  font-size: 12px;
+  color: #1e293b;
+  max-width: 100%;
+}
+
+.jt-attached-chip__icon {
+  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.jt-attached-chip__name {
+  font-weight: 500;
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.jt-attached-chip__size {
+  font-size: 11px;
+  color: #64748b;
+}
+
+.jt-attached-chip__remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border: 0;
+  background: transparent;
+  color: #94a3b8;
+  cursor: pointer;
+  border-radius: 50%;
+  margin-left: 2px;
+  transition: all 0.15s ease;
+}
+
+.jt-attached-chip__remove:hover {
+  background: #fee2e2;
+  color: #ef4444;
 }
 
 .jt-field-label__sub {
@@ -1893,7 +2138,7 @@
 }
 
 .jt-upload-dropzone__secondary {
-  font-size: 11.5px;
+  font-size: 12px;
   color: #64748b;
 }
 
@@ -1952,7 +2197,7 @@
 }
 
 .jt-attached-preview-item__name {
-  font-size: 12.5px;
+  font-size: 12px;
   font-weight: 600;
   color: #1e293b;
   white-space: nowrap;
@@ -2010,6 +2255,33 @@
   border-color: #dc2626 !important;
   color: #ffffff !important;
 }
+
+.jt-meeting-mode-checkboxes {
+  display: flex !important;
+  align-items: center !important;
+  gap: 24px !important;
+  height: 36px !important;
+}
+
+.jt-meeting-mode-checkboxes .ant-checkbox-wrapper {
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  color: #334155 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  cursor: pointer !important;
+  margin-inline-start: 0 !important;
+}
+
+.jt-meeting-mode-checkboxes .ant-checkbox-wrapper:hover .ant-checkbox-inner {
+  border-color: #dc2626 !important;
+}
+
+.jt-meeting-mode-checkboxes .ant-checkbox-checked .ant-checkbox-inner {
+  background-color: #dc2626 !important;
+  border-color: #dc2626 !important;
+}
+
 
 /* ==========================================================================
    MULTI-ROLE ACTION BAR & CONSULTATION DOCK (ĐẶC TẢ 4 VAI TRÒ V2.3)
@@ -2135,7 +2407,7 @@
   align-items: center;
   gap: 6px;
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 600;
   color: #6b21a8;
 }
 
@@ -2238,7 +2510,7 @@
 
 .jt-review-type-tag {
   margin: 0 !important;
-  font-size: 11.5px !important;
+  font-size: 12px !important;
   font-weight: 500 !important;
   border-radius: 4px !important;
   padding: 1px 7px !important;
@@ -2277,7 +2549,7 @@
   width: 140px;
   flex-shrink: 0;
   color: #64748b;
-  font-size: 12.5px;
+  font-size: 12px;
   font-weight: 500;
 }
 
@@ -2285,7 +2557,7 @@
   flex: 1;
   min-width: 0;
   color: #1e293b;
-  font-weight: 450;
+  font-weight: 400;
   word-break: break-word;
 }
 
@@ -2313,7 +2585,7 @@
   background: #f8fafc;
   border: 1px solid #e2e8f0;
   border-radius: 4px;
-  font-size: 11.5px;
+  font-size: 12px;
   color: #334155;
 }
 
@@ -2372,7 +2644,7 @@
 
 .jt-otp-confirm-modal .ant-modal-title {
   font-size: 16px !important;
-  font-weight: 650 !important;
+  font-weight: 600 !important;
   color: #0f172a !important;
   display: flex !important;
   align-items: center !important;
@@ -2410,7 +2682,7 @@
   border: 1px solid #bbf7d0;
   border-radius: 8px;
   padding: 8px 12px;
-  font-size: 12.5px;
+  font-size: 12px;
   color: #166534;
 }
 
@@ -2513,7 +2785,7 @@
   height: 38px !important;
   padding: 0 16px !important;
   font-weight: 600 !important;
-  font-size: 13.5px !important;
+  font-size: 14px !important;
   border-radius: 8px !important;
   display: inline-flex !important;
   align-items: center !important;
@@ -2641,7 +2913,7 @@
 .jt-modern-modal-title {
   margin: 0;
   font-size: 17px;
-  font-weight: 700;
+  font-weight: 600;
   color: #0f172a;
   line-height: 1.35;
 }
@@ -2674,7 +2946,7 @@
 
 .jt-modern-modal-card-label {
   color: #64748b;
-  font-size: 12.5px;
+  font-size: 12px;
   flex-shrink: 0;
 }
 
@@ -2715,7 +2987,7 @@
   border-radius: 8px !important;
   border: 1px solid #cbd5e1 !important;
   padding: 10px 12px !important;
-  font-size: 13.5px !important;
+  font-size: 14px !important;
   line-height: 1.5 !important;
   box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04) !important;
   transition: all 0.15s ease !important;
@@ -2740,7 +3012,7 @@
   padding: 0 18px !important;
   border-radius: 8px !important;
   font-weight: 600 !important;
-  font-size: 13.5px !important;
+  font-size: 14px !important;
   display: inline-flex !important;
   align-items: center !important;
   gap: 6px !important;
@@ -2822,7 +3094,7 @@
   border-radius: 0;
   background: transparent;
   color: #64748b;
-  font-size: 13.5px;
+  font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   box-shadow: none;
@@ -2889,7 +3161,7 @@
   align-items: center;
   gap: 6px;
   color: #0f172a;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .jt-approver-icon {
@@ -2897,40 +3169,40 @@
   font-size: 14px;
 }
 
-.jt-approver-status-pill {
+.jt-workflow-status-pill {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   height: 22px;
   padding: 0 9px;
   border-radius: 999px;
-  font-size: 11.5px;
+  font-size: 12px;
   font-weight: 600;
   border: 0;
 }
 
-.jt-approver-status-pill__dot {
+.jt-workflow-status-pill__dot {
   width: 6px;
   height: 6px;
   border-radius: 50%;
   flex-shrink: 0;
 }
 
-.jt-approver-status-pill.is-required {
+.jt-workflow-status-pill.is-required {
   background: #fffbeb;
   color: #b45309;
 }
 
-.jt-approver-status-pill.is-required .jt-approver-status-pill__dot {
+.jt-workflow-status-pill.is-required .jt-workflow-status-pill__dot {
   background: #d97706;
 }
 
-.jt-approver-status-pill.is-auto {
+.jt-workflow-status-pill.is-auto {
   background: #f1f5f9;
   color: #64748b;
 }
 
-.jt-approver-status-pill.is-auto .jt-approver-status-pill__dot {
+.jt-workflow-status-pill.is-auto .jt-workflow-status-pill__dot {
   background: #94a3b8;
 }
 
@@ -2950,7 +3222,7 @@
 }
 
 .jt-quick-log-bar__label {
-  font-size: 12.5px;
+  font-size: 12px;
   font-weight: 600;
   color: #475569;
 }
@@ -3017,3 +3289,1094 @@
 
 
 
+
+
+/* ==========================================================================
+   REVIEW & CONFIRMATION MODAL & SUB-MODALS (TASK / EVENT)
+   ========================================================================== */
+.jt-confirm-summary {
+  display: flex;
+  flex-direction: column;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  overflow: hidden;
+  margin: 12px 0 16px 0;
+}
+
+.jt-confirm-row {
+  display: flex;
+  align-items: flex-start;
+  padding: 10px 14px;
+  border-bottom: 1px solid #edf2f7;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.jt-confirm-row:last-child {
+  border-bottom: none;
+}
+
+.jt-confirm-label {
+  flex: 0 0 120px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.jt-confirm-value {
+  flex: 1 1 auto;
+  color: #0f172a;
+  word-break: break-word;
+}
+
+.jt-modal-helper-text {
+  font-size: 13px;
+  color: #475569;
+  line-height: 1.5;
+  margin-bottom: 14px;
+}
+
+
+/* ==========================================================================
+   PERSON LIST IN WORKFLOW STEPS (Anti-AI Flat & Clean)
+   ========================================================================== */
+.jt-step-person-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.jt-step-person-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 10px;
+  background: #f8fafc;
+  border: 1px solid #f1f5f9;
+  border-radius: 6px;
+  font-size: 12px;
+}
+
+.jt-step-person-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  flex: 1;
+}
+
+.jt-step-person-name {
+  font-weight: 400;
+  color: #1e293b;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.jt-step-person-name.is-self {
+  font-weight: 600;
+}
+
+.jt-step-person-time {
+  color: #64748b;
+  font-size: 12px;
+  margin-left: auto;
+  padding-right: 8px;
+  white-space: nowrap;
+}
+
+/* ==========================================================================
+   DOCUMENT ACTION GROUP (Bottom of Right Column)
+   ========================================================================== */
+.jt-doc-action-group {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  gap: 8px;
+  padding: 12px 16px;
+}
+
+.jt-action-row--full {
+  width: 100%;
+}
+
+.jt-action-btn--approve-solid {
+  width: 100%;
+  height: 38px;
+  background-color: #16a34a !important;
+  border-color: #16a34a !important;
+  color: #ffffff !important;
+  font-weight: 600;
+  border-radius: 6px;
+}
+
+.jt-action-btn--approve-solid:hover {
+  background-color: #15803d !important;
+  border-color: #15803d !important;
+}
+
+.jt-action-row--split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.jt-action-row--split .ant-btn {
+  height: 36px;
+  font-weight: 500;
+  border-radius: 6px;
+}
+
+.jt-action-btn--reject-outline {
+  border-color: #fca5a5 !important;
+  color: #dc2626 !important;
+}
+
+.jt-action-btn--reject-outline:hover {
+  background-color: #fef2f2 !important;
+  border-color: #dc2626 !important;
+}
+
+.jt-action-btn--consult-outline {
+  border-color: #ddd6fe !important;
+  color: #7c3aed !important;
+}
+
+.jt-action-btn--consult-outline:hover {
+  background-color: #f5f3ff !important;
+  border-color: #7c3aed !important;
+}
+
+.jt-action-btn--complete-solid {
+  width: 100%;
+  height: 38px;
+  background-color: #16a34a !important;
+  border-color: #16a34a !important;
+  color: #ffffff !important;
+  font-weight: 600;
+  border-radius: 6px;
+}
+
+.jt-action-btn--complete-solid:hover {
+  background-color: #15803d !important;
+  border-color: #15803d !important;
+}
+
+.jt-action-btn--consult-reply-solid {
+  border-color: #7c3aed !important;
+  color: #7c3aed !important;
+  height: 38px;
+  font-weight: 500;
+}
+
+
+.jt-step-subheading {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #475569;
+  margin-top: 10px;
+  margin-bottom: 4px;
+}
+
+.jt-step-subheading:first-child {
+  margin-top: 0;
+}
+
+
+/* =========================================================================
+   Smart Time Picker (Cụm chọn thời gian thông minh & tiện lợi cho người dùng)
+   ========================================================================= */
+.jt-smart-time-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.jt-time-presets-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.jt-time-presets-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+  flex-shrink: 0;
+}
+
+.jt-time-presets-list {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.jt-time-preset-chip {
+  padding: 3px 9px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #334155;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  line-height: 1.4;
+}
+
+.jt-time-preset-chip:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+  border-color: #cbd5e1;
+}
+
+.jt-time-preset-chip.is-active {
+  background: #fef2f2;
+  color: #b91c1c;
+  border-color: #fca5a5;
+  font-weight: 600;
+}
+
+.jt-time-inputs-row {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 10px;
+  width: 100%;
+}
+
+@media (max-width: 520px) {
+  .jt-time-inputs-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.jt-time-preview-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #475569;
+  padding: 5px 10px;
+  background: #f8fafc;
+  border-radius: 6px;
+  border: 1px solid #f1f5f9;
+}
+
+.jt-time-preview-icon {
+  font-size: 12px;
+  color: #0284c7;
+}
+
+.jt-time-preview-hint strong {
+  color: #0f172a;
+  font-weight: 600;
+}
+
+
+/* =========================================================================
+   Anti-AI UI Improvements: Hero Card, Chip Users, Icon Add Button, Clean Steps
+   ========================================================================= */
+
+/* Hero card minimal header */
+.jt-pinned-hero-card__header-minimal {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.jt-pinned-hero-card__header-minimal .jt-pinned-hero-card__title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #0f172a;
+  line-height: 1.4;
+  margin: 0;
+  white-space: normal;
+}
+
+.jt-pinned-hero-card__chevron-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: transparent;
+  color: #64748b;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.jt-pinned-hero-card__chevron-btn:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+/* Nút thêm icon tròn tinh tế */
+.jt-doc-icon-add-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  padding: 0;
+}
+
+.jt-doc-icon-add-btn:hover {
+  background: #f8fafc;
+  color: #0f172a;
+  border-color: #cbd5e1;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+/* Danh sách chip thành viên & người theo dõi */
+.jt-doc-info-user-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.jt-doc-info-user-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 8px 3px 4px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  font-size: 12px;
+  color: #1e293b;
+  line-height: 1.2;
+}
+
+.jt-doc-user-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #e0e7ff;
+  color: #4338ca;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.jt-doc-user-name {
+  font-weight: 500;
+  color: #334155;
+}
+
+.jt-doc-user-me-tag {
+  display: inline-block;
+  padding: 1px 5px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #1d4ed8;
+  background: #eff6ff;
+  border-radius: 4px;
+}
+
+.jt-doc-info-empty-text {
+  display: inline-block;
+  font-size: 12px;
+  color: #94a3b8;
+  font-style: italic;
+  margin-top: 4px;
+}
+
+/* Tiêu đề QUY TRÌNH đơn nhất */
+.jt-doc-pane-title {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: #0f172a;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* Đồng bộ status badge ở Header Drawer */
+.jt-document-drawer__title-wrap .booking-week-status-badge {
+  font-size: 12px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+  line-height: 16px;
+}
+
+
+/* =========================================================================
+   Redesigned Elements: Single Content Hero, Compact People Row, Senior Action Bar
+   ========================================================================= */
+
+/* Hero Card Single Content */
+.jt-pinned-hero-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.jt-pinned-hero-card__main-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.jt-pinned-hero-card__text {
+  font-size: 16px;
+  line-height: 1.5;
+  color: #0f172a;
+  font-weight: 600;
+  flex: 1;
+  word-break: break-word;
+  letter-spacing: -0.01em;
+}
+
+.jt-pinned-hero-card--collapsed .jt-pinned-hero-card__text {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-size: 15px;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+/* Person Section (Thành phần & Người theo dõi) */
+.jt-person-sec-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.jt-person-sec-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.jt-person-sec-count {
+  font-size: 12px;
+  font-weight: 500;
+  color: #94a3b8;
+}
+
+.jt-person-avatar-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.jt-person-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px 4px 6px;
+  background: #f1f5f9;
+  border: none;
+  border-radius: 14px;
+  font-size: 13px;
+  color: #1e293b;
+  line-height: 1;
+}
+
+.jt-person-chip__avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #e0e7ff;
+  color: #4338ca;
+  font-size: 11px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.jt-person-chip__name {
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.jt-person-chip__me-tag {
+  display: inline-block;
+  padding: 0 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #2563eb;
+  background: #eff6ff;
+  border-radius: 3px;
+}
+
+.jt-person-chip__remove-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  margin-left: 2px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: #94a3b8;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  line-height: 1;
+}
+
+.jt-person-chip__remove-btn:hover {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.jt-action-btn--unfollow-subtle {
+  border-color: #fecdd3 !important;
+  color: #e11d48 !important;
+  background-color: #fff1f2 !important;
+  font-weight: 500;
+}
+
+.jt-action-btn--unfollow-subtle:hover {
+  border-color: #fda4af !important;
+  color: #be123c !important;
+  background-color: #ffe4e6 !important;
+}
+
+.jt-person-add-tag-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 28px;
+  padding: 0 10px 0 8px;
+  background: #f8fafc;
+  border: 1px solid transparent;
+  border-radius: 14px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #475467;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  user-select: none;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+.jt-person-add-tag-chip:hover {
+  background: #fef2f2;
+  border-color: #fca5a5;
+  color: #d92d20;
+}
+
+.jt-person-add-tag-chip svg {
+  color: #64748b;
+  flex-shrink: 0;
+  transition: color 0.15s ease;
+}
+
+.jt-person-add-tag-chip:hover svg {
+  color: #d92d20;
+}
+
+.jt-person-add-btn,
+.jt-person-add-inline-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+  min-height: 24px;
+  max-width: 24px;
+  max-height: 24px;
+  aspect-ratio: 1 / 1;
+  padding: 0;
+  margin: 0;
+  border-radius: 9999px !important;
+  border: 1px solid #cbd5e1 !important;
+  background: #ffffff;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  line-height: 1;
+  outline: none;
+  overflow: hidden;
+}
+
+.jt-person-add-btn:hover,
+.jt-person-add-inline-btn:hover {
+  background: #f1f5f9;
+  border-color: #94a3b8 !important;
+  color: #0f172a;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.jt-person-add-btn:active,
+.jt-person-add-inline-btn:active {
+  transform: scale(0.95);
+}
+
+.jt-person-empty-text {
+  font-size: 12px;
+  color: #94a3b8;
+  font-style: normal;
+  line-height: 20px;
+}
+
+/* =========================================================================
+   Senior Modern Action Buttons (Duyệt, Không duyệt, Lấy ý kiến, Hoàn thành)
+   ========================================================================= */
+/* Nút Duyệt phiếu (Emerald Green thanh lịch, sang trọng) */
+.jt-action-btn--approve-modern {
+  width: 100% !important;
+  height: 36px !important;
+  background-color: #059669 !important;
+  border-color: #059669 !important;
+  color: #ffffff !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  border-radius: 7px !important;
+  box-shadow: 0 1px 2px rgba(5, 150, 105, 0.2) !important;
+  transition: all 0.15s ease !important;
+}
+
+.jt-action-btn--approve-modern:hover {
+  background-color: #047857 !important;
+  border-color: #047857 !important;
+  box-shadow: 0 2px 4px rgba(4, 120, 87, 0.25) !important;
+}
+
+/* Nút Hoàn thành */
+.jt-action-btn--complete-modern {
+  width: 100% !important;
+  height: 36px !important;
+  background-color: #059669 !important;
+  border-color: #059669 !important;
+  color: #ffffff !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  border-radius: 7px !important;
+  box-shadow: 0 1px 2px rgba(5, 150, 105, 0.2) !important;
+}
+
+.jt-action-btn--complete-modern:hover {
+  background-color: #047857 !important;
+  border-color: #047857 !important;
+}
+
+/* Nút Gửi phản hồi ý kiến */
+.jt-action-btn--consult-reply-modern {
+  width: 100% !important;
+  height: 32px !important;
+  background-color: #2563eb !important;
+  border-color: #2563eb !important;
+  color: #ffffff !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  border-radius: 7px !important;
+}
+
+.jt-action-btn--consult-reply-modern:hover {
+  background-color: #1d4ed8 !important;
+  border-color: #1d4ed8 !important;
+}
+
+/* Nút Không duyệt (Neutral soft, hover cảnh báo nhẹ nhàng) */
+.jt-action-btn--reject-subtle {
+  height: 34px !important;
+  background-color: #fef3f2 !important;
+  border: 1px solid #fecdca !important;
+  color: #b42318 !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  border-radius: 7px !important;
+  transition: all 0.15s ease !important;
+}
+
+.jt-action-btn--reject-subtle:hover {
+  background-color: #fee4e2 !important;
+  border-color: #fecaca !important;
+  color: #b91c1c !important;
+}
+
+/* Nút Lấy ý kiến (Neutral soft nhã nhặn) */
+.jt-action-btn--consult-subtle {
+  height: 34px !important;
+  background-color: #f8fafc !important;
+  border: 1px solid #e2e8f0 !important;
+  color: #334155 !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  border-radius: 7px !important;
+  transition: all 0.15s ease !important;
+}
+
+.jt-action-btn--consult-subtle:hover {
+  background-color: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+}
+
+
+/* ==========================================================================
+   ENHANCED HEADER & WORKFLOW PROCESS STYLING
+   ========================================================================== */
+
+/* Nút Quay lại tại Header */
+.jt-header-back-action-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  height: 32px !important;
+  padding: 0 10px !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  color: #344054 !important;
+  border-radius: 6px !important;
+  border: 1px solid #e4e7ec !important;
+  background: #ffffff !important;
+  transition: all 0.15s ease !important;
+  flex-shrink: 0;
+}
+
+.jt-header-back-action-btn:hover {
+  background: #f8fafc !important;
+  border-color: #d0d5dd !important;
+  color: #1d2939 !important;
+}
+
+/* Dấu phân cách divider trên header */
+.jt-header-divider {
+  display: inline-block;
+  width: 1px;
+  height: 18px;
+  background: #e4e7ec;
+  margin: 0 4px;
+  flex-shrink: 0;
+}
+
+/* Cụm Tags phân cấp ở Header */
+.jt-header-tags-cluster {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.jt-header-tag {
+  display: inline-flex !important;
+  align-items: center !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  padding: 1px 8px !important;
+  border-radius: 4px !important;
+  margin: 0 !important;
+  line-height: 1.4 !important;
+}
+
+.jt-header-tag--category {
+  font-weight: 600 !important;
+}
+
+.jt-header-tag--role {
+  font-weight: 600 !important;
+}
+
+.jt-header-tag--watcher {
+  font-weight: 500 !important;
+}
+
+.jt-header-tag--adjusted {
+  font-weight: 600 !important;
+}
+
+/* Nút Thu gọn / Mở rộng Sidebar tại Header */
+.jt-panel-toggle-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  height: 32px !important;
+  padding: 0 10px !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  color: #344054 !important;
+  border: 1px solid #e4e7ec !important;
+  border-radius: 6px !important;
+  background: #ffffff !important;
+  transition: all 0.15s ease !important;
+}
+
+.jt-panel-toggle-btn:hover {
+  background: #f8fafc !important;
+  border-color: #d0d5dd !important;
+  color: #1d2939 !important;
+}
+
+.jt-panel-toggle-btn[aria-expanded="false"] {
+  background: #f0fdf4 !important;
+  border-color: #a7f3d0 !important;
+  color: #047857 !important;
+}
+
+/* Header thanh mảnh cho Sidebar cột phải */
+.jt-sidebar-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  border-bottom: 1px solid #f1f5f9;
+  background: #fcfcfd;
+  flex-shrink: 0;
+}
+
+.jt-sidebar-title-text {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #64748b;
+}
+
+.jt-sidebar-quick-collapse-btn {
+  color: #64748b !important;
+  padding: 0 4px !important;
+  height: 26px !important;
+  width: 26px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.jt-sidebar-quick-collapse-btn:hover {
+  color: #1d2939 !important;
+  background: #f1f5f9 !important;
+}
+
+/* Tinh chỉnh Quy trình: Rail & Markers ngữ nghĩa chuẩn xác */
+.jt-doc-step__rail span.is-done {
+  border-color: #10b981 !important;
+  background: #10b981 !important;
+  box-shadow: inset 0 0 0 3px #ffffff !important;
+}
+
+.jt-doc-step__rail span.is-active {
+  border-color: #2563eb !important;
+  background: #2563eb !important;
+  box-shadow: inset 0 0 0 3px #ffffff !important;
+}
+
+.jt-doc-step__rail span.is-rejected {
+  border-color: #ef4444 !important;
+  background: #ef4444 !important;
+  box-shadow: inset 0 0 0 3px #ffffff !important;
+}
+
+/* Tinh chỉnh danh sách người thực hiện: Flat, clean, không viền hộp chồng viền hộp */
+.jt-step-person-row {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 6px 8px !important;
+  background: transparent !important;
+  border: none !important;
+  border-bottom: 1px solid #f8fafc !important;
+  border-radius: 4px !important;
+  font-size: 12px !important;
+  transition: background 0.15s ease !important;
+}
+
+.jt-step-person-row:hover {
+  background: #f8fafc !important;
+}
+
+.jt-step-person-row:last-child {
+  border-bottom: none !important;
+}
+
+.jt-step-person-row.jt-step-person-row--workflow-action {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+}
+
+.jt-step-person-row .jt-workflow-status {
+  flex-shrink: 0;
+  margin-inline-end: 0;
+}
+
+.jt-step-person-row--workflow-action .jt-workflow-status {
+  grid-column: 2;
+  grid-row: 1;
+  justify-self: end;
+}
+
+.jt-step-person-row--workflow-action .jt-workflow-actions {
+  grid-column: 1 / -1;
+  grid-row: 2;
+}
+
+.jt-workflow-actions {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.jt-workflow-actions .ant-btn {
+  width: auto !important;
+  height: 32px !important;
+  padding-inline: 8px;
+  font-size: 14px !important;
+  box-shadow: none;
+}
+.jt-workflow-actions[role="group"] {
+  overflow-x: auto;
+}
+
+.jt-workflow-actions[role="group"] .ant-btn {
+  flex-shrink: 0;
+}
+.jt-approver-consultations {
+  margin: 4px 8px 12px 24px;
+  padding: 8px 12px;
+  background: #f9fafb;
+  border-radius: 6px;
+}
+
+.jt-approver-consultations > .jt-step-subheading {
+  margin: 0 0 4px;
+  color: #475467;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.jt-approver-consultations .jt-step-person-row {
+  padding-inline: 0 !important;
+  border-bottom-color: #eaecf0 !important;
+}
+.jt-consultation-reply {
+  width: calc(100% - 21px);
+  max-width: none;
+  margin: 8px 0 8px 21px;
+}
+/* Nhánh tham vấn trong quy trình, mỗi đường ngang nối tới một người được hỏi. */
+.jt-consultation-node {
+  display: flow-root;
+  position: relative;
+  padding-inline-start: 16px;
+}
+
+.jt-consultation-node::before,
+.jt-consultation-node::after {
+  position: absolute;
+  inset-inline-start: 4px;
+  background: #d0d5dd;
+  content: "";
+  pointer-events: none;
+}
+
+.jt-consultation-node::before {
+  inset-block: 0;
+  width: 1px;
+}
+
+.jt-consultation-node:last-child::before {
+  inset-block-end: auto;
+  height: 16px;
+}
+
+.jt-consultation-node::after {
+  inset-block-start: 16px;
+  width: 12px;
+  height: 1px;
+}
+.jt-consultation-node .jt-step-person-left {
+  align-items: flex-start;
+}
+
+.jt-consultation-node .jt-step-person-left > svg {
+  flex-shrink: 0;
+  margin-block-start: 3px;
+}
+
+.jt-consultation-identity {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.jt-consultation-identity .jt-step-person-name {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.jt-consultation-identity .jt-step-person-time {
+  margin-inline-start: 0;
+  padding-inline-end: 0;
+}
+.jt-consultation-node .jt-step-person-row {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 4px 8px;
+}
+
+.jt-consultation-node .jt-step-person-left {
+  grid-column: 1 / -1;
+  grid-row: 1;
+}
+
+.jt-consultation-node .jt-consultation-time {
+  display: block;
+  margin: 0 0 8px 21px;
+  color: #64748b;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.jt-consultation-reply + .jt-consultation-time {
+  margin-block-start: -4px;
+}
+
+.jt-consultation-node .jt-step-person-row--workflow-action .jt-step-person-left {
+  grid-column: 1;
+}
+
+.jt-consultation-node .jt-workflow-actions {
+  grid-column: 2;
+  grid-row: 1;
+  justify-self: end;
+}
+.jt-consultation-node .jt-consultation-status {
+  grid-column: 2;
+  grid-row: 1;
+  justify-self: end;
+}

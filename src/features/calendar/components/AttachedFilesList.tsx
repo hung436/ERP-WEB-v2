@@ -1,18 +1,81 @@
-import { Button, Tooltip, message } from 'antd';
+import React from 'react';
+import { Tooltip } from 'antd';
 import type { UploadFile } from 'antd/es/upload/interface';
+import {
+  FileText,
+  FileSpreadsheet,
+  Image as ImageIcon,
+  Paperclip,
+  Download,
+  X,
+} from 'lucide-react';
+
 import type { CalendarAttachment } from '@/types/calendar';
 
-export function getFileCategory(name: string) {
-  const ext = name.split('.').pop()?.toLowerCase() || '';
-  if (['pdf'].includes(ext)) return { type: 'pdf', icon: '📄', color: '#d92d20', bg: '#fef3f2', border: '#fecdca', label: 'PDF' };
-  if (['doc', 'docx'].includes(ext)) return { type: 'doc', icon: '📝', color: '#1570ef', bg: '#eff8ff', border: '#b2ddff', label: 'DOCX' };
-  if (['xls', 'xlsx'].includes(ext)) return { type: 'xls', icon: '📊', color: '#079455', bg: '#edfcf2', border: '#abefc6', label: 'XLSX' };
-  if (['png', 'jpg', 'jpeg', 'svg', 'webp'].includes(ext)) return { type: 'img', icon: '🖼️', color: '#0694a2', bg: '#f0fdfa', border: '#99f6e4', label: 'IMG' };
-  if (['html', 'htm'].includes(ext)) return { type: 'html', icon: '🌐', color: '#7f56d9', bg: '#f4f3ff', border: '#d6bbffb', label: 'HTML' };
-  return { type: 'file', icon: '📁', color: '#475569', bg: '#f8fafc', border: '#e2e8f0', label: 'FILE' };
+import { canDownloadAttachment, downloadAttachment } from '../attachmentUtils';
+
+export interface FileCategoryMeta {
+  type: string;
+  color: string;
+  bg: string;
+  border: string;
+  label: string;
+  icon: React.ReactNode;
 }
 
-export function formatBytes(bytes?: number) {
+export function getFileCategory(name: string): FileCategoryMeta {
+  const ext = name.split('.').pop()?.toLowerCase() || '';
+  if (['pdf'].includes(ext)) {
+    return {
+      type: 'pdf',
+      color: '#d92d20',
+      bg: '#fef3f2',
+      border: '#fecdca',
+      label: 'PDF',
+      icon: <FileText size={13} strokeWidth={2.2} />,
+    };
+  }
+  if (['doc', 'docx'].includes(ext)) {
+    return {
+      type: 'doc',
+      color: '#1570ef',
+      bg: '#eff8ff',
+      border: '#b2ddff',
+      label: 'DOCX',
+      icon: <FileText size={13} strokeWidth={2.2} />,
+    };
+  }
+  if (['xls', 'xlsx', 'csv'].includes(ext)) {
+    return {
+      type: 'xls',
+      color: '#079455',
+      bg: '#edfcf2',
+      border: '#abefc6',
+      label: 'XLSX',
+      icon: <FileSpreadsheet size={13} strokeWidth={2.2} />,
+    };
+  }
+  if (['png', 'jpg', 'jpeg', 'svg', 'webp'].includes(ext)) {
+    return {
+      type: 'img',
+      color: '#0694a2',
+      bg: '#f0fdfa',
+      border: '#99f6e4',
+      label: 'IMG',
+      icon: <ImageIcon size={13} strokeWidth={2.2} />,
+    };
+  }
+  return {
+    type: 'file',
+    color: '#475569',
+    bg: '#f8fafc',
+    border: '#e2e8f0',
+    label: ext ? ext.toUpperCase() : 'FILE',
+    icon: <Paperclip size={13} strokeWidth={2.2} />,
+  };
+}
+
+export function formatBytes(bytes?: number): string {
   if (!bytes) return 'N/A';
   if (bytes < 1024) return `${bytes} B`;
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
@@ -36,28 +99,28 @@ export function AttachedFilesGrid({
           <div className="custom-file-card-item" key={file.uid || file.name}>
             <div
               className="file-badge-type"
-              style={{ background: cat.bg, color: cat.color, borderColor: cat.border }}
+              style={{ background: cat.bg, color: cat.color }}
+              title={cat.label}
             >
-              <span className="badge-icon">{cat.icon}</span>
-              <small className="badge-label">{cat.label}</small>
+              {cat.icon}
             </div>
 
             <div className="file-card-details">
               <Tooltip title={file.name}>
-                <strong className="file-card-name">{file.name}</strong>
+                <span className="file-card-name">{file.name}</span>
               </Tooltip>
               <span className="file-card-size">{formatBytes(file.size)}</span>
             </div>
 
-            <Button
+            <button
+              type="button"
               className="btn-remove-file-card"
               onClick={() => onRemove(file.uid)}
-              size="small"
               title="Gỡ tệp này"
-              type="text"
+              aria-label={`Xóa tệp ${file.name}`}
             >
-              ✕
-            </Button>
+              <X size={12} strokeWidth={2.5} />
+            </button>
           </div>
         );
       })}
@@ -80,27 +143,29 @@ export function ReadonlyAttachmentsGrid({
           <div className="custom-file-card-item readonly-card" key={att.id}>
             <div
               className="file-badge-type"
-              style={{ background: cat.bg, color: cat.color, borderColor: cat.border }}
+              style={{ background: cat.bg, color: cat.color }}
+              title={cat.label}
             >
-              <span className="badge-icon">{cat.icon}</span>
-              <small className="badge-label">{cat.label}</small>
+              {cat.icon}
             </div>
 
             <div className="file-card-details">
               <Tooltip title={att.name}>
-                <strong className="file-card-name">{att.name}</strong>
+                <span className="file-card-name">{att.name}</span>
               </Tooltip>
               <span className="file-card-size">{formatBytes(att.size)}</span>
             </div>
 
-            <Button
+            <button
+              type="button"
               className="btn-download-file-card"
-              onClick={() => message.info(`Đang tải xuống tệp: ${att.name}`)}
-              size="small"
-              type="link"
+              disabled={!canDownloadAttachment(att.url)}
+              onClick={() => downloadAttachment(att)}
+              title={canDownloadAttachment(att.url) ? "Tải về" : "Tệp mẫu chưa có nội dung để tải"}
+              aria-label={`Tải về ${att.name}`}
             >
-              Tải về
-            </Button>
+              <Download size={13} strokeWidth={2} />
+            </button>
           </div>
         );
       })}

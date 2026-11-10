@@ -1,4 +1,7 @@
+import { canManagePersonalMeeting, isCalendarMeeting, matchesCalendarPerson } from '@/features/calendar/calendarMembership';
+import { getSessionToken } from '@/services/authSession';
 import { adminUser, announcements, calendarEvents, chatMembers, conversations, demoUser, directoryContacts, mails, messages, meetingEvents, tasks } from '@/mocks/fixtures';
+import { demoUsers, findDemoUserByUsername } from '@/mocks/usersFixtures';
 import { cloudRecords, evaluationRecords, expertRecords, libraryRecords, meetingRecords, requestRecords } from '@/mocks/extendedFixtures';
 import { documentSubmissions, documentTemplates } from '@/mocks/documentFixtures';
 import { followerOptions, workTicketSubmissions, workTicketTemplates } from '@/mocks/workTicketFixtures';
@@ -6,6 +9,8 @@ import { evaluationPeriods, evaluationSheets } from '@/mocks/evaluationFixtures'
 import evaluationPersonnelRows from '@/mocks/evaluationPersonnelFixtures.json';
 import { initialChangeRequests, initialPersonnelList, initialPositionTitles, initialResignedEmployees, initialSpecialties, initialUnitPositionMappings, initialWorkUnits, personalProfile } from '@/mocks/personnelFixtures';
 import { initialCalendarNotifications, initialRecipientGroups } from '@/mocks/calendarNotificationFixtures';
+import dayjs from 'dayjs';
+import { getEventsForWeek } from '@/features/calendar/mockCalendarData';
 import type { Announcement, ApiResponse, ApiState, CalendarAttachmentItem, CalendarEvent, ChatAttachment, ChatConversation, ChatMessage, CustomDocumentTemplateItem, DashboardSummary, DirectoryContact, DocumentSubmission, DocumentWorkflowStep, MailComposePayload, MailItem, MailReply, MeetingEvent, Task, User, WorkTicketAttachment, WorkTicketFollower, WorkTicketSubmission } from '@/types/domain';
 import type { CalendarNotificationItem, CalendarRecipientGroup, CreateCalendarNotificationPayload, CreateRecipientGroupPayload } from '@/types/calendar';
 import type { EvaluationSheet, EvaluationSummary } from '@/types/evaluation';
@@ -16,10 +21,40 @@ let chatConversationStore: ChatConversation[] = conversations.map((item) => ({ .
 let chatMessageStore: ChatMessage[] = [...messages];
 let chatSequence = 100;
 let meetingEventStore: MeetingEvent[] = meetingEvents.map((item) => ({ ...item, responseStatus: item.responseStatus ?? 'pending' }));
+const calendarEventsKey = 'jt_calendar_events_v9';
+const calendarDeletedKey = 'jt_calendar_deleted_ids_v8';
+const calendarNotificationsKey = 'erp:calendar-notifications';
+const calendarGroupsKey = 'erp:calendar-groups';
+
+function readCalendarData<T>(key: string, fallback: T): T {
+  if (typeof window === 'undefined') return fallback;
+  try {
+    const saved = window.localStorage.getItem(key);
+    return saved ? JSON.parse(saved) as T : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+function writeCalendarData<T>(key: string, data: T): T {
+  if (typeof window !== 'undefined') {
+    window.localStorage.setItem(key, JSON.stringify(data));
+  }
+  return data;
+}
+
+function saveCalendarEvent(event: CalendarEvent): CalendarEvent {
+  const saved = readCalendarData<CalendarEvent[]>(calendarEventsKey, []);
+  writeCalendarData(calendarEventsKey, [event, ...saved.filter((item) => item.id !== event.id)]);
+  if (typeof window !== 'undefined') window.localStorage.removeItem(calendarDiscussionKey(event.id));
+  calendarEventStore = [event, ...calendarEventStore.filter((item) => item.id !== event.id)];
+  return event;
+}
+
 function getInitialCalendarEvents(): CalendarEvent[] {
   const base = calendarEvents.map((item) => ({ ...item, responseStatus: item.responseStatus ?? 'pending' }));
   try {
-    const saved = typeof window !== 'undefined' ? window.localStorage.getItem('jt_calendar_events_store') : null;
+    const saved = typeof window !== 'undefined' ? window.localStorage.getItem(calendarEventsKey) : null;
     if (saved) {
       const parsed = JSON.parse(saved);
       if (Array.isArray(parsed) && parsed.length > 0) {
@@ -35,6 +70,77 @@ function getInitialCalendarEvents(): CalendarEvent[] {
   return base;
 }
 let calendarEventStore: CalendarEvent[] = getInitialCalendarEvents();
+
+const calendarDiscussionKey = (id: string) => `erp:calendar-discussion:${id}`;
+
+function restoreCalendarDiscussion(event: CalendarEvent): CalendarEvent {
+  if (typeof window === 'undefined') return event;
+  try {
+    const saved = window.localStorage.getItem(calendarDiscussionKey(event.id));
+    if (!saved) return event;
+    const { comments, attachments } = JSON.parse(saved) as Pick<CalendarEvent, 'comments' | 'attachments'>;
+    return {
+      ...event,
+      comments: Array.from(new Map([...(comments ?? []), ...(event.comments ?? [])].map((item) => [item.id, item])).values()),
+      attachments: Array.from(new Map([...(attachments ?? []), ...(event.attachments ?? [])].map((item) => [item.id, item])).values()),
+    };
+  } catch {
+    return event;
+  }
+}
+
+function findCalendarEvent(id: string): CalendarEvent | undefined {
+  if (readCalendarData<string[]>(calendarDeletedKey, []).includes(id)) return undefined;
+  let event = calendarEventStore.find((item) => item.id === id);
+  if (event) return restoreCalendarDiscussion(event);
+
+  try {
+    // 1. Trích xuất ngày dạng YYYYMMDD nếu có trong ID (ví dụ: bbt-sat-0830-taphuan-20261107)
+    const dateMatch = id.match(/-(20\d{2})(\d{2})(\d{2})$/);
+    if (dateMatch) {
+      const targetDate = dayjs(`${dateMatch[1]}-${dateMatch[2]}-${dateMatch[3]}`);
+      if (targetDate.isValid()) {
+        const weekEvents = getEventsForWeek(targetDate.startOf('isoWeek'), calendarEventStore);
+        event = weekEvents.find((item) => item.id === id);
+        if (event) {
+          calendarEventStore = [...calendarEventStore, event];
+          return restoreCalendarDiscussion(event);
+        }
+      }
+    }
+
+    // 2. Tìm trong các tuần lân cận (hiện tại, trước, sau)
+    const now = dayjs();
+    for (const offset of [0, 1, -1, 2, -2, 3, 4, -3, -4]) {
+      const weekDate = now.add(offset, 'week').startOf('isoWeek');
+      const weekEvents = getEventsForWeek(weekDate, calendarEventStore);
+      event = weekEvents.find((item) => item.id === id);
+      if (event) {
+        calendarEventStore = [...calendarEventStore, event];
+        return restoreCalendarDiscussion(event);
+      }
+    }
+  } catch {
+    // ignore
+  }
+
+  return undefined;
+}
+
+export function saveCalendarDemoChanges(event: CalendarEvent, changes: Partial<CalendarEvent> = event): CalendarEvent {
+  if (readCalendarData<string[]>(calendarDeletedKey, []).includes(event.id)) {
+    throw new Error('Lịch này đã bị xóa.');
+  }
+  calendarEventStore = getInitialCalendarEvents();
+  const current = findCalendarEvent(event.id) ?? event;
+  const meetingContentKeys = ['title', 'notes', 'description', 'agenda', 'location', 'meetingUrl', 'startAt', 'endAt', 'mode', 'organizer', 'organizerId'];
+  if (isCalendarMeeting(current) && meetingContentKeys.some((key) => Object.prototype.hasOwnProperty.call(changes, key)) &&
+    !canManagePersonalMeeting(current, activeUser)) {
+    throw new Error('Chỉ người tạo mới có thể chỉnh sửa lịch họp cá nhân.');
+  }
+  return saveCalendarEvent({ ...current, ...changes, organizer: current.organizer, organizerId: current.organizerId });
+}
+
 let calendarNotificationStore: CalendarNotificationItem[] = [...initialCalendarNotifications];
 let recipientGroupStore: CalendarRecipientGroup[] = [...initialRecipientGroups];
 let mailStore: MailItem[] = mails.map((item) => ({ ...item }));
@@ -222,20 +328,51 @@ export async function mockRequest<T>(path: string, options?: { method?: string; 
   await wait(import.meta.env.MODE === 'test' ? (state === 'loading' ? 120 : 0) : state === 'loading' ? 900 : 80);
   if (state === 'error') throw new Error('Không thể tải dữ liệu. Vui lòng thử lại.');
 
+  if (pathname.startsWith('/api/calendar/events')) {
+    calendarEventStore = getInitialCalendarEvents();
+  } else if (pathname.startsWith('/api/calendar/notifications')) {
+    calendarNotificationStore = readCalendarData(calendarNotificationsKey, [...initialCalendarNotifications]);
+  } else if (pathname.startsWith('/api/calendar/groups')) {
+    recipientGroupStore = readCalendarData(calendarGroupsKey, [...initialRecipientGroups]);
+  }
+
   let data: unknown;
 
   if (pathname === '/api/auth/login' && options?.method === 'POST') {
     const credentials = options.body as { username?: string; password?: string };
-    if (credentials.username === 'admin' && (credentials.password === '123456' || credentials.password === 'admin123')) {
-      activeUser = adminUser;
-      data = { token: 'mock-admin-token', user: adminUser };
-    } else if (credentials.username === 'nhanvien' && credentials.password === '123456') {
-      activeUser = demoUser;
-      data = { token: 'mock-token', user: demoUser };
+    const user = findDemoUserByUsername(credentials.username || '');
+    if (
+      user &&
+      (credentials.password === '123456' || (user.role === 'admin' && credentials.password === 'admin123'))
+    ) {
+      activeUser = user;
+      const token =
+        user.id === 'user-admin'
+          ? 'mock-admin-token'
+          : user.id === 'user-001'
+            ? 'mock-token'
+            : `mock-token-${user.id}`;
+      data = { token, user };
     } else {
       throw new Error('Tên đăng nhập hoặc mật khẩu không đúng.');
     }
   } else if (pathname === '/api/auth/me') {
+    const sessionToken = typeof window !== 'undefined' ? getSessionToken() : null;
+    if (sessionToken === 'mock-admin-token') {
+      activeUser = adminUser;
+    } else if (sessionToken === 'mock-token') {
+      activeUser = demoUser;
+    } else if (sessionToken?.startsWith('mock-token-')) {
+      const userId = sessionToken.replace('mock-token-', '');
+      const found = demoUsers.find((u) => u.id === userId);
+      if (found) {
+        activeUser = found;
+      } else {
+        throw new Error('Phiên đăng nhập không hợp lệ. Vui lòng đăng nhập lại.');
+      }
+    } else {
+      throw new Error('Phiên đăng nhập không hợp lệ. Vui lòng đăng nhập lại.');
+    }
     data = activeUser;
   } else if (pathname === '/api/auth/logout') {
     activeUser = demoUser;
@@ -306,37 +443,44 @@ export async function mockRequest<T>(path: string, options?: { method?: string; 
   else if (pathname === '/api/calendar/events') {
     if (options?.method === 'POST') {
       const body = options.body as Partial<CalendarEvent>;
+      const isTask = body.ticketType === 'TASK';
+      const isEvent = body.ticketType === 'EVENT';
+      const isMeeting = !isTask && !isEvent;
       const meetingCode = `${Math.floor(100 + Math.random() * 900)}-${Math.floor(100 + Math.random() * 900)}`;
       const newEvent: CalendarEvent = {
         ...body,
         id: body.id || `event-${Date.now()}`,
-        title: body.title ?? 'Cuộc họp trực tuyến mới',
+        title: body.title ?? (isTask ? 'Phiếu công việc mới' : isEvent ? 'Sự kiện mới' : 'Cuộc họp trực tuyến mới'),
         startAt: body.startAt ?? new Date().toISOString(),
         endAt: body.endAt ?? new Date(Date.now() + 3600000).toISOString(),
-        location: body.location ?? 'https://meeting.tuoitre.vn/room-123',
-        meetingUrl: body.meetingUrl ?? `https://meeting.tuoitre.vn/phong-${meetingCode}`,
-        type: body.type ?? 'meeting',
+        location: isTask ? '' : (body.location ?? (isMeeting ? 'https://meeting.tuoitre.vn/room-123' : '')),
+        meetingUrl: isMeeting && body.mode !== 'offline' ? (body.meetingUrl ?? `https://meeting.tuoitre.vn/phong-${meetingCode}`) : undefined,
+        type: body.type ?? (isTask ? 'work' : isEvent ? 'event' : 'meeting'),
         scope: body.scope ?? 'personal',
         organizer: activeUser.fullName,
-        leader: body.leader ?? activeUser.fullName,
+        organizerId: activeUser.id,
+        leader: isMeeting ? (body.leader ?? activeUser.fullName) : undefined,
         responseStatus: 'accepted',
-        meetingId: `TT-${meetingCode}`,
-        platform: body.platform ?? 'meeting.tuoitre.vn',
-        agenda: body.agenda ?? 'Trao đổi nội dung công việc trực tuyến',
+        meetingId: isMeeting ? `TT-${meetingCode}` : undefined,
+        platform: isMeeting && body.mode !== 'offline' ? (body.platform ?? 'meeting.tuoitre.vn') : undefined,
+        agenda: body.agenda ?? (isTask ? 'Nội dung công việc' : 'Trao đổi nội dung công việc trực tuyến'),
         notes: body.notes,
-        participantText: body.participantText ?? (body.participants?.join(', ') || activeUser.fullName),
-        participants: body.participants?.length ? body.participants : [activeUser.fullName],
-        participantCount: body.participantCount ?? (body.participants?.length || 1),
+        ticketType: body.ticketType ?? 'MEETING',
+        participantText: body.participantText ?? (body.participants?.join(', ') ?? ''),
+        participants: body.participants ?? [],
+        participantCount: body.participantCount ?? (body.participants?.length ?? 0),
         isUserParticipant: true,
         attachments: body.attachments ?? [],
         comments: body.comments ?? [],
       };
-      calendarEventStore = [newEvent, ...calendarEventStore];
+      saveCalendarEvent(newEvent);
       data = newEvent;
     } else {
       const scopeFilter = url.searchParams.get('scope');
       const typeFilter = url.searchParams.get('type');
+      const deleted = new Set(readCalendarData<string[]>(calendarDeletedKey, []));
       data = calendarEventStore.filter((item) => {
+        if (deleted.has(item.id)) return false;
         if (scopeFilter && item.scope !== scopeFilter) return false;
         if (typeFilter && item.type !== typeFilter) return false;
         return true;
@@ -346,16 +490,16 @@ export async function mockRequest<T>(path: string, options?: { method?: string; 
   else if (/^\/api\/calendar\/events\/[^/]+\/respond$/.test(pathname) && options?.method === 'POST') {
     const eventId = pathname.split('/')[4];
     const body = options.body as { responseStatus?: CalendarEvent['responseStatus'] };
-    const event = calendarEventStore.find((item) => item.id === eventId);
+    const event = findCalendarEvent(eventId);
     if (!event || !body.responseStatus) throw new Error('Không thể cập nhật phản hồi lịch.');
     const updated = { ...event, responseStatus: body.responseStatus };
-    calendarEventStore = calendarEventStore.map((item) => item.id === eventId ? updated : item);
+    saveCalendarEvent(updated);
     data = updated;
   }
   else if (/^\/api\/calendar\/events\/[^/]+\/comments$/.test(pathname) && options?.method === 'POST') {
     const eventId = pathname.split('/')[4];
     const body = options.body as { content: string; attachments?: CalendarAttachmentItem[] };
-    const event = calendarEventStore.find((item) => item.id === eventId);
+    const event = findCalendarEvent(eventId);
     if (!event) throw new Error('Không tìm thấy sự kiện để bình luận.');
     const newComment = {
       id: `cmt-${Date.now()}`,
@@ -366,40 +510,57 @@ export async function mockRequest<T>(path: string, options?: { method?: string; 
     };
     const updated: CalendarEvent = {
       ...event,
+      meetingUrl: (event.ticketType === 'TASK' || event.ticketType === 'EVENT') ? undefined : event.meetingUrl,
+      leader: (event.ticketType === 'TASK' || event.ticketType === 'EVENT') ? undefined : event.leader,
       comments: [...(event.comments || []), newComment],
       attachments: body.attachments
         ? [...(event.attachments || []), ...body.attachments]
         : event.attachments,
     };
-    calendarEventStore = calendarEventStore.map((item) => item.id === eventId ? updated : item);
+    saveCalendarEvent(updated);
     data = updated;
   }
   else if (/^\/api\/calendar\/events\/[^/]+\/attachments$/.test(pathname) && options?.method === 'POST') {
     const eventId = pathname.split('/')[4];
     const body = options.body as { attachment: CalendarAttachmentItem };
-    const event = calendarEventStore.find((item) => item.id === eventId);
+    const event = findCalendarEvent(eventId);
     if (!event) throw new Error('Không tìm thấy sự kiện để thêm tệp đính kèm.');
     const updated: CalendarEvent = {
       ...event,
       attachments: [...(event.attachments || []), body.attachment],
     };
-    calendarEventStore = calendarEventStore.map((item) => item.id === eventId ? updated : item);
+    saveCalendarEvent(updated);
     data = updated;
   }
   else if (/^\/api\/calendar\/events\/[^/]+$/.test(pathname)) {
     const id = pathname.split('/')[4];
     if (options?.method === 'DELETE') {
+      const existing = findCalendarEvent(id);
+      if (!existing) throw new Error('Không tìm thấy sự kiện');
+      if (isCalendarMeeting(existing) && !canManagePersonalMeeting(existing, activeUser)) {
+        throw new Error('Chỉ người tạo mới có thể xóa lịch họp cá nhân.');
+      }
+      const deleted = readCalendarData<string[]>(calendarDeletedKey, []);
+      writeCalendarData(calendarDeletedKey, [...new Set([...deleted, id])]);
       calendarEventStore = calendarEventStore.filter((item) => item.id !== id);
       data = { success: true };
     } else if (options?.method === 'PUT' || options?.method === 'PATCH') {
       const body = options.body as Partial<CalendarEvent>;
-      const existing = calendarEventStore.find((item) => item.id === id);
+      const existing = findCalendarEvent(id);
       if (!existing) throw new Error('Không tìm thấy sự kiện');
-      const updated = { ...existing, ...body };
-      calendarEventStore = calendarEventStore.map((item) => item.id === id ? updated : item);
+      if (isCalendarMeeting(existing) && !canManagePersonalMeeting(existing, activeUser)) {
+        const approvalOnly = Object.keys(body).every((key) => ['approvalStatus', 'approvers', 'steps'].includes(key))
+          && (body.approvalStatus === 'APPROVED' || body.approvalStatus === 'REJECTED');
+        const assignedApprovers = existing.approvers?.length ? existing.approvers : existing.approver ? [existing.approver] : [];
+        if (!approvalOnly || !assignedApprovers.some((person) => matchesCalendarPerson(person, activeUser))) {
+          throw new Error('Chỉ người tạo mới có thể chỉnh sửa lịch họp cá nhân.');
+        }
+      }
+      const updated = { ...existing, ...body, organizer: existing.organizer, organizerId: existing.organizerId };
+      saveCalendarEvent(updated);
       data = updated;
     } else {
-      const event = calendarEventStore.find((item) => item.id === id);
+      const event = findCalendarEvent(id);
       if (!event) throw new Error('Không tìm thấy sự kiện');
       data = event;
     }
@@ -425,7 +586,7 @@ export async function mockRequest<T>(path: string, options?: { method?: string; 
         createdBy: activeUser.fullName,
         createdAt: nowIso,
       };
-      calendarNotificationStore = [newNotif, ...calendarNotificationStore];
+      calendarNotificationStore = writeCalendarData(calendarNotificationsKey, [newNotif, ...calendarNotificationStore]);
       data = newNotif;
     } else {
       const search = (url.searchParams.get('search') ?? '').trim().toLowerCase();
@@ -445,14 +606,14 @@ export async function mockRequest<T>(path: string, options?: { method?: string; 
   else if (/^\/api\/calendar\/notifications\/[^/]+$/.test(pathname)) {
     const id = pathname.split('/')[4];
     if (options?.method === 'DELETE') {
-      calendarNotificationStore = calendarNotificationStore.filter((item) => item.id !== id);
+      calendarNotificationStore = writeCalendarData(calendarNotificationsKey, calendarNotificationStore.filter((item) => item.id !== id));
       data = { success: true };
     } else if (options?.method === 'PUT' || options?.method === 'PATCH') {
       const body = options.body as Partial<CalendarNotificationItem>;
       const existing = calendarNotificationStore.find((item) => item.id === id);
       if (!existing) throw new Error('Không tìm thấy thông báo');
       const updated = { ...existing, ...body };
-      calendarNotificationStore = calendarNotificationStore.map((item) => item.id === id ? updated : item);
+      calendarNotificationStore = writeCalendarData(calendarNotificationsKey, calendarNotificationStore.map((item) => item.id === id ? updated : item));
       data = updated;
     } else {
       const notif = calendarNotificationStore.find((item) => item.id === id);
@@ -469,7 +630,7 @@ export async function mockRequest<T>(path: string, options?: { method?: string; 
       status: 'sent',
       sentAt: new Date().toISOString(),
     };
-    calendarNotificationStore = calendarNotificationStore.map((item) => item.id === id ? updated : item);
+    calendarNotificationStore = writeCalendarData(calendarNotificationsKey, calendarNotificationStore.map((item) => item.id === id ? updated : item));
     data = updated;
   }
   else if (pathname === '/api/calendar/groups') {
@@ -483,7 +644,7 @@ export async function mockRequest<T>(path: string, options?: { method?: string; 
         status: payload.status ?? 'active',
         createdAt: new Date().toISOString(),
       };
-      recipientGroupStore = [newGroup, ...recipientGroupStore];
+      recipientGroupStore = writeCalendarData(calendarGroupsKey, [newGroup, ...recipientGroupStore]);
       data = newGroup;
     } else {
       const search = (url.searchParams.get('search') ?? '').trim().toLowerCase();
@@ -501,7 +662,7 @@ export async function mockRequest<T>(path: string, options?: { method?: string; 
   else if (/^\/api\/calendar\/groups\/[^/]+$/.test(pathname)) {
     const id = pathname.split('/')[4];
     if (options?.method === 'DELETE') {
-      recipientGroupStore = recipientGroupStore.filter((item) => item.id !== id);
+      recipientGroupStore = writeCalendarData(calendarGroupsKey, recipientGroupStore.filter((item) => item.id !== id));
       data = { success: true };
     } else if (options?.method === 'PUT' || options?.method === 'PATCH') {
       const body = options.body as Partial<CalendarRecipientGroup>;
@@ -512,7 +673,7 @@ export async function mockRequest<T>(path: string, options?: { method?: string; 
         ...body,
         updatedAt: new Date().toISOString(),
       };
-      recipientGroupStore = recipientGroupStore.map((item) => item.id === id ? updated : item);
+      recipientGroupStore = writeCalendarData(calendarGroupsKey, recipientGroupStore.map((item) => item.id === id ? updated : item));
       data = updated;
     } else {
       const group = recipientGroupStore.find((item) => item.id === id);
@@ -1354,7 +1515,7 @@ export async function mockRequest<T>(path: string, options?: { method?: string; 
   else if (pathname === '/api/evaluations') data = evaluationRecords;
   else if (pathname === '/api/evaluations/periods') data = evaluationPeriods;
   else if (pathname === '/api/evaluations/summary') {
-    const period = evaluationPeriods.find((item) => item.id === (url.searchParams.get('period') ?? '2026-q3')) ?? evaluationPeriods[0];
+    const period = evaluationPeriods.find((item) => item.id === (url.searchParams.get('period') ?? '2026-q4')) ?? evaluationPeriods[0];
     const sheets = evaluationSheetStore.filter((item) => item.periodId === period.id);
     data = { period, total: sheets.length, waitingForMe: sheets.filter((item) => item.status === 'waiting').length, inProgress: sheets.filter((item) => item.status === 'draft' || item.status === 'in_review').length, published: sheets.filter((item) => item.status === 'published').length } satisfies EvaluationSummary;
   }

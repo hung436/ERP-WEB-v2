@@ -1,64 +1,23 @@
-import { useEffect, useRef, useState } from 'react';
+import { getDayDutyInfo } from '../dutySchedule';
+import { memo, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import type { Dayjs } from 'dayjs';
-import { Button, Popover, Skeleton, message } from 'antd';
+import { Skeleton, message } from 'antd';
 import {
-  ClockCircleOutlined,
-  DownOutlined,
   EnvironmentOutlined,
-  EyeOutlined,
   RightOutlined,
+  StarFilled,
   StarOutlined,
-  TeamOutlined,
-  UserOutlined,
 } from '@ant-design/icons';
 
 import {
   dayNames,
   eventTime,
   getApprovalStatusMeta,
-  getTicketTypeMeta,
+  getCalendarStatusDotTone,
+  isPastEvent,
   positionEvents,
-  type DutyShiftData,
   type NormalizedMeetingEvent,
 } from '../calendarWeekUtils';
-
-import { ParticipantList } from './ParticipantList';
-
-export function DutyInfo({ duty, past = false }: { duty?: DutyShiftData; past?: boolean }) {
-  if (!duty) return <span className="booking-week-muted">Chưa có thông tin trực</span>;
-  const shifts = duty.shifts;
-  if (!shifts) return null;
-
-  const shiftList = Array.isArray(shifts)
-    ? shifts.map((s) => ({
-        label: s.name ? `${s.name}:` : '',
-        details: [
-          s.tkts ? `TKTS: ${s.tkts}` : '',
-          s.btv ? `BTV: ${s.btv}` : '',
-        ].filter(Boolean).join(' · '),
-      }))
-    : Object.entries(shifts).map(([key, value]) => {
-        const label = `${key.replace(/_/g, ' ').replace(/^ca/i, 'Ca')}:`;
-        const details =
-          typeof value === 'object' && value !== null
-            ? Object.entries(value)
-                .map(([role, names]) => `${role.toUpperCase()}: ${Array.isArray(names) ? names.join(', ') : names || '—'}`)
-                .join(' · ')
-            : String(value || '—');
-        return { label, details };
-      });
-
-  return (
-    <div className="booking-week-duty-details">
-      {duty.leader && <strong className={past ? 'booking-week-past-duty' : ''}>{duty.leader}</strong>}
-      {shiftList.map((item, idx) => (
-        <div key={idx} className={past ? 'booking-week-past-duty' : ''}>
-          <b>{item.label}</b> {item.details}
-        </div>
-      ))}
-    </div>
-  );
-}
 
 interface EventCardProps {
   event: NormalizedMeetingEvent;
@@ -67,238 +26,138 @@ interface EventCardProps {
   width?: number;
   upward?: boolean;
   onSelect: (event: NormalizedMeetingEvent) => void;
+  onToggleInterest?: (event: NormalizedMeetingEvent, nextState: boolean) => void;
   vertical?: boolean;
   compact?: boolean;
   expandLeft?: boolean;
   disabledHover?: boolean;
 }
 
-export function EventCard({
+export const EventCard = memo(function EventCard({
   event,
   now,
   left = 0,
   width = 10,
-  upward = false,
   onSelect,
+  onToggleInterest,
   vertical = false,
   compact = false,
-  expandLeft = false,
-  disabledHover = false,
 }: EventCardProps) {
-  const [expanded, setExpanded] = useState(false);
-  const [starred, setStarred] = useState(false);
-  const enterTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const leaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  useEffect(() => () => {
-    if (enterTimer.current) clearTimeout(enterTimer.current);
-    if (leaveTimer.current) clearTimeout(leaveTimer.current);
-  }, []);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [starred, setStarred] = useState(Boolean(event.isInterested));
 
   useEffect(() => {
-    if (disabledHover) {
-      if (enterTimer.current) clearTimeout(enterTimer.current);
-      if (leaveTimer.current) clearTimeout(leaveTimer.current);
-      enterTimer.current = null;
-      setExpanded(false);
-    }
-  }, [disabledHover]);
+    setStarred(Boolean(event.isInterested));
+  }, [event.isInterested]);
 
-  const enter = () => {
-    if (disabledHover) return;
-    if (leaveTimer.current) clearTimeout(leaveTimer.current);
-    if (!expanded && !enterTimer.current) {
-      enterTimer.current = setTimeout(() => {
-        enterTimer.current = null;
-        setExpanded(true);
-      }, 120);
-    }
-  };
+  const isEditorial = event.scope === 'editorial';
+  const isUserAttending = Boolean(event.isUserParticipant || event.isUserWatcher);
 
-  const leave = () => {
-    if (enterTimer.current) clearTimeout(enterTimer.current);
-    enterTimer.current = null;
-    leaveTimer.current = setTimeout(() => setExpanded(false), 100);
-  };
-
-  const badge = event.scope === 'personal' ? 'Cá nhân' : event.isUserParticipant ? 'Tham gia' : '';
-  const typeMeta = getTicketTypeMeta(event.ticketType);
-  const approvalMeta = getApprovalStatusMeta(event.approvalStatus);
+  const approvalMeta = getApprovalStatusMeta(event.approvalStatus, event.ticketType, event.workflowType);
   const typeKey = String(event.ticketType || 'MEETING').toLowerCase();
-  const statusKey = String(event.approvalStatus || 'APPROVED').toLowerCase();
-  const showExceptionStatus = statusKey !== 'approved' && statusKey !== 'completed';
-  const showMetaRow =
-    Boolean(event.location) ||
-    showExceptionStatus ||
-    Boolean(event.isAdjusted) ||
-    Boolean(event.continuesFromPreviousDay || event.continuesToNextDay);
-  const past = Boolean(
-    now &&
-      event.end &&
-      event.end.isBefore(now) &&
-      (event.start.isSame(now, 'isoWeek') || event.end.isSame(now, 'isoWeek'))
-  );
+  const statusDotTone = getCalendarStatusDotTone(event.approvalStatus, event.scope);
+
+  const past = isPastEvent(event, now);
+
+  const handleToggleStar = (e: React.MouseEvent | React.KeyboardEvent) => {
+    e.stopPropagation();
+    const nextState = !starred;
+    setStarred(nextState);
+    onToggleInterest?.(event, nextState);
+    if (nextState) {
+      message.success('Đã quan tâm');
+    } else {
+      message.info(`Đã hủy nhắc nhở lịch "${event.title}".`);
+    }
+  };
 
   return (
     <div
-      className={`booking-week-event booking-week-ticket-${typeKey} ${vertical ? 'booking-week-feed-card' : ''} ${
+      ref={cardRef}
+      className={`booking-week-event booking-week-flat-card booking-week-ticket-${typeKey} ${isUserAttending ? 'booking-week-attending' : 'booking-week-non-attending'} ${vertical ? 'booking-week-feed-card' : ''} ${
         compact ? 'booking-week-out-hours-card' : ''
-      } ${past ? 'booking-week-past-event' : ''} ${
-        event.scope === 'personal' ? 'booking-week-personal' : event.isUserParticipant ? 'booking-week-attending' : ''
-      } ${expanded ? 'booking-week-expanded' : ''} ${
-        expandLeft || left > 58 ? 'booking-week-expand-left' : ''
-      } ${upward ? 'booking-week-expand-up' : ''}`}
+      } ${past ? 'booking-week-past-event is-past-event' : ''}`}
       style={
         vertical || compact
-          ? undefined
+          ? { border: 'none' }
           : ({
+              border: 'none',
               left: `${left}%`,
-              width: `calc(${width}% - 4px)`,
+              width: `calc(${width}% - 2px)`,
               ['--booking-week-right']: `${100 - left - width}%`,
             } as React.CSSProperties)
       }
-      onMouseEnter={enter}
-      onMouseLeave={leave}
     >
       <button
         type="button"
         className="booking-week-card-button"
         aria-label={`${eventTime(event)} ${event.title}`}
-        onClick={() => {
-          if (enterTimer.current) clearTimeout(enterTimer.current);
-          enterTimer.current = null;
-          setExpanded(false);
-          onSelect(event);
-        }}
+        data-calendar-event={event.id}
+        onClick={() => onSelect(event)}
+        style={{ cursor: 'pointer', position: 'relative' }}
       >
+        {/* Chấm tròn vàng ở góc phải nếu lịch đã điều chỉnh (Task 7) */}
+        {isEditorial && event.isAdjusted && (
+          <span
+            className="booking-week-adjusted-dot"
+            title={event.adjustedNote ? `Đã điều chỉnh: ${event.adjustedNote}` : 'Lịch đã điều chỉnh'}
+          />
+        )}
+
         <div className="booking-week-card-top">
-          <span className="booking-week-card-time-group">
-            <span className={`booking-week-type-dot booking-week-dot-${typeKey}`} aria-hidden="true" />
-            <span className="booking-week-card-time">{eventTime(event)}</span>
-          </span>
-          <span className="booking-week-card-badges">
-            <span
-              role="button"
-              tabIndex={0}
-              className="booking-week-card-star"
-              aria-label="Quan tâm lịch họp"
-              title="Nhắc trước 15 phút"
-              onClick={(e) => {
-                e.stopPropagation();
-                setStarred(true);
-                message.success('Bạn sẽ được nhắc nhở trước 15 phút');
-              }}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  setStarred(true);
-                  message.success('Bạn sẽ được nhắc nhở trước 15 phút');
-                }
-              }}
-            >
-              <StarOutlined />
-              {starred && (
-                <span style={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clip: 'rect(0,0,0,0)' }}>
-                  Bạn sẽ được nhắc nhở trước 15 phút
-                </span>
-              )}
-            </span>
-            {typeKey !== 'meeting' && (
-              <span className={`booking-week-type-badge booking-week-type-${typeKey}`}>{typeMeta.label}</span>
+          <div className="booking-week-card-time-group" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            {/* Chấm tròn trạng thái trước giờ (Task 7) */}
+            {statusDotTone && (
+              <span
+                className={`booking-week-status-dot dot-${statusDotTone}`}
+                title={`Trạng thái: ${approvalMeta.label}`}
+              />
             )}
-            {badge && <span className="booking-week-badge">{badge}</span>}
-          </span>
+            <span
+              className={`booking-week-card-time ${isUserAttending ? 'is-attending-time' : ''}`}
+              title={eventTime(event)}
+              style={isUserAttending ? { color: '#D92D20', fontWeight: 600 } : { color: '#475467', fontWeight: 500 }}
+            >
+              {eventTime(event)}
+            </span>
+          </div>
+
         </div>
 
+        {(event.continuesFromPreviousDay || event.continuesToNextDay) && (
+          <small className="booking-week-continuation">
+            {event.continuesFromPreviousDay ? 'Tiếp tục từ ngày trước' : 'Kéo dài sang ngày sau'}
+          </small>
+        )}
+
+        {/* Tên sự kiện: Hiển thị đầy đủ, không cắt 3 chấm (Task 4) */}
         <div className="booking-week-card-title">{event.title}</div>
 
-        {showMetaRow && (
-          <div className="booking-week-card-meta-row">
-            {event.location && (
-              <span className="booking-week-card-loc" title={event.location}>
-                <EnvironmentOutlined className="booking-week-card-loc-icon" aria-hidden="true" />
-                <span>{event.location}</span>
-              </span>
-            )}
-            {showExceptionStatus && (
-              <span className={`booking-week-status-badge booking-week-status-${statusKey}`}>
-                {approvalMeta.label}
-              </span>
-            )}
-            {event.isAdjusted && <span className="booking-week-adjusted">Đã điều chỉnh</span>}
-            {(event.continuesFromPreviousDay || event.continuesToNextDay) && (
-              <small className="booking-week-continuation">
-                {event.continuesFromPreviousDay ? 'Tiếp tục' : 'Kéo dài'}
-              </small>
-            )}
-          </div>
-        )}
-      </button>
+        <div className="booking-week-card-meta-list">
+          {!(event.scope === 'personal' && event.ticketType === 'EVENT') && Boolean(event.location) && (
+            <div className="booking-week-card-location" title={event.location}>
+              <EnvironmentOutlined className="booking-week-card-loc-icon" aria-hidden="true" style={{ color: '#667085' }} />
+              <span>{event.location}</span>
+            </div>
+          )}
 
-      {expanded && !disabledHover && (
-        <div className="booking-week-card-expanded">
-          <div className="booking-week-card-expanded-badges">
-            <span className={`booking-week-type-badge booking-week-type-${typeKey}`}>{typeMeta.label}</span>
-            <span className={`booking-week-status-badge booking-week-status-${statusKey}`}>{approvalMeta.label}</span>
-            {badge && <span className="booking-week-badge">{badge}</span>}
-          </div>
-          <strong>{event.title}</strong>
-          <p>
-            <ClockCircleOutlined /> {eventTime(event)}
-          </p>
-          {(event.location || event.ticketType !== 'TASK') && (
-            <p>
-              <EnvironmentOutlined /> {event.location || 'Chưa có địa điểm'}
-            </p>
-          )}
-          {event.ticketType !== 'TASK' && (
-            <p>
-              <TeamOutlined />
-              <ParticipantList
-                text={
-                  event.participantText ||
-                  (event.participantCount ? `${event.participantCount} người tham gia · Xem trong chi tiết` : 'Chưa có thông tin thành phần')
-                }
-                scrollExpanded
-              />
-            </p>
-          )}
-          {event.ticketType !== 'MEETING' && event.executorText && (
-            <p>
-              <UserOutlined /> <span>Triển khai: {event.executorText}</span>
-            </p>
-          )}
-          {event.ticketType !== 'MEETING' && event.approver && (
-            <p>
-              <UserOutlined /> <span>Người duyệt: {event.approver.display_name || event.approver.name}</span>
-            </p>
-          )}
-          {event.ticketType !== 'MEETING' && event.watcherText && (
-            <p>
-              <EyeOutlined /> <span>Theo dõi: {event.watcherText}</span>
-            </p>
-          )}
-          <div className="booking-week-card-footer">
-            <span>{event.attachmentCount ?? event.attachments.length} tài liệu</span>
-            <Button
-              type="link"
-              size="small"
-              onClick={() => {
-                if (enterTimer.current) clearTimeout(enterTimer.current);
-                enterTimer.current = null;
-                setExpanded(false);
-                onSelect(event);
-              }}
-            >
-              Xem chi tiết <RightOutlined />
-            </Button>
-          </div>
         </div>
+      </button>
+      {isEditorial && !isUserAttending && !past && (
+        <button
+          type="button"
+          className={`booking-week-card-star ${starred ? 'is-interested' : ''}`}
+          aria-label="Quan tâm lịch họp"
+          aria-pressed={starred}
+          title={starred ? 'Bỏ quan tâm' : 'Quan tâm lịch họp'}
+          onClick={handleToggleStar}
+        >
+          {starred ? <StarFilled className="calendar-star-icon" /> : <StarOutlined className="calendar-star-icon" />}
+        </button>
       )}
     </div>
   );
-}
+});
 
 function OutHoursIcon({ late = false }: { late?: boolean }) {
   return (
@@ -331,6 +190,7 @@ function OutHoursSlot({
   now,
   loading = false,
   onSelectEvent,
+  onToggleInterest,
   disabledHover = false,
 }: {
   events: NormalizedMeetingEvent[];
@@ -339,6 +199,7 @@ function OutHoursSlot({
   now: Dayjs;
   loading?: boolean;
   onSelectEvent: (event: NormalizedMeetingEvent) => void;
+  onToggleInterest?: (event: NormalizedMeetingEvent, nextState: boolean) => void;
   disabledHover?: boolean;
 }) {
   return (
@@ -355,6 +216,7 @@ function OutHoursSlot({
             expandLeft={late}
             upward={upward}
             onSelect={onSelectEvent}
+            onToggleInterest={onToggleInterest}
             disabledHover={disabledHover}
           />
         ))
@@ -370,12 +232,12 @@ function OutHoursSlot({
 export interface WeekTimelineProps {
   week: Dayjs;
   now: Dayjs;
-  selectedDate: Dayjs;
+  selectedDate: Dayjs | null;
   events: NormalizedMeetingEvent[];
-  duties: Record<string, DutyShiftData>;
-  showDuty?: boolean;
+
   onSelectDay: (day: Dayjs) => void;
   onSelectEvent: (event: NormalizedMeetingEvent) => void;
+  onToggleInterest?: (event: NormalizedMeetingEvent, nextState: boolean) => void;
   loading?: boolean;
   disabledHover?: boolean;
 }
@@ -385,19 +247,50 @@ export function WeekTimeline({
   now,
   selectedDate,
   events,
-  duties,
-  showDuty = true,
+
   onSelectDay,
   onSelectEvent,
+  onToggleInterest,
   loading = false,
   disabledHover = false,
 }: WeekTimelineProps) {
+  const gridRef = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => {
+    const grid = gridRef.current;
+    if (!grid) return;
+    const fitRows = () => {
+      grid.querySelectorAll<HTMLElement>('.booking-week-day-row').forEach((row) => {
+        const cards = Array.from(row.querySelectorAll<HTMLElement>('.booking-week-day-track .booking-week-event'));
+        const heights = cards.map((card) => card.offsetHeight);
+        const outsideHeights = Array.from(row.querySelectorAll<HTMLElement>('.booking-week-out-hours-slot'), (slot) =>
+          Array.from(slot.querySelectorAll<HTMLElement>('.booking-week-event'))
+            .reduce((height, card) => height + card.offsetHeight + 6, 10),
+        );
+        row.style.minHeight = Math.max(118, ...outsideHeights, ...heights.map((height) => height + 8)) + 'px';
+      });
+    };
+    fitRows();
+    const observer = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(fitRows);
+    grid.querySelectorAll('.booking-week-event').forEach((card) => observer?.observe(card));
+    return () => observer?.disconnect();
+  }, [events, loading]);
   const hours = Array.from({ length: 11 }, (_, index) => index + 7);
   const currentMinutes = now.hour() * 60 + now.minute();
   const withinTimeline = week.isSame(now, 'isoWeek') && currentMinutes >= 420 && currentMinutes < 1080;
 
+  // Tối ưu hóa: Nhóm sự kiện theo ngày một lần duy nhất với useMemo
+  const eventsByDay = useMemo(() => {
+    const map = new Map<string, NormalizedMeetingEvent[]>();
+    for (const ev of events) {
+      const list = map.get(ev.date) || [];
+      list.push(ev);
+      map.set(ev.date, list);
+    }
+    return map;
+  }, [events]);
+
   return (
-    <div className="booking-week-grid-scroll" aria-label="Lịch họp tuần" aria-busy={loading}>
+    <div ref={gridRef} className="booking-week-grid-scroll" aria-label="Lịch họp tuần" aria-busy={loading}>
       <div className="booking-week-grid">
         <div className="booking-week-hours-row">
           <div className="booking-week-corner" />
@@ -421,8 +314,9 @@ export function WeekTimeline({
         {dayNames.map((name, index) => {
           const day = week.add(index, 'day');
           const date = day.format('YYYY-MM-DD');
-          const selected = date === selectedDate.format('YYYY-MM-DD');
-          const dayEvents = events.filter((event) => event.date === date);
+          const dutyLeader = getDayDutyInfo(day)?.leader;
+          const selected = date === selectedDate?.format('YYYY-MM-DD');
+          const dayEvents = eventsByDay.get(date) || [];
           const earlyEvents = dayEvents
             .filter((event) => event.start.hour() < 7)
             .sort((a, b) => a.start.valueOf() - b.start.valueOf());
@@ -430,8 +324,6 @@ export function WeekTimeline({
             .filter((event) => event.start.hour() >= 18)
             .sort((a, b) => a.start.valueOf() - b.start.valueOf());
           const normalEvents = dayEvents.filter((event) => event.start.hour() >= 7 && event.start.hour() < 18);
-          const pastDuty = week.isSame(now, 'isoWeek') && day.isBefore(now, 'day');
-          const duty = duties[date];
 
           return (
             <div
@@ -444,12 +336,15 @@ export function WeekTimeline({
                   type="button"
                   className="booking-week-day-button"
                   disabled={loading}
+                  aria-label={`Xem ca trực ngày ${name} ${day.format('DD/MM')}`}
+                  data-calendar-day={date}
                   onClick={() => onSelectDay(day)}
                 >
                   <span className="booking-week-day-title">
                     <b>{name}</b>
                     <span className="booking-week-date-pill">{day.format('DD/MM')}</span>
                   </span>
+                  {dutyLeader && <span className="booking-week-day-duty-leader">Trực: <strong>{dutyLeader}</strong></span>}
                   <span className="booking-week-day-count">
                     {loading ? (
                       <Skeleton.Input active size="small" style={{ width: 65, height: 14, minWidth: 0 }} />
@@ -461,29 +356,6 @@ export function WeekTimeline({
                   </span>
                 </button>
 
-                {showDuty &&
-                  (loading ? (
-                    <div className="booking-week-duty-skeleton">
-                      <Skeleton.Input active size="small" style={{ width: 150, height: 14, minWidth: 0 }} />
-                    </div>
-                  ) : (
-                    <Popover
-                      trigger="click"
-                      placement={index >= 5 ? 'topLeft' : 'bottomLeft'}
-                      content={<DutyInfo duty={duty} past={pastDuty} />}
-                      overlayClassName="booking-week-duty-popover"
-                    >
-                      <button
-                        type="button"
-                        className={`booking-week-duty-button ${pastDuty ? 'booking-week-past-duty' : ''}`}
-                        aria-label="Mở rộng các ca trực"
-                      >
-                        <span>TRỰC:</span>
-                        <strong>{duty?.leader || 'Chưa có thông tin'}</strong>
-                        <DownOutlined />
-                      </button>
-                    </Popover>
-                  ))}
               </div>
 
               <OutHoursSlot
@@ -492,6 +364,7 @@ export function WeekTimeline({
                 upward={index >= 3}
                 loading={loading}
                 onSelectEvent={onSelectEvent}
+                onToggleInterest={onToggleInterest}
                 disabledHover={disabledHover}
               />
 
@@ -532,6 +405,7 @@ export function WeekTimeline({
                     width={width}
                     upward={index >= 3}
                     onSelect={onSelectEvent}
+                    onToggleInterest={onToggleInterest}
                     disabledHover={disabledHover}
                   />
                 ))}
@@ -544,6 +418,7 @@ export function WeekTimeline({
                 upward={index >= 3}
                 loading={loading}
                 onSelectEvent={onSelectEvent}
+                onToggleInterest={onToggleInterest}
                 disabledHover={disabledHover}
               />
             </div>

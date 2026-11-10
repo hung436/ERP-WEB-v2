@@ -1,14 +1,19 @@
-import { Button, Checkbox, DatePicker, Form, Input, Modal, Select, Upload, message } from 'antd';
+import { Button, Checkbox, Form, Input, Modal, Select, Upload, message } from 'antd';
 import type { UploadFile } from 'antd/es/upload/interface';
-import dayjs, { type Dayjs } from 'dayjs';
+import dayjs from 'dayjs';
+import type { Dayjs } from 'dayjs';
 import { useMemo, useState } from 'react';
 
 import { ModuleIcon } from '@/components/ModuleIcon';
 import { RichTextEditor } from '@/components/RichTextEditor';
 import { AttachedFilesGrid } from '@/features/calendar/components/AttachedFilesList';
-import { calendarGroupApi, calendarNotificationApi, directoryApi } from '@/services/api';
+import { calendarGroupApi, calendarNotificationApi } from '@/services/api';
 import { useAsyncData } from '@/hooks/useAsyncData';
 import type { CalendarAttachment, CalendarNotificationRecipient, CreateCalendarNotificationPayload } from '@/types/calendar';
+import type { CalendarEvent } from '@/types/domain';
+
+import { SmartTimePicker } from './SmartTimePicker';
+import { SmartParticipantPicker } from './SmartParticipantPicker';
 
 interface FormValues {
   recipientType: 'all' | 'groups' | 'individuals';
@@ -25,10 +30,12 @@ export function CreateEditorialMeetingModal({
   open,
   onClose,
   onCreated,
+  existingEvents = [],
 }: {
   open: boolean;
   onClose: () => void;
   onCreated: () => Promise<void>;
+  existingEvents?: CalendarEvent[];
 }) {
   const [form] = Form.useForm<FormValues>();
   const [submitting, setSubmitting] = useState(false);
@@ -37,10 +44,8 @@ export function CreateEditorialMeetingModal({
   const [editorContent, setEditorContent] = useState('');
 
   const groupsState = useAsyncData(async () => (await calendarGroupApi.list()).data);
-  const contactsState = useAsyncData(async () => (await directoryApi.list()).data);
 
   const activeGroups = (groupsState.data ?? []).filter((g) => g.status === 'active');
-  const contacts = contactsState.data ?? [];
 
   const groupOptions = useMemo(() => {
     return activeGroups.map((g) => ({
@@ -48,13 +53,6 @@ export function CreateEditorialMeetingModal({
       value: g.name,
     }));
   }, [activeGroups]);
-
-  const individualOptions = useMemo(() => {
-    return contacts.map((c) => ({
-      label: `${c.fullName} (${c.department})`,
-      value: c.fullName,
-    }));
-  }, [contacts]);
 
   const handleFinish = async (values: FormValues) => {
     setSubmitting(true);
@@ -163,6 +161,7 @@ export function CreateEditorialMeetingModal({
         initialValues={{
           recipientType: 'groups',
           selectedGroups: ['Ban Biên tập'],
+          scheduledAt: dayjs().add(5 - (dayjs().minute() % 5 || 5), 'minute').second(0).millisecond(0),
           sendMailCopy: true,
           applyWatermark: true,
         }}
@@ -206,16 +205,10 @@ export function CreateEditorialMeetingModal({
               name="selectedIndividuals"
               rules={[{ required: true, message: 'Vui lòng chọn cá nhân' }]}
             >
-              <Select
-                allowClear
-                filterOption={(input, option) =>
-                  (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
-                }
-                mode="multiple"
-                options={individualOptions}
-                placeholder="Chọn các nhân viên..."
-                showSearch
-                size="middle"
+              <SmartParticipantPicker
+                role={'participants' as const}
+                allowGroups={false}
+                placeholder="Chọn các nhân viên nhận thông báo cuộc họp..."
               />
             </Form.Item>
           )}
@@ -279,15 +272,24 @@ export function CreateEditorialMeetingModal({
         <Form.Item
           label="Hẹn giờ gửi"
           name="scheduledAt"
+          rules={[
+            {
+              validator: async (_, val) => {
+                if (!val) return Promise.resolve();
+                const now = dayjs();
+                const d = dayjs(val);
+                if (d.isValid() && d.isBefore(now.subtract(1, 'minute'))) {
+                  return Promise.reject(new Error('Thời gian hẹn giờ không được ở trong quá khứ'));
+                }
+                return Promise.resolve();
+              },
+            },
+          ]}
         >
-          <DatePicker
-            allowClear
-            format="DD/MM/YYYY HH:mm"
-            minDate={dayjs()}
-            placeholder="Chọn ngày & giờ hẹn gửi"
-            showTime={{ format: 'HH:mm' }}
-            size="middle"
-            style={{ width: '100%' }}
+          <SmartTimePicker
+            mode="single"
+            existingEvents={existingEvents}
+            placeholder="Chọn ngày & giờ hẹn gửi..."
           />
         </Form.Item>
 

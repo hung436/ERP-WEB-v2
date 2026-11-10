@@ -80,18 +80,8 @@ export const evaluationCampaigns: EvaluationCampaignFixture[] = [
 ];
 
 export const evaluationPeriods: EvaluationPeriod[] = [
-  { id: '2026-q4', label: 'Quý IV/2026', startAt: '2026-10-01T08:00:00+07:00', dueAt: '2026-12-31T17:00:00+07:00', status: 'active' },
-  { id: '2026-q3', label: 'Quý III/2026', startAt: '2026-07-01T08:00:00+07:00', dueAt: '2026-09-30T17:00:00+07:00', status: 'closed' },
-  { id: '2026-q2', label: 'Quý II/2026', startAt: '2026-04-01T08:00:00+07:00', dueAt: '2026-06-30T17:00:00+07:00', status: 'closed' },
-  { id: '2026-q1', label: 'Quý I/2026', startAt: '2026-01-01T08:00:00+07:00', dueAt: '2026-03-31T17:00:00+07:00', status: 'closed' },
-  { id: '2025-q4', label: 'Quý IV/2025', startAt: '2025-10-01T08:00:00+07:00', dueAt: '2025-12-31T17:00:00+07:00', status: 'closed' },
-  { id: '2025-q3', label: 'Quý III/2025', startAt: '2025-07-01T08:00:00+07:00', dueAt: '2025-09-30T17:00:00+07:00', status: 'closed' },
-  { id: '2025-q2', label: 'Quý II/2025', startAt: '2025-04-01T08:00:00+07:00', dueAt: '2025-06-30T17:00:00+07:00', status: 'closed' },
-  { id: '2025-q1', label: 'Quý I/2025', startAt: '2025-01-01T08:00:00+07:00', dueAt: '2025-03-31T17:00:00+07:00', status: 'closed' },
-  { id: '2024-q4', label: 'Quý IV/2024', startAt: '2024-10-01T08:00:00+07:00', dueAt: '2024-12-31T17:00:00+07:00', status: 'closed' },
-  { id: '2024-q3', label: 'Quý III/2024', startAt: '2024-07-01T08:00:00+07:00', dueAt: '2024-09-30T17:00:00+07:00', status: 'closed' },
-  { id: '2024-q2', label: 'Quý II/2024', startAt: '2024-04-01T08:00:00+07:00', dueAt: '2024-06-30T17:00:00+07:00', status: 'closed' },
-  { id: '2024-q1', label: 'Quý I/2024', startAt: '2024-01-01T08:00:00+07:00', dueAt: '2024-03-31T17:00:00+07:00', status: 'closed' },
+  { id: '2026-q3', label: 'Quý III/2026', startAt: '2026-08-01T08:00:00+07:00', dueAt: '2026-08-15T17:00:00+07:00', status: 'active' },
+  { id: '2026-q2', label: 'Quý II/2026', startAt: '2026-04-01T08:00:00+07:00', dueAt: '2026-04-15T17:00:00+07:00', status: 'closed' },
 ];
 
 const numberCriterion = (id: string, groupId: string, title: string, max = 5, score: number | null = null) => ({ id, groupId, title, type: 'number' as const, min: 0, max, score });
@@ -355,15 +345,13 @@ const cloneGroups = (progress: number, stage: EvaluationStage | 'published' = 's
 
 const defaultEvaluators = {
   self: 'Nguyễn Minh Anh',
-  deputy: 'Trần Văn Bình',
-  manager: 'Phạm Quốc Nam',
-  editorial: 'Hoàng Thị Lan',
-  council: 'Hội đồng chuyên môn',
+  deputy: 'Lê Ngọc Hiển',
+  manager: 'Nguyễn Viễn Sự',
+  editorial: 'Lê Xuân Trung',
+  council: 'Hội đồng Thi đua - Khen thưởng Báo Tuổi Trẻ',
 };
 
 export const evaluationSheets: EvaluationSheet[] = [
-  { id: 'eval-self-q4', employeeName: 'Nguyễn Minh Anh', employeeCode: 'NV-001', department: 'Ban Nội dung', position: 'Phóng viên', periodId: '2026-q4', periodLabel: 'Quý IV/2026', status: 'draft', stage: 'self', progress: 50, selfScore: 165, currentScore: 165, stageTotals: { self: 165 }, stageEvaluators: defaultEvaluators, dueAt: '2026-12-15T17:00:00+07:00', updatedAt: '2026-11-05T10:20:00+07:00', groups: cloneGroups(50, 'self') },
-  { id: 'eval-van-q4', employeeName: 'Lê Thanh Vân', employeeCode: 'NV-014', department: 'Ban Nội dung', position: 'Biên tập viên', periodId: '2026-q4', periodLabel: 'Quý IV/2026', status: 'waiting', stage: 'deputy', progress: 0, selfScore: 165, currentScore: 161, stageTotals: { self: 165, deputy: 161 }, stageEvaluators: { ...defaultEvaluators, self: 'Lê Thanh Vân' }, dueAt: '2026-12-12T17:00:00+07:00', updatedAt: '2026-11-06T16:10:00+07:00', groups: cloneGroups(0, 'deputy') },
   { id: 'eval-self-q3', employeeName: 'Nguyễn Minh Anh', employeeCode: 'NV-001', department: 'Ban Nội dung', position: 'Phóng viên', periodId: '2026-q3', periodLabel: 'Quý III/2026', status: 'draft', stage: 'self', progress: 88, selfScore: 165, currentScore: 165, stageTotals: { self: 165 }, stageEvaluators: defaultEvaluators, dueAt: '2026-08-15T17:00:00+07:00', updatedAt: '2026-08-07T10:20:00+07:00', groups: cloneGroups(88, 'self') },
   { id: 'eval-van-q3', employeeName: 'Lê Thanh Vân', employeeCode: 'NV-014', department: 'Ban Nội dung', position: 'Biên tập viên', periodId: '2026-q3', periodLabel: 'Quý III/2026', status: 'waiting', stage: 'deputy', progress: 100, selfScore: 165, currentScore: 161, stageTotals: { self: 165, deputy: 161 }, stageEvaluators: { ...defaultEvaluators, self: 'Lê Thanh Vân' }, dueAt: '2026-08-12T17:00:00+07:00', updatedAt: '2026-08-06T16:10:00+07:00', groups: cloneGroups(100, 'deputy') },
   { id: 'eval-huy-q3', employeeName: 'Đỗ Quang Huy', employeeCode: 'NV-026', department: 'Ban Khoa giáo', position: 'Phóng viên', periodId: '2026-q3', periodLabel: 'Quý III/2026', status: 'in_review', stage: 'manager', progress: 100, selfScore: 165, currentScore: 158, stageTotals: { self: 165, deputy: 161, manager: 158 }, stageEvaluators: { ...defaultEvaluators, self: 'Đỗ Quang Huy' }, dueAt: '2026-08-13T17:00:00+07:00', updatedAt: '2026-08-07T08:45:00+07:00', groups: cloneGroups(100, 'manager') },

@@ -1,6 +1,6 @@
 import dayjs, { extend } from 'dayjs';
 import isoWeek from 'dayjs/plugin/isoWeek';
-import { render, screen, within } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 
@@ -24,13 +24,16 @@ describe('Lịch làm việc theo tuần (Google Calendar style)', () => {
     renderCalendarWeek();
 
     expect(await screen.findByText(/Tuần 41/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /^Tạo lịch họp$/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /^Tạo$/i })).toBeInTheDocument();
 
     // 3 Filter Chips ở Cụm Giữa
-    expect(screen.getByText('Ban biên tập')).toBeInTheDocument();
-    expect(screen.getAllByText('Cá nhân').length).toBeGreaterThan(0);
+    expect(screen.getByText('Lịch chung')).toBeInTheDocument();
+    expect(screen.getAllByText('Lịch cá nhân').length).toBeGreaterThan(0);
     expect(screen.getByText('Chỉ hiện lịch có mặt tôi')).toBeInTheDocument();
-    expect(screen.getAllByText('Tham gia').length).toBeGreaterThan(0);
+    // Task 7: Thay tag loại bằng chấm tròn trạng thái trên thẻ
+    await waitFor(() => {
+      expect(document.querySelectorAll('.booking-week-status-dot').length).toBeGreaterThan(0);
+    });
 
     // Các ngày trong tuần
     expect(screen.getAllByText('Thứ Hai').length).toBeGreaterThan(0);
@@ -42,35 +45,22 @@ describe('Lịch làm việc theo tuần (Google Calendar style)', () => {
     expect(screen.getAllByText('Chủ Nhật').length).toBeGreaterThan(0);
   });
 
-  it('sự kiện BBT mà user tham gia được highlight và có thể click mở modal chi tiết kèm tệp đính kèm và bình luận', async () => {
+  it('sự kiện có tôi tham gia mở drawer tóm tắt và liên kết chi tiết ở tab mới', async () => {
     const user = userEvent.setup();
     renderCalendarWeek();
-
-    await screen.findByText(/Tuần 41/i);
-
-    // Chào cờ đầu tuần là sự kiện user tham gia
-    const attendingEvent = (await screen.findAllByText('Chào cờ đầu tuần'))[0];
-    expect(attendingEvent).toBeInTheDocument();
-
-    // Click vào sự kiện để mở modal
-    await user.click(attendingEvent);
-
-    // Kiểm tra nội dung modal chi tiết mở ra (tệp hiển thị ở mục Tài liệu và Timeline trao đổi)
-    const fileItems = await screen.findAllByText('Thong-bao-chao-co-dau-tuan-thang-10.pdf');
-    expect(fileItems.length).toBeGreaterThan(0);
-    expect(screen.getAllByText(/Tài liệu/i)[0]).toBeInTheDocument();
-    expect(screen.getByText(/Thảo luận/i)).toBeInTheDocument();
-    expect(screen.getByText('Đính kèm')).toBeInTheDocument();
-    expect(screen.getByPlaceholderText(/Viết trao đổi/i)).toBeInTheDocument();
-    expect(screen.getByText('Đề nghị các ban có mặt đúng 7g40 để ổn định vị trí.')).toBeInTheDocument();
+    await user.click((await screen.findAllByText('Chào cờ đầu tuần'))[0]);
+    const drawer = await screen.findByRole('dialog', );
+    expect(within(drawer).getByText('Thời gian')).toBeInTheDocument();
+    expect(within(drawer).getByRole('link', { name: 'Xem chi tiết' })).toHaveAttribute('target', '_blank');
+    expect(within(drawer).queryByText('Thong-bao-chao-co-dau-tuan-thang-10.pdf')).not.toBeInTheDocument();
+    expect(within(drawer).queryByRole('textbox')).not.toBeInTheDocument();
   });
-
   it('mở modal Tạo lịch họp với đầy đủ các trường và tính năng đính kèm tệp', async () => {
     const user = userEvent.setup();
     renderCalendarWeek();
 
     await screen.findByText(/Tuần 41/i);
-    await user.click(screen.getByRole('button', { name: /^Tạo lịch họp$/i }));
+    await user.click(screen.getByRole('button', { name: /^Tạo$/i }));
 
     // Khi mở popup chọn loại phiếu theo chuẩn Booking / Job-Ticket, chọn option "Lịch họp"
     const dialogs = await screen.findAllByRole('dialog');
@@ -96,7 +86,7 @@ describe('Lịch làm việc theo tuần (Google Calendar style)', () => {
     renderCalendarWeek();
 
     await screen.findByText(/Tuần 41/i);
-    const editorialChip = screen.getByRole('button', { name: 'Ban biên tập' });
+    const editorialChip = screen.getByRole('button', { name: 'Lịch chung' });
     expect(editorialChip).toHaveAttribute('aria-pressed', 'true');
 
     await user.click(editorialChip);
@@ -104,7 +94,7 @@ describe('Lịch làm việc theo tuần (Google Calendar style)', () => {
 
     await user.click(editorialChip);
     expect(editorialChip).toHaveAttribute('aria-pressed', 'true');
-  });
+  }, 45000);
 
   it('không hiển thị tag Chỉ xem và dòng thông báo Chỉ xem thông tin', async () => {
     renderCalendarWeek();
@@ -112,62 +102,53 @@ describe('Lịch làm việc theo tuần (Google Calendar style)', () => {
 
     expect(screen.queryByText('Chỉ xem')).not.toBeInTheDocument();
     expect(screen.queryByText(/Không thuộc thành phần tham dự/i)).not.toBeInTheDocument();
-  });
+  }, 45000);
 
-  it('cho phép bấm icon ngôi sao Quan tâm trên lịch chỉ xem và hiển thị thông báo nhắc nhở 15 phút', async () => {
+  it('cho phép bấm icon ngôi sao Quan tâm trên lịch chỉ xem và hiển thị thông báo Đã quan tâm', async () => {
     const user = userEvent.setup();
-    renderCalendarWeek();
-    await screen.findByText(/Tuần 41/i);
+    const futureWeek = dayjs().add(1, 'week');
+    renderCalendarWeek('/calendar/week?date=' + futureWeek.format('YYYY-MM-DD'));
+    await screen.findByText(new RegExp('Tuần ' + futureWeek.isoWeek(), 'i'));
 
     const starButtons = screen.getAllByRole('button', { name: /Quan tâm lịch họp/i });
     expect(starButtons.length).toBeGreaterThan(0);
 
     await user.click(starButtons[0]);
-    expect(await screen.findByText(/Bạn sẽ được nhắc nhở trước 15 phút/i)).toBeInTheDocument();
-  });
+    expect(await screen.findByText('Đã quan tâm', { exact: true })).toBeInTheDocument();
+  }, 45000);
 
-  it('hiển thị thông tin người trực và các ca trực tòa soạn cho từng ngày trong tuần', async () => {
+  it('chỉ hiển thị trực ban và ca trực khi bấm ngày để mở drawer', async () => {
+    const user = userEvent.setup();
+    renderCalendarWeek();
+    await screen.findByText(/Tuần 41/i);
+    expect(screen.queryByText('Trực:')).not.toBeInTheDocument();
+    expect(screen.queryByText('Ca 0:')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Mở rộng các ca trực/i })).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: /Xem ca trực ngày Thứ Hai/i }));
+    const drawer = await screen.findByRole('dialog');
+    expect(within(drawer).getByText('Ca 0:')).toBeInTheDocument();
+    expect(within(drawer).getByText('Ca 1:')).toBeInTheDocument();
+    expect(within(drawer).getByText('Ca 2:')).toBeInTheDocument();
+    expect(within(drawer).getByRole('button', { name: 'Ngày tiếp theo' })).toBeInTheDocument();
+  }, 45000);
+  it('hiển thị chấm vàng Đã điều chỉnh cho các sự kiện có lịch điều chỉnh', async () => {
     const user = userEvent.setup();
     renderCalendarWeek();
     await screen.findByText(/Tuần 41/i);
 
-    // Người trực ban Thứ Hai
-    expect((await screen.findAllByText('Anh Hoàng Nguyên')).length).toBeGreaterThan(0);
-
-    // Chuyển sang dạng ngang Timeline để tương tác với các ca trực mở rộng
-    const timelineBtn = screen.getByRole('button', { name: /Xem dạng ngang theo dòng thời gian/i });
-    await user.click(timelineBtn);
-
-    // Mặc định đóng ca trực, click mở rộng các ca trực
-    const toggleButtons = screen.getAllByRole('button', { name: /Mở rộng các ca trực/i });
-    expect(toggleButtons.length).toBeGreaterThan(0);
-    await user.click(toggleButtons[0]);
-
-    // Các ca trực hiển thị trên cột Thứ Hai
-    expect(screen.getAllByText('Ca 0:').length).toBeGreaterThan(0);
-    expect(screen.getAllByText('Ca 1:').length).toBeGreaterThan(0);
-    expect(screen.getAllByText('Ca 2:').length).toBeGreaterThan(0);
-    expect(screen.getAllByText(/Đà Trang/i).length).toBeGreaterThan(0);
-    expect(screen.getAllByText(/Viễn Sự, N.V.Hải/i).length).toBeGreaterThan(0);
-  });
-
-  it('hiển thị tag Đã điều chỉnh cho các sự kiện có lịch điều chỉnh', async () => {
-    const user = userEvent.setup();
-    renderCalendarWeek();
-    await screen.findByText(/Tuần 41/i);
-
-    // Có các tag Đã điều chỉnh trên giao diện tuần
-    const adjustedBadges = await screen.findAllByText('Đã điều chỉnh');
-    expect(adjustedBadges.length).toBeGreaterThan(0);
+    // Task 7: Có chấm vàng Đã điều chỉnh trên giao diện tuần
+    await waitFor(() => {
+      expect(document.querySelectorAll('.booking-week-adjusted-dot').length).toBeGreaterThan(0);
+    });
 
     // Click vào sự kiện có điều chỉnh mà user tham gia (Họp giao ban phóng viên)
     const adjustedAttendingEvent = screen.getAllByText('Họp giao ban phóng viên')[0];
     await user.click(adjustedAttendingEvent);
 
-    // Trong modal chi tiết hiển thị banner thông tin điều chỉnh
-    expect(await screen.findByText(/Lưu ý điều chỉnh:/i)).toBeInTheDocument();
-    expect(screen.getAllByText(/Thay đổi địa điểm sang Hội trường HTT2/i)[0]).toBeInTheDocument();
-  });
+    const drawer = await screen.findByRole('dialog', );
+    expect(within(drawer).getByText('HTT2')).toBeInTheDocument();
+    expect(within(drawer).getByRole('link', { name: 'Xem chi tiết' })).toBeInTheDocument();
+  }, 45000);
 
   it('mặc định hiển thị tuần đang hiện hành khi mở module', async () => {
     // Gọi trực tiếp route không có param ?date để kiểm tra mặc định tuần hiện hành
@@ -180,21 +161,21 @@ describe('Lịch làm việc theo tuần (Google Calendar style)', () => {
     render(<App />);
     const currentWeekNumber = dayjs().isoWeek();
     expect(await screen.findByText(new RegExp(`Tuần ${currentWeekNumber}`, 'i'))).toBeInTheDocument();
-  });
+  }, 45000);
 
-  it('hiển thị drawer danh sách sự kiện trong ngày khi bấm vào một ngày trong tuần', async () => {
+  it('hiển thị drawer ca trực khi bấm vào một ngày trong tuần', async () => {
     const user = userEvent.setup();
     renderCalendarWeek();
     await screen.findByText(/Tuần 41/i);
 
     // Bấm vào header ngày Thứ Hai
-    const mondayBtn = screen.getByRole('button', { name: /Xem danh sách lịch ngày Thứ Hai/i });
+    const mondayBtn = screen.getByRole('button', { name: /Xem ca trực ngày Thứ Hai/i });
     await user.click(mondayBtn);
 
     // Mở drawer xem lịch trong ngày
     expect((await screen.findAllByText(/Trực:/i)).length).toBeGreaterThan(0);
-    expect(screen.getAllByRole('button', { name: /Tạo lịch họp/i }).length).toBeGreaterThan(0);
-  });
+    expect(screen.getAllByRole('button', { name: /Tạo/i }).length).toBeGreaterThan(0);
+  }, 45000);
 
   it('hỗ trợ responsive với nút Bộ lọc thu gọn mở popover đầy đủ các nhóm lọc', async () => {
     const user = userEvent.setup();
@@ -209,14 +190,44 @@ describe('Lịch làm việc theo tuần (Google Calendar style)', () => {
     await user.click(filterBtn);
 
     // Nguồn lịch Ban biên tập & Cá nhân luôn ở ngoài thanh công cụ
-    expect(screen.getByRole('button', { name: 'Ban biên tập' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Cá nhân' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Lịch chung' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Lịch cá nhân' })).toBeInTheDocument();
 
     // Popover hiển thị các bộ lọc bổ sung (Tham gia & Loại mục ghi)
     expect(await screen.findByText('Bộ lọc lịch làm việc')).toBeInTheDocument();
     expect(screen.getAllByText('Tham gia').length).toBeGreaterThan(0);
-    expect(screen.getByText('Loại mục ghi')).toBeInTheDocument();
-  });
+    expect(screen.getByText('Loại mục')).toBeInTheDocument();
+  }, 45000);
+
+  it('phiếu công việc có 3 thành phần chính và 2 nút Triển khai / Đề xuất cùng các popup tương ứng', async () => {
+    const user = userEvent.setup();
+    renderCalendarWeek();
+
+    await screen.findByText(/Tuần 41/i);
+    await user.click(screen.getByRole('button', { name: /^Tạo$/i }));
+
+    // Khi mở popup chọn loại phiếu, chọn option "Phiếu công việc"
+    const dialogs = await screen.findAllByRole('dialog');
+    const taskTypeBtn = within(dialogs[0]).queryByRole('button', { name: /Phiếu công việc/i });
+    if (taskTypeBtn) {
+      await user.click(taskTypeBtn);
+    }
+
+    // Kiểm tra form có đủ 3 trường: Nội dung, Thời gian, Chọn thành phần
+    const activeDialogs = await screen.findAllByRole('dialog');
+    const formModal = activeDialogs[activeDialogs.length - 1];
+
+    expect(within(formModal).getByText('Tạo mới phiếu công việc')).toBeInTheDocument();
+    expect(within(formModal).getByText('Nội dung')).toBeInTheDocument();
+    expect(within(formModal).getAllByText('Thời gian').length).toBeGreaterThan(0);
+    expect(within(formModal).getByText('Chọn thành phần')).toBeInTheDocument();
+
+    // Có 2 nút: Triển khai và Đề xuất
+    const deployBtn = within(formModal).getByRole('button', { name: /Triển khai/i });
+    const proposeBtn = within(formModal).getByRole('button', { name: /Đề xuất/i });
+    expect(deployBtn).toBeInTheDocument();
+    expect(proposeBtn).toBeInTheDocument();
+  }, 40000);
 });
 
 

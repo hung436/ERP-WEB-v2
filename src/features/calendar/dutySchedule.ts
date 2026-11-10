@@ -12,76 +12,76 @@ export interface DayDutyInfo {
 }
 
 export const WEEKLY_DUTY_SCHEDULE: Record<number, DayDutyInfo> = {
-  // 1: Thứ Hai (12-10-2026)
+  // 1: Thứ Hai (02-11-2026)
   1: {
-    leader: 'Anh Hoàng Nguyên',
+    leader: 'Nguyễn Hoàng Nguyên',
     shifts: [
-      { name: 'Ca 0', tkts: 'Bảo Châu' },
-      { name: 'Ca 1', tkts: 'H.T.Hãn, Viễn Sự', btv: 'B.Dậu, K.Thoa' },
-      { name: 'Ca 2', tkts: 'Minh Luận', btv: 'L.Anh, T.Mai' },
+      { name: 'Ca 0', tkts: 'Nguyễn Văn Hải' },
+      { name: 'Ca 1', tkts: 'Nguyễn Viễn Sự, Lê Thanh Liêm', btv: 'Võ Thị Kim Nhung, Đỗ Thị Hồng Điệp' },
+      { name: 'Ca 2', tkts: 'Nguyễn Thanh Liêm', btv: 'Phạm Nguyễn Hoài Trang, Dương Kim Thoa' },
     ],
   },
-  // 2: Thứ Ba (13-10-2026)
+  // 2: Thứ Ba (03-11-2026)
   2: {
-    leader: 'Anh Đức Thọ',
+    leader: 'Nguyễn Thái Bình',
     shifts: [
-      { name: 'Ca 0', tkts: 'C.V.Kình' },
-      { name: 'Ca 1', tkts: 'N.V.Hải, P.Huy', btv: 'H.Điệp, Ng.Quý' },
-      { name: 'Ca 2', tkts: 'Đà Trang', btv: 'H.Trang, K.Nhung' },
+      { name: 'Ca 0', tkts: 'Trương Bảo Châu' },
+      { name: 'Ca 1', tkts: 'Võ Minh Luận, Phạm Văn Quen', btv: 'Đào Như Thùy Mai, Lê Trung Kiên' },
+      { name: 'Ca 2', tkts: 'Nguyễn Văn Hải', btv: 'Nguyễn Hữu Khá, Nguyễn Đức Tuyên' },
     ],
   },
-  // 3: Thứ Tư (14-10-2026)
+  // 3: Thứ Tư (04-11-2026)
   3: {
-    leader: 'Anh Thái Bình',
+    leader: 'Lê Cao Cường',
     shifts: [
-      { name: 'Ca 0', tkts: 'T.Liêm' },
-      { name: 'Ca 1', tkts: 'Minh Luận, Q.Trung', btv: 'Cát Khuê, L.Anh' },
-      { name: 'Ca 2', tkts: 'H.T.Hãn', btv: 'D.Thanh, B.Dậu' },
+      { name: 'Ca 0', tkts: 'Nguyễn Thanh Liêm' },
+      { name: 'Ca 1', tkts: 'Dương Đức Đà Trang, Lê Thanh Liêm', btv: 'Phạm Nguyễn Hoài Trang, Đào Thị Bích Dậu' },
+      { name: 'Ca 2', tkts: 'Võ Minh Luận', btv: 'Nguyễn Thị Lan Anh, Nguyễn Thị Quý' },
     ],
   },
-  // 4: Thứ Năm (15-10-2026)
+  // 4: Thứ Năm (05-11-2026)
   4: {
-    leader: 'Chị Ng.T.Hương',
+    leader: 'Nguyễn Hồng Minh',
     shifts: [
-      { name: 'Ca 0', tkts: 'Đà Trang' },
-      { name: 'Ca 1', tkts: 'M.Luận, Q.Trung', btv: 'T.Mai, H.Trang' },
-      { name: 'Ca 2', tkts: 'Bảo Châu', btv: 'K.Nhung, H.Tươi' },
+      { name: 'Ca 0', tkts: 'Cầm Văn Kình' },
+      { name: 'Ca 1', tkts: 'Trương Bảo Châu, Phạm Quỳnh Trung', btv: 'Lê Thị Thái Hòa, Đào Như Thùy Mai' },
+      { name: 'Ca 2', tkts: 'Dương Đức Đà Trang', btv: 'Nguyễn Duy Thanh, Phạm Nguyễn Hoài Trang' },
     ],
   },
-  // 5: Thứ Sáu (16-10-2026)
+  // 5: Thứ Sáu (06-11-2026)
   5: {
-    leader: 'Anh Lê Cường',
+    leader: 'Đinh Đức Thọ',
     shifts: [
-      { name: 'Ca 0', tkts: 'Ng.V.Hải' },
-      { name: 'Ca 1', tkts: 'Phúc Huy, H.T.Hãn', btv: 'H.Điệp, L.Anh' },
-      { name: 'Ca 2', tkts: 'C.V.Kình', btv: 'Đ.Tuyên, Hữu Khá' },
+      { name: 'Ca 0', tkts: 'Nguyễn Thanh Liêm' },
+      { name: 'Ca 1', tkts: 'Phạm Văn Quen, Lê Thanh Liêm', btv: 'Đỗ Thị Hồng Điệp, Trần Thị Hồng Tươi' },
+      { name: 'Ca 2', tkts: 'Cầm Văn Kình', btv: 'Nguyễn Thị Lan Anh, Nguyễn Hữu Khá' },
     ],
   },
-  // 6: Thứ Bảy (17-10-2026)
+  // 6: Thứ Bảy (07-11-2026)
   6: {
-    leader: 'Anh Nguyễn Phan',
+    leader: 'Nguyễn Hồng Minh',
     shifts: [
-      { name: 'Ca 0', tkts: 'T.Liêm' },
-      { name: 'Ca 1', tkts: 'Ng.V.Hải', btv: 'Bích Dậu, Như Bình' },
-      { name: 'Ca 2', tkts: 'Thanh Liêm', btv: 'Lan Anh, Đ.Tuyên' },
+      { name: 'Ca 0', tkts: 'Dương Đức Đà Trang' },
+      { name: 'Ca 1', tkts: 'Nguyễn Văn Hải', btv: 'Đào Như Thùy Mai, Võ Thị Kim Nhung' },
+      { name: 'Ca 2', tkts: 'Trương Bảo Châu', btv: 'Trần Thị Hồng Tươi, Đào Thị Bích Dậu' },
     ],
   },
-  // 0: Chủ Nhật (18-10-2026)
+  // 0: Chủ Nhật (08-11-2026)
   0: {
-    leader: 'Anh Xuân Trung',
+    leader: 'Lê Xuân Trung',
     shifts: [
-      { name: 'Ca 0', tkts: 'Đà Trang' },
-      { name: 'Ca 1', tkts: 'C.V.Kình', btv: 'Thùy Mai, Nguyễn Quý' },
-      { name: 'Ca 2', tkts: 'Đà Trang', btv: 'H.Điệp, H.Trang' },
+      { name: 'Ca 0', tkts: 'Võ Minh Luận' },
+      { name: 'Ca 1', tkts: 'Nguyễn Thanh Liêm', btv: 'Nguyễn Thị Quý, Nguyễn Thị Lan Anh' },
+      { name: 'Ca 2', tkts: 'Cầm Văn Kình', btv: 'Đoàn Từ Duy, Đỗ Thị Hồng Điệp' },
     ],
   },
 };
 
-// Tra cứu lịch trực cụ thể theo ngày (hỗ trợ cả tuần 05/10 và tuần 12/10)
+// Tra cứu lịch trực cụ thể theo ngày (hỗ trợ cả tuần 05/10 và tuần 02/11)
 export const DATE_DUTY_SCHEDULE: Record<string, DayDutyInfo> = {
   // Tuần 05/10/2026 - 11/10/2026 (Tuần 41)
   '2026-10-05': {
-    leader: 'Anh Hoàng Nguyên',
+    leader: 'Nguyễn Hoàng Nguyên',
     shifts: [
       { name: 'Ca 0', tkts: 'Đà Trang' },
       { name: 'Ca 1', tkts: 'Viễn Sự, N.V.Hải', btv: 'Lan Anh, H.Điệp' },
@@ -89,7 +89,7 @@ export const DATE_DUTY_SCHEDULE: Record<string, DayDutyInfo> = {
     ],
   },
   '2026-10-06': {
-    leader: 'Anh Lê Xuân Trung',
+    leader: 'Lê Xuân Trung',
     shifts: [
       { name: 'Ca 0', tkts: 'Quốc Thắng' },
       { name: 'Ca 1', tkts: 'Đức Thọ, Minh Cường', btv: 'Hải Triều, Văn Nam' },
@@ -97,7 +97,7 @@ export const DATE_DUTY_SCHEDULE: Record<string, DayDutyInfo> = {
     ],
   },
   '2026-10-07': {
-    leader: 'Chị Đinh Thị Thảo',
+    leader: 'Đinh Thị Thảo',
     shifts: [
       { name: 'Ca 0', tkts: 'Quang Định' },
       { name: 'Ca 1', tkts: 'Đà Trang, Hoài Nam', btv: 'Lan Anh, Thu Hà' },
@@ -105,7 +105,7 @@ export const DATE_DUTY_SCHEDULE: Record<string, DayDutyInfo> = {
     ],
   },
   '2026-10-08': {
-    leader: 'Anh Bùi Thanh Liêm',
+    leader: 'Bùi Thanh Liêm',
     shifts: [
       { name: 'Ca 0', tkts: 'Viễn Sự' },
       { name: 'Ca 1', tkts: 'N.V.Hải, M.Luận', btv: 'Văn Nam, Bích Ngọc' },
@@ -113,7 +113,7 @@ export const DATE_DUTY_SCHEDULE: Record<string, DayDutyInfo> = {
     ],
   },
   '2026-10-09': {
-    leader: 'Anh Trần Xuân Toàn',
+    leader: 'Trần Xuân Toàn',
     shifts: [
       { name: 'Ca 0', tkts: 'M.Luận' },
       { name: 'Ca 1', tkts: 'Thành Luân, Đà Trang', btv: 'H.Điệp, Lan Anh' },
@@ -121,7 +121,7 @@ export const DATE_DUTY_SCHEDULE: Record<string, DayDutyInfo> = {
     ],
   },
   '2026-10-10': {
-    leader: 'Anh Đức Thọ',
+    leader: 'Đinh Đức Thọ',
     shifts: [
       { name: 'Ca 0', tkts: 'Hoài Nam' },
       { name: 'Ca 1', tkts: 'Quang Định, N.V.Hải', btv: 'Văn Nam, Hải Triều' },
@@ -129,7 +129,7 @@ export const DATE_DUTY_SCHEDULE: Record<string, DayDutyInfo> = {
     ],
   },
   '2026-10-11': {
-    leader: 'Anh Xuân Trung',
+    leader: 'Lê Xuân Trung',
     shifts: [
       { name: 'Ca 0', tkts: 'Đà Trang' },
       { name: 'Ca 1', tkts: 'Quốc Thắng, M.Luận', btv: 'Lan Anh, H.Điệp' },
@@ -137,14 +137,14 @@ export const DATE_DUTY_SCHEDULE: Record<string, DayDutyInfo> = {
     ],
   },
 
-  // Tuần 12/10/2026 - 18/10/2026 (Tuần 42 - theo 10.12.md)
-  '2026-10-12': WEEKLY_DUTY_SCHEDULE[1],
-  '2026-10-13': WEEKLY_DUTY_SCHEDULE[2],
-  '2026-10-14': WEEKLY_DUTY_SCHEDULE[3],
-  '2026-10-15': WEEKLY_DUTY_SCHEDULE[4],
-  '2026-10-16': WEEKLY_DUTY_SCHEDULE[5],
-  '2026-10-17': WEEKLY_DUTY_SCHEDULE[6],
-  '2026-10-18': WEEKLY_DUTY_SCHEDULE[0],
+  // Tuần 02/11/2026 - 08/11/2026 (Lịch làm việc Ban Biên tập - Lịch điều chỉnh)
+  '2026-11-02': WEEKLY_DUTY_SCHEDULE[1],
+  '2026-11-03': WEEKLY_DUTY_SCHEDULE[2],
+  '2026-11-04': WEEKLY_DUTY_SCHEDULE[3],
+  '2026-11-05': WEEKLY_DUTY_SCHEDULE[4],
+  '2026-11-06': WEEKLY_DUTY_SCHEDULE[5],
+  '2026-11-07': WEEKLY_DUTY_SCHEDULE[6],
+  '2026-11-08': WEEKLY_DUTY_SCHEDULE[0],
 };
 
 export function getDayDutyInfo(date: Dayjs): DayDutyInfo {

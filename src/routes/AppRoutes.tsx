@@ -3,9 +3,11 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import { AccountProfilePage } from '@/features/account/AccountProfilePage';
 import { AnnouncementsPage } from '@/features/announcements/AnnouncementsPage';
 import { LoginPage } from '@/features/auth/LoginPage';
+import { AdminRoute } from '@/features/auth/AdminRoute';
 import { ProtectedRoute } from '@/features/auth/ProtectedRoute';
 import { CalendarGroupsPage } from '@/features/calendar/CalendarGroupsPage';
 import { CalendarNotificationsPage } from '@/features/calendar/CalendarNotificationsPage';
+import { CalendarEventDetailPage } from '@/features/calendar/CalendarEventDetailPage';
 import { CalendarWeekPage } from '@/features/calendar/CalendarWeekPage';
 import { MeetingPage } from '@/features/meeting/MeetingPage';
 import { ChatPage } from '@/features/chat/ChatPage';
@@ -58,8 +60,13 @@ export function AppRoutes() {
           <Route path="personnel/edit/:id" element={<CreatePersonnelPage />} />
           <Route path="calendar" element={<Navigate replace to="/calendar/week" />} />
           <Route path="calendar/week" element={<CalendarWeekPage />} />
-          <Route path="calendar/notifications" element={<CalendarNotificationsPage />} />
-          <Route path="calendar/groups" element={<CalendarGroupsPage />} />
+          <Route path="calendar/events/:id" element={<CalendarEventDetailPage />} />
+          <Route path="calendar/detail/:id" element={<CalendarEventDetailPage />} />
+          <Route path="calendar/:id" element={<CalendarEventDetailPage />} />
+          <Route element={<AdminRoute fallback="/calendar/week" />}>
+            <Route path="calendar/notifications" element={<CalendarNotificationsPage />} />
+            <Route path="calendar/groups" element={<CalendarGroupsPage />} />
+          </Route>
           <Route path="account" element={<AccountProfilePage />} />
           <Route path="meeting" element={<MeetingPage />} />
           <Route path="meetings" element={<MeetingPage />} />

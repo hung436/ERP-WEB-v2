@@ -33,7 +33,8 @@ describe('Module Nhân sự - Lý lịch cá nhân', () => {
     Object.defineProperty(HTMLElement.prototype, 'scrollIntoView', { configurable: true, value: scrollIntoView });
     fireEvent.click(within(sectionNav).getByRole('link', { name: /VII Khen thưởng/ }));
     expect(scrollIntoView).toHaveBeenCalledWith({ behavior: 'smooth', block: 'start' });
-    expect(screen.getByRole('link', { name: 'Nhân sự' })).toHaveAttribute('href', '/personnel/profile');
+    fireEvent.click(screen.getByRole('button', { name: 'Nhân sự' }));
+    expect(screen.getByRole('link', { name: 'Lý lịch cá nhân' })).toHaveAttribute('href', '/personnel/profile');
   }, 15000);
 
   it('hiển thị trạng thái rỗng của hồ sơ', async () => {

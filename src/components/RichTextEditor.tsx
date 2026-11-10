@@ -5,6 +5,7 @@ interface RichTextEditorProps {
   onChange?: (html: string) => void;
   placeholder?: string;
   minHeight?: number;
+  ariaLabelledby?: string;
 }
 
 export function RichTextEditor({
@@ -12,6 +13,7 @@ export function RichTextEditor({
   onChange,
   placeholder = 'Nhập nội dung thông báo...',
   minHeight = 220,
+  ariaLabelledby,
 }: RichTextEditorProps) {
   const editorRef = useRef<HTMLDivElement>(null);
   const isUpdatingRef = useRef(false);
@@ -233,6 +235,10 @@ export function RichTextEditor({
         ref={editorRef}
         className="rte-content-editable"
         contentEditable
+        role="textbox"
+        aria-multiline="true"
+        aria-labelledby={ariaLabelledby}
+        aria-label={ariaLabelledby ? undefined : "Nội dung"}
         data-placeholder={placeholder}
         onBlur={handleInput}
         onInput={handleInput}

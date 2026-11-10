@@ -1,12 +1,14 @@
 import { message } from 'antd';
-import dayjs from 'dayjs';
+import dayjs, { extend, type Dayjs } from 'dayjs';
 import isoWeek from 'dayjs/plugin/isoWeek';
-import { ArrowRight, Calendar, Clock, MapPin, MessageSquare, Paperclip, Star, Users } from 'lucide-react';
+import { MapPin, Star } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
 import type { CalendarEvent } from '@/types/domain';
 
-dayjs.extend(isoWeek);
+import { getApprovalStatusMeta, getCalendarStatusDotTone, isPastEvent } from '../calendarWeekUtils';
+
+extend(isoWeek);
 
 interface CalendarEventCardProps {
   event: CalendarEvent;
@@ -15,18 +17,21 @@ interface CalendarEventCardProps {
   style?: React.CSSProperties;
   className?: string;
   disabledHover?: boolean;
+  now?: Dayjs;
 }
 
-export function CalendarEventCard({ event, onSelectEvent, onHoverChange, style, className, disabledHover }: CalendarEventCardProps) {
+export function CalendarEventCard({ event, onSelectEvent, onHoverChange, style, className, disabledHover, now }: CalendarEventCardProps) {
   const start = dayjs(event.startAt);
   const end = dayjs(event.endAt);
 
   const isEditorial = event.scope === 'editorial';
-  const isPersonal = event.scope === 'personal';
   const isTask = event.ticketType === 'TASK';
   const isUserAttending = Boolean(event.isUserParticipant || event.isUserWatcher);
   const [isInterested, setIsInterested] = useState(Boolean(event.isInterested));
   const [isHoverExpanded, setIsHoverExpanded] = useState(false);
+
+  const approvalMeta = getApprovalStatusMeta(event.approvalStatus, event.ticketType, event.workflowType);
+  const statusDotTone = getCalendarStatusDotTone(event.approvalStatus, event.scope);
 
   const enterTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const leaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -76,30 +81,9 @@ export function CalendarEventCard({ event, onSelectEvent, onHoverChange, style, 
     }, 120);
   };
 
-  const handleMouseEnter = () => {
-    if (disabledHover) return;
-    startEnterTimer();
-  };
-
-  const handleMouseMove = () => {
-    if (disabledHover) return;
-    // Chỉ kích hoạt hẹn giờ nếu chưa có popup và chưa có timer đang chạy (tránh reset timer liên tục khi chuột di chuyển trong thẻ)
-    if (!isHoverExpanded && !enterTimerRef.current) {
-      startEnterTimer();
-    }
-  };
-
-  const handleMouseLeave = () => {
-    resetEnterTimer();
-    // Khi chuột rời đi, giữ thêm khoảng 120ms trước khi đóng
-    leaveTimerRef.current = setTimeout(() => {
-      setIsHoverExpanded(false);
-    }, 120);
-  };
-
-  const timeLabel = isTask
-    ? `Hạn: ${dayjs(event.deadline || event.endAt || event.startAt).format('HH:mm')}`
-    : `${start.format('HH:mm')} - ${end.format('HH:mm')}`;
+  const timeLabel = dayjs(
+    isTask && event.deadline ? event.deadline : event.startAt || event.deadline || event.endAt
+  ).format('HH:mm');
 
   const handleToggleInterest = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -107,7 +91,7 @@ export function CalendarEventCard({ event, onSelectEvent, onHoverChange, style, 
     setIsInterested(nextState);
     if (nextState) {
       message.success({
-        content: `Đã quan tâm: "${event.title}". Bạn sẽ được nhắc nhở trước 15 phút!`,
+        content: 'Đã quan tâm',
         icon: <Star color="#f59e0b" fill="#f59e0b" size={16} style={{ marginRight: 6 }} />,
         duration: 3,
       });
@@ -116,23 +100,13 @@ export function CalendarEventCard({ event, onSelectEvent, onHoverChange, style, 
     }
   };
 
-  const canOpenDrawer = isPersonal || isUserAttending;
+  const canOpenDrawer = true;
 
-  const now = dayjs();
-  const isCurrentWeek = start.isSame(now, 'isoWeek') || end.isSame(now, 'isoWeek');
-  const isPast = isCurrentWeek && end.isBefore(now);
+  const isPast = isPastEvent(event, now);
 
-  let cardClass = `calendar-list-card ${className || ''}`;
+  let cardClass = `calendar-list-card booking-week-flat-card ${isUserAttending ? 'card-attending' : 'card-non-attending'} ${className || ''}`;
   if (isPast) {
-    cardClass += ' is-past-event';
-  }
-  if (isEditorial) {
-    cardClass += isUserAttending ? ' card-editorial-user' : ' card-editorial-other';
-  } else if (isPersonal) {
-    cardClass += ' card-personal';
-  }
-  if (isHoverExpanded && !disabledHover) {
-    cardClass += ' is-hover-expanded';
+    cardClass += ' is-past-event booking-week-past-event';
   }
 
   const handleClick = () => {
@@ -147,6 +121,7 @@ export function CalendarEventCard({ event, onSelectEvent, onHoverChange, style, 
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.target !== e.currentTarget) return;
     if (!canOpenDrawer) return;
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
@@ -160,206 +135,73 @@ export function CalendarEventCard({ event, onSelectEvent, onHoverChange, style, 
       className={cardClass}
       onClick={handleClick}
       onKeyDown={handleKeyDown}
-      onMouseEnter={handleMouseEnter}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-      role={canOpenDrawer ? 'button' : undefined}
-      style={style}
-      tabIndex={canOpenDrawer ? 0 : undefined}
+      role="button"
+      style={{
+        ...style,
+        border: 'none',
+        cursor: canOpenDrawer ? 'pointer' : 'default',
+        position: 'relative',
+        ...(isPast ? { opacity: 0.65 } : {}),
+      }}
+      tabIndex={canOpenDrawer ? 0 : -1}
     >
-      {/* 1. Trạng thái mặc định (khi không hover) */}
+      {/* Chấm tròn vàng ở góc phải nếu lịch đã điều chỉnh (Task 7) */}
+      {isEditorial && event.isAdjusted && (
+        <span
+          className="booking-week-adjusted-dot"
+          aria-label="Đã điều chỉnh"
+          title={event.adjustedNote ? `Đã điều chỉnh: ${event.adjustedNote}` : 'Lịch đã điều chỉnh'}
+        />
+      )}
+
       <div className="card-default-view">
         <div className="card-header-row">
-          <span className="card-time-tag">
-            {timeLabel}
-          </span>
+          <div className="card-time-group" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            {/* Chấm tròn trạng thái trước giờ (Task 7) */}
+            {statusDotTone && (
+              <span
+                className={`booking-week-status-dot dot-${statusDotTone}`}
+                title={`Trạng thái: ${approvalMeta.label}`}
+              />
+            )}
+            <span
+              className={`card-time-tag ${isUserAttending ? 'is-attending-time' : ''}`}
+              style={isUserAttending ? { color: '#D92D20', fontWeight: 600 } : { color: '#475467', fontWeight: 500 }}
+            >
+              {timeLabel}
+            </span>
+          </div>
 
-          <div className="card-header-badges">
-            {event.ticketType === 'TASK' && <span className="card-status-badge task">Task</span>}
-            {event.ticketType === 'EVENT' && <span className="card-status-badge event">Sự kiện</span>}
-            {event.ticketType === 'MEETING' && <span className="card-status-badge meeting">Lịch họp</span>}
-            {isEditorial && isUserAttending && (
-              <span className="card-status-badge attending">Tham gia</span>
-            )}
-            {isPersonal && (
-              <span className="card-status-badge personal">Cá nhân</span>
-            )}
-            {isEditorial && !isUserAttending && !isPast && (
+          <div className="card-header-actions">
+            {isEditorial && !isUserAttending && (
               <button
                 type="button"
                 className={`calendar-star-btn ${isInterested ? 'active' : ''}`}
                 onClick={handleToggleInterest}
                 title={isInterested ? 'Bỏ quan tâm' : 'Quan tâm lịch họp'}
                 aria-label={isInterested ? 'Bỏ quan tâm lịch họp' : 'Quan tâm lịch họp'}
+                aria-pressed={isInterested}
               >
-                <Star size={13} fill={isInterested ? '#f59e0b' : 'none'} color={isInterested ? '#f59e0b' : '#94a3b8'} />
+                <Star className="calendar-star-icon" size={13} fill={isInterested ? '#f59e0b' : 'none'} color={isInterested ? '#f59e0b' : '#667085'} />
               </button>
             )}
           </div>
         </div>
 
+        {/* Tên sự kiện: Hiển thị đầy đủ, không cắt 3 chấm (Task 4) */}
         <div className="card-title">{event.title}</div>
 
-        {event.isAdjusted && (
-          <div className="card-adjusted-tag-row">
-            <span className="card-status-badge adjusted">
-              Đã điều chỉnh
-            </span>
-          </div>
-        )}
-
-        {(event.location || Boolean(event.leader?.trim())) && (
+        {!(event.scope === 'personal' && event.ticketType === 'EVENT') && event.location && (
           <div className="card-location-row">
             {event.location ? (
               <div className="card-location-info" title={event.location}>
-                <MapPin size={12} style={{ flexShrink: 0 }} />
+                <MapPin size={12} color="#667085" style={{ flexShrink: 0 }} />
                 <span>{event.location}</span>
-              </div>
-            ) : event.leader?.trim() ? (
-              <div className="card-location-info" title={event.leader}>
-                <Users size={12} style={{ flexShrink: 0 }} />
-                <span>{event.leader}</span>
               </div>
             ) : null}
           </div>
         )}
       </div>
-
-      {/* 2. Popup preview nhanh khi chuột dừng yên (120ms delay, có arrow beak chỉ hướng) */}
-      <div className="card-hover-popover-portal">
-        <div className="card-hover-arrow" />
-        <div className="card-hover-rich-view">
-        <div className="card-rich-header">
-          <div className="card-rich-title">{event.title}</div>
-          <div className="card-rich-badges">
-            {event.ticketType === 'TASK' && <span className="card-status-badge task">Task</span>}
-            {event.ticketType === 'EVENT' && <span className="card-status-badge event">Sự kiện</span>}
-            {event.ticketType === 'MEETING' && <span className="card-status-badge meeting">Lịch họp</span>}
-            {isEditorial && isUserAttending && (
-              <span className="card-status-badge attending">Tham gia</span>
-            )}
-            {isPersonal && (
-              <span className="card-status-badge personal">Cá nhân</span>
-            )}
-          </div>
-        </div>
-
-        {event.isAdjusted && (
-          <div className="card-rich-adjusted-alert">
-            <span className="card-rich-adjusted-label">
-              Đã điều chỉnh{event.adjustedNote ? ':' : ''}
-            </span>
-            {event.adjustedNote && (
-              <span className="card-rich-adjusted-note"> {event.adjustedNote}</span>
-            )}
-          </div>
-        )}
-
-        <div className="card-rich-row">
-          <Clock size={13} />
-          <span>
-            <strong>Thời gian:</strong> {timeLabel}
-          </span>
-        </div>
-
-        {event.location && (
-          <div className="card-rich-row">
-            <MapPin size={13} />
-            <span>
-              <strong>Địa điểm:</strong> {event.location}
-            </span>
-          </div>
-        )}
-
-        {Boolean(event.leader?.trim()) && (
-          <div className="card-rich-row">
-            <Users size={13} />
-            <span>
-              <strong>Chủ trì:</strong> {event.leader}
-            </span>
-          </div>
-        )}
-
-        {!isTask && event.participantText && (
-          <div className="card-rich-row">
-            <Users size={13} />
-            <span>
-              <strong>Thành phần:</strong> {event.participantText}
-            </span>
-          </div>
-        )}
-
-        {Boolean(event.executors?.length) && (
-          <div className="card-rich-row">
-            <Users size={13} />
-            <span>
-              <strong>Triển khai:</strong> {event.executors!.map((u) => u.name).join(', ')}
-            </span>
-          </div>
-        )}
-
-        {event.dutyInfo && (
-          <div className="card-rich-row">
-            <Calendar size={13} />
-            <span>
-              <strong>Trực ban:</strong> {event.dutyInfo}
-            </span>
-          </div>
-        )}
-
-        {isEditorial && !isUserAttending && !isPast && (
-          <div className="card-rich-interest-row">
-            <button
-              aria-label={isInterested ? 'Bỏ quan tâm lịch họp' : 'Quan tâm lịch họp'}
-              className={`card-rich-star-btn ${isInterested ? 'active' : ''}`}
-              onClick={handleToggleInterest}
-              type="button"
-            >
-              <Star
-                color={isInterested ? '#f59e0b' : '#64748b'}
-                fill={isInterested ? '#f59e0b' : 'none'}
-                size={13}
-              />
-              <span className="card-star-btn-text">
-                {isInterested ? 'Đang quan tâm (Nhắc trước 15p)' : 'Quan tâm (Nhắc trước 15p)'}
-              </span>
-            </button>
-          </div>
-        )}
-
-        {/* Nút gợi ý nhấp để mở Side Drawer chi tiết (chỉ hiện cho sự kiện được tham gia) */}
-        {(Boolean(event.attachments?.length) || Boolean(event.comments?.length) || canOpenDrawer) && (
-          <div className="card-hover-drawer-hint">
-            <div className="card-hover-hint-meta">
-              {Boolean(event.attachments?.length) && (
-                <span className="card-meta-chip" title={`${event.attachments?.length} tệp đính kèm`}>
-                  <Paperclip size={12} />
-                  {event.attachments?.length}
-                </span>
-              )}
-              {Boolean(event.comments?.length) && (
-                <span className="card-meta-chip" title={`${event.comments?.length} bình luận`}>
-                  <MessageSquare size={12} />
-                  {event.comments?.length}
-                </span>
-              )}
-            </div>
-            {canOpenDrawer && (
-              <button
-                type="button"
-                className="card-hover-hint-cta"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleClick();
-                }}
-              >
-                Xem chi tiết <ArrowRight size={12} />
-              </button>
-            )}
-          </div>
-        )}
-      </div>
     </div>
-  </div>
   );
 }

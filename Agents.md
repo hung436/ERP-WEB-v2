@@ -1145,3 +1145,21 @@ Tôi xác nhận:
 **Khi giải pháp phức tạp mâu thuẫn với giải pháp đơn giản nhưng đáp ứng đủ yêu cầu, chọn giải pháp đơn giản.**
 
 **Mọi quyết định phải phục vụ mục tiêu: người dùng nhìn vào thấy công việc của mình và bắt đầu xử lý được ngay.**
+
+---
+
+# PHỤ LỤC C — QUY CHẾ TRIỂN KHAI NHANH (FAST-TRACK MODE)
+
+> **Cập nhật ngày:** 05/11/2026 (theo yêu cầu của Người giao việc)
+
+1. **Chế độ triển khai nhanh (Fast-Track Dev Mode)**:
+   - Trong quá trình phát triển tính năng hoặc sửa lỗi thông thường, Codex **ưu tiên tốc độ phản hồi tối đa**:
+     - Phân tích và sửa code chính xác, gọn gàng, đúng kiến trúc.
+     - Phản hồi ngay kết quả để Người giao việc trực tiếp thử nghiệm và xem giao diện trên dev server.
+     - **Bỏ qua các bước chạy test/build trung gian** (`vitest`, `npm run build`, `npm run typecheck`, `npm run lint`) trong từng turn nhỏ để không làm gián đoạn nhịp độ làm việc.
+
+2. **Nghiệm thu tổng thể (Milestone Verification)**:
+   - Codex chỉ kích hoạt và chạy toàn bộ quy trình kiểm thử và nghiệm thu nghiêm ngặt (`tsc`, `lint`, `vitest`, `build`) khi:
+     - Người giao việc ra lệnh rõ ràng (ví dụ: *"Kiểm tra tổng thể"*, *"Chạy test/build"*, *"Nghiệm thu"*).
+     - Hoàn thành toàn bộ một tính năng/giai đoạn lớn trước khi bàn giao chốt.
+

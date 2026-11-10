@@ -236,6 +236,14 @@ export function EvaluationCriterionRow({
   const handleChildScoreChange = (childId: string, score: number | null) =>
     onChildScoreChange?.(childId, score);
 
+  const chooseLevel = (level: EvaluationLevel) => {
+    if (readOnly) return;
+    setSelectedLevel(level);
+    if (criterion.score === null || criterion.score < level.min || criterion.score > level.max) {
+      onScoreChange(level.max);
+    }
+  };
+
   const handleOpenScoreModal = (level?: EvaluationLevel | null) => {
     if (readOnly) return;
     const targetLevel = level || selectedLevel || criterion.levels?.[0] || null;
@@ -294,7 +302,7 @@ export function EvaluationCriterionRow({
               </div>
             )}
 
-            {!readOnly && !hasLevels && !isSumMode && (
+            {!readOnly && !isSumMode && (
               <div className="evaluation-score-inline">
                 <label htmlFor={`evaluation-score-input-${criterion.id}`}>Điểm</label>
                 <InputNumber
@@ -331,7 +339,7 @@ export function EvaluationCriterionRow({
 
       {/* Lịch sử các cấp: chuỗi chip điểm gọn theo mũi tên, đặt ngay dưới tiêu đề để thấy điểm các cấp trước ngay. */}
       {previousStages.length > 0 && (
-        <div className="criterion-stage-history-container" aria-label={`Lịch sử điểm chấm: ${criterion.title}`}>
+        <div className="criterion-stage-history-container" aria-label={`Chi tiết đánh giá các cấp: ${criterion.title}`}>
           <div className="stage-comparison-strip">
             {previousStages.map((stage, idx) => {
               const val =
@@ -354,15 +362,20 @@ export function EvaluationCriterionRow({
                     {optLetter && <strong className="chip-stage-letter">{optLetter}.</strong>}
                     <strong className="chip-stage-score">{val} điểm</strong>
                     {noteText && (
-                      <button
-                        type="button"
-                        className="stage-note-view-btn"
-                        aria-label={`Xem ghi chú ${stageLabels[stage]}`}
-                        title="Xem ghi chú"
-                        onClick={() => setViewingStageNote({ label: stageLabels[stage], text: noteText })}
-                      >
-                        📝
-                      </button>
+                      <>
+                        <span className="stage-note-inline-text" style={{ fontSize: 11, color: '#475467', marginLeft: 4 }}>
+                          {noteText}
+                        </span>
+                        <button
+                          type="button"
+                          className="stage-note-view-btn"
+                          aria-label={`Xem ghi chú ${stageLabels[stage]}`}
+                          title="Xem ghi chú"
+                          onClick={() => setViewingStageNote({ label: stageLabels[stage], text: noteText })}
+                        >
+                          📝
+                        </button>
+                      </>
                     )}
                   </span>
                 </div>
@@ -462,7 +475,7 @@ export function EvaluationCriterionRow({
                   isPublishedMatch ? ' published-winner' : isSelected ? ' selected' : ''
                 }`}
                 disabled={readOnly}
-                onClick={() => handleOpenScoreModal(level)}
+                onClick={() => chooseLevel(level)}
               >
                 <span className="radio-indicator" aria-hidden="true">
                   <span className="radio-dot" />

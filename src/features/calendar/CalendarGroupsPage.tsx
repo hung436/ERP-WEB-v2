@@ -1,4 +1,4 @@
-import { Button, Empty, Input, Popconfirm, Segmented, Space, Table, Tag, Tooltip, message } from 'antd';
+import { Button, Empty, Input, Segmented, Space, Table, Tag, Tooltip, message } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { useMemo, useState } from 'react';
 
@@ -8,9 +8,12 @@ import { CreateRecipientGroupModal } from '@/features/calendar/components/Create
 import { useAsyncData } from '@/hooks/useAsyncData';
 import { calendarGroupApi } from '@/services/api';
 import type { CalendarRecipientGroup, GroupStatus } from '@/types/calendar';
+import { useCalendarConfirmation } from './useCalendarConfirmation';
+
 import './calendar-notifications.css';
 
 export function CalendarGroupsPage() {
+  const { confirm, confirmationHolder } = useCalendarConfirmation();
   const state = useAsyncData(async () => (await calendarGroupApi.list()).data);
   const [filterStatus, setFilterStatus] = useState<'all' | GroupStatus>('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -40,6 +43,7 @@ export function CalendarGroupsPage() {
       await state.reload();
     } catch (error) {
       message.error(error instanceof Error ? error.message : 'Không thể xóa nhóm');
+      throw error;
     }
   };
 
@@ -134,21 +138,20 @@ export function CalendarGroupsPage() {
             {record.status === 'active' ? 'Đóng nhóm' : 'Mở lại'}
           </Button>
 
-          <Popconfirm
-            cancelText="Hủy"
-            okText="Xóa"
-            onConfirm={() => void handleDelete(record.id)}
-            title="Xóa nhóm nhận thông báo này?"
+          <Button
+            onClick={() => confirm({
+                title: 'Xóa nhóm nhận thông báo?',
+                content: `Bạn có muốn xóa nhóm “${record.name}” không?`,
+                onConfirm: () => handleDelete(record.id),
+                fallbackFocus: '[data-calendar-groups-heading]',
+              })}
+            className="action-link-btn btn-delete-row"
+            danger
+            size="small"
+            type="link"
           >
-            <Button
-              className="action-link-btn btn-delete-row"
-              danger
-              size="small"
-              type="link"
-            >
-              Xóa
-            </Button>
-          </Popconfirm>
+            Xóa
+          </Button>
         </Space>
       ),
     },
@@ -156,6 +159,7 @@ export function CalendarGroupsPage() {
 
   return (
     <div className="calendar-groups-page module-page">
+      {confirmationHolder}
       {/* PAGE HEADER */}
       <div className="calendar-page-header surface-panel">
         <div className="header-left">
@@ -163,7 +167,7 @@ export function CalendarGroupsPage() {
             <ModuleIcon module="calendar" size={26} />
           </div>
           <div className="header-title-row">
-            <h1>Lịch làm việc · Quản lý nhóm</h1>
+            <h1 tabIndex={-1} data-calendar-groups-heading>Lịch làm việc · Quản lý nhóm</h1>
           </div>
         </div>
 

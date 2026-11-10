@@ -360,8 +360,14 @@ export function ProfileDocument({ profile, onImport }: { profile: PersonalProfil
             </FormRow>
           </section>
 
+          <section aria-label="Ngạch và chế độ" className="personnel-form-section">
+            <FormRow columns={3}><FormField label="Ngạch công chức, viên chức" value={profile.civilServantRank} /><FormField label="Mã số" value={profile.rankCode} /><FormField label="Bậc lương" value={profile.salaryGrade} /></FormRow>
+            <FormRow columns={3}><FormField label="Hệ số lương" value={profile.salaryCoefficient} /><FormField label="Từ tháng/năm" value={profile.salaryEffectiveFrom} /><FormField label="Danh hiệu được phong" value={profile.awardedTitle} /></FormRow>
+          </section>
+
           <section aria-label="Tình trạng sức khỏe và tài sản" className="personnel-form-section last">
             <FormRow columns={3}><FormField label="Tình trạng sức khỏe" value={profile.healthStatus} /><FormField label="Chiều cao" value={profile.height} /><FormField label="Cân nặng" value={profile.weight} /></FormRow>
+            <FormRow columns={1}><FormField label="Sở trường công tác" value={profile.workStrengths} wide /></FormRow>
           </section>
         </div>
 

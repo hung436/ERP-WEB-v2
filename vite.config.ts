@@ -5,6 +5,7 @@ import { defineConfig } from 'vite';
 export default defineConfig({
   plugins: [react(), tsconfigPaths()],
   test: {
+    pool: 'threads',
     environment: 'jsdom',
     setupFiles: './src/test/setup.ts',
     css: true,

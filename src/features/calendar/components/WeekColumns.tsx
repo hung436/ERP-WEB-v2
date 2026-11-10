@@ -1,76 +1,22 @@
-import { useState, type UIEvent } from 'react';
+import { getDayDutyInfo } from '../dutySchedule';
+import { useMemo } from 'react';
 import type { Dayjs } from 'dayjs';
 import { Skeleton } from 'antd';
-import { DownOutlined, UpOutlined } from '@ant-design/icons';
 
-import { dayNames, type DutyShiftData, type NormalizedMeetingEvent } from '../calendarWeekUtils';
+import { dayNames, type NormalizedMeetingEvent } from '../calendarWeekUtils';
 
 import { EventCard } from './WeekTimeline';
-
-function DutyShifts({ shifts, past = false }: { shifts?: DutyShiftData['shifts']; past?: boolean }) {
-  if (!shifts) return null;
-
-  if (Array.isArray(shifts)) {
-    return (
-      <div className="booking-week-column-shifts">
-        {shifts.map((shift, idx) => (
-          <div className={`booking-week-column-shift ${past ? 'booking-week-past-duty' : ''}`} key={idx}>
-            <b>{shift.name ? `${shift.name}:` : ''}</b>
-            <div>
-              {shift.tkts && (
-                <div className="booking-week-column-role">
-                  <b>TKTS:</b>
-                  <span>{shift.tkts}</span>
-                </div>
-              )}
-              {shift.btv && (
-                <div className="booking-week-column-role">
-                  <b>BTV:</b>
-                  <span>{shift.btv}</span>
-                </div>
-              )}
-            </div>
-          </div>
-        ))}
-      </div>
-    );
-  }
-
-  return (
-    <div className="booking-week-column-shifts">
-      {Object.entries(shifts).map(([name, roles]) => (
-        <div className={`booking-week-column-shift ${past ? 'booking-week-past-duty' : ''}`} key={name}>
-          <b>{name.replace(/_/g, ' ').replace(/^ca/i, 'Ca')}:</b>
-          <div>
-            {typeof roles === 'object' && roles !== null
-              ? Object.entries(roles)
-                  .sort(([a], [b]) =>
-                    a.toUpperCase() === 'TKTS' ? -1 : b.toUpperCase() === 'TKTS' ? 1 : a.localeCompare(b),
-                  )
-                  .map(([role, names]) => (
-                    <div className="booking-week-column-role" key={role}>
-                      <b>{role.toUpperCase()}:</b>
-                      <span>{Array.isArray(names) ? names.join(', ') : String(names || '—')}</span>
-                    </div>
-                  ))
-              : String(roles || '—')}
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
 
 export interface WeekColumnsProps {
   week: Dayjs;
   now: Dayjs;
-  selectedDate: Dayjs;
+  selectedDate: Dayjs | null;
   events: NormalizedMeetingEvent[];
-  duties: Record<string, DutyShiftData>;
-  showDuty?: boolean;
+
   loading?: boolean;
   onSelectDay: (day: Dayjs) => void;
   onSelectEvent: (event: NormalizedMeetingEvent) => void;
+  onToggleInterest?: (event: NormalizedMeetingEvent, nextState: boolean) => void;
   disabledHover?: boolean;
 }
 
@@ -79,40 +25,44 @@ export function WeekColumns({
   now,
   selectedDate,
   events,
-  duties,
-  showDuty = true,
+
   loading = false,
   onSelectDay,
   onSelectEvent,
+  onToggleInterest,
   disabledHover = false,
 }: WeekColumnsProps) {
-  const [compact, setCompact] = useState(false);
-  const [dutyExpanded, setDutyExpanded] = useState(false);
-
-  const handleScroll = (event: UIEvent<HTMLDivElement>) => {
-    const top = event.currentTarget.scrollTop;
-    if (top > 70 && !compact) setCompact(true);
-    else if (top < 15 && compact) setCompact(false);
-  };
+  // Tối ưu hóa: Nhóm các sự kiện theo ngày 1 lần duy nhất với useMemo (O(N) thay vì lặp O(7*N))
+  const eventsByDay = useMemo(() => {
+    const map = new Map<string, NormalizedMeetingEvent[]>();
+    for (const ev of events) {
+      const list = map.get(ev.date) || [];
+      list.push(ev);
+      map.set(ev.date, list);
+    }
+    for (const list of map.values()) {
+      list.sort((a, b) => a.start.valueOf() - b.start.valueOf());
+    }
+    return map;
+  }, [events]);
 
   return (
     <div
-      className={`booking-week-columns-scroll ${compact ? 'booking-week-columns-compact' : ''}`}
+
+      className="booking-week-columns-scroll"
       aria-label="Lịch họp tuần theo cột ngày"
       aria-busy={loading}
-      onScroll={handleScroll}
     >
       <div className="booking-week-columns-grid">
         {dayNames.map((name, index) => {
           const day = week.add(index, 'day');
           const date = day.format('YYYY-MM-DD');
-          const duty = duties[date];
-          const selected = date === selectedDate.format('YYYY-MM-DD');
+          const dutyLeader = getDayDutyInfo(day)?.leader;
+
+          const selected = date === selectedDate?.format('YYYY-MM-DD');
           const isToday = day.isSame(now, 'day');
-          const pastDuty = week.isSame(now, 'isoWeek') && day.isBefore(now, 'day');
-          const dayEvents = events
-            .filter((event) => event.date === date)
-            .sort((a, b) => a.start.valueOf() - b.start.valueOf());
+
+          const dayEvents = eventsByDay.get(date) || [];
 
           return (
             <section
@@ -127,44 +77,19 @@ export function WeekColumns({
                   <button
                     type="button"
                     className="booking-week-column-day"
-                    aria-label={`Xem danh sách lịch ngày ${name} ${day.format('DD/MM')}`}
+                    aria-label={`Xem ca trực ngày ${name} ${day.format('DD/MM')}`}
+                    data-calendar-day={date}
                     onClick={() => onSelectDay(day)}
                     disabled={loading}
                   >
-                    <span>{name}</span>
+                    <span className="booking-week-column-day-title">
+                      <span>{name}</span>
+                    </span>
                     <b className="booking-week-column-date">{day.format('DD/MM')}</b>
                   </button>
                 </div>
 
-                {showDuty && (
-                  <div className="booking-week-column-duty">
-                    {loading ? (
-                      <Skeleton active title={false} paragraph={{ rows: 1, width: ['75%'] }} />
-                    ) : (
-                      <>
-                        <button
-                          type="button"
-                          className={`booking-week-column-leader booking-week-column-leader--interactive ${
-                            pastDuty ? 'booking-week-past-duty' : ''
-                          }`}
-                          aria-expanded={dutyExpanded}
-                          aria-label={dutyExpanded ? 'Thu gọn các ca trực' : 'Mở rộng các ca trực'}
-                          onClick={() => setDutyExpanded((prev) => !prev)}
-                        >
-                          <span>Trực:</span>
-                          <strong title={duty?.leader}>{duty?.leader || 'Chưa có thông tin'}</strong>
-                          {duty?.shifts &&
-                            (dutyExpanded ? (
-                              <UpOutlined className="booking-week-duty-chevron" />
-                            ) : (
-                              <DownOutlined className="booking-week-duty-chevron" />
-                            ))}
-                        </button>
-                        {dutyExpanded && <DutyShifts shifts={duty?.shifts} past={pastDuty} />}
-                      </>
-                    )}
-                  </div>
-                )}
+                {dutyLeader && <div className="booking-week-day-duty-leader">Trực: <strong>{dutyLeader}</strong></div>}
               </div>
 
               <div className="booking-week-column-events">
@@ -185,9 +110,10 @@ export function WeekColumns({
                       event={event}
                       now={now}
                       vertical
-                      expandLeft={index >= 5}
+                      expandLeft={index >= 3}
                       upward={eventIndex >= 4}
                       onSelect={onSelectEvent}
+                      onToggleInterest={onToggleInterest}
                       disabledHover={disabledHover}
                     />
                   ))
