@@ -295,7 +295,6 @@ export function ProfileDocument({ profile, onImport }: { profile: PersonalProfil
       setCollapsedSections(all);
     }
   };
-
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
       {/* Action bar — right-aligned compact buttons */}
