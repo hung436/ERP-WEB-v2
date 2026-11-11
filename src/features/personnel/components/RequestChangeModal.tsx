@@ -1,4 +1,4 @@
-import { Alert, Avatar, Button, Form, Input, Modal, Select, Tabs, Tag, Upload, message } from 'antd';
+import {  Avatar, Button, Form, Input, Modal, Select, Tabs, Tag, Upload, message } from 'antd';
 import {
   CheckCircleOutlined,
   EditOutlined,
@@ -7,7 +7,6 @@ import {
   PaperClipOutlined,
   RightOutlined,
   RollbackOutlined,
-  UserOutlined,
 } from '@ant-design/icons';
 import { useMemo, useState } from 'react';
 import type { UploadFile } from 'antd/es/upload/interface';
@@ -716,7 +715,6 @@ export function RequestChangeModal({ open, onClose, profile, onSuccess }: Reques
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: '#1e40af', fontWeight: 600 }}>
-            <span>Đang xem mục:</span>
             <Select
               onChange={(key) => setActiveTab(key as ChangeSectionKey)}
               options={SECTION_DEFINITIONS.map((s) => ({
@@ -736,7 +734,7 @@ export function RequestChangeModal({ open, onClose, profile, onSuccess }: Reques
               size="small"
               style={{ fontWeight: 600 }}
             >
-              Mục trước
+              Trước 
             </Button>
             <Button
               disabled={!nextSection}
@@ -746,7 +744,7 @@ export function RequestChangeModal({ open, onClose, profile, onSuccess }: Reques
               style={{ fontWeight: 600 }}
               type="primary"
             >
-              Mục kế tiếp
+              Sau
             </Button>
           </div>
         </div>

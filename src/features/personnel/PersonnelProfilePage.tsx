@@ -1,5 +1,5 @@
 import { Avatar, Button, Select, Tag } from 'antd';
-import { DownloadOutlined, FormOutlined, HistoryOutlined, UploadOutlined } from '@ant-design/icons';
+import { DownloadOutlined, DownOutlined, FormOutlined, HistoryOutlined, UploadOutlined } from '@ant-design/icons';
 import { useEffect, useState } from 'react';
 import type { MouseEvent, ReactNode } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
@@ -18,7 +18,7 @@ import './personnel-profile.css';
 const initials = (name: string) => name.split(' ').slice(-2).map((part) => part[0]).join('').toUpperCase();
 
 export const profileSections = [
-  { numeral: 'I', title: 'Thông tin cá nhân' },
+  { numeral: 'I', title: 'Sơ yếu lý lịch' },
   { numeral: 'II', title: 'Lịch sử bản thân' },
   { numeral: 'III', title: 'Đặc điểm lịch sử' },
   { numeral: 'IV', title: 'Gia nhập Đảng' },
@@ -126,11 +126,14 @@ export function ProfileSectionNav() {
 
   const navigateToSection = (event: MouseEvent<HTMLAnchorElement>, numeral: string) => {
     event.preventDefault();
-    const el = document.getElementById(`personnel-section-${numeral}`);
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      setActiveSection(numeral);
-    }
+    window.dispatchEvent(new CustomEvent('personnel-expand-section', { detail: numeral }));
+    setTimeout(() => {
+      const el = document.getElementById(`personnel-section-${numeral}`);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        setActiveSection(numeral);
+      }
+    }, 60);
   };
 
   return (
@@ -195,11 +198,42 @@ function FormRow({ children, columns = 2 }: { children: ReactNode; columns?: 1 |
   return <dl className={`personnel-form-row columns-${columns}`}>{children}</dl>;
 }
 
-function RomanSection({ numeral, title, children }: { numeral: string; title: string; children: ReactNode }) {
+function RomanSection({
+  numeral,
+  title,
+  isOpen = true,
+  onToggle,
+  children,
+}: {
+  numeral: string;
+  title: string;
+  isOpen?: boolean;
+  onToggle?: () => void;
+  children: ReactNode;
+}) {
   return (
     <section aria-labelledby={`personnel-section-${numeral}`} className="personnel-roman-section">
-      <h2 id={`personnel-section-${numeral}`}><span>{numeral}.</span>{title}</h2>
-      {children}
+      <div
+        className="personnel-section-collapse-header"
+        id={`personnel-section-${numeral}`}
+        onClick={onToggle}
+        role="button"
+        tabIndex={0}
+        aria-expanded={isOpen}
+      >
+        <h2 style={{ margin: 0 }}>
+          <span>{numeral}.</span>
+          {title}
+        </h2>
+        <div className={`personnel-collapse-arrow ${isOpen ? 'is-open' : 'is-collapsed'}`}>
+          <DownOutlined style={{ transform: isOpen ? 'rotate(0deg)' : 'rotate(-90deg)', transition: 'transform 0.25s ease' }} />
+        </div>
+      </div>
+      {isOpen && (
+        <div className="personnel-section-collapse-content">
+          {children}
+        </div>
+      )}
     </section>
   );
 }
@@ -226,11 +260,41 @@ function DataTable<T>({ columns, rows, emptyText }: { columns: Array<{ title: st
 export function ProfileDocument({ profile, onImport }: { profile: PersonalProfile; onImport?: (file?: File) => void }) {
   const [requestModalOpen, setRequestModalOpen] = useState(false);
   const [historyDrawerOpen, setHistoryDrawerOpen] = useState(false);
+  const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({});
+
+  useEffect(() => {
+    const handleExpand = (e: any) => {
+      const numeral = e.detail;
+      if (numeral) {
+        setCollapsedSections((prev) => ({ ...prev, [numeral]: false }));
+      }
+    };
+    window.addEventListener('personnel-expand-section', handleExpand);
+    return () => window.removeEventListener('personnel-expand-section', handleExpand);
+  }, []);
 
   const historyState = useAsyncData(async () => (await changeRequestsApi.list()).data);
   const historyList = (historyState.data ?? []).filter(
     (req) => req.personnelId === profile.id || req.employeeCode === profile.employeeCode
   );
+
+  const isSectionOpen = (numeral: string) => !collapsedSections[numeral];
+  const toggleSection = (numeral: string) => {
+    setCollapsedSections((prev) => ({ ...prev, [numeral]: !prev[numeral] }));
+  };
+
+  const isAllCollapsed = profileSections.every((sec) => collapsedSections[sec.numeral]);
+  const toggleAll = () => {
+    if (isAllCollapsed) {
+      setCollapsedSections({});
+    } else {
+      const all: Record<string, boolean> = {};
+      profileSections.forEach((sec) => {
+        all[sec.numeral] = true;
+      });
+      setCollapsedSections(all);
+    }
+  };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
@@ -251,7 +315,7 @@ export function ProfileDocument({ profile, onImport }: { profile: PersonalProfil
             color: '#475467',
           }}
         >
-          Import lý lịch
+          Import
         </Button>
         <input
           accept=".pdf,.doc,.docx"
@@ -276,7 +340,7 @@ export function ProfileDocument({ profile, onImport }: { profile: PersonalProfil
           }}
           style={{ height: 36, fontSize: 13.5, fontWeight: 600, borderColor: '#e4e7ec', background: '#ffffff', color: '#475467' }}
         >
-          Tải file
+          Download
         </Button>
         <Button
           icon={<HistoryOutlined />}
@@ -296,106 +360,193 @@ export function ProfileDocument({ profile, onImport }: { profile: PersonalProfil
 
       <article aria-labelledby="personnel-section-I" className="personnel-form-document">
         <header className="personnel-document-masthead">
-          <div className="personnel-document-context"><span><ModuleIcon module="personnel" size={17} /></span><div><small>Mẫu hồ sơ điện tử</small><strong>2A / {profile.employeeCode}</strong></div></div>
-          <div className="personnel-document-title"><span>Hồ sơ cán bộ, viên chức</span><h1 id="personnel-section-I">I. Sơ yếu lý lịch</h1></div>
-          <Tag bordered={false} className="personnel-verified"><span aria-hidden>✓</span> Đã xác minh</Tag>
+          {/* <div className="personnel-document-context"><span><ModuleIcon module="personnel" size={17} /></span><div><small>Hồ sơ điện tử</small></div></div> */}
+          <h1 className="personnel-doc-main-heading">
+            <span style={{color:'rgb(217, 45, 32)'}}><ModuleIcon module="personnel" size={17} /></span><span>Lý lịch cán bộ, viên chức</span>
+          </h1>
+          {/* <div className="personnel-document-title"><span>Sơ yếu lý lịch cán bộ, viên chức</span> */}
+          {/* <h1 className="personnel-doc-main-heading"><span>Lý lịch cán bộ, viên chức</span> */}
+          {/* <h1 className="personnel-doc-main-heading">SƠ YẾU LÝ LỊCH CÁN BỘ, VIÊN CHỨC</h1> */}
+          {/* </h1> */}
+          <button
+            type="button"
+            className="personnel-open-fullpage-btn"
+            onClick={() => window.open(`/personnel/resume/${profile.id}`, '_blank')}
+            title="Mở toàn trang trong tab mới"
+          >
+            <span>Mở toàn trang</span>
+            <span aria-hidden="true" style={{ fontSize: 14 }}>↗</span>
+          </button>
         </header>
 
-        <section aria-label="Thông tin nhận diện" className="personnel-identity-block">
-          <figure className="personnel-photo"><Avatar className="personnel-photo-avatar" shape="square" size={132} src={profile.avatarUrl}>{initials(profile.fullName)}</Avatar><figcaption>Ảnh 4 × 6</figcaption></figure>
-          <div className="personnel-identity-fields">
-            <FormRow columns={1}><FormField label="Họ và tên khai sinh" value={profile.fullName.toUpperCase()} /></FormRow>
-            <FormRow><FormField label="Sinh ngày" value={profile.birthDate} /><FormField label="Giới tính" value={profile.gender} /></FormRow>
-            <FormRow columns={1}><FormField label="Nơi sinh" value={profile.birthPlace} /></FormRow>
-            <FormRow columns={1}><FormField label="Quê quán" value={profile.hometown} /></FormRow>
-            <FormRow><FormField label="Chức vụ hiện tại" value={profile.currentPosition} /><FormField label="Đơn vị công tác" value={profile.department} /></FormRow>
-          </div>
-        </section>
-
-        <div className="personnel-document-body">
-          <section aria-label="Thông tin cá nhân" className="personnel-form-section">
-            <FormRow columns={1}><FormField label="Địa chỉ thường trú (hộ khẩu)" value={profile.permanentAddress} /></FormRow>
-            <FormRow columns={1}><FormField label="Nơi ở hiện nay" value={profile.currentAddress} /></FormRow>
-            <FormRow columns={3}><FormField label="Dân tộc" value={profile.ethnicity} /><FormField label="Tôn giáo" value={profile.religion} /><FormField label="Quốc tịch" value={profile.nationality} /></FormRow>
-            <FormRow columns={3}><FormField label="Số CMND/CCCD" value={profile.identityNumber} /><FormField label="Ngày cấp" value={profile.identityIssuedDate} /><FormField label="Nơi cấp" value={profile.identityIssuedPlace} /></FormRow>
-            <FormRow columns={3}><FormField label="Điện thoại nhà" value={profile.homePhone} /><FormField label="Điện thoại di động" value={profile.phone} /><FormField label="Email" value={profile.email} /></FormRow>
-          </section>
-
-          <section aria-label="Xuất thân và học vấn" className="personnel-form-section">
-            <FormRow><FormField label="Thành phần gia đình xuất thân" value={profile.familyBackground} /><FormField label="Nghề nghiệp khi được tuyển dụng" value={profile.occupationAtRecruitment} /></FormRow>
-            <div className="personnel-education">
-              <span className="personnel-inline-label">Trình độ học vấn</span>
-              <div>
-                <FormField label="Văn hóa phổ thông" value={profile.generalEducation} />
-                <FormField label="Chuyên môn, kỹ thuật" value={profile.professionalQualification} />
-                <FormField label="Lý luận chính trị" value={profile.politicalTheory} />
-                <FormField label="Ngoại ngữ" value={profile.foreignLanguages} />
-                <FormField label="Tin học" value={profile.informationTechnology} />
-              </div>
-            </div>
-          </section>
-
-          <section aria-label="Quá trình tham gia và tuyển dụng" className="personnel-form-section">
-            <FormRow columns={2}>
-              <FormField label="Ngày tham gia cách mạng" value={profile.revolutionParticipationDate} />
-              <FormField label="Làm gì, trong tổ chức nào" value={profile.revolutionActivity} />
-            </FormRow>
-            <FormRow columns={3}>
-              <FormField label="Ngày nhập ngũ" value={profile.enlistmentDate} />
-              <FormField label="Ngày xuất ngũ" value={profile.dischargeDate} />
-              <FormField label="Quân hàm" value={profile.militaryRank} />
-            </FormRow>
-            <FormRow columns={2}>
-              <FormField label="Ngày được tuyển dụng" value={profile.recruitmentDate} />
-              <FormField label="Cơ quan tuyển dụng" value={profile.recruitingAgency} />
-            </FormRow>
-            <FormRow columns={2}>
-              <FormField label="Ngày vào Đoàn TNCS Hồ Chí Minh" value={profile.youthUnionJoinDate} />
-              <FormField label="Nơi kết nạp" value={profile.youthUnionJoinPlace} />
-            </FormRow>
-            <FormRow columns={3}>
-              <FormField label="Ngày vào Đảng (dự bị)" value={profile.partyProbationaryDate} />
-              <FormField label="Ngày chính thức" value={profile.partyOfficialDate} />
-              <FormField label="Số thẻ Đảng" value={profile.partyCardNumber} />
-            </FormRow>
-          </section>
-
-          <section aria-label="Ngạch và chế độ" className="personnel-form-section">
-            <FormRow columns={3}><FormField label="Ngạch công chức, viên chức" value={profile.civilServantRank} /><FormField label="Mã số" value={profile.rankCode} /><FormField label="Bậc lương" value={profile.salaryGrade} /></FormRow>
-            <FormRow columns={3}><FormField label="Hệ số lương" value={profile.salaryCoefficient} /><FormField label="Từ tháng/năm" value={profile.salaryEffectiveFrom} /><FormField label="Danh hiệu được phong" value={profile.awardedTitle} /></FormRow>
-          </section>
-
-          <section aria-label="Tình trạng sức khỏe và tài sản" className="personnel-form-section last">
-            <FormRow columns={3}><FormField label="Tình trạng sức khỏe" value={profile.healthStatus} /><FormField label="Chiều cao" value={profile.height} /><FormField label="Cân nặng" value={profile.weight} /></FormRow>
-            <FormRow columns={1}><FormField label="Sở trường công tác" value={profile.workStrengths} wide /></FormRow>
-          </section>
-        </div>
-
         <div className="personnel-extended-sections">
-          <RomanSection numeral="II" title="Lịch sử bản thân">
+          <RomanSection
+            numeral="I"
+            title="Sơ yếu lý lịch"
+            isOpen={isSectionOpen('I')}
+            onToggle={() => toggleSection('I')}
+          >
+            <section aria-label="Thông tin nhận diện" className="personnel-identity-block" style={{ padding: '20px 0', borderBottom: '1px solid #e4e7ec' }}>
+              <figure className="personnel-photo"><Avatar className="personnel-photo-avatar" shape="square" size={132} src={profile.avatarUrl}>{initials(profile.fullName)}</Avatar><figcaption>Ảnh 4 × 6</figcaption></figure>
+              <div className="personnel-identity-fields">
+                <FormRow columns={1}><FormField label="Họ và tên khai sinh" value={profile.fullName.toUpperCase()} /></FormRow>
+                <FormRow><FormField label="Sinh ngày" value={profile.birthDate} /><FormField label="Giới tính" value={profile.gender} /></FormRow>
+                <FormRow columns={1}><FormField label="Nơi sinh" value={profile.birthPlace} /></FormRow>
+                <FormRow columns={1}><FormField label="Quê quán" value={profile.hometown} /></FormRow>
+                <FormRow><FormField label="Chức vụ hiện tại" value={profile.currentPosition} /><FormField label="Đơn vị công tác" value={profile.department} /></FormRow>
+              </div>
+            </section>
+
+            <div className="personnel-document-body" style={{ padding: 0 }}>
+              <section aria-label="Thông tin cá nhân" className="personnel-form-section">
+                <FormRow columns={1}><FormField label="Địa chỉ thường trú (hộ khẩu)" value={profile.permanentAddress} /></FormRow>
+                <FormRow columns={1}><FormField label="Nơi ở hiện nay" value={profile.currentAddress} /></FormRow>
+                <FormRow columns={3}><FormField label="Dân tộc" value={profile.ethnicity} /><FormField label="Tôn giáo" value={profile.religion} /><FormField label="Quốc tịch" value={profile.nationality} /></FormRow>
+                <FormRow columns={3}><FormField label="Số CMND/CCCD" value={profile.identityNumber} /><FormField label="Ngày cấp" value={profile.identityIssuedDate} /><FormField label="Nơi cấp" value={profile.identityIssuedPlace} /></FormRow>
+                <FormRow columns={3}><FormField label="Điện thoại nhà" value={profile.homePhone} /><FormField label="Điện thoại di động" value={profile.phone} /><FormField label="Email" value={profile.email} /></FormRow>
+              </section>
+
+              <section aria-label="Xuất thân và học vấn" className="personnel-form-section">
+                <FormRow><FormField label="Thành phần gia đình xuất thân" value={profile.familyBackground} /><FormField label="Nghề nghiệp khi được tuyển dụng" value={profile.occupationAtRecruitment} /></FormRow>
+                <div className="personnel-education">
+                  <span className="personnel-inline-label">Trình độ học vấn</span>
+                  <div>
+                    <FormField label="Văn hóa phổ thông" value={profile.generalEducation} />
+                    <FormField label="Chuyên môn, kỹ thuật" value={profile.professionalQualification} />
+                    <FormField label="Lý luận chính trị" value={profile.politicalTheory} />
+                    <FormField label="Ngoại ngữ" value={profile.foreignLanguages} />
+                    <FormField label="Tin học" value={profile.informationTechnology} />
+                  </div>
+                </div>
+              </section>
+
+              <section aria-label="Quá trình tham gia và tuyển dụng" className="personnel-form-section">
+                <FormRow columns={2}>
+                  <FormField label="Ngày tham gia cách mạng" value={profile.revolutionParticipationDate} />
+                  <FormField label="Làm gì, trong tổ chức nào" value={profile.revolutionActivity} />
+                </FormRow>
+                <FormRow columns={3}>
+                  <FormField label="Ngày nhập ngũ" value={profile.enlistmentDate} />
+                  <FormField label="Ngày xuất ngũ" value={profile.dischargeDate} />
+                  <FormField label="Quân hàm" value={profile.militaryRank} />
+                </FormRow>
+                <FormRow columns={2}>
+                  <FormField label="Ngày được tuyển dụng" value={profile.recruitmentDate} />
+                  <FormField label="Cơ quan tuyển dụng" value={profile.recruitingAgency} />
+                </FormRow>
+                <FormRow columns={2}>
+                  <FormField label="Ngày vào Đoàn TNCS Hồ Chí Minh" value={profile.youthUnionJoinDate} />
+                  <FormField label="Nơi kết nạp" value={profile.youthUnionJoinPlace} />
+                </FormRow>
+                <FormRow columns={3}>
+                  <FormField label="Ngày vào Đảng (dự bị)" value={profile.partyProbationaryDate} />
+                  <FormField label="Ngày chính thức" value={profile.partyOfficialDate} />
+                  <FormField label="Số thẻ Đảng" value={profile.partyCardNumber} />
+                </FormRow>
+              </section>
+
+              <section aria-label="Ngạch và chế độ" className="personnel-form-section">
+                <FormRow columns={3}><FormField label="Ngạch công chức, viên chức" value={profile.civilServantRank} /><FormField label="Mã số" value={profile.rankCode} /><FormField label="Bậc lương" value={profile.salaryGrade} /></FormRow>
+                <FormRow columns={3}><FormField label="Hệ số lương" value={profile.salaryCoefficient} /><FormField label="Từ tháng/năm" value={profile.salaryEffectiveFrom} /><FormField label="Danh hiệu được phong" value={profile.awardedTitle} /></FormRow>
+              </section>
+
+              <section aria-label="Tình trạng sức khỏe và tài sản" className="personnel-form-section last">
+                <FormRow columns={3}><FormField label="Tình trạng sức khỏe" value={profile.healthStatus} /><FormField label="Chiều cao" value={profile.height} /><FormField label="Cân nặng" value={profile.weight} /></FormRow>
+                <FormRow columns={1}><FormField label="Sở trường công tác" value={profile.workStrengths} wide /></FormRow>
+              </section>
+            </div>
+          </RomanSection>
+
+          <RomanSection
+            numeral="II"
+            title="Lịch sử bản thân"
+            isOpen={isSectionOpen('II')}
+            onToggle={() => toggleSection('II')}
+          >
             <div className="personnel-subsection"><h3>II.A Trước khi được tuyển dụng vào cơ quan</h3><DataTable columns={[{ title: 'Từ tháng, năm – đến tháng, năm', value: (row) => row.period }, { title: 'Quá trình học tập, lao động và hoạt động nổi bật', value: (row) => row.details }]} emptyText="Chưa có thông tin trước tuyển dụng" rows={profile.historyBeforeRecruitment} /></div>
             <div className="personnel-subsection"><h3>II.B Quá trình công tác từ khi được tuyển dụng</h3><DataTable columns={[{ title: 'Từ tháng, năm – đến tháng, năm', value: (row) => row.period }, { title: 'Chức danh, chức vụ, đơn vị công tác và nhiệm vụ', value: (row) => row.details }]} emptyText="Chưa có quá trình công tác" rows={profile.employmentHistory} /></div>
           </RomanSection>
 
-          <RomanSection numeral="III" title="Những đặc điểm về lịch sử bản thân"><div className="personnel-note-panel">{profile.personalHistoryNotes}</div></RomanSection>
+          <RomanSection
+            numeral="III"
+            title="Những đặc điểm về lịch sử bản thân"
+            isOpen={isSectionOpen('III')}
+            onToggle={() => toggleSection('III')}
+          >
+            <div className="personnel-note-panel">{profile.personalHistoryNotes}</div>
+          </RomanSection>
 
-          <RomanSection numeral="IV" title="Gia nhập Đảng Cộng sản Việt Nam">
+          <RomanSection
+            numeral="IV"
+            title="Gia nhập Đảng Cộng sản Việt Nam"
+            isOpen={isSectionOpen('IV')}
+            onToggle={() => toggleSection('IV')}
+          >
             <div className="personnel-roman-form"><FormRow columns={3}><FormField label="Ngày được kết nạp vào Đảng" value={profile.partyProbationaryDate} /><FormField label="Tại Chi bộ" value={profile.partyJoinBranch} /><FormField label="Thuộc Đảng bộ" value={profile.partyCommittee} /></FormRow><FormRow><FormField label="Người giới thiệu thứ nhất" value={profile.partyIntroducers[0] ?? 'Chưa có thông tin'} /><FormField label="Người giới thiệu thứ hai" value={profile.partyIntroducers[1] ?? 'Chưa có thông tin'} /></FormRow><FormRow columns={3}><FormField label="Ngày tuyên bố chính thức" value={profile.partyOfficialDate} /><FormField label="Số thẻ Đảng viên" value={profile.partyCardNumber} /><FormField label="Ngày cấp thẻ" value={profile.partyCardIssuedDate} /></FormRow></div>
           </RomanSection>
 
-          <RomanSection numeral="V" title="Tham gia các tổ chức chính trị, xã hội, hội nghề nghiệp"><DataTable columns={[{ title: 'Từ thời gian đến thời gian', value: (row) => row.period }, { title: 'Tên tổ chức, nhiệm vụ và chức danh', value: (row) => row.details }]} emptyText="Chưa có thông tin tham gia tổ chức" rows={profile.politicalOrganizationHistory} /></RomanSection>
+          <RomanSection
+            numeral="V"
+            title="Tham gia các tổ chức chính trị, xã hội, hội nghề nghiệp"
+            isOpen={isSectionOpen('V')}
+            onToggle={() => toggleSection('V')}
+          >
+            <DataTable columns={[{ title: 'Từ thời gian đến thời gian', value: (row) => row.period }, { title: 'Tên tổ chức, nhiệm vụ và chức danh', value: (row) => row.details }]} emptyText="Chưa có thông tin tham gia tổ chức" rows={profile.politicalOrganizationHistory} />
+          </RomanSection>
 
-          <RomanSection numeral="VI" title="Đào tạo, bồi dưỡng về chuyên môn, nghiệp vụ, lý luận chính trị, ngoại ngữ"><DataTable columns={[{ title: 'Tên trường, địa chỉ', value: (row) => row.institution }, { title: 'Chuyên ngành', value: (row) => row.specialization }, { title: 'Thời gian học', value: (row) => row.period }, { title: 'Chế độ học', value: (row) => row.mode }, { title: 'Văn bằng, chứng chỉ', value: (row) => row.qualification }]} emptyText="Chưa có thông tin đào tạo" rows={profile.trainingHistory} /></RomanSection>
+          <RomanSection
+            numeral="VI"
+            title="Đào tạo, bồi dưỡng về chuyên môn, nghiệp vụ, lý luận chính trị, ngoại ngữ"
+            isOpen={isSectionOpen('VI')}
+            onToggle={() => toggleSection('VI')}
+          >
+            <DataTable columns={[{ title: 'Tên trường, địa chỉ', value: (row) => row.institution }, { title: 'Chuyên ngành', value: (row) => row.specialization }, { title: 'Thời gian học', value: (row) => row.period }, { title: 'Chế độ học', value: (row) => row.mode }, { title: 'Văn bằng, chứng chỉ', value: (row) => row.qualification }]} emptyText="Chưa có thông tin đào tạo" rows={profile.trainingHistory} />
+          </RomanSection>
 
-          <RomanSection numeral="VII" title="Khen thưởng"><DataTable columns={[{ title: 'Tháng năm', value: (row) => row.date }, { title: 'Nội dung và hình thức khen thưởng', value: (row) => row.content }, { title: 'Số quyết định khen thưởng', value: (row) => row.decision }]} emptyText="Chưa có thông tin khen thưởng" rows={profile.rewards} /></RomanSection>
+          <RomanSection
+            numeral="VII"
+            title="Khen thưởng"
+            isOpen={isSectionOpen('VII')}
+            onToggle={() => toggleSection('VII')}
+          >
+            <DataTable columns={[{ title: 'Tháng năm', value: (row) => row.date }, { title: 'Nội dung và hình thức khen thưởng', value: (row) => row.content }, { title: 'Số quyết định khen thưởng', value: (row) => row.decision }]} emptyText="Chưa có thông tin khen thưởng" rows={profile.rewards} />
+          </RomanSection>
 
-          <RomanSection numeral="VIII" title="Kỷ luật"><DataTable columns={[{ title: 'Tháng năm', value: (row) => row.date }, { title: 'Nội dung và hình thức kỷ luật', value: (row) => row.content }, { title: 'Cấp quyết định', value: (row) => row.decision }]} emptyText="Không có thông tin kỷ luật" rows={profile.disciplines} /></RomanSection>
+          <RomanSection
+            numeral="VIII"
+            title="Kỷ luật"
+            isOpen={isSectionOpen('VIII')}
+            onToggle={() => toggleSection('VIII')}
+          >
+            <DataTable columns={[{ title: 'Tháng năm', value: (row) => row.date }, { title: 'Nội dung và hình thức kỷ luật', value: (row) => row.content }, { title: 'Cấp quyết định', value: (row) => row.decision }]} emptyText="Không có thông tin kỷ luật" rows={profile.disciplines} />
+          </RomanSection>
 
-          <RomanSection numeral="IX" title="Hoàn cảnh kinh tế, quan hệ gia đình và thân tộc"><DataTable columns={[{ title: 'Quan hệ', value: (row) => row.relation }, { title: 'Họ tên, năm sinh, nghề nghiệp, nơi cư trú và hoàn cảnh kinh tế', value: (row) => row.details }]} emptyText="Chưa có thông tin quan hệ gia đình" rows={profile.familyRelations} /></RomanSection>
+          <RomanSection
+            numeral="IX"
+            title="Hoàn cảnh kinh tế, quan hệ gia đình và thân tộc"
+            isOpen={isSectionOpen('IX')}
+            onToggle={() => toggleSection('IX')}
+          >
+            <DataTable columns={[{ title: 'Quan hệ', value: (row) => row.relation }, { title: 'Họ tên, năm sinh, nghề nghiệp, nơi cư trú và hoàn cảnh kinh tế', value: (row) => row.details }]} emptyText="Chưa có thông tin quan hệ gia đình" rows={profile.familyRelations} />
+          </RomanSection>
 
-          <RomanSection numeral="X" title="Quan hệ xã hội"><DataTable columns={[{ title: 'Quan hệ', value: (row) => row.relation }, { title: 'Thông tin cá nhân, quá trình công tác và nơi cư trú', value: (row) => row.details }]} emptyText="Chưa có dữ liệu quan hệ xã hội" rows={profile.socialRelations} /></RomanSection>
+          <RomanSection
+            numeral="X"
+            title="Quan hệ xã hội"
+            isOpen={isSectionOpen('X')}
+            onToggle={() => toggleSection('X')}
+          >
+            <DataTable columns={[{ title: 'Quan hệ', value: (row) => row.relation }, { title: 'Thông tin cá nhân, quá trình công tác và nơi cư trú', value: (row) => row.details }]} emptyText="Chưa có dữ liệu quan hệ xã hội" rows={profile.socialRelations} />
+          </RomanSection>
 
-          <RomanSection numeral="XI" title="Tự nhận xét"><div className="personnel-assessment"><p>{profile.selfAssessment}</p><span>{profile.fullName}</span></div></RomanSection>
+          <RomanSection
+            numeral="XI"
+            title="Tự nhận xét"
+            isOpen={isSectionOpen('XI')}
+            onToggle={() => toggleSection('XI')}
+          >
+            <div className="personnel-assessment"><p>{profile.selfAssessment}</p><span>{profile.fullName}</span></div>
+          </RomanSection>
         </div>
 
         <footer className="personnel-document-footer"><span><ModuleIcon module="personnel" size={14} /> Hồ sơ điện tử nội bộ</span><span>{profile.employeeCode}</span></footer>

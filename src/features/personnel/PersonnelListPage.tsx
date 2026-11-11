@@ -837,7 +837,7 @@ export function PersonnelListPage() {
         <section className="peopleos-intro">
           <h1>Quản trị nhân sự &amp; quy trình đánh giá</h1>
           <div className="peopleos-actions">
-            <button className="peopleos-btn peopleos-btn-primary" onClick={() => { setCampaignStep(1); setIsCampaignCreated(false); setModal('campaign'); }} type="button">＋ Tạo bình bầu ĐGLĐ</button>
+            <button style={{background:'#fff',color:'#334155',  border: '1px solid #d0d5dd'}} className="peopleos-btn peopleos-btn-primary" onClick={() => { setCampaignStep(1); setIsCampaignCreated(false); setModal('campaign'); }} type="button">＋ Tạo bình bầu ĐGLĐ</button>
             <button className="peopleos-btn peopleos-btn-green" onClick={() => message.info('Đang xuất file quy trình...')} type="button">⇩ Xuất file quy trình ĐGLĐ</button>
             <label className="peopleos-btn peopleos-btn-green peopleos-file-action">
               ⇧ Import quy trình ĐLGĐ
@@ -997,90 +997,33 @@ export function PersonnelListPage() {
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                       {profileActiveTab === 'resume' && selectedPerson && (
-                        <>
-                          <Select
-                            value={resumeType}
-                            onChange={(val) => setResumeType(val)}
-                            size="small"
-                            style={{ width: 115 }}
-                            aria-label="Loại lý lịch"
-                          >
-                            <Select.Option value="2A">Lý lịch 2A</Select.Option>
-                            <Select.Option value="2B">Lý lịch 2B</Select.Option>
-                            <Select.Option value="2C">Lý lịch 2C</Select.Option>
-                          </Select>
-
-                          <Button
-                            size="small"
-                            type={isFocusResume ? 'primary' : 'default'}
-                            onClick={() => setIsFocusResume((prev) => !prev)}
-                            style={{
-                              height: 28,
-                              fontSize: 12,
-                              display: 'inline-flex',
-                              alignItems: 'center',
-                              gap: 4,
-                              background: isFocusResume ? '#1570ef' : '#ffffff',
-                              borderColor: isFocusResume ? '#1570ef' : '#d0d5dd',
-                              color: isFocusResume ? '#ffffff' : '#344054',
-                              fontWeight: 600,
-                              borderRadius: 6,
-                            }}
-                          >
-                            {isFocusResume ? '◫ Hiện danh sách' : '⛶ Chế độ tập trung'}
-                          </Button>
-
-                          <button
-                            type="button"
-                            className="peopleos-inline-link"
-                            onClick={() => window.open(`/personnel/resume/${selectedPerson.id}?type=${resumeType}`, '_blank')}
-                            style={{
-                              fontSize: 13,
-                              display: 'inline-flex',
-                              alignItems: 'center',
-                              gap: 4,
-                              fontWeight: 600,
-                              color: '#1570ef',
-                              background: 'none',
-                              border: 'none',
-                              cursor: 'pointer',
-                            }}
-                            title="Mở toàn trang trong tab mới"
-                          >
-                            Mở toàn trang ↗
-                          </button>
-                        </>
+                        <Select
+                          value={resumeType}
+                          onChange={(val) => setResumeType(val)}
+                          size="small"
+                          style={{ width: 115 }}
+                          aria-label="Loại lý lịch"
+                        >
+                          <Select.Option value="2A">Lý lịch 2A</Select.Option>
+                          <Select.Option value="2B">Lý lịch 2B</Select.Option>
+                          <Select.Option value="2C">Lý lịch 2C</Select.Option>
+                        </Select>
                       )}
                     </div>
                   </div>
 
                   {!selectedPerson ? (
                     <Empty description="Chọn nhân sự để xem hồ sơ" />
-                  ) : profileActiveTab === 'resume' ? (
-                    <div
-                      className="peopleos-resume-tab-wrapper"
-                      style={{
-                        flex: 1,
-                        minHeight: 0,
-                        maxHeight: '100%',
-                        overflowY: 'auto',
-                        display: 'flex',
-                        flexDirection: 'column',
-                      }}
-                    >
-                      {isFocusResume ? (
-                        <div className="peopleos-resume-focus-layout">
-                          <ProfileSectionNav />
-                          <div style={{ flex: 1, minWidth: 0 }}>
-                            <ProfileDocument onImport={importDocument} profile={convertRowToPersonalProfile(selectedPerson, selectedAssignments)} />
-                          </div>
-                        </div>
-                      ) : (
-                        <ProfileDocument onImport={importDocument} profile={convertRowToPersonalProfile(selectedPerson, selectedAssignments)} />
-                      )}
-                    </div>
                   ) : (
-                    <div className="peopleos-profile-content" style={{ flex: 1, minHeight: 0, overflowY: 'auto' }}>
+                    <div className="peopleos-profile-slider-viewport">
+                      <div
+                        className="peopleos-profile-slider-track"
+                        style={{
+                          transform: profileActiveTab === 'profile' ? 'translateX(0%)' : 'translateX(-50%)',
+                        }}
+                      >
+                        {/* Tab 1: Thông tin cá nhân */}
+                        <div className="peopleos-profile-content peopleos-profile-slider-pane">
                       {/* ========================================================================= */}
                       {/* BLOCK 1: THÔNG TIN NHÂN SỰ & ĐƠN VỊ / CHỨC VỤ CÔNG TÁC                   */}
                       {/* ========================================================================= */}
@@ -1331,8 +1274,30 @@ export function PersonnelListPage() {
                         </div>
                       </div>
                     </div>
-                  )}
-                </section>
+
+                    {/* Tab 2: Lý lịch cá nhân */}
+                    <div
+                      className="peopleos-resume-tab-wrapper peopleos-profile-slider-pane"
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                      }}
+                    >
+                      {isFocusResume ? (
+                        <div className="peopleos-resume-focus-layout">
+                          <ProfileSectionNav />
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <ProfileDocument onImport={importDocument} profile={convertRowToPersonalProfile(selectedPerson, selectedAssignments)} />
+                          </div>
+                        </div>
+                      ) : (
+                        <ProfileDocument onImport={importDocument} profile={convertRowToPersonalProfile(selectedPerson, selectedAssignments)} />
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </section>
               </aside>
             </div>
           </>
